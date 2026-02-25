@@ -1,20 +1,9 @@
 console.log('--- ERP AC SYSTEM V67 LOADING (CLOUD SYNC) ---');
 
-// Visual Logger for Debugging without Console
+// Visual Logger (Console only for production V67)
 window.ERP_LOG = function (msg, type = 'info') {
     console.log(`[ERP ${type.toUpperCase()}]`, msg);
-    let tray = document.getElementById('debug-tray');
-    if (!tray) {
-        tray = document.createElement('div');
-        tray.id = 'debug-tray';
-        tray.style = 'position:fixed; bottom:0; right:0; width:300px; max-height:200px; background:rgba(0,0,0,0.8); color:#0f0; font-family:monospace; font-size:10px; padding:10px; overflow-y:auto; z-index:99999; border-top-left-radius:10px; pointer-events:none;';
-        document.body.appendChild(tray);
-    }
-    const entry = document.createElement('div');
-    entry.style.color = type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : '#0f0';
-    entry.textContent = `> ${new Date().toLocaleTimeString()}: ${msg}`;
-    tray.appendChild(entry);
-    tray.scrollTop = tray.scrollHeight;
+    // Visual tray removed by user request
 };
 
 window.onerror = function (msg, url, line) {
