@@ -150,6 +150,57 @@ window.Dashboard = {
 
         this.renderCreditsList('millenio-credits-today', mCredits);
         this.renderCreditsList('vulcano-credits-today', vCredits);
+
+        // Product Rotation
+        this.renderRotation(filteredSales, products);
+    },
+
+    renderRotation(filteredSales, products) {
+        const rotationMap = {};
+
+        // Initialize all active products with 0
+        products.filter(p => p.active !== false).forEach(p => {
+            rotationMap[p.id] = { name: p.name, qty: 0 };
+        });
+
+        // Sum quantities from filtered sales
+        filteredSales.forEach(s => {
+            if (s.items && Array.isArray(s.items)) {
+                s.items.forEach(item => {
+                    if (rotationMap[item.id]) {
+                        rotationMap[item.id].qty += (item.quantity || 0);
+                    } else {
+                        // In case product was deleted but exists in sales
+                        rotationMap[item.id] = { name: item.name, qty: item.quantity || 0 };
+                    }
+                });
+            }
+        });
+
+        const sorted = Object.values(rotationMap).sort((a, b) => b.qty - a.qty);
+
+        const top5 = sorted.slice(0, 5).filter(i => i.qty > 0);
+        const bottom5 = sorted.slice(-5).reverse();
+
+        this.renderRotationList('top-products-rotation', top5, 'fire');
+        this.renderRotationList('bottom-products-rotation', bottom5, 'snowflake');
+    },
+
+    renderRotationList(id, list, icon) {
+        const container = document.getElementById(id);
+        if (!container) return;
+
+        if (list.length === 0) {
+            container.innerHTML = '<p class="text-secondary">No hay datos suficientes</p>';
+            return;
+        }
+
+        container.innerHTML = list.map(item => `
+            <div class="credit-item">
+                <span title="${item.name}">${item.name}</span>
+                <strong class="${icon === 'fire' ? 'text-success' : 'text-secondary'}">${item.qty} uni.</strong>
+            </div>
+        `).join('');
     },
 
     updateElText(id, text) {
