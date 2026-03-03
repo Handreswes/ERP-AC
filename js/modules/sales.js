@@ -144,7 +144,7 @@ window.Sales = {
                     <img src="${p.image || 'https://via.placeholder.com/150?text=No+Foto'}" class="card-img" alt="${p.name}">
                     <div class="card-info">
                         <div class="card-name">${p.name}</div>
-                        <div class="card-price">$${(p.priceWholesale || p.priceInternet).toLocaleString()}</div>
+                        <div class="card-price">$${(parseFloat(p.priceWholesale) || parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</div>
                         <div class="card-stock">S: ${stock}</div>
                     </div>
                 </div>
