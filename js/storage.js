@@ -14,7 +14,11 @@ window.STORAGE_KEYS = {
     CASH_CLOSINGS: 'cash_closings',
     TRANSIT_ORDERS: 'transit_orders',
     CONFIG: 'config',
-    PAYMENTS: 'payments' // Added for consistency
+    PAYMENTS: 'payments', // Added for consistency
+    SELLERS: 'sellers',
+    TUCOMPRAS_SALES: 'tucompras_sales',
+    CAMPAIGNS: 'campaigns',
+    TUCOMPRAS_CUSTOMERS: 'tucompras_customers'
 };
 
 // Map storage keys to Supabase table names
@@ -28,7 +32,11 @@ const TABLE_MAP = {
     [STORAGE_KEYS.RECURRING_EXPENSES]: 'recurring_expenses',
     [STORAGE_KEYS.CASH_CLOSINGS]: 'cash_closings',
     [STORAGE_KEYS.PAYMENTS]: 'payments',
-    [STORAGE_KEYS.TRANSIT_ORDERS]: 'transit_orders'
+    [STORAGE_KEYS.TRANSIT_ORDERS]: 'transit_orders',
+    [STORAGE_KEYS.SELLERS]: 'sellers',
+    [STORAGE_KEYS.TUCOMPRAS_SALES]: 'tucompras_sales',
+    [STORAGE_KEYS.CAMPAIGNS]: 'campaigns',
+    [STORAGE_KEYS.TUCOMPRAS_CUSTOMERS]: 'tucompras_customers'
 };
 
 window.Storage = {
