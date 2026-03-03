@@ -144,7 +144,7 @@ window.Sales = {
                     <img src="${p.image || 'https://via.placeholder.com/150?text=No+Foto'}" class="card-img" alt="${p.name}">
                     <div class="card-info">
                         <div class="card-name">${p.name}</div>
-                        <div class="card-price">$${(p.priceWholesale || p.priceFinal).toLocaleString()}</div>
+                        <div class="card-price">$${(p.priceWholesale || p.priceInternet).toLocaleString()}</div>
                         <div class="card-stock">S: ${stock}</div>
                     </div>
                 </div>
@@ -190,7 +190,7 @@ window.Sales = {
     addToCart(product) {
         const existing = this.cart.find(item => item.id === product.id);
         // Default to wholesale price as requested
-        const defaultPrice = product.priceWholesale || product.priceFinal;
+        const defaultPrice = product.priceWholesale || product.priceInternet;
 
         if (existing) {
             existing.quantity++;
@@ -239,7 +239,7 @@ window.Sales = {
                 this.cart.forEach(item => {
                     if (!item.manualPrice) {
                         const p = Inventory.getProducts().find(prod => prod.id === item.id);
-                        item.price = this.selectedClient.type === 'wholesale' ? p.priceWholesale : p.priceFinal;
+                        item.price = this.selectedClient.type === 'wholesale' ? p.priceWholesale : p.priceInternet;
                     }
                 });
                 this.updateCartUI();
