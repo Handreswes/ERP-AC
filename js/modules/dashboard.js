@@ -34,6 +34,15 @@ window.Dashboard = {
                 if (id === 'stat-sales') this.showSalesDetail();
                 if (id === 'stat-stock') this.showCriticalStockDetail();
                 if (id === 'stat-credits') this.showCreditsDetail();
+                if (id === 'stat-commissions') {
+                    // Navigate to Vendedores settlements tab
+                    const btn = document.querySelector('.nav-item[data-panel="vendedores"]');
+                    if (btn) {
+                        btn.click();
+                        Vendedores.activeTab = 'settlements';
+                        Vendedores.renderPanel();
+                    }
+                }
             }
         });
     },
@@ -141,6 +150,32 @@ window.Dashboard = {
         this.updateElText('vulcano-cash-today', `$${vSales.cash.toLocaleString()}`);
         this.updateElText('vulcano-consignment-today', `$${vSales.consignment.toLocaleString()}`);
         this.updateElText('vulcano-expenses-today', `$${vExpenses.toLocaleString()}`);
+
+        // TUCOMPRAS Summary
+        const tcSales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
+
+        // Pending Commissions calculation (TOTAL liability, regardless of date range selects)
+        const pendingCommissions = tcSales.filter(s =>
+            s.status === 'recibido' &&
+            s.money_confirmed === true &&
+            s.is_commission_paid !== true
+        ).reduce((sum, s) => sum + (parseFloat(s.commission_paid) || 0), 0);
+
+        const commCardText = document.querySelector('#stat-commissions .stat-value');
+        if (commCardText) commCardText.textContent = `$${pendingCommissions.toLocaleString()}`;
+
+        const tcFiltered = tcSales.filter(s => {
+            const d = new Date(s.date);
+            return d >= startDate && d <= endDate;
+        });
+        const tcUtility = tcFiltered.reduce((sum, s) => {
+            if (s.status === 'recibido') return sum + (parseFloat(s.sale_price) - parseFloat(s.cost_price) - parseFloat(s.commission_paid) - parseFloat(s.shipping_cost));
+            if (s.status === 'devuelto') return sum - (parseFloat(s.shipping_loss) || 0);
+            return sum;
+        }, 0);
+
+        // Add TUCOMPRAS to Dashboard if space allows (or just log for now)
+        console.log(`[Dashboard] TUCOMPRAS Utility for period: $${tcUtility.toLocaleString()}`);
 
         // Credits Lists
         const mCredits = filteredSales.filter(s => s.method === 'credit' && (s.totalM || 0) > 0)
