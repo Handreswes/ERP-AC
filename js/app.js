@@ -57,13 +57,30 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function initNavigation() {
-    const navLinks = document.querySelectorAll('.nav-item, .bottom-nav-item');
+    const navLinks = document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item');
+    const sheet = document.getElementById('bottom-sheet');
+    const overlay = document.getElementById('bottom-sheet-overlay');
+    const menuTrigger = document.getElementById('mobile-menu-trigger');
+    const closeMenu = document.getElementById('close-mobile-menu');
+
+    const toggleMenu = (show) => {
+        if (sheet && overlay) {
+            sheet.classList.toggle('active', show);
+            overlay.classList.toggle('active', show);
+        }
+    };
+
+    if (menuTrigger) menuTrigger.addEventListener('click', (e) => { e.preventDefault(); toggleMenu(true); });
+    if (closeMenu) closeMenu.addEventListener('click', () => toggleMenu(false));
+    if (overlay) overlay.addEventListener('click', () => toggleMenu(false));
 
     navLinks.forEach(item => {
         item.addEventListener('click', (e) => {
-            e.preventDefault();
             const panelName = item.getAttribute('data-panel');
             if (!panelName) return;
+            e.preventDefault();
+
+            toggleMenu(false); // Close menu if it's open
 
             // Update active states
             navLinks.forEach(ni => ni.classList.remove('active'));
