@@ -78,23 +78,47 @@
             <i class="fas fa-users"></i>
             <span>Clientes</span>
         </a>
-        <a href="#" class="bottom-nav-item" data-panel="finances">
-            <i class="fas fa-chart-line"></i>
-            <span>Finanzas</span>
-        </a>
-        <a href="#" class="bottom-nav-item" data-panel="tucompras">
-            <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
-            <span>Compras</span>
-        </a>
-        <a href="#" class="bottom-nav-item" data-panel="catalog">
-            <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
-            <span>Catálogo</span>
-        </a>
-        <a href="#" class="bottom-nav-item" data-panel="config">
-            <i class="fas fa-cog"></i>
-            <span>Ajustes</span>
+        <a href="#" id="mobile-menu-trigger" class="bottom-nav-item">
+            <i class="fas fa-bars"></i>
+            <span>Menú</span>
         </a>
     </nav>
+
+    <!-- Bottom Sheet Menu (Mobile) -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-header">
+            <h3>Menú del Sistema</h3>
+            <button id="close-mobile-menu" class="icon-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="bottom-sheet-grid">
+            <a href="#" class="menu-grid-item" data-panel="finances">
+                <i class="fas fa-chart-line" style="color: #6366f1;"></i>
+                <span>Finanzas</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="tucompras">
+                <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
+                <span>TuCompras</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="catalog">
+                <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
+                <span>Catálogo</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="vendedores">
+                <i class="fas fa-user-tie" style="color: #ec4899;"></i>
+                <span>Vendedores</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="consultas">
+                <i class="fas fa-search-plus" style="color: #06b6d4;"></i>
+                <span>Consultas</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="config">
+                <i class="fas fa-cog" style="color: #94a3b8;"></i>
+                <span>Ajustes</span>
+            </a>
+        </div>
+    </div>
 
     <div id="app" class="app-container">
 
