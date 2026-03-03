@@ -80,6 +80,9 @@ function initNavigation() {
 
             if (panelName === 'dashboard' && window.Dashboard) Dashboard.updateStats();
             if (panelName === 'inventory' && window.Inventory) Inventory.updateInventoryList();
+            if (panelName === 'sales' && window.Sales) Sales.renderPanel();
+            if (panelName === 'crm' && window.CRM) CRM.renderPanel();
+            if (panelName === 'finances' && window.Finances) Finances.renderPanel();
             if (panelName === 'tucompras' && window.TuCompras) TuCompras.renderPanel();
             if (panelName === 'vendedores' && window.Vendedores) Vendedores.renderPanel();
             if (panelName === 'tucompras-crm' && window.TuComprasCRM) TuComprasCRM.renderPanel();
@@ -87,14 +90,13 @@ function initNavigation() {
             if (panelName === 'catalog' && window.Catalog) Catalog.renderPanel();
 
             localStorage.setItem('erp_active_panel', panelName);
-
         });
     });
 }
 
 function loadActivePanel() {
     const last = localStorage.getItem('erp_active_panel') || 'dashboard';
-    const btn = document.querySelector(`.nav-item[data-panel="${last}"]`);
+    const btn = document.querySelector(`[data-panel="${last}"]`);
     if (btn) btn.click();
 }
 
