@@ -453,6 +453,11 @@ body.logged-out .app-container {
     opacity: 0.5;
 }
 
+.highlight-return {
+    background-color: rgba(245, 158, 11, 0.08) !important;
+    border-left: 4px solid var(--warning);
+}
+
 /* Table Actions and Icons */
 .table-actions {
     display: flex;
@@ -1045,6 +1050,43 @@ option:checked {
     color: white;
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
     transform: translateY(-2px);
+}
+
+/* TUCOMPRAS Grid & Cart */
+.product-grid-tiny::-webkit-scrollbar {
+    width: 4px;
+}
+
+.product-item-tiny {
+    transition: all 0.2s ease;
+    cursor: default;
+}
+
+.product-item-tiny:hover {
+    border-color: var(--accent) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cart-item {
+    animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.product-selection-area .search-bar:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
 }
 
 /* POS Visual Grid */
