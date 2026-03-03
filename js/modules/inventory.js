@@ -45,11 +45,12 @@ window.Inventory = {
             <div class="inventory-tabs" style="margin-bottom: 2rem;">
                 <div style="display:flex; gap: 1rem;">
                     <button class="tab-btn ${this.activeTab === 'stock' ? 'active' : ''}" data-tab="stock">Inventario Disponible</button>
+                    <button class="tab-btn ${this.activeTab === 'limbo' ? 'active' : ''}" data-tab="limbo">🌪️ El Limbo (Agotados)</button>
                     <button class="tab-btn ${this.activeTab === 'transit' ? 'active' : ''}" data-tab="transit">📦 En Tránsito / Importaciones</button>
                 </div>
             </div>
 
-            <div id="inventory-stock-view" style="display: ${this.activeTab === 'stock' ? 'block' : 'none'};">
+            <div id="inventory-stock-view" style="display: ${this.activeTab === 'stock' || this.activeTab === 'limbo' ? 'block' : 'none'};">
                 <div class="inventory-tabs" style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 25px; display: inline-flex;">
                     <button class="tab-btn ${this.activeCompanyFilter === 'all' ? 'active' : ''}" data-company="all" style="font-size: 0.8rem; padding: 4px 15px;">Todos</button>
                     <button class="tab-btn ${this.activeCompanyFilter === 'millenio' ? 'active' : ''}" data-company="millenio" style="font-size: 0.8rem; padding: 4px 15px;">Millenio</button>
@@ -65,13 +66,14 @@ window.Inventory = {
                         <thead>
                             <tr>
                                 <th>Foto</th>
+                                <th>Ref</th>
                                 <th>Producto</th>
                                 <th>Categoría</th>
-                                <th>Stock Millenio</th>
-                                <th>Stock Vulcano</th>
-                                <th>Precio Final</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
+                                 <th>Stock Millenio</th>
+                                 <th>Stock Vulcano</th>
+                                 <th>Precio Internet/Final</th>
+                                 <th>Estado</th>
+                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="inventory-list">
@@ -120,6 +122,10 @@ window.Inventory = {
                                         <input type="hidden" name="image" id="product-image-base64">
                                     </div>
                                 </div>
+                                 <div class="form-group">
+                                    <label>Referencia / REF</label>
+                                    <input type="text" name="ref" placeholder="Ej: REF-001">
+                                </div>
                                 <div class="form-group">
                                     <label>Nombre</label>
                                     <input type="text" name="name" required>
@@ -132,18 +138,22 @@ window.Inventory = {
                                     <label>Proveedor</label>
                                     <input type="text" name="provider">
                                 </div>
-                                <div class="form-group">
-                                    <label>Costo</label>
-                                    <input type="number" name="cost" step="0.01" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Precio Final</label>
-                                    <input type="number" name="priceFinal" step="0.01" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Precio Mayorista</label>
-                                    <input type="number" name="priceWholesale" step="0.01" required>
-                                </div>
+                                 <div class="form-group">
+                                     <label>Costo</label>
+                                     <input type="number" name="cost" step="0.01" required>
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Precio Mayorista</label>
+                                     <input type="number" name="priceWholesale" step="0.01" required>
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Precio Internet / Final</label>
+                                     <input type="number" name="priceInternet" step="0.01" value="0">
+                                 </div>
+                                 <div class="form-group">
+                                     <label>Comisión Base (TUCOMPRAS)</label>
+                                     <input type="number" name="commissionBase" step="0.01" value="0">
+                                 </div>
                                 <div class="form-group">
                                     <label>Stock Millenio</label>
                                     <input type="number" name="stockMillenio" value="0">
@@ -175,7 +185,7 @@ window.Inventory = {
             </div>
         `;
 
-        this.activeTab === 'stock' ? this.updateInventoryList() : this.updateTransitList();
+        this.activeTab === 'transit' ? this.updateTransitList() : this.updateInventoryList();
     },
 
     updateTransitList() {
@@ -263,6 +273,13 @@ window.Inventory = {
             filtered = filtered.filter(p => p.company === 'both' || p.company === this.activeCompanyFilter);
         }
 
+        // FILTER BY DISPONIBLE VS LIMBO
+        if (this.activeTab === 'stock') {
+            filtered = filtered.filter(p => (parseFloat(p.stockMillenio) || 0) + (parseFloat(p.stockVulcano) || 0) > 0);
+        } else if (this.activeTab === 'limbo') {
+            filtered = filtered.filter(p => (parseFloat(p.stockMillenio) || 0) + (parseFloat(p.stockVulcano) || 0) <= 0);
+        }
+
         if (filtered.length === 0) {
             list.innerHTML = '<tr><td colspan="8" class="text-center">No se encontraron productos</td></tr>';
             return;
@@ -273,12 +290,13 @@ window.Inventory = {
                 <td>
                     <img src="${p.image || 'https://via.placeholder.com/40?text=NP'}" class="table-thumb" alt="${p.name}">
                 </td>
+                <td><small class="text-secondary">${p.ref || '-'}</small></td>
                 <td><strong>${p.name}</strong></td>
                 <td>${p.category}</td>
                 <td><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
-                <td><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
-                <td>$${parseFloat(p.priceFinal).toLocaleString()}</td>
-                <td>
+                 <td><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
+                 <td>$${parseFloat(p.priceInternet).toLocaleString()}</td>
+                 <td>
                     <span class="status-badge ${p.active === false ? 'inactive' : 'active'}">
                         ${p.active === false ? 'Inactivo' : 'Activo'}
                     </span>
@@ -324,7 +342,7 @@ window.Inventory = {
                         const input = form.elements[key];
                         if (input) {
                             if (input.type === 'checkbox') input.checked = product[key] !== false;
-                            else if (input.type !== 'file') input.value = product[key];
+                            else if (input.type !== 'file') input.value = product[key] !== undefined ? product[key] : (input.type === 'number' ? 0 : '');
                         }
                     });
                     document.getElementById('product-image-preview').src = product.image || "https://via.placeholder.com/150?text=No+Foto";
@@ -420,14 +438,15 @@ window.Inventory = {
                 name: formData.get('name'),
                 category: formData.get('category'),
                 provider: formData.get('provider'),
-                cost: parseFloat(formData.get('cost')) || 0,
-                priceFinal: parseFloat(formData.get('priceFinal')) || 0,
                 priceWholesale: parseFloat(formData.get('priceWholesale')) || 0,
+                priceInternet: parseFloat(formData.get('priceInternet')) || 0,
+                commissionBase: parseFloat(formData.get('commissionBase')) || 0,
                 stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
                 stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
                 company: formData.get('company'),
                 active: formData.get('active') === 'true',
-                image: document.getElementById('product-image-base64').value || ''
+                image: document.getElementById('product-image-base64').value || '',
+                ref: formData.get('ref') || ''
             };
 
             if (this.editingId) {
