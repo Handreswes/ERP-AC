@@ -370,13 +370,13 @@ window.Finances = {
             const accounts = Storage.get(STORAGE_KEYS.ACCOUNTS);
             accountList.innerHTML = accounts.map(acc => `
                 <tr>
-                    <td>${acc.company}</td>
-                    <td>${acc.bankName || 'N/A'}</td>
-                    <td>${acc.accountNumber || 'N/A'}</td>
-                    <td>${acc.accountType === 'savings' ? 'Ahorros' : 'Corriente'}</td>
-                    <td>${acc.name}</td>
-                    <td><strong>$${(balances[acc.company].banks[acc.id]?.balance || 0).toLocaleString()}</strong></td>
-                    <td><button class="icon-btn delete-account-btn" data-id="${acc.id}"><i class="fas fa-trash"></i></button></td>
+                    <td data-label="Empresa">${acc.company}</td>
+                    <td data-label="Banco">${acc.bankName || 'N/A'}</td>
+                    <td data-label="Nro Cuenta">${acc.accountNumber || 'N/A'}</td>
+                    <td data-label="Tipo">${acc.accountType === 'savings' ? 'Ahorros' : 'Corriente'}</td>
+                    <td data-label="Nombre">${acc.name}</td>
+                    <td data-label="Saldo"><strong>$${(balances[acc.company].banks[acc.id]?.balance || 0).toLocaleString()}</strong></td>
+                    <td class="table-actions"><button class="icon-btn delete-account-btn" data-id="${acc.id}"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -421,11 +421,11 @@ window.Finances = {
                 const total = (c.balanceMillenio || 0) + (c.balanceVulcano || 0);
                 return `
                     <tr>
-                        <td><strong>${c.name}</strong></td>
-                        <td class="text-danger">$${(c.balanceMillenio || 0).toLocaleString()}</td>
-                        <td class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
-                        <td><strong>$${total.toLocaleString()}</strong></td>
-                        <td>
+                        <td data-label="Cliente"><strong>${c.name}</strong></td>
+                        <td data-label="Millenio" class="text-danger">$${(c.balanceMillenio || 0).toLocaleString()}</td>
+                        <td data-label="Vulcano" class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
+                        <td data-label="Total"><strong>$${total.toLocaleString()}</strong></td>
+                        <td class="table-actions">
                             <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono"><i class="fas fa-hand-holding-usd"></i></button>
                             <button class="icon-btn whatsapp-btn" data-id="${c.id}" title="Enviar por WhatsApp"><i class="fab fa-whatsapp"></i></button>
                         </td>
@@ -838,11 +838,11 @@ window.Finances = {
             total += l.amount;
             return `
                 <tr>
-                    <td style="font-size: 0.8rem; white-space: nowrap;">${new Date(l.date).toLocaleDateString()}</td>
-                    <td><span class="badge ${l.amount > 0 ? 'bg-green' : 'bg-red'}" style="font-size: 0.7rem; padding: 2px 6px;">${l.type}</span></td>
-                    <td style="font-size: 0.85rem;">${l.concept}</td>
-                    <td class="text-right ${l.amount > 0 ? 'text-success' : 'text-danger'}"><strong>$${Math.abs(l.amount).toLocaleString()}</strong></td>
-                    <td style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis;">${l.notes || '-'}</td>
+                    <td data-label="Fecha" style="font-size: 0.8rem; white-space: nowrap;">${new Date(l.date).toLocaleDateString()}</td>
+                    <td data-label="Tipo"><span class="badge ${l.amount > 0 ? 'bg-green' : 'bg-red'}" style="font-size: 0.7rem; padding: 2px 6px;">${l.type}</span></td>
+                    <td data-label="Concepto" style="font-size: 0.85rem;">${l.concept}</td>
+                    <td data-label="Monto" class="text-right ${l.amount > 0 ? 'text-success' : 'text-danger'}"><strong>$${Math.abs(l.amount).toLocaleString()}</strong></td>
+                    <td data-label="Notas" style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis;">${l.notes || '-'}</td>
                 </tr>
             `;
         }).join('');
