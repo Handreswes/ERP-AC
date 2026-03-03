@@ -287,16 +287,16 @@ window.Inventory = {
 
         list.innerHTML = filtered.map(p => `
             <tr class="${p.active === false ? 'inactive-row' : ''}">
-                <td>
+                <td data-label="Foto">
                     <img src="${p.image || 'https://via.placeholder.com/40?text=NP'}" class="table-thumb" alt="${p.name}">
                 </td>
-                <td><small class="text-secondary">${p.ref || '-'}</small></td>
-                <td><strong>${p.name}</strong></td>
-                <td>${p.category}</td>
-                <td><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
-                 <td><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
-                 <td>$${parseFloat(p.priceInternet).toLocaleString()}</td>
-                 <td>
+                <td data-label="Ref"><small class="text-secondary">${p.ref || '-'}</small></td>
+                <td data-label="Producto"><strong>${p.name}</strong></td>
+                <td data-label="Categoría">${p.category}</td>
+                <td data-label="Stock Millenio"><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
+                 <td data-label="Stock Vulcano"><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
+                 <td data-label="Precio">$${parseFloat(p.priceInternet).toLocaleString()}</td>
+                 <td data-label="Estado">
                     <span class="status-badge ${p.active === false ? 'inactive' : 'active'}">
                         ${p.active === false ? 'Inactivo' : 'Activo'}
                     </span>
