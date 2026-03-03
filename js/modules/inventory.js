@@ -295,7 +295,7 @@ window.Inventory = {
                 <td data-label="Categoría">${p.category}</td>
                 <td data-label="Stock Millenio"><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
                  <td data-label="Stock Vulcano"><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
-                 <td data-label="Precio">$${parseFloat(p.priceInternet).toLocaleString()}</td>
+                 <td data-label="Precio">$${(parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</td>
                  <td data-label="Estado">
                     <span class="status-badge ${p.active === false ? 'inactive' : 'active'}">
                         ${p.active === false ? 'Inactivo' : 'Activo'}
@@ -381,8 +381,8 @@ window.Inventory = {
 
             if (e.target.id === 'load-test-data') {
                 const testProducts = [
-                    { id: 'TEST1', name: 'Aceite Millenio Gold', category: 'Aceites', cost: 15000, priceFinal: 25000, priceWholesale: 22000, stockMillenio: 10, stockVulcano: 5, company: 'millenio', active: true, image: 'https://via.placeholder.com/150?text=Aceite' },
-                    { id: 'TEST2', name: 'Filtro Aire Vulcano', category: 'Filtros', cost: 5000, priceFinal: 12000, priceWholesale: 10000, stockMillenio: 0, stockVulcano: 20, company: 'vulcano', active: true, image: 'https://via.placeholder.com/150?text=Filtro' }
+                    { id: 'TEST1', name: 'Aceite Millenio Gold', category: 'Aceites', cost: 15000, priceInternet: 25000, priceWholesale: 22000, stockMillenio: 10, stockVulcano: 5, company: 'millenio', active: true, image: 'https://via.placeholder.com/150?text=Aceite' },
+                    { id: 'TEST2', name: 'Filtro Aire Vulcano', category: 'Filtros', cost: 5000, priceInternet: 12000, priceWholesale: 10000, stockMillenio: 0, stockVulcano: 20, company: 'vulcano', active: true, image: 'https://via.placeholder.com/150?text=Filtro' }
                 ];
                 testProducts.forEach(p => this.addProduct(p));
                 this.updateInventoryList();
