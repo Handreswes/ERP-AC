@@ -31,7 +31,37 @@
 
 <body class="dark-theme">
 
+    <!-- Login Overlay (Outside app-container to avoid display:none conflicts) -->
+    <div id="login-overlay" class="login-overlay hidden">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>ERP <span style="color: white;">AC</span></h1>
+                <p>Inicia sesión para continuar</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Usuario</label>
+                    <input type="text" name="username" class="form-control" required placeholder="Tu usuario">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>Contraseña</label>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="login-password" class="form-control" required
+                            placeholder="••••••••" style="padding-right: 40px;">
+                        <i id="toggle-password" class="fas fa-eye"
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary);"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Iniciar Sesión</button>
+            </form>
+            <div class="login-footer">
+                ERP AC - v67 Production Ready
+            </div>
+        </div>
+    </div>
+
     <div id="app" class="app-container">
+
         <!-- Sidebar Navigation -->
         <aside id="sidebar" class="sidebar">
             <div class="sidebar-header">
@@ -60,6 +90,28 @@
                 <a href="#" class="nav-item" data-panel="finances">
                     <i class="fas fa-chart-line"></i>
                     <span>Finanzas</span>
+                </a>
+                <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+                <a href="#" class="nav-item" data-panel="tucompras">
+                    <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
+                    <span>TUCOMPRAS</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="vendedores">
+                    <i class="fas fa-user-tie" style="color: #f59e0b;"></i>
+                    <span>Vendedores</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="tucompras-crm">
+                    <i class="fas fa-address-book" style="color: #6366f1;"></i>
+                    <span>CRM Ecommerce</span>
+                </a>
+                <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+                <a href="#" class="nav-item" data-panel="consultas">
+                    <i class="fas fa-search-dollar" style="color: #06b6d4;"></i>
+                    <span>Consultas</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="catalog">
+                    <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
+                    <span>Catálogo PDF</span>
                 </a>
                 <a href="#" class="nav-item" data-panel="config">
                     <i class="fas fa-cog"></i>
@@ -91,7 +143,11 @@
                     <button id="notif-btn" class="icon-btn"><i class="fas fa-bell"></i></button>
                     <div class="user-profile">
                         <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff" alt="User">
-                        <span>Administrador</span>
+                        <div style="display: flex; flex-direction: column; line-height: 1;">
+                            <span style="font-size: 0.85rem; font-weight: 600;">Cargando...</span>
+                            <a href="#" id="logout-btn"
+                                style="font-size: 0.7rem; color: #ef4444; text-decoration: none;">Cerrar Sesión</a>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -131,6 +187,11 @@
                             <h3 id="stat-credits-title">Créditos Pendientes</h3>
                             <p class="stat-value">$0.00</p>
                             <span class="stat-label">Por cobrar</span>
+                        </div>
+                        <div class="stat-card clickable" id="stat-commissions" style="cursor:pointer;">
+                            <h3 id="stat-commissions-title">Comisiones Pendientes</h3>
+                            <p class="stat-value" style="color: var(--warning);">$0.00</p>
+                            <span class="stat-label">Por pagar a vendedores</span>
                         </div>
                     </div>
 
@@ -210,10 +271,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
-    </div>
-    </section>
-    </main>
+                </div> <!-- closes dashboard-panel -->
+            </section> <!-- closes content-area -->
+        </main> <!-- closes main-content -->
+    </div> <!-- closes app-container -->
 
     <!-- Dashboard Detail Modal -->
     <div id="dashboard-detail-modal" class="modal">
@@ -354,15 +415,21 @@
     </div>
 
     <!-- 5. Core System (v67) - Loaded in Order -->
-    <script src="js/supabase.js?v=67"></script>
-    <script src="js/storage.js?v=67"></script>
-    <script src="js/modules/inventory.js?v=67"></script>
-    <script src="js/modules/crm.js?v=67"></script>
-    <script src="js/modules/sales.js?v=67"></script>
-    <script src="js/modules/dashboard.js?v=67"></script>
-    <script src="js/modules/finances.js?v=67"></script>
-    <script src="js/modules/settings.js?v=67"></script>
-    <script src="js/app.js?v=67"></script>
+    <script src="js/supabase.js?v=68"></script>
+    <script src="js/storage.js?v=68"></script>
+    <script src="js/modules/auth.js?v=68"></script>
+    <script src="js/modules/inventory.js?v=68"></script>
+    <script src="js/modules/catalog.js?v=68"></script>
+    <script src="js/modules/crm.js?v=68"></script>
+    <script src="js/modules/sales.js?v=68"></script>
+    <script src="js/modules/dashboard.js?v=68"></script>
+    <script src="js/modules/finances.js?v=68"></script>
+    <script src="js/modules/tucompras_crm.js?v=68"></script>
+    <script src="js/modules/tucompras.js?v=68"></script>
+    <script src="js/modules/vendedores.js?v=68"></script>
+    <script src="js/modules/settings.js?v=68"></script>
+    <script src="js/modules/consultas.js?v=68"></script>
+    <script src="js/app.js?v=68"></script>
 </body>
 
 </html>
