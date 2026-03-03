@@ -93,10 +93,88 @@ window.Settings = {
                         </button>
                     </div>
                 </div>
+
+                <!-- User Management (Principal Only) -->
+                ${Auth.isPrincipal() ? `
+                <div class="stat-card" style="grid-column: span 2;">
+                    <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1rem;">
+                        <i class="fas fa-users-cog" style="color:var(--accent); font-size:1.2rem;"></i>
+                        <h2 style="margin:0; font-size:1.1rem;">Gestión de Usuarios</h2>
+                    </div>
+                    <div class="form-grid" style="grid-template-columns: 1fr 2fr; gap: 2rem;">
+                        <!-- Add User Form -->
+                        <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
+                            <h3 style="font-size: 0.9rem; margin-bottom: 1rem;">Crear Nuevo Usuario</h3>
+                            <form id="add-user-form">
+                                <div class="form-group">
+                                    <label>Usuario (Login)</label>
+                                    <input type="text" name="username" class="form-control" placeholder="ej: andres" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Contraseña</label>
+                                    <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nombre Completo</label>
+                                    <input type="text" name="full_name" class="form-control" placeholder="Nombre real" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Rol</label>
+                                    <select name="role" class="form-control">
+                                        <option value="admin">Administrador (Ventas/Kardex)</option>
+                                        <option value="principal">Principal (Acceso Total)</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-block">Crear Usuario</button>
+                            </form>
+                        </div>
+                        <!-- User List -->
+                        <div>
+                            <h3 style="font-size: 0.9rem; margin-bottom: 1rem;">Usuarios Actuales</h3>
+                            <div class="table-container" style="max-height: 300px; overflow-y: auto;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Usuario</th>
+                                            <th>Nombre</th>
+                                            <th>Rol</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="user-list-tbody">
+                                        <tr><td colspan="4" class="text-center">Cargando...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>` : ''}
             </div>
         `;
 
         this.setupEventListeners();
+        if (Auth.isPrincipal()) this.updateUserList();
+    },
+
+    async updateUserList() {
+        const tbody = document.getElementById('user-list-tbody');
+        if (!tbody) return;
+
+        const users = await Auth.getUsers();
+        tbody.innerHTML = users.map(u => `
+            <tr>
+                <td><strong>${u.username}</strong></td>
+                <td>${u.full_name}</td>
+                <td><span class="badge ${u.role === 'principal' ? 'bg-success' : 'bg-blue'}">${u.role.toUpperCase()}</span></td>
+                <td>
+                    ${u.username !== Auth.currentUser.username ? `
+                        <button class="btn btn-sm btn-outline delete-user-btn" data-id="${u.id}" style="color:var(--danger); border-color:var(--danger);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : '<small class="text-secondary">Ese eres tú</small>'}
+                </td>
+            </tr>
+        `).join('');
     },
 
     setupEventListeners() {
@@ -174,6 +252,37 @@ window.Settings = {
                     localStorage.clear();
                     alert('Sistema reiniciado. Se cargará en blanco.');
                     location.reload();
+                }
+            }
+        });
+
+        // 6. User Management Events
+        const addUserForm = document.getElementById('add-user-form');
+        addUserForm?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const data = Object.fromEntries(new FormData(e.target));
+            const result = await Auth.createUser(data.username, data.password, data.full_name, data.role);
+            if (result.success) {
+                alert('Usuario creado con éxito.');
+                e.target.reset();
+                this.updateUserList();
+            } else {
+                alert('Error al crear usuario: ' + result.error);
+            }
+        });
+
+        const panelArea = document.getElementById('config-panel');
+        panelArea?.addEventListener('click', async (e) => {
+            const deleteBtn = e.target.closest('.delete-user-btn');
+            if (deleteBtn) {
+                if (confirm('¿Estás seguro de eliminar este usuario? No podrá volver a entrar.')) {
+                    const result = await Auth.deleteUser(deleteBtn.dataset.id);
+                    if (result.success) {
+                        alert('Usuario eliminado.');
+                        this.updateUserList();
+                    } else {
+                        alert('Error: ' + result.error);
+                    }
                 }
             }
         });
