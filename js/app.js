@@ -57,21 +57,23 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 function initNavigation() {
-    const navItems = document.querySelectorAll('.nav-item');
-    navItems.forEach(item => {
+    const navLinks = document.querySelectorAll('.nav-item, .bottom-nav-item');
+
+    navLinks.forEach(item => {
         item.addEventListener('click', (e) => {
             e.preventDefault();
             const panelName = item.getAttribute('data-panel');
+            if (!panelName) return;
 
-            navItems.forEach(ni => ni.classList.remove('active'));
-            item.classList.add('active');
+            // Update active states
+            navLinks.forEach(ni => ni.classList.remove('active'));
+            document.querySelectorAll(`[data-panel="${panelName}"]`).forEach(el => el.classList.add('active'));
 
+            // Show panel
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             const target = document.getElementById(`${panelName}-panel`);
             if (target) {
                 target.classList.add('active');
-            } else {
-                console.warn(`Panel target not found in DOM: ${panelName}-panel. Expecting module to render it.`);
             }
 
             console.log(`Navigation: Switching to ${panelName}`);
