@@ -162,19 +162,19 @@ window.Sales = {
             total += subtotal;
             return `
                 <tr>
-                    <td><div style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">${item.name}</div></td>
-                    <td>
+                    <td data-label="Producto"><div style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">${item.name}</div></td>
+                    <td data-label="Precio">
                         <input type="number" class="cart-price-input" data-index="${index}" value="${item.price}" step="1">
                     </td>
-                    <td>
+                    <td data-label="Cant.">
                         <div class="qty-control">
                             <button class="qty-btn" data-index="${index}" data-action="dec">-</button>
                             <span>${item.quantity}</span>
                             <button class="qty-btn" data-index="${index}" data-action="inc">+</button>
                         </div>
                     </td>
-                    <td>$${subtotal.toLocaleString()}</td>
-                    <td><button class="icon-btn text-danger remove-item" data-index="${index}"><i class="fas fa-times"></i></button></td>
+                    <td data-label="Subtotal">$${subtotal.toLocaleString()}</td>
+                    <td class="table-actions"><button class="icon-btn text-danger remove-item" data-index="${index}"><i class="fas fa-times"></i></button></td>
                 </tr>
             `;
         }).join('');
