@@ -872,11 +872,17 @@ option:checked {
     backdrop-filter: blur(20px);
     border-top: 1px solid var(--border);
     display: none;
-    justify-content: space-around;
+    justify-content: flex-start;
     align-items: center;
     padding: 0 10px;
     padding-bottom: env(safe-area-inset-bottom);
     z-index: 1000;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.bottom-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .bottom-nav-item {
@@ -889,7 +895,8 @@ option:checked {
     font-size: 0.65rem;
     font-weight: 600;
     transition: all 0.2s;
-    flex: 1;
+    flex: 0 0 70px;
+    padding: 0 5px;
 }
 
 .bottom-nav-item i {
