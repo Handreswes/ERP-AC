@@ -15,7 +15,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.erpStarted = true;
     ERP_LOG('Iniciando Sistema V67...');
 
-    // 0. Initialize Supabase
+    // 0. Initialize Auth FIRST
+    try {
+        if (typeof Auth !== 'undefined') {
+            await Auth.init();
+            ERP_LOG('Auth Listo', 'success');
+        }
+    } catch (e) { ERP_LOG('Error Auth: ' + e.message, 'error'); }
+
+    // 0.1 Initialize Supabase
     try {
         if (typeof window.initSupabase === 'function') {
             window.initSupabase();
@@ -30,9 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { ERP_LOG('Error Storage: ' + e.message, 'error'); }
 
     // 2. Initialize Modules
-    const mods = [Inventory, CRM, Sales, Dashboard, Finances, Settings];
+    const mods = [Inventory, CRM, Sales, Dashboard, Finances, TuCompras, Vendedores, Settings, Consultas, Catalog];
     mods.forEach(m => {
-        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo: ' + e.message, 'error'); }
+        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo: ' + m?.constructor?.name + ': ' + e.message, 'error'); }
     });
 
     // 3. Navigation
@@ -60,12 +68,24 @@ function initNavigation() {
 
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             const target = document.getElementById(`${panelName}-panel`);
-            if (target) target.classList.add('active');
+            if (target) {
+                target.classList.add('active');
+            } else {
+                console.warn(`Panel target not found in DOM: ${panelName}-panel. Expecting module to render it.`);
+            }
+
+            console.log(`Navigation: Switching to ${panelName}`);
 
             if (panelName === 'dashboard' && window.Dashboard) Dashboard.updateStats();
             if (panelName === 'inventory' && window.Inventory) Inventory.updateInventoryList();
+            if (panelName === 'tucompras' && window.TuCompras) TuCompras.renderPanel();
+            if (panelName === 'vendedores' && window.Vendedores) Vendedores.renderPanel();
+            if (panelName === 'tucompras-crm' && window.TuComprasCRM) TuComprasCRM.renderPanel();
+            if (panelName === 'consultas' && window.Consultas) Consultas.renderPanel();
+            if (panelName === 'catalog' && window.Catalog) Catalog.renderPanel();
 
             localStorage.setItem('erp_active_panel', panelName);
+
         });
     });
 }
