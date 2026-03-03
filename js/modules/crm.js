@@ -119,17 +119,17 @@ window.CRM = {
 
         list.innerHTML = filtered.map(c => `
             <tr>
-                <td>
+                <td data-label="Cliente">
                     <div class="client-info">
                         <strong>${c.name}</strong>
                         <span>${c.businessName || 'Persona Natural'}</span>
                     </div>
                 </td>
-                <td><span class="badge ${c.type === 'wholesale' ? 'bg-orange' : 'bg-blue'}">${c.type === 'wholesale' ? 'Mayorista' : 'Final'}</span></td>
-                <td>${c.phone}</td>
-                <td class="text-danger">$${(c.balanceMillenio || 0).toLocaleString()}</td>
-                <td class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
-                <td><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
+                <td data-label="Tipo"><span class="badge ${c.type === 'wholesale' ? 'bg-orange' : 'bg-blue'}">${c.type === 'wholesale' ? 'Mayorista' : 'Final'}</span></td>
+                <td data-label="Celular">${c.phone}</td>
+                <td data-label="Deuda Millenio" class="text-danger">$${(c.balanceMillenio || 0).toLocaleString()}</td>
+                <td data-label="Deuda Vulcano" class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
+                <td data-label="Total Deuda"><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
                 <td class="table-actions">
                     <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono"><i class="fas fa-hand-holding-usd"></i></button>
                     <button class="icon-btn state-btn" data-id="${c.id}" title="Estado de Cuenta"><i class="fas fa-file-invoice-dollar"></i></button>
