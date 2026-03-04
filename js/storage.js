@@ -66,9 +66,15 @@ window.Storage = {
                 try {
                     const { data, error } = await supabase.from(table).select('*').limit(1000);
                     if (!error && data) {
-                        this.cache[key] = data;
-                        localStorage.setItem(`erp_${key}`, JSON.stringify(data));
-                        console.log(`Cloud Sync: ${table} (${data.length} items)`);
+                        // CRITICAL FIX: Only overwrite local if cloud has data
+                        // This prevents wiping local products if cloud is empty
+                        if (data.length > 0) {
+                            this.cache[key] = data;
+                            localStorage.setItem(`erp_${key}`, JSON.stringify(data));
+                            console.log(`Cloud Sync: ${table} (${data.length} items loaded)`);
+                        } else {
+                            console.log(`Cloud Table ${table} is empty. Preserving local data for migration.`);
+                        }
                         this.updateStatus(true);
                     } else if (error) {
                         console.warn(`Cloud Sync Error (${table}):`, error.message);
