@@ -12,14 +12,15 @@ window.Catalog = {
 
     renderPanel() {
         const contentArea = document.getElementById('content-area');
-        if (!document.getElementById('catalog-panel')) {
-            const panel = document.createElement('div');
+        let panel = document.getElementById('catalog-panel');
+
+        if (!panel) {
+            panel = document.createElement('div');
             panel.id = 'catalog-panel';
             panel.className = 'panel';
             contentArea.appendChild(panel);
         }
 
-        const panel = document.getElementById('catalog-panel');
         panel.innerHTML = `
             <div class="panel-header">
                 <h1>Generador de Catálogos Premium</h1>
@@ -30,8 +31,8 @@ window.Catalog = {
                 </div>
             </div>
 
-            <div class="card" style="margin-bottom: 2rem; padding: 2rem; background: var(--bg-card);">
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 2rem;">
+            <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
+                <div class="form-grid">
                     <div class="form-group">
                         <label><i class="fas fa-building"></i> Filtrar por Empresa</label>
                         <select id="catalog-company-filter" class="form-control">
@@ -48,14 +49,13 @@ window.Catalog = {
                         </select>
                     </div>
                 </div>
-                <div class="alert alert-info" style="margin-top: 1.5rem; background: rgba(59,130,246,0.1); border: 1px solid var(--accent);">
-                    <i class="fas fa-magic"></i> <strong>Tip:</strong> El catálogo se genera automáticamente con todos los productos activos de la empresa seleccionada. El diseño es responsive y elegante para compartir con tus clientes.
+                <div class="alert alert-info" style="margin-top: 1.5rem; background: rgba(59,130,246,0.1); border: 1px solid var(--accent); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
+                    <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos. El diseño es responsive y elegante.
                 </div>
             </div>
 
             <div id="catalog-preview-container" class="catalog-preview">
-                <!-- Preview list -->
-                <div class="table-container">
+                <div class="desktop-only table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
@@ -67,6 +67,9 @@ window.Catalog = {
                         </thead>
                         <tbody id="catalog-preview-list"></tbody>
                     </table>
+                </div>
+                <div class="mobile-only" id="catalog-mobile-list">
+                    <!-- Mobile cards load here -->
                 </div>
             </div>
         `;
@@ -84,19 +87,37 @@ window.Catalog = {
         }
 
         const list = document.getElementById('catalog-preview-list');
-        if (!list) return;
+        const mobileList = document.getElementById('catalog-mobile-list');
 
-        list.innerHTML = filtered.map(p => {
-            const price = this.currentPriceType === 'wholesale' ? p.priceWholesale : p.priceInternet;
-            return `
-                <tr>
-                    <td><img src="${p.image || 'https://via.placeholder.com/50'}" style="width: 50px; height:50px; object-fit: cover; border-radius: 8px;"></td>
-                    <td><strong>${p.name}</strong></td>
-                    <td>${p.category}</td>
-                    <td class="text-success" style="font-weight: 700;">$${parseFloat(price).toLocaleString()}</td>
-                </tr>
-            `;
-        }).join('');
+        if (list) {
+            list.innerHTML = filtered.map(p => {
+                const price = this.currentPriceType === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
+                return `
+                    <tr>
+                        <td><img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/50'}" style="width: 50px; height:50px; object-fit: cover; border-radius: 8px;"></td>
+                        <td><strong>${p.name}</strong></td>
+                        <td>${p.category}</td>
+                        <td class="text-success" style="font-weight: 700;">$${parseFloat(price || 0).toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        if (mobileList) {
+            mobileList.innerHTML = filtered.map(p => {
+                const price = this.currentPriceType === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
+                return `
+                    <div class="catalog-mobile-card">
+                        <img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/70'}" class="catalog-mobile-img">
+                        <div class="catalog-mobile-info">
+                            <span class="catalog-mobile-name">${p.name}</span>
+                            <small style="color: var(--text-secondary)">${p.category}</small>
+                            <div class="catalog-mobile-price">$${parseFloat(price || 0).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
     },
 
     setupEventListeners() {
@@ -132,10 +153,14 @@ window.Catalog = {
         const title = this.currentCompany === 'all' ? 'Catálogo General' : 'Catálogo ' + this.currentCompany.toUpperCase();
 
         const htmlProducts = filtered.map(p => {
-            const price = this.currentPriceType === 'wholesale' ? p.priceWholesale : p.priceInternet;
+            const price = this.currentPriceType === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
             return `
                 <div class="product-card">
-                    <img src="${p.image || 'https://via.placeholder.com/300?text=Premium+Product'}" class="product-img">
+                    <div class="product-gallery">
+                        ${(Array.isArray(p.image) ? p.image : [p.image || 'https://via.placeholder.com/300?text=Premium+Product']).map((img, idx) => `
+                            <img src="${img}" class="product-img ${idx === 0 ? 'active' : ''}" data-index="${idx}">
+                        `).join('')}
+                    </div>
                     <div class="product-info">
                         <div class="category">${p.category || 'General'}</div>
                         <div class="name">${p.name}</div>
@@ -158,10 +183,12 @@ window.Catalog = {
         .header h1 { margin: 0; font-size: 3rem; }
         .container { max-width: 1200px; margin: -2rem auto 4rem; padding: 0 2rem; }
         .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
-        .product-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; }
+        .product-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; }
         .product-card:hover { transform: translateY(-10px); }
-        .product-img { width: 100%; height: 250px; object-fit: cover; }
-        .product-info { padding: 1.5rem; text-align: center; }
+        .product-gallery { width: 100%; height: 280px; position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: #f1f5f9; }
+        .product-gallery::-webkit-scrollbar { display: none; }
+        .product-img { min-width: 100%; height: 280px; object-fit: cover; scroll-snap-align: start; }
+        .product-info { padding: 1.5rem; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; }
         .category { font-size: 0.7rem; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
         .name { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
         .price-tag { background: var(--primary); color: white; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 700; }
