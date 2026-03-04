@@ -115,12 +115,21 @@ window.Inventory = {
                             <input type="hidden" name="id" id="product-id">
                             <div class="form-grid">
                                 <div class="form-group" style="grid-column: span 2;">
-                                    <label>Imagen del Producto</label>
-                                    <div class="image-upload-wrapper" style="display: flex; flex-direction: column; align-items: center; gap: 1rem; background: rgba(255,255,255,0.02); padding: 1.5rem; border-radius: 12px; border: 1px dashed var(--border);">
-                                        <input type="file" id="product-image-input" accept="image/*" class="form-control" style="margin-bottom: 0;">
-                                        <img id="product-image-preview" src="https://via.placeholder.com/150?text=No+Foto" class="upload-preview" style="width: 150px; height: 150px; border-radius: 12px; object-fit: cover;">
-                                        <input type="hidden" name="image" id="product-image-base64">
+                                    <label>Imágenes del Producto (Máx 5)</label>
+                                    <div class="image-gallery-grid" id="product-image-gallery">
+                                        <!-- 5 Slots will be dynamically managed -->
+                                        ${[0, 1, 2, 3, 4].map(i => `
+                                            <div class="image-slot empty" data-index="${i}">
+                                                <input type="file" id="product-image-input-${i}" accept="image/*" style="display:none" onchange="window.Inventory.handleImageUpload(event, ${i})">
+                                                <input type="hidden" class="image-base64" data-index="${i}">
+                                                <div class="slot-placeholder" onclick="document.getElementById('product-image-input-${i}').click()">
+                                                    <i class="fas fa-plus"></i>
+                                                </div>
+                                                <button type="button" class="remove-image-btn" onclick="window.Inventory.removeImage(event, ${i})">&times;</button>
+                                            </div>
+                                        `).join('')}
                                     </div>
+                                    <p class="text-secondary" style="font-size: 0.75rem; margin-top: 5px;">* La primera imagen es la principal. Haz clic en un espacio para subir.</p>
                                 </div>
                                  <div class="form-group">
                                     <label>Referencia / REF</label>
@@ -288,7 +297,7 @@ window.Inventory = {
         list.innerHTML = filtered.map(p => `
             <tr class="${p.active === false ? 'inactive-row' : ''}">
                 <td data-label="Foto">
-                    <img src="${p.image || 'https://via.placeholder.com/40?text=NP'}" class="table-thumb" alt="${p.name}">
+                    <img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/40?text=NP'}" class="table-thumb" alt="${p.name}">
                 </td>
                 <td data-label="Ref"><small class="text-secondary">${p.ref || '-'}</small></td>
                 <td data-label="Producto"><strong>${p.name}</strong></td>
@@ -345,8 +354,32 @@ window.Inventory = {
                             else if (input.type !== 'file') input.value = product[key] !== undefined ? product[key] : (input.type === 'number' ? 0 : '');
                         }
                     });
-                    document.getElementById('product-image-preview').src = product.image || "https://via.placeholder.com/150?text=No+Foto";
-                    document.getElementById('product-image-base64').value = product.image || "";
+                    const previewOld = document.getElementById('product-image-preview');
+                    if (previewOld) previewOld.remove();
+
+                    // Populate images
+                    const images = Array.isArray(product.image) ? product.image : (product.image ? [product.image] : []);
+                    const slots = document.querySelectorAll('.image-slot');
+                    slots.forEach((slot, i) => {
+                        const imgData = images[i];
+                        if (imgData) {
+                            slot.classList.remove('empty');
+                            if (i === 0) slot.classList.add('primary');
+                            let img = slot.querySelector('img');
+                            if (!img) {
+                                img = document.createElement('img');
+                                slot.appendChild(img);
+                            }
+                            img.src = imgData;
+                            slot.querySelector('.image-base64').value = imgData;
+                        } else {
+                            slot.classList.add('empty');
+                            slot.classList.remove('primary');
+                            slot.querySelector('img')?.remove();
+                            slot.querySelector('.image-base64').value = '';
+                        }
+                    });
+
                     document.getElementById('product-modal').classList.add('show');
                 } else if (actionBtn.classList.contains('delete-btn')) {
                     if (confirm('¿Estás seguro de eliminar este producto?')) {
@@ -373,8 +406,13 @@ window.Inventory = {
             if (e.target.id === 'add-product-btn') {
                 this.editingId = null;
                 document.getElementById('modal-title').textContent = 'Nuevo Producto';
-                document.getElementById('product-form').reset();
-                document.getElementById('product-image-preview').src = "https://via.placeholder.com/150?text=No+Foto";
+                const slots = document.querySelectorAll('.image-slot');
+                slots.forEach(slot => {
+                    slot.classList.add('empty');
+                    slot.classList.remove('primary');
+                    slot.querySelector('img')?.remove();
+                    slot.querySelector('.image-base64').value = '';
+                });
                 document.getElementById('product-modal').classList.add('show');
                 return;
             }
@@ -403,20 +441,50 @@ window.Inventory = {
             }
         });
 
-        // Image Preview logic
-        panel.addEventListener('change', (e) => {
-            if (e.target.id === 'product-image-input') {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (ev) => {
-                        document.getElementById('product-image-preview').src = ev.target.result;
-                        document.getElementById('product-image-base64').value = ev.target.result;
-                    };
-                    reader.readAsDataURL(file);
+    },
+
+    handleImageUpload(e, index) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        console.log(`DEBUG: Uploading image to slot ${index}`);
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const base64 = ev.target.result;
+            const slot = document.querySelector(`.image-slot[data-index="${index}"]`);
+            if (slot) {
+                slot.classList.remove('empty');
+                if (index === 0) slot.classList.add('primary');
+
+                let img = slot.querySelector('img');
+                if (!img) {
+                    img = document.createElement('img');
+                    slot.insertBefore(img, slot.firstChild);
+                }
+                img.src = base64;
+                const hiddenInput = slot.querySelector('.image-base64');
+                if (hiddenInput) {
+                    hiddenInput.value = base64;
+                    console.log(`DEBUG: Image ${index} set in hidden input (length: ${base64.length})`);
                 }
             }
-        });
+        };
+        reader.readAsDataURL(file);
+    },
+
+    removeImage(e, index) {
+        if (e) e.stopPropagation();
+        console.log(`DEBUG: Removing image from slot ${index}`);
+        const slot = document.querySelector(`.image-slot[data-index="${index}"]`);
+        if (slot) {
+            slot.classList.add('empty');
+            slot.classList.remove('primary');
+            slot.querySelector('img')?.remove();
+            const hiddenInput = slot.querySelector('.image-base64');
+            if (hiddenInput) hiddenInput.value = '';
+            const fileInput = document.getElementById(`product-image-input-${index}`);
+            if (fileInput) fileInput.value = '';
+        }
     },
 
     async handleSaveProduct() {
@@ -439,22 +507,27 @@ window.Inventory = {
                 category: formData.get('category'),
                 provider: formData.get('provider'),
                 priceWholesale: parseFloat(formData.get('priceWholesale')) || 0,
-                priceInternet: parseFloat(formData.get('priceInternet')) || 0,
+                priceFinal: parseFloat(formData.get('priceInternet')) || 0, // Mapped to priceFinal in DB
                 commissionBase: parseFloat(formData.get('commissionBase')) || 0,
                 stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
                 stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
                 company: formData.get('company'),
                 active: formData.get('active') === 'true',
-                image: document.getElementById('product-image-base64').value || '',
+                image: Array.from(document.querySelectorAll('.image-base64'))
+                    .map(input => input.value)
+                    .filter(val => !!val),
                 ref: formData.get('ref') || ''
             };
+
+            console.log('DEBUG: Product object to save:', product);
 
             if (this.editingId) {
                 await Storage.updateItem(STORAGE_KEYS.PRODUCTS, this.editingId, product);
                 window.ERP_LOG('Actualización local exitosa', 'success');
             } else {
-                await Storage.addItem(STORAGE_KEYS.PRODUCTS, product);
-                window.ERP_LOG('Creación local exitosa', 'success');
+                const result = await Storage.addItem(STORAGE_KEYS.PRODUCTS, product);
+                console.log('DEBUG: Storage.addItem result:', result);
+                window.ERP_LOG('Creación local exitosa. ID: ' + result.id, 'success');
             }
 
             form.reset();
@@ -462,6 +535,9 @@ window.Inventory = {
             const modal = document.getElementById('product-modal');
             if (modal) modal.classList.remove('show');
             this.updateInventoryList();
+
+            // Final verification log
+            console.log('DEBUG: Inventory List Updated. Search for "soldador" now.');
             alert('✅ ¡EXITO! Producto guardado correctamente y sincronizando...');
 
         } catch (err) {
