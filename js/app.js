@@ -67,47 +67,67 @@ function initNavigation() {
         if (sheet && overlay) {
             sheet.classList.toggle('active', show);
             overlay.classList.toggle('active', show);
+
+            // Prevent body scroll when menu is open
+            document.body.style.overflow = show ? 'hidden' : '';
         }
     };
 
-    if (menuTrigger) menuTrigger.addEventListener('click', (e) => { e.preventDefault(); toggleMenu(true); });
-    if (closeMenu) closeMenu.addEventListener('click', () => toggleMenu(false));
-    if (overlay) overlay.addEventListener('click', () => toggleMenu(false));
-
-    navLinks.forEach(item => {
-        item.addEventListener('click', (e) => {
-            const panelName = item.getAttribute('data-panel');
-            if (!panelName) return;
+    if (menuTrigger) {
+        menuTrigger.onclick = (e) => {
             e.preventDefault();
+            toggleMenu(true);
+        };
+    }
 
-            toggleMenu(false); // Close menu if it's open
+    if (closeMenu) closeMenu.onclick = () => toggleMenu(false);
+    if (overlay) overlay.onclick = () => toggleMenu(false);
 
-            // Update active states
-            navLinks.forEach(ni => ni.classList.remove('active'));
-            document.querySelectorAll(`[data-panel="${panelName}"]`).forEach(el => el.classList.add('active'));
+    // Global navigation handler
+    document.addEventListener('click', (e) => {
+        const navItem = e.target.closest('.nav-item, .bottom-nav-item, .menu-grid-item');
+        if (!navItem) return;
 
-            // Show panel
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            const target = document.getElementById(`${panelName}-panel`);
-            if (target) {
-                target.classList.add('active');
-            }
+        const panelName = navItem.getAttribute('data-panel');
+        if (!panelName) return;
 
-            console.log(`Navigation: Switching to ${panelName}`);
+        e.preventDefault();
+        toggleMenu(false);
 
-            if (panelName === 'dashboard' && window.Dashboard) Dashboard.updateStats();
-            if (panelName === 'inventory' && window.Inventory) Inventory.updateInventoryList();
-            if (panelName === 'sales' && window.Sales) Sales.renderPanel();
-            if (panelName === 'crm' && window.CRM) CRM.renderPanel();
-            if (panelName === 'finances' && window.Finances) Finances.renderPanel();
-            if (panelName === 'tucompras' && window.TuCompras) TuCompras.renderPanel();
-            if (panelName === 'vendedores' && window.Vendedores) Vendedores.renderPanel();
-            if (panelName === 'tucompras-crm' && window.TuComprasCRM) TuComprasCRM.renderPanel();
-            if (panelName === 'consultas' && window.Consultas) Consultas.renderPanel();
-            if (panelName === 'catalog' && window.Catalog) Catalog.renderPanel();
-
-            localStorage.setItem('erp_active_panel', panelName);
+        // Update all related nav items (bottom, sidebar, sheet)
+        document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item').forEach(el => {
+            el.classList.toggle('active', el.getAttribute('data-panel') === panelName);
         });
+
+        // Switch panels
+        document.querySelectorAll('.panel').forEach(p => {
+            p.classList.toggle('active', p.id === `${panelName}-panel`);
+        });
+
+        console.log(`Navigation: Switching to ${panelName}`);
+
+        // Module specific refreshes
+        const modMap = {
+            'dashboard': window.Dashboard?.updateStats,
+            'inventory': window.Inventory?.updateInventoryList,
+            'sales': window.Sales?.renderPanel,
+            'crm': window.CRM?.renderPanel,
+            'finances': window.Finances?.renderPanel,
+            'tucompras': window.TuCompras?.renderPanel,
+            'vendedores': window.Vendedores?.renderPanel,
+            'tucompras-crm': window.TuComprasCRM?.renderPanel,
+            'consultas': window.Consultas?.renderPanel,
+            'catalog': window.Catalog?.renderPanel
+        };
+
+        if (modMap[panelName]) {
+            try { modMap[panelName](); } catch (err) { console.error(`Error refreshing ${panelName}:`, err); }
+        }
+
+        localStorage.setItem('erp_active_panel', panelName);
+
+        // Scroll to top on mobile when switching panels
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 }
 
