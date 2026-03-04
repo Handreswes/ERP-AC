@@ -14,19 +14,22 @@ window.TuCompras = {
 
     renderPanel() {
         const contentArea = document.getElementById('content-area');
-        if (!document.getElementById('tucompras-panel')) {
-            const panel = document.createElement('div');
+        let panel = document.getElementById('tucompras-panel');
+
+        if (!panel) {
+            panel = document.createElement('div');
             panel.id = 'tucompras-panel';
             panel.className = 'panel';
             contentArea.appendChild(panel);
         }
 
-        const panel = document.getElementById('tucompras-panel');
         panel.innerHTML = `
             <div class="panel-header">
                 <h1>E-commerce TUCOMPRAS</h1>
                 <div class="actions">
-                    <button id="new-tucompras-sale-btn" class="btn btn-primary">Nueva Venta Ecommerce</button>
+                    <button id="new-tucompras-sale-btn" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Nueva Venta
+                    </button>
                 </div>
             </div>
 
@@ -34,7 +37,7 @@ window.TuCompras = {
                 <!-- Stats load here -->
             </div>
 
-            <div class="inventory-tabs" style="margin-bottom: 1.5rem;">
+            <div class="inventory-tabs">
                 <button class="tab-btn ${this.activeStatus === 'despachado' ? 'active' : ''}" data-status="despachado">Despachados</button>
                 <button class="tab-btn ${this.activeStatus === 'recibido' ? 'active' : ''}" data-status="recibido">Entregados</button>
                 <button class="tab-btn ${this.activeStatus === 'proceso_devolucion' ? 'active' : ''}" data-status="proceso_devolucion">En Proceso Dev.</button>
@@ -46,7 +49,7 @@ window.TuCompras = {
                 <!-- Data will be loaded here -->
             </div>
 
-            <!-- New Sale Modal - CRM & MULTI PRODUCT -->
+            <!-- New Sale Modal - Improved Responsiveness -->
             <div id="tucompras-sale-modal" class="modal">
                 <div class="modal-content" style="max-width: 1100px; width: 95%;">
                     <div class="modal-header">
@@ -54,15 +57,15 @@ window.TuCompras = {
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body" style="padding: 1rem;">
-                        <div class="pos-container" style="display: grid; grid-template-columns: 1fr 380px; gap: 1rem; height: 80vh;">
+                        <div class="pos-container">
                             
                             <!-- Left: Product Selection & Customer -->
-                            <div class="selection-area" style="display: flex; flex-direction: column; gap: 1rem; overflow-y: auto;">
+                            <div class="selection-area" style="display: flex; flex-direction: column; gap: 1rem;">
                                 
                                 <!-- CUSTOMER SECTION -->
-                                <div class="card" style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
-                                    <h3><i class="fas fa-user-circle"></i> Información del Cliente</h3>
-                                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; margin-top: 10px;">
+                                <div class="card" style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
+                                    <h3 style="font-size: 1rem; margin-bottom: 1rem;"><i class="fas fa-user-circle"></i> Información del Cliente</h3>
+                                    <div class="form-grid">
                                         <div class="form-group">
                                             <label>Nombre Completo *</label>
                                             <input type="text" id="tc-cust-name" class="form-control" placeholder="Nombre completo" required>
@@ -85,7 +88,7 @@ window.TuCompras = {
                                             <label>Escriba Ciudad *</label>
                                             <input type="text" id="tc-cust-city-other" class="form-control" placeholder="Nombre de la ciudad">
                                         </div>
-                                        <div class="form-group" style="grid-column: span 2;">
+                                        <div class="form-group" style="grid-column: 1 / -1;">
                                             <label>Dirección (Opcional)</label>
                                             <input type="text" id="tc-cust-address" class="form-control" placeholder="Calle, Carrera, Apto...">
                                         </div>
@@ -93,23 +96,23 @@ window.TuCompras = {
                                 </div>
 
                                 <!-- PRODUCT GRID -->
-                                <div class="card" style="background: rgba(255,255,255,0.02); padding: 1rem; border-radius: 8px; border: 1px solid var(--border); flex: 1; display: flex; flex-direction: column; min-height: 300px;">
-                                    <h3><i class="fas fa-box-open"></i> Elegir Productos</h3>
-                                    <div class="search-bar" style="width: 100%; margin: 10px 0;">
-                                        <i class="fas fa-search"></i>
-                                        <input type="text" id="tc-product-search" placeholder="Buscar por nombre..." style="background: none; border: none; color: white; width: 100%;">
+                                <div class="card" style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border); min-height: 400px; display: flex; flex-direction: column;">
+                                    <h3 style="font-size: 1rem; margin-bottom: 1rem;"><i class="fas fa-box-open"></i> Elegir Productos</h3>
+                                    <div class="search-bar" style="width: 100%; margin: 0 0 1rem 0; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem;">
+                                        <i class="fas fa-search" style="color: var(--text-secondary);"></i>
+                                        <input type="text" id="tc-product-search" placeholder="Buscar por nombre..." style="background: none; border: none; color: white; width: 100%; outline: none; margin-left: 8px;">
                                     </div>
-                                    <div id="tc-product-grid" class="product-grid-tiny" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; overflow-y: auto; flex: 1;">
+                                    <div id="tc-product-grid" class="product-grid-tiny" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; flex: 1; overflow-y: auto;">
                                         <!-- Products -->
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Right: Logistics & Cart -->
-                            <div class="cart-form-area" style="background: var(--bg-sidebar); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; border: 1px solid var(--border); overflow-y: auto;">
-                                <h3><i class="fas fa-shipping-fast"></i> Logística y Comisión</h3>
-                                <form id="tucompras-sale-form">
-                                    <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div class="cart-form-area" style="background: var(--bg-sidebar); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; border: 1px solid var(--border);">
+                                <h3 style="font-size: 1rem;"><i class="fas fa-shipping-fast"></i> Logística y Comisión</h3>
+                                <form id="tucompras-sale-form" style="display: flex; flex-direction: column; gap: 1rem;">
+                                    <div class="form-grid">
                                         <div class="form-group">
                                             <label>Transportadora</label>
                                             <select name="carrier" class="form-control">
@@ -137,26 +140,30 @@ window.TuCompras = {
                                         </div>
                                     </div>
 
-                                    <div id="tc-cart-items" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1rem; min-height: 100px;">
+                                    <div id="tc-cart-items" style="display: flex; flex-direction: column; gap: 10px; min-height: 100px;">
                                         <!-- Cart -->
                                     </div>
 
-                                    <div class="summary-card" style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px;">
-                                        <div class="form-group" style="margin-bottom: 5px;">
+                                    <div class="summary-card" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
+                                        <div class="form-group" style="margin-bottom: 0.75rem;">
                                             <label style="font-size: 0.75rem;">Flete (Valor Cobrado por Dropi)</label>
-                                            <input type="number" name="shipping_cost" class="form-control" required value="0" style="height: 30px;">
+                                            <input type="number" name="shipping_cost" class="form-control" required value="0" style="height: 36px; font-weight: 700;">
                                         </div>
-                                        <div class="summary-line" style="display: flex; justify-content: space-between; font-size: 0.9rem;">
-                                            <span>Subtotal Venta:</span>
-                                            <strong id="tc-total-sale-text">$0</strong>
-                                        </div>
-                                        <div class="summary-line" style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary);">
-                                            <span>Subtotal Comisión:</span>
-                                            <strong id="tc-total-commission-text">$0</strong>
+                                        <div style="display: flex; flex-direction: column; gap: 6px;">
+                                            <div class="summary-line" style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                                                <span>Subtotal Venta:</span>
+                                                <strong id="tc-total-sale-text" style="color: var(--accent-vibrant);">$0</strong>
+                                            </div>
+                                            <div class="summary-line" style="display: flex; justify-content: space-between; font-size: 0.95rem;">
+                                                <span>Subtotal Comisión:</span>
+                                                <strong id="tc-total-commission-text" style="color: var(--warning);">$0</strong>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1rem; height: 50px;">REGISTRAR DESPACHO</button>
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 0.5rem; height: 56px; border-radius: 16px;">
+                                        REGISTRAR DESPACHO
+                                    </button>
                                 </form>
                             </div>
                         </div>
@@ -562,7 +569,7 @@ window.TuCompras = {
         const products = Inventory.getProducts().filter(p => p.active !== false && p.name.toLowerCase().includes(query.toLowerCase()));
         grid.innerHTML = products.map(p => `
             <div class="product-item-tiny" style="background: var(--bg-card); padding: 5px; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px;">
-                <img src="${p.image || 'https://via.placeholder.com/60'}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 3px;">
+                <img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/60'}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 3px;">
                 <h4 style="font-size: 0.65rem; margin:0; line-height: 1.1;">${p.name}</h4>
                 <p style="font-size: 0.6rem; color: var(--text-secondary); margin:0;">Stock: ${parseInt(p.stockMillenio) + parseInt(p.stockVulcano)}</p>
                 <button class="btn btn-sm btn-primary tc-add-btn" data-id="${p.id}" style="padding: 1px; font-size: 0.6rem;">+Añadir</button>
@@ -583,7 +590,7 @@ window.TuCompras = {
                 name: product.name,
                 qty: 1,
                 cost_price: product.priceWholesale || product.cost || 0,
-                sale_price: product.priceInternet || 0,
+                sale_price: product.priceFinal || product.priceInternet || 0,
                 commission_paid: product.commissionBase || 0
             });
         }
