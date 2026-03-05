@@ -335,9 +335,9 @@ body.logged-out .app-container {
 }
 
 /* Stats Cards */
-.form-grid {
+.stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
     margin-bottom: 2rem;
 }
@@ -1275,9 +1275,55 @@ option:checked {
 
     body.modal-open {
         overflow: hidden !important;
-        position: fixed !important;
-        width: 100% !important;
     }
+}
+
+/* ===========================
+   GLOBAL IMAGE SIZE CONSTRAINTS (V82)
+   Prevent images from filling the screen
+=========================== */
+
+/* Inventory Table Images */
+.data-table td img,
+.table-thumb {
+    width: 70px !important;
+    height: 70px !important;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+/* POS Product Grid Images */
+.pos-product-img,
+.product-card img,
+.pos-product-card img {
+    width: 100% !important;
+    max-height: 160px !important;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+/* Image Gallery in form - max 5 columns desktop, 3 on mobile */
+.image-gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin: 1rem 0;
+}
+
+.image-slot {
+    aspect-ratio: 1/1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px dashed var(--border);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-height: 120px;
 }
 
 /* Global Grid Fix (Prevent huge images) */
