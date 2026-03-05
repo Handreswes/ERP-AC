@@ -343,7 +343,8 @@ window.Inventory = {
                     this.renderPanel();
                 } else if (tabBtn.dataset.company) {
                     this.activeCompanyFilter = tabBtn.dataset.company;
-                    this.updateInventoryList(document.getElementById('inventory-search')?.value || '');
+                    const searchEl = document.getElementById('inventory-search');
+                    this.updateInventoryList(searchEl ? searchEl.value : '');
                     panel.querySelectorAll('.inventory-tabs [data-company]').forEach(b => b.classList.remove('active'));
                     tabBtn.classList.add('active');
                 }
@@ -387,7 +388,8 @@ window.Inventory = {
                         } else {
                             slot.classList.add('empty');
                             slot.classList.remove('primary');
-                            slot.querySelector('img')?.remove();
+                            const img = slot.querySelector('img');
+                            if (img) img.remove();
                             slot.querySelector('.image-base64').value = '';
                         }
                     });
@@ -396,7 +398,8 @@ window.Inventory = {
                 } else if (actionBtn.classList.contains('delete-btn')) {
                     if (confirm('¿Estás seguro de eliminar este producto?')) {
                         await Storage.deleteItem(STORAGE_KEYS.PRODUCTS, id);
-                        this.updateInventoryList(document.getElementById('inventory-search')?.value || '');
+                        const searchEl = document.getElementById('inventory-search');
+                        this.updateInventoryList(searchEl ? searchEl.value : '');
                     }
                 }
                 return;
@@ -422,7 +425,8 @@ window.Inventory = {
                 slots.forEach(slot => {
                     slot.classList.add('empty');
                     slot.classList.remove('primary');
-                    slot.querySelector('img')?.remove();
+                    const img = slot.querySelector('img');
+                    if (img) img.remove();
                     slot.querySelector('.image-base64').value = '';
                 });
                 document.getElementById('product-modal').classList.add('show');
@@ -491,7 +495,8 @@ window.Inventory = {
         if (slot) {
             slot.classList.add('empty');
             slot.classList.remove('primary');
-            slot.querySelector('img')?.remove();
+            const img = slot.querySelector('img');
+            if (img) img.remove();
             const hiddenInput = slot.querySelector('.image-base64');
             if (hiddenInput) hiddenInput.value = '';
             const fileInput = document.getElementById(`product-image-input-${index}`);
