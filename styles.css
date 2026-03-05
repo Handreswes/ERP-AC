@@ -1,5 +1,4 @@
-/* V81: DEFINITIVE MOBILE & SCROLL FIX - FORCE REFRESH */
-:root {
+﻿:root {
     color-scheme: dark;
     --bg-dark: #020617;
     --bg-card: rgba(30, 41, 59, 0.7);
@@ -586,12 +585,6 @@ body.logged-out .app-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
-}
-
-/* Ensure wide inputs don't break grid */
-.form-group input,
-.form-group select {
-    width: 100%;
 }
 
 .form-group {
@@ -1211,99 +1204,95 @@ option:checked {
     }
 }
 
-/* --- FINAL PREMIUM MOBILE FIX (V81) --- */
+@media (max-width: 768px) {
+    .dashboard-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- PREMIUM MOBILE OVERHAUL --- */
+.modal {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(2, 6, 23, 0.7);
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    border-radius: 28px;
+    padding: 0;
+    overflow: hidden;
+}
+
 @media (max-width: 768px) {
     .modal-content {
-        width: 100% !important;
-        height: 94% !important;
-        max-height: 94% !important;
-        position: fixed !important;
-        bottom: 0 !important;
-        left: 0 !important;
-        margin: 0 !important;
-        border-radius: 24px 24px 0 0 !important;
-        background: #0f172a !important;
-        border-top: 3px solid var(--accent) !important;
-        z-index: 2000 !important;
-        display: flex !important;
-        flex-direction: column !important;
-    }
-
-    .modal-body {
-        flex: 1 !important;
-        padding: 1.25rem !important;
-        padding-bottom: 4rem !important;
-        overflow-y: auto !important;
-        overflow-x: hidden !important;
-        -webkit-overflow-scrolling: touch !important;
-        display: block !important;
-    }
-
-    .form-grid {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 1.25rem !important;
-        width: 100% !important;
-    }
-
-    .form-group {
-        width: 100% !important;
-        display: block !important;
-    }
-
-    .form-group label {
-        white-space: normal !important;
-        font-size: 0.8rem !important;
-        margin-bottom: 0.5rem !important;
-    }
-
-    .image-gallery-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
-        gap: 8px !important;
-    }
-
-    /* POS Mobile Fix */
-    .pos-container {
-        flex-direction: column !important;
-        height: auto !important;
-    }
-
-    .pos-main,
-    .pos-sidebar {
-        width: 100% !important;
-    }
-
-    body.modal-open {
-        overflow: hidden !important;
+        width: 100%;
+        height: 92%;
+        position: fixed;
+        bottom: 0;
+        margin: 0;
+        border-radius: 30px 30px 0 0;
+        animation: slideUp 0.4s cubic-bezier(0.32, 0.72, 0, 1);
     }
 }
 
-/* ===========================
-   GLOBAL IMAGE SIZE CONSTRAINTS (V82)
-   Prevent images from filling the screen
-=========================== */
+@keyframes slideUp {
+    from {
+        transform: translateY(100%);
+    }
 
-/* Inventory Table Images */
-.data-table td img,
-.table-thumb {
-    width: 70px !important;
-    height: 70px !important;
-    object-fit: cover;
-    border-radius: 8px;
-    flex-shrink: 0;
+    to {
+        transform: translateY(0);
+    }
 }
 
-/* POS Product Grid Images */
-.pos-product-img,
-.product-card img,
-.pos-product-card img {
-    width: 100% !important;
-    max-height: 160px !important;
-    object-fit: cover;
-    border-radius: 12px;
+.modal-header {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-/* Image Gallery in form - max 5 columns desktop, 3 on mobile */
+.modal-body {
+    padding: 2rem;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+}
+
+.form-group label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--accent-vibrant);
+    margin-bottom: 0.75rem;
+    display: block;
+}
+
+.form-control,
+input[type="text"],
+input[type="number"],
+select {
+    background: rgba(0, 0, 0, 0.2) !important;
+    border: 2px solid var(--border) !important;
+    border-radius: 16px !important;
+    padding: 0.8rem 1rem !important;
+    font-size: 1rem !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: var(--accent-vibrant) !important;
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
+    background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Image Slots Native Style */
 .image-gallery-grid {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
@@ -1311,19 +1300,80 @@ option:checked {
     margin: 1rem 0;
 }
 
-.image-slot {
-    aspect-ratio: 1/1;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px dashed var(--border);
-    border-radius: 16px;
-    position: relative;
-    overflow: hidden;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    max-height: 120px;
+/* --- PREMIUM MOBILE OVERHAUL (V77) --- */
+@media (max-width: 768px) {
+    .modal-content {
+        width: 100% !important;
+        height: 94% !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        margin: 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        background: #0f172a !important;
+        /* Solid dark for predictability */
+        border-top: 3px solid var(--accent) !important;
+        z-index: 2000 !important;
+    }
+
+    .modal-body {
+        padding: 1rem !important;
+        overflow-y: auto !important;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1.25rem !important;
+    }
+
+    .image-gallery-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+    }
+
+    .image-slot {
+        border-radius: 12px !important;
+    }
+
+    /* Catalog Cards (Mobile) */
+    .catalog-mobile-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .catalog-mobile-img {
+        width: 70px !important;
+        height: 70px !important;
+        border-radius: 12px;
+        object-fit: cover;
+    }
+
+    .catalog-mobile-info {
+        flex: 1;
+    }
+
+    .catalog-mobile-name {
+        font-weight: 600;
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.9rem;
+    }
+
+    .catalog-mobile-price {
+        color: var(--success);
+        font-weight: 700;
+        font-size: 1rem;
+    }
+
+    .btn-block {
+        width: 100% !important;
+        display: block !important;
+    }
 }
 
 /* Global Grid Fix (Prevent huge images) */
