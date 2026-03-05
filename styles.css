@@ -583,8 +583,14 @@ body.logged-out .app-container {
 
 .form-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
+}
+
+/* Ensure wide inputs don't break grid */
+.form-group input,
+.form-group select {
+    width: 100%;
 }
 
 .form-group {
@@ -1322,8 +1328,9 @@ select {
 
     .form-grid {
         grid-template-columns: 1fr !important;
-        gap: 1.25rem !important;
-        width: 100% !important;
+        gap: 1rem !important;
+        display: flex !important;
+        flex-direction: column !important;
     }
 
     .form-group {
