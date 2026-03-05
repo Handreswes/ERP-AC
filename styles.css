@@ -583,7 +583,7 @@ body.logged-out .app-container {
 
 .form-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1.5rem;
 }
 
@@ -1323,6 +1323,16 @@ select {
     .form-grid {
         grid-template-columns: 1fr !important;
         gap: 1.25rem !important;
+        width: 100% !important;
+    }
+
+    .form-group {
+        width: 100% !important;
+    }
+
+    .form-group label {
+        white-space: normal !important;
+        font-size: 0.8rem !important;
     }
 
     .image-gallery-grid {
@@ -1360,7 +1370,9 @@ select {
     .modal-body {
         flex: 1 !important;
         overflow-y: auto !important;
-        padding-bottom: 2rem !important;
+        overflow-x: hidden !important;
+        padding: 1.25rem !important;
+        padding-bottom: 3rem !important;
         -webkit-overflow-scrolling: touch !important;
     }
 
