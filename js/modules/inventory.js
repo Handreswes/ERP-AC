@@ -7,6 +7,27 @@ window.Inventory = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
+        this.setupCurrencyMasks();
+    },
+
+    setupCurrencyMasks() {
+        const panel = document.getElementById('inventory-panel');
+        if (!panel) return;
+
+        const formatValue = (val) => {
+            let n = val.replace(/\D/g, "");
+            return n === "" ? "" : Number(n).toLocaleString('es-CO');
+        };
+
+        panel.addEventListener('input', (e) => {
+            if (['cost', 'priceWholesale', 'priceInternet', 'commissionBase'].includes(e.target.name)) {
+                const cursor = e.target.selectionStart;
+                const oldLen = e.target.value.length;
+                e.target.value = formatValue(e.target.value);
+                const newLen = e.target.value.length;
+                e.target.setSelectionRange(cursor + (newLen - oldLen), cursor + (newLen - oldLen));
+            }
+        });
     },
 
 
@@ -152,20 +173,20 @@ window.Inventory = {
                                     <input type="text" name="provider">
                                 </div>
                                  <div class="form-group">
-                                     <label>Costo</label>
-                                     <input type="number" name="cost" step="any" required>
+                                     <label>Costo ($)</label>
+                                     <input type="text" name="cost" placeholder="0" required>
                                  </div>
                                  <div class="form-group">
-                                     <label>Precio Mayorista</label>
-                                     <input type="number" name="priceWholesale" step="any" required>
+                                     <label>Precio Mayorista ($)</label>
+                                     <input type="text" name="priceWholesale" placeholder="0" required>
                                  </div>
                                  <div class="form-group">
-                                     <label>Precio Internet / Final</label>
-                                     <input type="number" name="priceInternet" step="any" value="0">
+                                     <label>Precio Internet / Final ($)</label>
+                                     <input type="text" name="priceInternet" value="0">
                                  </div>
                                  <div class="form-group">
-                                     <label>Comisión Base (TUCOMPRAS)</label>
-                                     <input type="number" name="commissionBase" step="any" value="0">
+                                     <label>Comisión Base (TUCOMPRAS) ($)</label>
+                                     <input type="text" name="commissionBase" value="0">
                                  </div>
                                 <div class="form-group">
                                     <label>Stock Millenio</label>
