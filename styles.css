@@ -949,7 +949,6 @@ option:checked {
     z-index: 1000;
 }
 
-/* Bottom Sheet (Drawer) */
 .bottom-sheet-overlay {
     position: fixed;
     top: 0;
@@ -958,15 +957,17 @@ option:checked {
     height: 100%;
     background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px);
-    z-index: 2000;
+    z-index: 900;
     opacity: 0;
     visibility: hidden;
+    pointer-events: none;
     transition: all 0.3s ease;
 }
 
 .bottom-sheet-overlay.active {
     opacity: 1;
     visibility: visible;
+    pointer-events: auto;
 }
 
 .bottom-sheet {
@@ -1055,6 +1056,11 @@ option:checked {
     font-weight: 600;
     transition: all 0.2s;
     flex: 1;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 .bottom-nav-item i {
