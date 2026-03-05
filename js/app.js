@@ -82,15 +82,10 @@ function initNavigation() {
     if (closeMenu) closeMenu.onclick = () => toggleMenu(false);
     if (overlay) overlay.onclick = () => toggleMenu(false);
 
-    // Global navigation handler
-    document.addEventListener('click', (e) => {
-        const navItem = e.target.closest('.nav-item, .bottom-nav-item, .menu-grid-item');
-        if (!navItem) return;
-
-        const panelName = navItem.getAttribute('data-panel');
+    // Global navigation handler exposed for direct onclick calls
+    window.handleNavClick = function (panelName) {
         if (!panelName) return;
 
-        e.preventDefault();
         toggleMenu(false);
 
         // Update all related nav items (bottom, sidebar, sheet)
@@ -127,6 +122,16 @@ function initNavigation() {
 
         // Scroll to top on mobile when switching panels
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Attach to existing elements just in case they don't have inline handlers
+    document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item').forEach(el => {
+        if (el.id !== 'mobile-menu-trigger') {
+            el.addEventListener('click', (e) => {
+                e.preventDefault();
+                window.handleNavClick(el.getAttribute('data-panel'));
+            });
+        }
     });
 }
 
