@@ -211,10 +211,10 @@ window.Sales = {
         const container = document.getElementById('sales-panel');
         if (!container) return;
 
-        // Re-render products whenever the panel becomes visible (navigation)
         const observer = new MutationObserver(() => {
             if (container.classList.contains('active')) {
-                this.renderProductGrid(document.getElementById('pos-product-search')?.value || '');
+                const searchEl = document.getElementById('pos-product-search');
+                this.renderProductGrid(searchEl ? searchEl.value : '');
             }
         });
         observer.observe(container, { attributes: true, attributeFilter: ['class'] });
@@ -230,7 +230,8 @@ window.Sales = {
                         ? 'btn btn-primary'
                         : 'btn btn-outline';
                 });
-                this.renderProductGrid(document.getElementById('pos-product-search')?.value || '');
+                const searchEl = document.getElementById('pos-product-search');
+                this.renderProductGrid(searchEl ? searchEl.value : '');
                 return;
             }
 
@@ -374,7 +375,8 @@ window.Sales = {
             window.ERP_LOG('Iniciando proceso de checkout POS...');
 
             const method = document.getElementById('payment-method').value;
-            const accountId = method === 'transfer' ? document.getElementById('pos-bank-account')?.value : null;
+            const bankSelect = document.getElementById('pos-bank-account');
+            const accountId = method === 'transfer' ? (bankSelect ? bankSelect.value : null) : null;
             const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
             let totalM = 0;
             let totalV = 0;
