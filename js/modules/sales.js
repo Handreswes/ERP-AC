@@ -43,7 +43,7 @@ window.Sales = {
 
                 <aside class="pos-sidebar">
                     <div class="cart-container" style="margin-bottom: 1.5rem;">
-                        <table class="data-table">
+                        <table class="data-table cart-table">
                             <thead>
                                 <tr>
                                     <th>Producto</th>
