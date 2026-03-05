@@ -210,10 +210,16 @@ window.Sales = {
 
         // Centralized Event Delegation for Click Actions
         container.onclick = async (e) => {
-            // 1. Company Switching
-            if (e.target.dataset.company) {
+            // 1. Company Switching — only re-render grid, don't rebuild whole panel
+            if (e.target.dataset.company !== undefined) {
                 this.activeCompany = e.target.dataset.company;
-                this.renderPanel();
+                // Update active button styles
+                container.querySelectorAll('[data-company]').forEach(btn => {
+                    btn.className = btn.dataset.company === this.activeCompany
+                        ? 'btn btn-primary'
+                        : 'btn btn-outline';
+                });
+                this.renderProductGrid(document.getElementById('pos-product-search')?.value || '');
                 return;
             }
 
