@@ -713,10 +713,50 @@ option:checked {
 /* POS Layout */
 .pos-container {
     display: grid;
-    grid-template-columns: 1fr 340px;
+    grid-template-columns: 1fr 420px;
     gap: 2rem;
     align-items: start;
 }
+
+/* Ensure the cart table doesn't push stuff off-screen on desktop */
+.cart-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+.cart-table th,
+.cart-table td {
+    padding: 10px 5px;
+}
+
+/* Specific column widths for desktop cart to prevent squishing */
+.cart-table th:nth-child(1) {
+    width: 35%;
+}
+
+/* Producto */
+.cart-table th:nth-child(2) {
+    width: 25%;
+}
+
+/* Precio */
+.cart-table th:nth-child(3) {
+    width: 15%;
+}
+
+/* Cant */
+.cart-table th:nth-child(4) {
+    width: 20%;
+}
+
+/* Total */
+.cart-table th:nth-child(5) {
+    width: 5%;
+}
+
+/* Remove */
+
 
 /* POS Product Grid — compact Treinta style */
 .pos-grid {
@@ -1198,6 +1238,54 @@ option:checked {
         flex-direction: column;
         gap: 0.5rem;
         padding: 1rem 0;
+    }
+
+    /* POS Cart Table Mobile Responsive */
+    .cart-table thead {
+        display: none;
+    }
+
+    .cart-table tbody tr {
+        display: block;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        margin-bottom: 1rem;
+        padding: 1rem;
+        position: relative;
+    }
+
+    .cart-table td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        text-align: right;
+    }
+
+    .cart-table td:last-child {
+        border-bottom: none;
+        justify-content: flex-end;
+    }
+
+    .cart-table td:before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--accent);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+    }
+
+    .cart-table td[data-label="Producto"] {
+        flex-direction: column;
+        align-items: flex-start;
+        text-align: left;
+    }
+
+    .cart-table td[data-label="Producto"] div {
+        max-width: 100% !important;
+        white-space: normal !important;
     }
 }
 
