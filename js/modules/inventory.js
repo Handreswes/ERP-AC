@@ -389,6 +389,7 @@ window.Inventory = {
                     });
 
                     document.getElementById('product-modal').classList.add('show');
+                    document.body.classList.add('modal-open'); // Add this line
                 } else if (actionBtn.classList.contains('delete-btn')) {
                     if (confirm('¿Estás seguro de eliminar este producto?')) {
                         await Storage.deleteItem(STORAGE_KEYS.PRODUCTS, id);
@@ -422,6 +423,7 @@ window.Inventory = {
                     slot.querySelector('.image-base64').value = '';
                 });
                 document.getElementById('product-modal').classList.add('show');
+                document.body.classList.add('modal-open'); // Add this line
                 return;
             }
 
@@ -438,6 +440,7 @@ window.Inventory = {
 
             if (e.target.classList.contains('close-modal')) {
                 e.target.closest('.modal').classList.remove('show');
+                document.body.classList.remove('modal-open'); // Add this line
                 return;
             }
         });
