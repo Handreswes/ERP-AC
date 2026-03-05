@@ -107,16 +107,16 @@ function initNavigation() {
 
         // Module specific refreshes
         const modMap = {
-            'dashboard': () => window.Dashboard?.updateStats?.(),
-            'inventory': () => window.Inventory?.updateInventoryList?.(),
-            'sales': () => window.Sales?.renderProductGrid?.(''),
-            'crm': () => window.CRM?.renderPanel?.(),
-            'finances': () => window.Finances?.renderPanel?.(),
-            'tucompras': () => window.TuCompras?.renderPanel?.(),
-            'vendedores': () => window.Vendedores?.renderPanel?.(),
-            'tucompras-crm': () => window.TuComprasCRM?.renderPanel?.(),
-            'consultas': () => window.Consultas?.renderPanel?.(),
-            'catalog': () => window.Catalog?.renderPanel?.()
+            'dashboard': () => { if (window.Dashboard && window.Dashboard.updateStats) window.Dashboard.updateStats(); },
+            'inventory': () => { if (window.Inventory && window.Inventory.updateInventoryList) window.Inventory.updateInventoryList(); },
+            'sales': () => { if (window.Sales && window.Sales.renderProductGrid) window.Sales.renderProductGrid(''); },
+            'crm': () => { if (window.CRM && window.CRM.renderPanel) window.CRM.renderPanel(); },
+            'finances': () => { if (window.Finances && window.Finances.renderPanel) window.Finances.renderPanel(); },
+            'tucompras': () => { if (window.TuCompras && window.TuCompras.renderPanel) window.TuCompras.renderPanel(); },
+            'vendedores': () => { if (window.Vendedores && window.Vendedores.renderPanel) window.Vendedores.renderPanel(); },
+            'tucompras-crm': () => { if (window.TuComprasCRM && window.TuComprasCRM.renderPanel) window.TuComprasCRM.renderPanel(); },
+            'consultas': () => { if (window.Consultas && window.Consultas.renderPanel) window.Consultas.renderPanel(); },
+            'catalog': () => { if (window.Catalog && window.Catalog.renderPanel) window.Catalog.renderPanel(); }
         };
 
         if (modMap[panelName]) {
