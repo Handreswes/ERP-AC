@@ -517,7 +517,7 @@ window.Inventory = {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             window.ERP_LOG('Iniciando guardado manual (V66)...');
 
-            const cleanCurrency = (val) => parseFloat(String(val).replace(/[^0-9.-]/g, "")) || 0;
+            const cleanCurrency = (val) => parseFloat(String(val).replace(/\./g, "").replace(/[^0-9-]/g, "")) || 0;
 
             const formData = new FormData(form);
             const product = {
@@ -525,6 +525,7 @@ window.Inventory = {
                 name: formData.get('name'),
                 category: formData.get('category'),
                 provider: formData.get('provider'),
+                cost: cleanCurrency(formData.get('cost')),
                 priceWholesale: cleanCurrency(formData.get('priceWholesale')),
                 priceFinal: cleanCurrency(formData.get('priceInternet')),
                 commissionBase: cleanCurrency(formData.get('commissionBase')),
