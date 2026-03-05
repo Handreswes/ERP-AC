@@ -67,10 +67,9 @@ function initNavigation() {
         if (sheet && overlay) {
             sheet.classList.toggle('active', show);
             overlay.classList.toggle('active', show);
-
-            // Prevent body scroll when menu is open
-            document.body.style.overflow = show ? 'hidden' : '';
         }
+        // Always reset overflow — never leave it stuck
+        document.body.style.overflow = show ? 'hidden' : '';
     };
 
     if (menuTrigger) {
@@ -110,7 +109,7 @@ function initNavigation() {
         const modMap = {
             'dashboard': window.Dashboard?.updateStats,
             'inventory': window.Inventory?.updateInventoryList,
-            'sales': window.Sales?.renderPanel,
+            'sales': () => window.Sales?.renderProductGrid?.(''),
             'crm': window.CRM?.renderPanel,
             'finances': window.Finances?.renderPanel,
             'tucompras': window.TuCompras?.renderPanel,
