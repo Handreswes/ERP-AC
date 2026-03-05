@@ -1,4 +1,4 @@
-console.log('--- ERP AC SYSTEM V67 LOADING (CLOUD SYNC) ---');
+console.log('--- ERP AC SYSTEM V81 LOADING (PRODUCTION) ---');
 
 // Visual Logger (Console only for production V67)
 window.ERP_LOG = function (msg, type = 'info') {
@@ -13,7 +13,7 @@ window.onerror = function (msg, url, line) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     window.erpStarted = true;
-    ERP_LOG('Iniciando Sistema V67...');
+    ERP_LOG('Iniciando Sistema V81 (Garantizado)...');
 
     // 0. Initialize Auth FIRST
     try {
