@@ -7,29 +7,8 @@ window.Inventory = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
-        this.setupCurrencyMasks();
     },
 
-    setupCurrencyMasks() {
-        // Function to format currency on input
-        const formatValue = (val) => {
-            let n = val.replace(/\D/g, "");
-            return n === "" ? "" : "$ " + Number(n).toLocaleString('es-CO');
-        };
-
-        const panel = document.getElementById('inventory-panel');
-        if (!panel) return;
-
-        panel.addEventListener('input', (e) => {
-            if (['cost', 'priceWholesale', 'priceInternet', 'commissionBase'].includes(e.target.name)) {
-                const start = e.target.selectionStart;
-                const oldLen = e.target.value.length;
-                e.target.value = formatValue(e.target.value);
-                const newLen = e.target.value.length;
-                e.target.selectionEnd = start + (newLen - oldLen);
-            }
-        });
-    },
 
     getProducts() {
         return Storage.get(STORAGE_KEYS.PRODUCTS);
@@ -212,8 +191,8 @@ window.Inventory = {
                                     </select>
                                 </div>
                             </div>
-                             <div class="form-group" style="grid-column: span 2;">
-                                 <button type="button" id="save-product-manual-btn" class="btn btn-primary btn-block" style="padding: 1.25rem; border-radius: 18px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);">
+                             <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
+                                 <button type="button" id="save-product-manual-btn" class="btn btn-primary btn-block" style="padding: 1rem; border-radius: 16px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
                                      <i class="fas fa-save"></i> GUARDAR PRODUCTO
                                  </button>
                              </div>
