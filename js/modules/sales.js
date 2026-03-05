@@ -139,13 +139,16 @@ window.Sales = {
                 this.activeCompany === 'vulcano' ? p.stockVulcano :
                     ((parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0));
 
+            const img = Array.isArray(p.image) ? p.image[0] : p.image;
+
             return `
-                <div class="product-card" data-id="${p.id}">
-                    <img src="${p.image || 'https://via.placeholder.com/150?text=No+Foto'}" class="card-img" alt="${p.name}">
-                    <div class="card-info">
-                        <div class="card-name">${p.name}</div>
-                        <div class="card-price">$${(parseFloat(p.priceWholesale) || parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</div>
-                        <div class="card-stock">S: ${stock}</div>
+                <div class="product-card" data-id="${p.id}" style="background:var(--bg-card);border:1px solid var(--border);border-radius:14px;overflow:hidden;cursor:pointer;display:flex;flex-direction:column;transition:transform 0.15s;">
+                    <img src="${img || 'https://via.placeholder.com/150?text=Sin+Foto'}" alt="${p.name}"
+                        style="width:100%;height:110px;object-fit:cover;display:block;flex-shrink:0;">
+                    <div style="padding:8px 10px;">
+                        <div style="font-size:0.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
+                        <div style="font-size:0.85rem;font-weight:700;color:#10b981;">$${(parseFloat(p.priceWholesale) || parseFloat(p.priceInternet) || 0).toLocaleString('es-CO')}</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;">S: ${stock}</div>
                     </div>
                 </div>
             `;
