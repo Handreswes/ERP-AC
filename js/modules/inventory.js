@@ -7,6 +7,28 @@ window.Inventory = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
+        this.setupCurrencyMasks();
+    },
+
+    setupCurrencyMasks() {
+        // Function to format currency on input
+        const formatValue = (val) => {
+            let n = val.replace(/\D/g, "");
+            return n === "" ? "" : "$ " + Number(n).toLocaleString('es-CO');
+        };
+
+        const panel = document.getElementById('inventory-panel');
+        if (!panel) return;
+
+        panel.addEventListener('input', (e) => {
+            if (['cost', 'priceWholesale', 'priceInternet', 'commissionBase'].includes(e.target.name)) {
+                const start = e.target.selectionStart;
+                const oldLen = e.target.value.length;
+                e.target.value = formatValue(e.target.value);
+                const newLen = e.target.value.length;
+                e.target.selectionEnd = start + (newLen - oldLen);
+            }
+        });
     },
 
     getProducts() {
@@ -115,21 +137,24 @@ window.Inventory = {
                             <input type="hidden" name="id" id="product-id">
                             <div class="form-grid">
                                 <div class="form-group" style="grid-column: span 2;">
-                                    <label>Imágenes del Producto (Máx 5)</label>
+                                    <label>Galería de Imágenes (Máx 5)</label>
                                     <div class="image-gallery-grid" id="product-image-gallery">
-                                        <!-- 5 Slots will be dynamically managed -->
                                         ${[0, 1, 2, 3, 4].map(i => `
-                                            <div class="image-slot empty" data-index="${i}">
+                                            <div class="image-slot empty" data-index="${i}" onclick="document.getElementById('product-image-input-${i}').click()">
                                                 <input type="file" id="product-image-input-${i}" accept="image/*" style="display:none" onchange="window.Inventory.handleImageUpload(event, ${i})">
                                                 <input type="hidden" class="image-base64" data-index="${i}">
-                                                <div class="slot-placeholder" onclick="document.getElementById('product-image-input-${i}').click()">
-                                                    <i class="fas fa-plus"></i>
+                                                <div class="slot-placeholder">
+                                                    <i class="fas fa-camera"></i>
                                                 </div>
-                                                <button type="button" class="remove-image-btn" onclick="window.Inventory.removeImage(event, ${i})">&times;</button>
+                                                <button type="button" class="remove-image-btn" onclick="window.Inventory.removeImage(event, ${i})">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
                                             </div>
                                         `).join('')}
                                     </div>
-                                    <p class="text-secondary" style="font-size: 0.75rem; margin-top: 5px;">* La primera imagen es la principal. Haz clic en un espacio para subir.</p>
+                                    <p class="text-secondary" style="font-size: 0.7rem; margin-top: 5px; opacity: 0.7;">
+                                        <i class="fas fa-info-circle"></i> La primera foto aparecerá en el catálogo principal.
+                                    </p>
                                 </div>
                                  <div class="form-group">
                                     <label>Referencia / REF</label>
@@ -187,7 +212,11 @@ window.Inventory = {
                                     </select>
                                 </div>
                             </div>
-                            <button type="button" id="save-product-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 1rem;">Guardar Producto</button>
+                             <div class="form-group" style="grid-column: span 2;">
+                                 <button type="button" id="save-product-manual-btn" class="btn btn-primary btn-block" style="padding: 1.25rem; border-radius: 18px; font-weight: 700; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);">
+                                     <i class="fas fa-save"></i> GUARDAR PRODUCTO
+                                 </button>
+                             </div>
                         </form>
                     </div>
                 </div>
@@ -500,22 +529,24 @@ window.Inventory = {
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             window.ERP_LOG('Iniciando guardado manual (V66)...');
 
+            const cleanCurrency = (val) => parseFloat(String(val).replace(/[^0-9.-]/g, "")) || 0;
+
             const formData = new FormData(form);
             const product = {
                 id: this.editingId || '',
                 name: formData.get('name'),
                 category: formData.get('category'),
                 provider: formData.get('provider'),
-                priceWholesale: parseFloat(formData.get('priceWholesale')) || 0,
-                priceFinal: parseFloat(formData.get('priceInternet')) || 0, // Mapped to priceFinal in DB
-                commissionBase: parseFloat(formData.get('commissionBase')) || 0,
+                priceWholesale: cleanCurrency(formData.get('priceWholesale')),
+                priceFinal: cleanCurrency(formData.get('priceInternet')),
+                commissionBase: cleanCurrency(formData.get('commissionBase')),
                 stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
                 stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
                 company: formData.get('company'),
                 active: formData.get('active') === 'true',
                 image: Array.from(document.querySelectorAll('.image-base64'))
                     .map(input => input.value)
-                    .filter(val => !!val),
+                    .filter(val => val && val.startsWith('data:image')),
                 ref: formData.get('ref') || ''
             };
 
