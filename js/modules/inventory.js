@@ -153,19 +153,19 @@ window.Inventory = {
                                 </div>
                                  <div class="form-group">
                                      <label>Costo</label>
-                                     <input type="number" name="cost" step="0.01" required>
+                                     <input type="number" name="cost" step="any" required>
                                  </div>
                                  <div class="form-group">
                                      <label>Precio Mayorista</label>
-                                     <input type="number" name="priceWholesale" step="0.01" required>
+                                     <input type="number" name="priceWholesale" step="any" required>
                                  </div>
                                  <div class="form-group">
                                      <label>Precio Internet / Final</label>
-                                     <input type="number" name="priceInternet" step="0.01" value="0">
+                                     <input type="number" name="priceInternet" step="any" value="0">
                                  </div>
                                  <div class="form-group">
                                      <label>Comisión Base (TUCOMPRAS)</label>
-                                     <input type="number" name="commissionBase" step="0.01" value="0">
+                                     <input type="number" name="commissionBase" step="any" value="0">
                                  </div>
                                 <div class="form-group">
                                     <label>Stock Millenio</label>
