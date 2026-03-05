@@ -211,6 +211,14 @@ window.Sales = {
         const container = document.getElementById('sales-panel');
         if (!container) return;
 
+        // Re-render products whenever the panel becomes visible (navigation)
+        const observer = new MutationObserver(() => {
+            if (container.classList.contains('active')) {
+                this.renderProductGrid(document.getElementById('pos-product-search')?.value || '');
+            }
+        });
+        observer.observe(container, { attributes: true, attributeFilter: ['class'] });
+
         // Centralized Event Delegation for Click Actions
         container.onclick = async (e) => {
             // 1. Company Switching — only re-render grid, don't rebuild whole panel
