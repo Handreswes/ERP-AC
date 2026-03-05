@@ -1101,25 +1101,45 @@ option:checked {
         text-transform: uppercase;
     }
 
-    .data-table td[data-label="Foto"] {
-        justify-content: center;
-        padding-bottom: 1rem;
-        border-bottom: 1px solid var(--border);
-        margin-bottom: 0.5rem;
+    /* Thumbnail fix in cards */
+    .data-table td img {
+        width: 60px !important;
+        height: 60px !important;
+        border-radius: 8px;
+        object-fit: cover;
     }
 
-    .table-thumb {
-        width: 100px;
-        height: 100px;
-        border-radius: 12px;
-    }
-
-    .table-actions {
+    /* Hide redundant columns in mobile if needed */
+    .data-table td[data-label="Acciones"] {
         justify-content: center;
-        padding-top: 1rem;
         border-top: 1px solid var(--border);
         margin-top: 0.5rem;
+        padding-top: 1rem;
     }
+}
+
+text-transform: uppercase;
+}
+
+.data-table td[data-label="Foto"] {
+    justify-content: center;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0.5rem;
+}
+
+.table-thumb {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+}
+
+.table-actions {
+    justify-content: center;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    margin-top: 0.5rem;
+}
 }
 
 /* Dashboard Details Section */
