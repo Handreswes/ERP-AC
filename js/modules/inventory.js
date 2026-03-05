@@ -152,20 +152,24 @@ window.Inventory = {
                                     <input type="text" name="provider">
                                 </div>
                                  <div class="form-group">
-                                     <label>Costo</label>
-                                     <input type="number" name="cost" step="any" required>
+                                     <label>Costo ($)</label>
+                                     <input type="text" name="cost" placeholder="0" inputmode="numeric" required
+                                         oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
                                  </div>
                                  <div class="form-group">
-                                     <label>Precio Mayorista</label>
-                                     <input type="number" name="priceWholesale" step="any" required>
+                                     <label>Precio Mayorista ($)</label>
+                                     <input type="text" name="priceWholesale" placeholder="0" inputmode="numeric" required
+                                         oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
                                  </div>
                                  <div class="form-group">
-                                     <label>Precio Internet / Final</label>
-                                     <input type="number" name="priceInternet" step="any" value="0">
+                                     <label>Precio Internet / Final ($)</label>
+                                     <input type="text" name="priceInternet" placeholder="0" inputmode="numeric"
+                                         oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
                                  </div>
                                  <div class="form-group">
-                                     <label>Comisión Base (TUCOMPRAS)</label>
-                                     <input type="number" name="commissionBase" step="any" value="0">
+                                     <label>Comisión Base (TUCOMPRAS) ($)</label>
+                                     <input type="text" name="commissionBase" placeholder="0" inputmode="numeric"
+                                         oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
                                  </div>
                                 <div class="form-group">
                                     <label>Stock Millenio</label>
