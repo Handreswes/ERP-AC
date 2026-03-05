@@ -439,8 +439,11 @@ window.Inventory = {
             }
 
             if (e.target.classList.contains('close-modal')) {
-                e.target.closest('.modal').classList.remove('show');
-                document.body.classList.remove('modal-open'); // Add this line
+                const modal = e.target.closest('.modal');
+                if (modal) {
+                    modal.classList.remove('show');
+                    document.body.classList.remove('modal-open');
+                }
                 return;
             }
         });
