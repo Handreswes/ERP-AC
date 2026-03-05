@@ -7,6 +7,27 @@ window.Sales = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
+        this.setupCurrencyMasks();
+    },
+
+    setupCurrencyMasks() {
+        const panel = document.getElementById('sales-panel');
+        if (!panel) return;
+
+        const formatValue = (val) => {
+            let n = val.replace(/\D/g, "");
+            return n === "" ? "" : Number(n).toLocaleString('es-CO');
+        };
+
+        panel.addEventListener('input', (e) => {
+            if (e.target.classList.contains('cart-price-input')) {
+                const cursor = e.target.selectionStart;
+                const oldLen = e.target.value.length;
+                e.target.value = formatValue(e.target.value);
+                const newLen = e.target.value.length;
+                e.target.setSelectionRange(cursor + (newLen - oldLen), cursor + (newLen - oldLen));
+            }
+        });
     },
 
     renderPanel() {
