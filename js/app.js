@@ -107,16 +107,16 @@ function initNavigation() {
 
         // Module specific refreshes
         const modMap = {
-            'dashboard': window.Dashboard?.updateStats,
-            'inventory': window.Inventory?.updateInventoryList,
+            'dashboard': () => window.Dashboard?.updateStats?.(),
+            'inventory': () => window.Inventory?.updateInventoryList?.(),
             'sales': () => window.Sales?.renderProductGrid?.(''),
-            'crm': window.CRM?.renderPanel,
-            'finances': window.Finances?.renderPanel,
-            'tucompras': window.TuCompras?.renderPanel,
-            'vendedores': window.Vendedores?.renderPanel,
-            'tucompras-crm': window.TuComprasCRM?.renderPanel,
-            'consultas': window.Consultas?.renderPanel,
-            'catalog': window.Catalog?.renderPanel
+            'crm': () => window.CRM?.renderPanel?.(),
+            'finances': () => window.Finances?.renderPanel?.(),
+            'tucompras': () => window.TuCompras?.renderPanel?.(),
+            'vendedores': () => window.Vendedores?.renderPanel?.(),
+            'tucompras-crm': () => window.TuComprasCRM?.renderPanel?.(),
+            'consultas': () => window.Consultas?.renderPanel?.(),
+            'catalog': () => window.Catalog?.renderPanel?.()
         };
 
         if (modMap[panelName]) {
