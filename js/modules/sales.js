@@ -1,4 +1,4 @@
-// Sales Module
+﻿// Sales Module
 window.Sales = {
     cart: [],
     selectedClient: null,
@@ -7,27 +7,6 @@ window.Sales = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
-        this.setupCurrencyMasks();
-    },
-
-    setupCurrencyMasks() {
-        const panel = document.getElementById('sales-panel');
-        if (!panel) return;
-
-        const formatValue = (val) => {
-            let n = val.replace(/\D/g, "");
-            return n === "" ? "" : Number(n).toLocaleString('es-CO');
-        };
-
-        panel.addEventListener('input', (e) => {
-            if (e.target.classList.contains('cart-price-input')) {
-                const cursor = e.target.selectionStart;
-                const oldLen = e.target.value.length;
-                e.target.value = formatValue(e.target.value);
-                const newLen = e.target.value.length;
-                e.target.setSelectionRange(cursor + (newLen - oldLen), cursor + (newLen - oldLen));
-            }
-        });
     },
 
     renderPanel() {
@@ -269,9 +248,7 @@ window.Sales = {
 
             // 4. Close Modal
             if (e.target.classList.contains('close-modal')) {
-                const modal = e.target.closest('.modal');
-                modal.classList.remove('show');
-                document.body.classList.remove('modal-open');
+                e.target.closest('.modal').classList.remove('show');
                 return;
             }
 
@@ -294,9 +271,7 @@ window.Sales = {
                 }
 
                 if (btn.id === 'select-client-btn') {
-                    const modal = document.getElementById('client-picker-modal');
-                    modal.classList.add('show');
-                    document.body.classList.add('modal-open');
+                    document.getElementById('client-picker-modal').classList.add('show');
                     this.renderPickerList();
                     return;
                 }
@@ -455,3 +430,4 @@ window.Sales = {
         }
     }
 };
+
