@@ -62,23 +62,26 @@
 
     <!-- Bottom Navigation (Mobile Only) -->
     <nav class="bottom-nav">
-        <a href="#" class="bottom-nav-item active" data-panel="dashboard" onclick="void(0)">
+        <a href="javascript:void(0)" class="bottom-nav-item active" data-panel="dashboard"
+            onclick="window.handleNavClick('dashboard')">
             <i class="fas fa-th-large"></i>
             <span>Inicio</span>
         </a>
-        <a href="#" class="bottom-nav-item" data-panel="inventory" onclick="void(0)">
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="inventory"
+            onclick="window.handleNavClick('inventory')">
             <i class="fas fa-boxes"></i>
             <span>Stock</span>
         </a>
-        <a href="#" class="bottom-nav-item" data-panel="sales" onclick="void(0)">
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="sales"
+            onclick="window.handleNavClick('sales')">
             <i class="fas fa-cash-register"></i>
             <span>Ventas</span>
         </a>
-        <a href="#" class="bottom-nav-item" data-panel="crm" onclick="void(0)">
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="crm" onclick="window.handleNavClick('crm')">
             <i class="fas fa-users"></i>
             <span>Clientes</span>
         </a>
-        <a href="#" id="mobile-menu-trigger" class="bottom-nav-item" onclick="void(0)">
+        <a href="javascript:void(0)" id="mobile-menu-trigger" class="bottom-nav-item">
             <i class="fas fa-bars"></i>
             <span>Menú</span>
         </a>
