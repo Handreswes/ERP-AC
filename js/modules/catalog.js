@@ -173,26 +173,32 @@ window.Catalog = {
         const html = `<!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${title}</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; }
-        body { font-family: "Outfit", sans-serif; background: var(--bg); margin: 0; padding: 0; }
-        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 4rem 2rem; text-align: center; }
-        .header h1 { margin: 0; font-size: 3rem; }
-        .container { max-width: 1200px; margin: -2rem auto 4rem; padding: 0 2rem; }
-        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
-        .product-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; }
-        .product-card:hover { transform: translateY(-10px); }
-        .product-gallery { width: 100%; height: 280px; position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: #f1f5f9; }
+        body { font-family: "Outfit", sans-serif; background: var(--bg); margin: 0; padding: 0; overflow-x: hidden; }
+        .header { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: white; padding: 3rem 1.5rem; text-align: center; }
+        .header h1 { margin: 0; font-size: 2.2rem; }
+        .container { max-width: 1200px; margin: -1.5rem auto 4rem; padding: 0 1rem; }
+        .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+        .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; }
+        .product-gallery { width: 100%; height: 250px; position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: #f1f5f9; }
         .product-gallery::-webkit-scrollbar { display: none; }
-        .product-img { min-width: 100%; height: 280px; object-fit: cover; scroll-snap-align: start; }
-        .product-info { padding: 1.5rem; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; }
-        .category { font-size: 0.7rem; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem; }
-        .name { font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; }
-        .price-tag { background: var(--primary); color: white; padding: 0.5rem 1.5rem; border-radius: 50px; font-weight: 700; }
-        .print-btn { position: fixed; bottom: 2rem; right: 2rem; background: var(--accent); color: white; border: none; padding: 1rem 2rem; border-radius: 50px; cursor: pointer; }
+        .product-img { min-width: 100%; height: 250px; object-fit: cover; scroll-snap-align: start; }
+        .product-info { padding: 1.25rem; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; }
+        .category { font-size: 0.65rem; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.3rem; }
+        .name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1e293b; }
+        .price-tag { background: var(--primary); color: white; padding: 0.4rem 1.2rem; border-radius: 50px; font-weight: 700; display: inline-block; align-self: center; }
+        .print-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--accent); color: white; border: none; padding: 1rem 1.5rem; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 20px rgba(59,130,246,0.3); z-index: 100; }
+        @media (max-width: 480px) {
+            .catalog-grid { grid-template-columns: 1fr; }
+            .header h1 { font-size: 1.8rem; }
+            .product-gallery, .product-img { height: 300px; }
+        }
         @media print { .print-btn { display: none; } }
     </style>
 </head>
