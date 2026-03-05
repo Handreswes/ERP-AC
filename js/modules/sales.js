@@ -248,7 +248,9 @@ window.Sales = {
 
             // 4. Close Modal
             if (e.target.classList.contains('close-modal')) {
-                e.target.closest('.modal').classList.remove('show');
+                const modal = e.target.closest('.modal');
+                modal.classList.remove('show');
+                document.body.classList.remove('modal-open');
                 return;
             }
 
@@ -271,7 +273,9 @@ window.Sales = {
                 }
 
                 if (btn.id === 'select-client-btn') {
-                    document.getElementById('client-picker-modal').classList.add('show');
+                    const modal = document.getElementById('client-picker-modal');
+                    modal.classList.add('show');
+                    document.body.classList.add('modal-open');
                     this.renderPickerList();
                     return;
                 }
