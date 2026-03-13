@@ -147,6 +147,10 @@ window.Inventory = {
                                     <label>Categoría</label>
                                     <input type="text" name="category" required>
                                 </div>
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label>Descripción (Sólo visible en Catálogo)</label>
+                                    <textarea name="description" rows="3" placeholder="Ej: Excelente herramienta con motor de cobre..."></textarea>
+                                </div>
                                 <div class="form-group">
                                     <label>Proveedor</label>
                                     <input type="text" name="provider">
@@ -524,6 +528,7 @@ window.Inventory = {
                 id: this.editingId || '',
                 name: formData.get('name'),
                 category: formData.get('category'),
+                description: formData.get('description') || '',
                 provider: formData.get('provider'),
                 cost: cleanCurrency(formData.get('cost')),
                 priceWholesale: cleanCurrency(formData.get('priceWholesale')),
