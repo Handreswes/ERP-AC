@@ -1,4 +1,4 @@
-﻿// Inventory Module
+// Inventory Module
 window.Inventory = {
     activeCompanyFilter: 'all',
     activeTab: 'stock',
@@ -470,24 +470,58 @@ window.Inventory = {
         console.log(`DEBUG: Uploading image to slot ${index}`);
         const reader = new FileReader();
         reader.onload = (ev) => {
-            const base64 = ev.target.result;
-            const slot = document.querySelector(`.image-slot[data-index="${index}"]`);
-            if (slot) {
-                slot.classList.remove('empty');
-                if (index === 0) slot.classList.add('primary');
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                // Resize rules for LocalStorage limits
+                const MAX_WIDTH = 600;
+                const MAX_HEIGHT = 600;
+                let width = tempImg.width;
+                let height = tempImg.height;
 
-                let img = slot.querySelector('img');
-                if (!img) {
-                    img = document.createElement('img');
-                    slot.insertBefore(img, slot.firstChild);
+                if (width > height) {
+                    if (width > MAX_WIDTH) {
+                        height *= MAX_WIDTH / width;
+                        width = MAX_WIDTH;
+                    }
+                } else {
+                    if (height > MAX_HEIGHT) {
+                        width *= MAX_HEIGHT / height;
+                        height = MAX_HEIGHT;
+                    }
                 }
-                img.src = base64;
-                const hiddenInput = slot.querySelector('.image-base64');
-                if (hiddenInput) {
-                    hiddenInput.value = base64;
-                    console.log(`DEBUG: Image ${index} set in hidden input (length: ${base64.length})`);
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                
+                // Clear and draw image with white background in case of transparent PNGs
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(tempImg, 0, 0, width, height);
+
+                // Compress heavily to avoid 5MB quota errors
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+
+                const slot = document.querySelector(`.image-slot[data-index="${index}"]`);
+                if (slot) {
+                    slot.classList.remove('empty');
+                    if (index === 0) slot.classList.add('primary');
+
+                    let img = slot.querySelector('img');
+                    if (!img) {
+                        img = document.createElement('img');
+                        slot.insertBefore(img, slot.firstChild);
+                    }
+                    img.src = compressedBase64;
+                    const hiddenInput = slot.querySelector('.image-base64');
+                    if (hiddenInput) {
+                        hiddenInput.value = compressedBase64;
+                        console.log(`DEBUG: Image ${index} compressed to ${Math.round(compressedBase64.length / 1024)}KB`);
+                    }
                 }
-            }
+            };
+            tempImg.src = ev.target.result;
         };
         reader.readAsDataURL(file);
     },
