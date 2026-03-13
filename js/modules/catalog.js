@@ -95,7 +95,10 @@ window.Catalog = {
                 return `
                     <tr>
                         <td><img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/50'}" style="width: 50px; height:50px; object-fit: cover; border-radius: 8px;"></td>
-                        <td><strong>${p.name}</strong></td>
+                        <td>
+                            <strong>${p.name}</strong>
+                            ${p.description ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; white-space: normal; line-height: 1.2;">${p.description}</div>` : ''}
+                        </td>
                         <td>${p.category}</td>
                         <td class="text-success" style="font-weight: 700;">$${parseFloat(price || 0).toLocaleString()}</td>
                     </tr>
@@ -111,6 +114,7 @@ window.Catalog = {
                         <img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/70'}" class="catalog-mobile-img">
                         <div class="catalog-mobile-info">
                             <span class="catalog-mobile-name">${p.name}</span>
+                            ${p.description ? `<div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 2px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${p.description}</div>` : ''}
                             <small style="color: var(--text-secondary)">${p.category}</small>
                             <div class="catalog-mobile-price">$${parseFloat(price || 0).toLocaleString()}</div>
                         </div>
@@ -164,6 +168,7 @@ window.Catalog = {
                     <div class="product-info">
                         <div class="category">${p.category || 'General'}</div>
                         <div class="name">${p.name}</div>
+                        ${p.description ? `<div style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem; line-height: 1.4; text-align: left;">${p.description}</div>` : ''}
                         <div class="price-tag">$${parseFloat(price).toLocaleString()}</div>
                     </div>
                 </div>
