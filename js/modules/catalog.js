@@ -7,7 +7,7 @@ window.Catalog = {
     currentPriceType: 'wholesale', // 'wholesale' or 'internet'
 
     init() {
-        // This will be called via Navigation
+        this.renderPanel();
     },
 
     renderPanel() {
