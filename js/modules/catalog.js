@@ -221,7 +221,8 @@ window.Catalog = {
 </body>
 </html>`;
 
-        catalogWindow.document.write(html);
-        catalogWindow.document.close();
+        const blob = new Blob([html], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        catalogWindow.location.href = url;
     }
 };
