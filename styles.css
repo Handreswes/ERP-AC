@@ -728,34 +728,55 @@ option:checked {
 .cart-table th,
 .cart-table td {
     padding: 10px 5px;
+    vertical-align: middle;
 }
 
 /* Specific column widths for desktop cart to prevent squishing */
-.cart-table th:nth-child(1) {
-    width: 35%;
-}
+@media (min-width: 769px) {
 
-/* Producto */
-.cart-table th:nth-child(2) {
-    width: 25%;
-}
+    .cart-table th:nth-child(1),
+    .cart-table td:nth-child(1) {
+        width: 35%;
+        max-width: 130px;
+    }
 
-/* Precio */
-.cart-table th:nth-child(3) {
-    width: 15%;
-}
+    /* Producto */
+    .cart-table th:nth-child(2),
+    .cart-table td:nth-child(2) {
+        width: 25%;
+        min-width: 80px;
+    }
 
-/* Cant */
-.cart-table th:nth-child(4) {
-    width: 20%;
-}
+    /* Precio */
+    .cart-table th:nth-child(3),
+    .cart-table td:nth-child(3) {
+        width: 15%;
+        min-width: 90px;
+    }
 
-/* Total */
-.cart-table th:nth-child(5) {
-    width: 5%;
-}
+    /* Cant */
+    .cart-table th:nth-child(4),
+    .cart-table td:nth-child(4) {
+        width: 20%;
+        min-width: 70px;
+    }
 
-/* Remove */
+    /* Total */
+    .cart-table th:nth-child(5),
+    .cart-table td:nth-child(5) {
+        width: 5%;
+        min-width: 30px;
+        text-align: center;
+    }
+
+    /* Remove */
+
+    .cart-table td:nth-child(1) div {
+        white-space: nowrap !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
 
 
 /* POS Product Grid — compact Treinta style */
@@ -1621,4 +1642,54 @@ select {
 
 .image-slot:not(.empty) .slot-placeholder {
     display: none;
+}
+
+/* Catalog Mobile & Desktop Visibility */
+@media (max-width: 768px) {
+    .desktop-only {
+        display: none !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+/* Catalog Mobile Cards */
+.catalog-mobile-card {
+    display: flex;
+    gap: 15px;
+    padding: 15px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    align-items: center;
+}
+
+.catalog-mobile-img {
+    width: 70px;
+    height: 70px;
+    border-radius: 12px;
+    object-fit: cover;
+}
+
+.catalog-mobile-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.catalog-mobile-name {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--text-primary);
+}
+
+.catalog-mobile-price {
+    font-weight: 700;
+    color: var(--success);
+    margin-top: 5px;
 }
