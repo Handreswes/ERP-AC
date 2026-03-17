@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     color-scheme: dark;
     --bg-dark: #020617;
     --bg-card: rgba(30, 41, 59, 0.7);
@@ -600,7 +600,8 @@ body.logged-out .app-container {
 }
 
 .form-group input,
-.form-group select {
+.form-group select,
+.form-group textarea {
     background-color: var(--bg-dark);
     border: 1px solid var(--border);
     color: var(--text-primary);
@@ -608,14 +609,15 @@ body.logged-out .app-container {
     border-radius: 8px;
     outline: none;
     cursor: pointer;
+    width: 100%;
+    box-sizing: border-box;
+    font-family: inherit;
+    resize: vertical;
 }
 
-.form-group select option {
-    background-color: var(--bg-card);
-    color: var(--text-primary);
-}
-
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
     border-color: var(--accent);
 }
 
@@ -1461,7 +1463,8 @@ option:checked {
 .form-control,
 input[type="text"],
 input[type="number"],
-select {
+select,
+textarea {
     background: rgba(0, 0, 0, 0.2) !important;
     border: 2px solid var(--border) !important;
     border-radius: 16px !important;
@@ -1469,9 +1472,12 @@ select {
     font-size: 1rem !important;
     color: white !important;
     transition: all 0.3s ease;
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.form-control:focus {
+.form-control:focus,
+textarea:focus {
     border-color: var(--accent-vibrant) !important;
     box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1) !important;
     background: rgba(0, 0, 0, 0.3) !important;
