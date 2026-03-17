@@ -589,22 +589,37 @@ window.Inventory = {
                 window.ERP_LOG('Creación local exitosa. ID: ' + result.id, 'success');
             }
 
-            form.reset();
-            this.editingId = null;
-            const modal = document.getElementById('product-modal');
-            if (modal) modal.classList.remove('show');
-            this.updateInventoryList();
+            // If stock is 0, user won't see it in 'stock' tab. Auto-switch to 'limbo'.
+            const totalStock = product.stockMillenio + product.stockVulcano;
+            if (totalStock <= 0) {
+                this.activeTab = 'limbo';
+            } else {
+                this.activeTab = 'stock';
+            }
 
-            // Final verification log
-            console.log('DEBUG: Inventory List Updated. Search for "soldador" now.');
-            alert('✅ ¡EXITO! Producto guardado correctamente y sincronizando...');
+            // Visual Success instead of blocking alert
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡GUARDADO!';
+            btn.classList.replace('btn-primary', 'btn-success');
+            
+            setTimeout(() => {
+                form.reset();
+                this.editingId = null;
+                const modal = document.getElementById('product-modal');
+                if (modal) modal.classList.remove('show');
+                
+                // Re-render UI to update tabs and lists
+                this.renderPanel();
+                
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PRODUCTO';
+                btn.classList.replace('btn-success', 'btn-primary');
+            }, 1200);
 
         } catch (err) {
             window.ERP_LOG('ERROR CRITICO: ' + err.message, 'error');
             alert('❌ ERROR AL GUARDAR: ' + err.message);
-        } finally {
             btn.disabled = false;
-            btn.innerHTML = 'Guardar Producto';
+            btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PRODUCTO';
         }
     }
 };
