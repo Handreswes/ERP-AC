@@ -177,6 +177,7 @@ window.Storage = {
                     if (error) {
                         console.error(`Supabase Insert Error (${table}):`, error.message);
                         this.updateStatus(false);
+                        if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
                     } else {
                         console.log(`Supabase Sync Success (${table})`);
                         this.updateStatus(true);
@@ -213,6 +214,7 @@ window.Storage = {
                         if (error) {
                             console.error(`Supabase Update Error (${table}):`, error.message);
                             this.updateStatus(false);
+                            if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
                         } else {
                             this.updateStatus(true);
                         }
