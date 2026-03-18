@@ -39,7 +39,7 @@ window.CRM = {
                     <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Gestión de Clientes</h3>
                     <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Agrega nuevos clientes para llevar su control de cartera y facturación.</p>
                 </div>
-                <button type="button" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-weight: 600; background: #10b981; border-color: #10b981;" onclick="document.getElementById('client-modal').classList.add('show')">
+                <button type="button" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-weight: 600; background: #10b981; border-color: #10b981;" onclick="window.CRM.editingId = null; document.getElementById('client-form').reset(); document.getElementById('client-modal-title').textContent = 'Nuevo Cliente'; document.getElementById('client-modal').classList.add('show');">
                     <i class="fas fa-plus-circle" style="margin-right: 8px;"></i> Crear Nuevo Cliente
                 </button>
             </div>
@@ -132,8 +132,21 @@ window.CRM = {
                     </div>
                 </div>
             </div>
+            <!-- Statement Modal -->
+            <div id="statement-modal" class="modal">
+                <div class="modal-content" style="max-width: 400px;">
+                    <div class="modal-header">
+                        <h2>Estado de Cuenta</h2>
+                        <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
+                    </div>
+                    <div class="modal-body" id="statement-modal-body">
+                        <!-- Content -->
+                    </div>
+                </div>
+            </div>
         `;
 
+        this.editingId = null;
         this.updateClientList();
     },
 
@@ -167,7 +180,8 @@ window.CRM = {
                 <td class="table-actions">
                     <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono" onclick="document.getElementById('payment-client-id').value = this.dataset.id; document.getElementById('payment-modal').classList.add('show');"><i class="fas fa-hand-holding-usd"></i></button>
                     <button class="icon-btn state-btn" data-id="${c.id}" title="Estado de Cuenta"><i class="fas fa-file-invoice-dollar"></i></button>
-                    <button class="icon-btn edit-btn" data-id="${c.id}"><i class="fas fa-edit"></i></button>
+                    <button class="icon-btn edit-btn" data-id="${c.id}" title="Editar Cliente"><i class="fas fa-edit"></i></button>
+                    <button class="icon-btn delete-btn" data-id="${c.id}" title="Eliminar Cliente" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>
         `).join('');
@@ -250,6 +264,69 @@ window.CRM = {
 
             // Safe check for closest to avoid errors on Document/Window clicks
             if (tgt && typeof tgt.closest === 'function') {
+                const editBtn = tgt.closest('.edit-btn');
+                if (editBtn) {
+                    const id = editBtn.dataset.id;
+                    const client = this.getClients().find(c => c.id === id);
+                    if (client) {
+                        this.editingId = id;
+                        document.getElementById('client-modal-title').textContent = 'Editar Cliente';
+                        const form = document.getElementById('client-form');
+                        Object.keys(client).forEach(key => {
+                            if (form.elements[key]) form.elements[key].value = client[key];
+                        });
+                        document.getElementById('client-modal').classList.add('show');
+                    }
+                    return;
+                }
+
+                const deleteBtn = tgt.closest('.delete-btn');
+                if (deleteBtn) {
+                    const id = deleteBtn.dataset.id;
+                    if (confirm('¿Estás seguro de eliminar este cliente permanentemente? Serán eliminados sus registros locales.')) {
+                        try {
+                            await Storage.deleteItem(STORAGE_KEYS.CLIENTS, id);
+                            alert('✅ Cliente eliminado correctamente.');
+                            this.updateClientList();
+                        } catch (e) {
+                            alert('❌ Error eliminando cliente: ' + e.message);
+                        }
+                    }
+                    return;
+                }
+                
+                const stateBtn = tgt.closest('.state-btn');
+                if (stateBtn) {
+                    const id = stateBtn.dataset.id;
+                    const client = this.getClients().find(c => c.id === id);
+                    if (client) {
+                        const mDebt = parseFloat(client.balanceMillenio) || 0;
+                        const vDebt = parseFloat(client.balanceVulcano) || 0;
+                        const total = mDebt + vDebt;
+                        
+                        document.getElementById('statement-modal-body').innerHTML = `
+                            <div style="text-align: center; margin-bottom: 1.5rem;">
+                                <h3>${client.name}</h3>
+                                <p class="text-secondary">${client.phone || 'Sin télefono'}</p>
+                            </div>
+                            <div class="stat-card" style="margin-bottom: 1rem; border-left: 4px solid var(--accent);">
+                                <h4 style="margin:0; font-size: 0.8rem; color: var(--text-secondary);">Deuda Millenio</h4>
+                                <p style="margin:0; font-size: 1.25rem; font-weight: bold; color: ${mDebt > 0 ? 'var(--danger)' : 'var(--success)'}">$${mDebt.toLocaleString()}</p>
+                            </div>
+                            <div class="stat-card" style="margin-bottom: 1rem; border-left: 4px solid var(--warning);">
+                                <h4 style="margin:0; font-size: 0.8rem; color: var(--text-secondary);">Deuda Vulcano</h4>
+                                <p style="margin:0; font-size: 1.25rem; font-weight: bold; color: ${vDebt > 0 ? 'var(--danger)' : 'var(--success)'}">$${vDebt.toLocaleString()}</p>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 1px solid var(--border);">
+                                <strong>TOTAL ADEUDADO:</strong>
+                                <strong style="color: ${total > 0 ? 'var(--danger)' : 'var(--success)'};">$${total.toLocaleString()}</strong>
+                            </div>
+                        `;
+                        document.getElementById('statement-modal').classList.add('show');
+                    }
+                    return;
+                }
+
                 const abonoBtn = tgt.closest('.abono-btn');
                 if (abonoBtn) {
                     const modal = document.getElementById('payment-modal');
@@ -273,10 +350,20 @@ window.CRM = {
             window.ERP_LOG('Iniciando creación de cliente...');
 
             const formData = new FormData(form);
-            const client = Object.fromEntries(formData.entries());
+            const clientData = Object.fromEntries(formData.entries());
 
-            await this.addClient(client);
-            window.ERP_LOG('Cliente creado localmente', 'success');
+            if (this.editingId) {
+                await Storage.updateItem(STORAGE_KEYS.CLIENTS, this.editingId, {
+                    ...clientData,
+                    balanceMillenio: parseFloat(clientData.balanceMillenio) || 0,
+                    balanceVulcano: parseFloat(clientData.balanceVulcano) || 0
+                });
+                window.ERP_LOG('Cliente actualizado localmente', 'success');
+                this.editingId = null;
+            } else {
+                await this.addClient(clientData);
+                window.ERP_LOG('Cliente creado localmente', 'success');
+            }
 
             form.reset();
             document.getElementById('client-modal').classList.remove('show');
