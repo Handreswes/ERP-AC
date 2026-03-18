@@ -156,45 +156,45 @@ CREATE TABLE IF NOT EXISTS public.sellers (
     "id" TEXT PRIMARY KEY,
     "name" TEXT,
     "phone" TEXT,
+    "status" TEXT,                       /* Added to match frontend 'active'/'inactive' */
     "commissionRate" DECIMAL(5, 2) DEFAULT 0,
-    "active" BOOLEAN DEFAULT true,
+    "active" BOOLEAN DEFAULT true,       /* Kept for backwards config compatibility */
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
 CREATE TABLE IF NOT EXISTS public.tucompras_sales (
     "id" TEXT PRIMARY KEY,
-    "cliente" TEXT,
-    "clientId" TEXT,
+    "date" TEXT,
+    "customer_name" TEXT,
+    "customer_phone" TEXT,
+    "seller_id" TEXT,
+    "carrier" TEXT,
+    "tracking_number" TEXT,
+    "inventory_source" TEXT,
+    "status" TEXT,
+    "shipping_cost" DECIMAL(12, 2) DEFAULT 0,
+    "shipping_loss" DECIMAL(12, 2) DEFAULT 0,
+    "commission_paid" DECIMAL(12, 2) DEFAULT 0,
     "items" JSONB DEFAULT '[]'::jsonb,
-    "subtotal" DECIMAL(12, 2) DEFAULT 0,
-    "envio" DECIMAL(12, 2) DEFAULT 0,
-    "total" DECIMAL(12, 2) DEFAULT 0,
-    "estado" TEXT,
-    "recaudador" TEXT,
-    "guia" TEXT,
-    "fecha" TEXT,
-    "vendedorId" TEXT,
-    "vendedorName" TEXT,
-    "comisionTotal" DECIMAL(12, 2) DEFAULT 0,
-    "comisionPagada" BOOLEAN DEFAULT false,
+    "money_confirmed" BOOLEAN DEFAULT false,
+    "money_confirmed_at" TEXT,
+    "is_paid_to_inventory" BOOLEAN DEFAULT false,
+    "inventory_paid_at" TEXT,
+    "is_commission_paid" BOOLEAN DEFAULT false,
+    "commission_paid_at" TEXT,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
 CREATE TABLE IF NOT EXISTS public.campaigns (
     "id" TEXT PRIMARY KEY,
-    "name" TEXT,
-    "budget" DECIMAL(12, 2) DEFAULT 0,
-    "platform" TEXT,
-    "startDate" TEXT,
-    "endDate" TEXT,
+    "seller_id" TEXT,
+    "start_date" TEXT,
+    "end_date" TEXT,
+    "goal_type" TEXT,
+    "goal_value" DECIMAL(12, 2) DEFAULT 0,
     "status" TEXT,
-    "leadsGenerated" INTEGER DEFAULT 0,
-    "costPerLead" DECIMAL(12, 2) DEFAULT 0,
-    "salesConverted" INTEGER DEFAULT 0,
-    "revenueGenerated" DECIMAL(12, 2) DEFAULT 0,
-    "roas" DECIMAL(10, 2) DEFAULT 0,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
@@ -203,12 +203,14 @@ CREATE TABLE IF NOT EXISTS public.tucompras_customers (
     "id" TEXT PRIMARY KEY,
     "name" TEXT,
     "phone" TEXT,
+    "dept" TEXT,             /* Added from crm object */
     "city" TEXT,
     "address" TEXT,
     "totalPurchases" INTEGER DEFAULT 0,
     "totalSpent" DECIMAL(12, 2) DEFAULT 0,
     "lastPurchase" TEXT,
     "tags" JSONB DEFAULT '[]'::jsonb,
+    "created_at" TEXT,       /* Exact match from JS created_at */
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
