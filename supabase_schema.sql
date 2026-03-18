@@ -1,6 +1,7 @@
 -- ERP AC DATABASE SCHEMA (V2 - Strict CamelCase matching Frontend JS)
--- DROP existing tables safely if you are starting fresh
--- DROP TABLE IF EXISTS public.products, public.clients, public.sales, public.accounts, public.movements, public.expenses, public.recurring_expenses, public.cash_closings, public.transit_orders, public.payments, public.sellers, public.tucompras_sales, public.campaigns, public.tucompras_customers CASCADE;
+-- WARNING: This will drop existing tables and recreate them to match the JS codebase perfectly.
+
+DROP TABLE IF EXISTS public.products, public.clients, public.sales, public.accounts, public.movements, public.expenses, public.recurring_expenses, public.cash_closings, public.transit_orders, public.payments, public.sellers, public.tucompras_sales, public.campaigns, public.tucompras_customers CASCADE;
 
 CREATE TABLE IF NOT EXISTS public.products (
     "id" TEXT PRIMARY KEY,
@@ -29,6 +30,8 @@ CREATE TABLE IF NOT EXISTS public.clients (
     "email" TEXT,
     "company" TEXT,
     "level" TEXT,
+    "type" TEXT,                     /* Added to match frontend crm.js */
+    "businessName" TEXT,             /* Added to match frontend crm.js */
     "address" TEXT,
     "city" TEXT,
     "balanceMillenio" DECIMAL(12, 2) DEFAULT 0,
@@ -142,6 +145,7 @@ CREATE TABLE IF NOT EXISTS public.payments (
     "method" TEXT,
     "company" TEXT,
     "accountId" TEXT,
+    "paymentDetails" TEXT,           /* Added to prevent crashes when hidden input is submitted */
     "date" TEXT,
     "notes" TEXT,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
