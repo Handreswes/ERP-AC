@@ -152,7 +152,7 @@ window.Storage = {
     },
 
     /**
-     * ADD ITEM: STRICTLY OFFLINE-FIRST
+     * ADD ITEM: CLOUD-FIRST (Awaits network response)
      */
     async addItem(key, item) {
         const table = TABLE_MAP[key];
@@ -164,36 +164,32 @@ window.Storage = {
             createdAt: new Date().toISOString()
         };
 
-        // 1. UPDATE CACHE & LOCALSTORAGE INSTANTLY
+        // 1. CLOUD SYNC STRICT AWAIT (Fails if network/API errors occur)
+        if (table && supabase) {
+            console.log(`Syncing ${table} to Cloud...`);
+            const { error } = await supabase.from(table).insert(newItem);
+            
+            if (error) {
+                console.error(`Supabase Insert Error (${table}):`, error.message);
+                this.updateStatus(false);
+                if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
+                throw new Error(`Refusado por el Servidor (Nube): ${error.message}`);
+            } else {
+                console.log(`Supabase Sync Success (${table})`);
+                this.updateStatus(true);
+            }
+        }
+
+        // 2. UPDATE CACHE & LOCALSTORAGE ONLY ON SUCCESS
         if (!this.cache[key]) this.cache[key] = [];
         this.cache[key].push(newItem);
         localStorage.setItem(`erp_${key}`, JSON.stringify(this.cache[key]));
-
-        // 2. BACKGROUND SYNC (NO AWAIT)
-        if (table && supabase) {
-            console.log(`Syncing ${table} in background...`);
-            supabase.from(table).insert(newItem)
-                .then(({ error }) => {
-                    if (error) {
-                        console.error(`Supabase Insert Error (${table}):`, error.message);
-                        this.updateStatus(false);
-                        if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
-                    } else {
-                        console.log(`Supabase Sync Success (${table})`);
-                        this.updateStatus(true);
-                    }
-                })
-                .catch(err => {
-                    console.error('Network Error during sync:', err);
-                    this.updateStatus(false);
-                });
-        }
 
         return newItem;
     },
 
     /**
-     * UPDATE ITEM: STRICTLY OFFLINE-FIRST
+     * UPDATE ITEM: CLOUD-FIRST
      */
     async updateItem(key, id, updatedData) {
         const table = TABLE_MAP[key];
@@ -203,52 +199,52 @@ window.Storage = {
 
         if (index !== -1) {
             const finalItem = { ...items[index], ...updatedData, updatedAt: new Date().toISOString() };
+
+            // Cloud Sync Await
+            if (table && supabase) {
+                const { error } = await supabase.from(table).update(updatedData).eq('id', id);
+                if (error) {
+                    console.error(`Supabase Update Error (${table}):`, error.message);
+                    this.updateStatus(false);
+                    if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
+                    throw new Error(`Refusado por el Servidor (Nube): ${error.message}`);
+                } else {
+                    this.updateStatus(true);
+                }
+            }
+
+            // Local Update
             items[index] = finalItem;
             this.cache[key] = items;
             localStorage.setItem(`erp_${key}`, JSON.stringify(items));
-
-            // Background Sync
-            if (table && supabase) {
-                supabase.from(table).update(updatedData).eq('id', id)
-                    .then(({ error }) => {
-                        if (error) {
-                            console.error(`Supabase Update Error (${table}):`, error.message);
-                            this.updateStatus(false);
-                            if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
-                        } else {
-                            this.updateStatus(true);
-                        }
-                    })
-                    .catch(() => this.updateStatus(false));
-            }
         }
         return items;
     },
 
     /**
-     * DELETE ITEM: STRICTLY OFFLINE-FIRST
+     * DELETE ITEM: CLOUD-FIRST
      */
     async deleteItem(key, id) {
         const table = TABLE_MAP[key];
         const supabase = window.supabaseClient;
         const items = this.get(key);
+        
+        // Cloud Sync Await
+        if (table && supabase) {
+            const { error } = await supabase.from(table).delete().eq('id', id);
+            if (error) {
+                console.error(`Supabase Delete Error (${table}):`, error.message);
+                this.updateStatus(false);
+                if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
+                throw new Error(`Refusado por el Servidor (Nube): ${error.message}`);
+            } else {
+                this.updateStatus(true);
+            }
+        }
+
         const filtered = items.filter(item => item.id !== id);
         this.cache[key] = filtered;
         localStorage.setItem(`erp_${key}`, JSON.stringify(filtered));
-
-        // Background Sync
-        if (table && supabase) {
-            supabase.from(table).delete().eq('id', id)
-                .then(({ error }) => {
-                    if (error) {
-                        console.error(`Supabase Delete Error (${table}):`, error.message);
-                        this.updateStatus(false);
-                    } else {
-                        this.updateStatus(true);
-                    }
-                })
-                .catch(() => this.updateStatus(false));
-        }
 
         return filtered;
     }
