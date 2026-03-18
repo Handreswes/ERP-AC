@@ -12,8 +12,8 @@ window.CRM = {
     async addClient(client) {
         return await Storage.addItem(STORAGE_KEYS.CLIENTS, {
             ...client,
-            balanceMillenio: 0,
-            balanceVulcano: 0,
+            balanceMillenio: parseFloat(client.balanceMillenio) || 0,
+            balanceVulcano: parseFloat(client.balanceVulcano) || 0,
             totalPurchases: 0
         });
     },
@@ -96,14 +96,25 @@ window.CRM = {
                                 </div>
                                 <div class="form-group">
                                     <label>Ciudad</label>
-                                    <input type="text" name="city">
+                                    <input type="text" name="city" class="form-control">
                                 </div>
                                 <div class="form-group">
                                     <label>Dirección</label>
-                                    <input type="text" name="address">
+                                    <input type="text" name="address" class="form-control">
+                                </div>
+                                <div class="form-group" style="grid-column: span 2; padding-top: 1rem; border-top: 1px solid var(--border); margin-top: 0.5rem;">
+                                    <h4 style="margin: 0 0 0.5rem 0; color: var(--accent);">Deudas Anteriores (Opcional)</h4>
+                                </div>
+                                <div class="form-group">
+                                    <label>Saldo Deuda Millenio</label>
+                                    <input type="number" name="balanceMillenio" class="form-control" placeholder="0">
+                                </div>
+                                <div class="form-group">
+                                    <label>Saldo Deuda Vulcano</label>
+                                    <input type="number" name="balanceVulcano" class="form-control" placeholder="0">
                                 </div>
                             </div>
-                            <button type="button" id="save-client-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 1rem;" onclick="CRM.handleSaveClient()">Guardar Cliente</button>
+                            <button type="button" id="save-client-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 1rem;">Guardar Cliente</button>
                         </form>
                     </div>
                 </div>
