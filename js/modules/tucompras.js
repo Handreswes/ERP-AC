@@ -681,24 +681,6 @@ window.TuCompras = {
             return;
         }
 
-        // Save customer profile automatically
-        await TuComprasCRM.addCustomer({
-            name, phone,
-            dept: document.getElementById('tc-cust-dept').value,
-            city: document.getElementById('tc-cust-city').value,
-            address: document.getElementById('tc-cust-address').value
-        });
-
-
-        for (const item of this.cart) {
-            const product = Inventory.getProducts().find(p => p.id === item.product_id);
-            if (product) {
-                if (source === 'millenio') product.stockMillenio -= item.qty;
-                else product.stockVulcano -= item.qty;
-                await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
-            }
-        }
-
         // Calculate total commission (sum across all cart items x qty)
         const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
 
@@ -718,7 +700,26 @@ window.TuCompras = {
             is_paid_to_inventory: false
         };
 
+        // 1. SAVE SALE FIRST (Primary Data)
         await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale);
+
+        // 2. DEPENDENT DATA (Customer CRM)
+        await TuComprasCRM.addCustomer({
+            name, phone,
+            dept: document.getElementById('tc-cust-dept').value,
+            city: document.getElementById('tc-cust-city').value,
+            address: document.getElementById('tc-cust-address').value
+        });
+
+        // 3. DEPENDENT DATA (Inventory Discount)
+        for (const item of this.cart) {
+            const product = Inventory.getProducts().find(p => p.id === item.product_id);
+            if (product) {
+                if (source === 'millenio') product.stockMillenio -= item.qty;
+                else product.stockVulcano -= item.qty;
+                await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+            }
+        }
         document.getElementById('tucompras-sale-modal').classList.remove('show');
         this.renderPanel();
         alert('Despacho registrado con éxito.');
