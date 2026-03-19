@@ -1,4 +1,4 @@
-﻿// Sales Module
+// Sales Module
 window.Sales = {
     cart: [],
     selectedClient: null,
@@ -84,6 +84,18 @@ window.Sales = {
                             <!-- Dynamic Bank Select -->
                         </div>
 
+                        <!-- Remission Box -->
+                        <div style="margin-top: 1rem; padding: 10px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                                <input type="checkbox" id="generate-remision-chk" checked style="width: 16px; height: 16px; cursor: pointer;">
+                                <label for="generate-remision-chk" style="margin: 0; cursor: pointer; font-weight: 600; color: var(--accent);">Generar Remisión PDF</label>
+                            </div>
+                            <div id="remision-number-wrapper">
+                                <label style="font-size: 0.75rem;">N° Consecutivo</label>
+                                <input type="text" id="remision-number-input" class="form-control" style="padding: 6px; font-size: 0.9rem;">
+                            </div>
+                        </div>
+
                         <button id="checkout-btn" class="btn btn-primary btn-block btn-lg" style="margin-top: 1rem;">Finalizar Venta</button>
                     </div>
                 </aside>
@@ -106,6 +118,12 @@ window.Sales = {
 
         this.renderProductGrid();
         this.updateCartUI();
+
+        // Auto-fill Remission Sequence
+        const salesCount = (Storage.get(STORAGE_KEYS.SALES) || []).length;
+        const nextRem = `REM-${String(salesCount + 1).padStart(4, '0')}`;
+        const remInput = document.getElementById('remision-number-input');
+        if(remInput) remInput.value = nextRem;
     },
 
     renderProductGrid(searchTerm = '') {
@@ -404,7 +422,7 @@ window.Sales = {
                     p.stockVulcano = (p.stockVulcano || 0) - item.quantity;
                     totalV += itemTotal;
                 }
-                await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, p);
+                // Update deferred to after sale is securely saved
             }
 
             const sale = {
@@ -424,9 +442,17 @@ window.Sales = {
                 date: new Date().toISOString()
             };
 
+            // 1. SAVE SALE FIRST (Primary Data)
             await Storage.addItem(STORAGE_KEYS.SALES, sale);
-            window.ERP_LOG('Venta registrada localmente', 'success');
+            window.ERP_LOG('Venta registrada en la nube', 'success');
 
+            // 2. COMMIT INVENTORY (Dependent Data)
+            for (const item of this.cart) {
+                const p = Inventory.getProducts().find(prod => prod.id === item.id);
+                if (p) await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, p);
+            }
+
+            // 3. COMMIT CREDIT DEBT IF APPLICABLE
             if (method === 'credit') {
                 const c = this.selectedClient;
                 c.balanceMillenio = (c.balanceMillenio || 0) + totalM;
@@ -434,12 +460,25 @@ window.Sales = {
                 await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, c);
             }
 
-            alert(`✅ Venta realizada. Millenio: $${totalM.toLocaleString()} | Vulcano: $${totalV.toLocaleString()}`);
+            const generateRemision = document.getElementById('generate-remision-chk')?.checked;
+            const remNumber = document.getElementById('remision-number-input')?.value || `REM-${Date.now()}`;
+            
+            // Add metadata for PDF rendering
+            sale.company = totalM >= totalV ? 'millenio' : 'vulcano'; 
+            sale.clientPhone = this.selectedClient.phone;
+            sale.sellerName = Auth.currentUser?.name || "Caja Mostrador";
+
             this.cart = [];
             this.selectedClient = null;
             this.renderPanel();
             this.setupEventListeners();
             Inventory.updateInventoryList();
+
+            if (generateRemision && window.PDFManager) {
+                window.PDFManager.showRemission(sale, remNumber);
+            } else {
+                alert(`✅ Venta realizada. Millenio: $${totalM.toLocaleString()} | Vulcano: $${totalV.toLocaleString()}`);
+            }
         } catch (err) {
             window.ERP_LOG('Error Checkout: ' + err.message, 'error');
             alert('❌ Error: ' + err.message);
