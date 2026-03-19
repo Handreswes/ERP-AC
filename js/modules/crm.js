@@ -134,13 +134,13 @@ window.CRM = {
             </div>
             <!-- Statement Modal -->
             <div id="statement-modal" class="modal">
-                <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-content" style="max-width: 500px;">
                     <div class="modal-header">
-                        <h2>Estado de Cuenta</h2>
+                        <h2>Generar Estado de Cuenta</h2>
                         <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
                     </div>
                     <div class="modal-body" id="statement-modal-body">
-                        <!-- Content -->
+                        <!-- Content injected via JS -->
                     </div>
                 </div>
             </div>
@@ -306,24 +306,41 @@ window.CRM = {
                         
                         document.getElementById('statement-modal-body').innerHTML = `
                             <div style="text-align: center; margin-bottom: 1.5rem;">
-                                <h3>${client.name}</h3>
-                                <p class="text-secondary">${client.phone || 'Sin télefono'}</p>
+                                <h3 style="margin: 0; font-size: 1.3rem;">${client.name}</h3>
+                                <p class="text-secondary" style="margin: 5px 0 0 0;">Saldo Actual: <strong style="color: ${total > 0 ? 'var(--danger)' : 'var(--success)'};">$${total.toLocaleString()}</strong></p>
                             </div>
-                            <div class="stat-card" style="margin-bottom: 1rem; border-left: 4px solid var(--accent);">
-                                <h4 style="margin:0; font-size: 0.8rem; color: var(--text-secondary);">Deuda Millenio</h4>
-                                <p style="margin:0; font-size: 1.25rem; font-weight: bold; color: ${mDebt > 0 ? 'var(--danger)' : 'var(--success)'}">$${mDebt.toLocaleString()}</p>
+                            
+                            <div class="form-group" style="background: rgba(59,130,246,0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+                                <label style="font-weight: 600; color: var(--accent);">Rango de Periodo a Reportar</label>
+                                <select id="statement-period" class="form-control" style="margin-top: 5px;">
+                                    <option value="30">Últimos 30 días</option>
+                                    <option value="60">Últimos 60 días</option>
+                                    <option value="90">Últimos 90 días</option>
+                                    <option value="365">Último año</option>
+                                    <option value="all">Todo el Historial</option>
+                                </select>
                             </div>
-                            <div class="stat-card" style="margin-bottom: 1rem; border-left: 4px solid var(--warning);">
-                                <h4 style="margin:0; font-size: 0.8rem; color: var(--text-secondary);">Deuda Vulcano</h4>
-                                <p style="margin:0; font-size: 1.25rem; font-weight: bold; color: ${vDebt > 0 ? 'var(--danger)' : 'var(--success)'}">$${vDebt.toLocaleString()}</p>
-                            </div>
-                            <div style="display: flex; justify-content: space-between; padding-top: 1rem; border-top: 1px solid var(--border);">
-                                <strong>TOTAL ADEUDADO:</strong>
-                                <strong style="color: ${total > 0 ? 'var(--danger)' : 'var(--success)'};">$${total.toLocaleString()}</strong>
-                            </div>
+
+                            <button id="generate-statement-pdf-btn" data-client="${client.id}" class="btn btn-primary btn-block" style="padding: 1rem; margin-top: 1.5rem;">
+                                <i class="fas fa-file-pdf"></i> Construir y Previsualizar PDF
+                            </button>
                         `;
                         document.getElementById('statement-modal').classList.add('show');
                     }
+                    return;
+                }
+
+                if (tgt.id === 'generate-statement-pdf-btn') {
+                    const clientId = tgt.dataset.client;
+                    const periodDays = document.getElementById('statement-period').value;
+                    const btn = tgt;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+                    btn.disabled = true;
+                    setTimeout(() => {
+                        this.buildAccountStatement(clientId, periodDays);
+                        btn.innerHTML = '<i class="fas fa-file-pdf"></i> Construir y Previsualizar PDF';
+                        btn.disabled = false;
+                    }, 500); // UI breathing room
                     return;
                 }
 
@@ -413,6 +430,84 @@ window.CRM = {
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'Registrar Pago / Abono';
+        }
+    },
+
+    buildAccountStatement(clientId, periodDays) {
+        const client = this.getClients().find(c => c.id === clientId);
+        if (!client) return;
+
+        // Current Final Balance (The absolute truth for the current state)
+        const saldoActual = (parseFloat(client.balanceMillenio) || 0) + (parseFloat(client.balanceVulcano) || 0);
+
+        // Date Range logic
+        const now = new Date();
+        let startDate = new Date(1970, 0, 1); // "all"
+        let dateRangeStr = "Todo el histórico comercial";
+        
+        if (periodDays !== 'all') {
+            startDate = new Date();
+            startDate.setDate(now.getDate() - parseInt(periodDays));
+            startDate.setHours(0,0,0,0);
+            dateRangeStr = `Últimos ${periodDays} días (${startDate.toLocaleDateString('es-CO')} - ${now.toLocaleDateString('es-CO')})`;
+        }
+
+        // Get all Sales for this client
+        const allSales = Storage.get(STORAGE_KEYS.SALES).filter(s => s.clientId === clientId && s.method === 'credit');
+        
+        // Get all Payments for this client
+        const allPayments = Storage.get(STORAGE_KEYS.PAYMENTS).filter(p => p.clientId === clientId);
+
+        // Filter and Build Movements
+        let movimientos = [];
+        let salesInRange = 0;
+        let paymentsInRange = 0;
+
+        // Process Sales (Charges)
+        allSales.forEach(s => {
+            const date = new Date(s.date);
+            const amt = parseFloat(s.total) || 0;
+            if (date >= startDate) {
+                movimientos.push({
+                    date: s.date,
+                    type: `Compra (Remisión POS)`,
+                    description: `${s.items?.length || 0} producto(s) | Facturado: ${s.company === 'vulcano' ? 'Vulcano' : 'Millenio'}`,
+                    amount: amt,
+                    isCharge: true
+                });
+                salesInRange += amt;
+            }
+        });
+
+        // Process Payments (Credits)
+        allPayments.forEach(p => {
+            const date = new Date(p.date || p.createdAt || Date.now());
+            const amt = parseFloat(p.amount) || 0;
+            if (date >= startDate) {
+                const methodStr = p.method === 'cash' ? 'Efectivo' : 'Banco';
+                movimientos.push({
+                    date: date.toISOString(),
+                    type: 'Abono Recibido',
+                    description: `Vía ${methodStr} - ${p.notes || 'Aplicado a cartera'}`,
+                    amount: amt,
+                    isCharge: false
+                });
+                paymentsInRange += amt;
+            }
+        });
+
+        // Sort movements chronologically (oldest first)
+        movimientos.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        // Calculate Saldo Anterior
+        // Saldo Actual = Saldo Anterior + Cargos(Sales in range) - Abonos(Payments in range)
+        // Por lo tanto: Saldo Anterior = Saldo Actual - Cargos + Abonos
+        const saldoAnterior = saldoActual - salesInRange + paymentsInRange;
+
+        if (window.PDFManager) {
+            window.PDFManager.showStatement(client, saldoAnterior, saldoActual, movimientos, dateRangeStr);
+        } else {
+            alert("Error: PDFManager no está cargado. Actualice la página e intente nuevamente.");
         }
     }
 };
