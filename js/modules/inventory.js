@@ -367,7 +367,7 @@ window.Inventory = {
                     </span>
                 </td>
                 <td class="table-actions">
-                    <button class="icon-btn receive-btn" data-id="${p.id}" title="Recibir Mercancía (Sumar)" style="color: var(--success);"><i class="fas fa-plus-circle"></i></button>
+                    <button class="icon-btn receive-btn" data-id="${p.id}" title="Recibir Mercancía (Sumar)" style="color: var(--success);"><i class="fas fa-plus"></i></button>
                     <button class="icon-btn edit-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
                     <button class="icon-btn delete-btn" data-id="${p.id}"><i class="fas fa-trash"></i></button>
                 </td>
@@ -447,7 +447,11 @@ window.Inventory = {
                         this.updateInventoryList(searchEl ? searchEl.value : '');
                     }
                 } else if (actionBtn.classList.contains('receive-btn')) {
-                    const product = this.getProducts().find(p => p.id === id);
+                    const product = this.getProducts().find(p => p.id == id);
+                    if (!product) {
+                        console.error("Producto no encontrado para ID:", id);
+                        return;
+                    }
                     
                     const qty = parseInt(prompt(`Recibir Mercancía (Sumar stock)\nProducto: ${product.name}\n\n¿Cuántas unidades llegaron?`));
                     if (isNaN(qty) || qty <= 0) return;
