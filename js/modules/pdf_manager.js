@@ -21,20 +21,21 @@ window.PDFManager = {
                         <h2 id="pdf-preview-title">Vista Previa de Documento</h2>
                         <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
                     </div>
-                    
-                    <!-- Toolbar for Actions -->
-                    <div style="display: flex; gap: 10px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
-                        <button id="pdf-btn-download" class="btn btn-primary" style="background: var(--accent); flex: 1; min-width: 150px;">
-                            <i class="fas fa-file-pdf"></i> Descargar PDF
-                        </button>
-                        <button id="pdf-btn-whatsapp" class="btn btn-success" style="background: #25D366; border-color: #25D366; flex: 1; min-width: 150px;">
-                            <i class="fab fa-whatsapp"></i> Generar link WhatsApp
-                        </button>
-                    </div>
+                    <div class="modal-body" style="padding: 1.5rem;">
+                        <!-- Toolbar for Actions -->
+                        <div style="display: flex; gap: 10px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
+                            <button id="pdf-btn-download" class="btn btn-primary" style="background: var(--accent); flex: 1; min-width: 150px;">
+                                <i class="fas fa-file-pdf"></i> Descargar PDF
+                            </button>
+                            <button id="pdf-btn-whatsapp" class="btn btn-success" style="background: #25D366; border-color: #25D366; flex: 1; min-width: 150px;">
+                                <i class="fab fa-whatsapp"></i> Generar link WhatsApp
+                            </button>
+                        </div>
 
-                    <!-- The actual element to be converted to PDF -->
-                    <div id="pdf-export-content" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color: #1e293b; font-family: 'Inter', sans-serif;">
-                        <!-- Content injected dynamically -->
+                        <!-- The actual element to be converted to PDF -->
+                        <div id="pdf-export-content" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color: #1e293b; font-family: 'Inter', sans-serif;">
+                            <!-- Content injected dynamically -->
+                        </div>
                     </div>
                 </div>
             </div>`;
