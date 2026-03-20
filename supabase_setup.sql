@@ -133,6 +133,18 @@ CREATE TABLE IF NOT EXISTS transit_orders (
     "createdAt" TIMESTAMPTZ DEFAULT now()
 );
 
+CREATE TABLE IF NOT EXISTS stock_entries (
+    id TEXT PRIMARY KEY,
+    "productId" TEXT,
+    "productName" TEXT,
+    quantity INTEGER,
+    company TEXT,
+    source TEXT,
+    notes TEXT,
+    date TIMESTAMPTZ DEFAULT now(),
+    "createdAt" TIMESTAMPTZ DEFAULT now()
+);
+
 -- Disable RLS for easy testing
 ALTER TABLE products DISABLE ROW LEVEL SECURITY;
 ALTER TABLE clients DISABLE ROW LEVEL SECURITY;
@@ -144,3 +156,4 @@ ALTER TABLE recurring_expenses DISABLE ROW LEVEL SECURITY;
 ALTER TABLE cash_closings DISABLE ROW LEVEL SECURITY;
 ALTER TABLE payments DISABLE ROW LEVEL SECURITY;
 ALTER TABLE transit_orders DISABLE ROW LEVEL SECURITY;
+ALTER TABLE stock_entries DISABLE ROW LEVEL SECURITY;
