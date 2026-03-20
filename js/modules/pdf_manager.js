@@ -5,8 +5,10 @@
 
 window.PDFManager = {
     init() {
+        console.log("[PDFManager] Inicializando...");
         this.injectModals();
         this.setupEventListeners();
+        console.log("[PDFManager] Listo.");
     },
 
     injectModals() {
@@ -82,10 +84,10 @@ window.PDFManager = {
 
         const itemsHtml = sale.items.map(item => `
             <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 0; font-size: 0.9rem;">${item.qty}</td>
+                <td style="padding: 12px 0; font-size: 0.9rem;">${item.quantity}</td>
                 <td style="padding: 12px 0; font-size: 0.9rem;">${item.name}</td>
                 <td style="padding: 12px 0; text-align: right; font-size: 0.9rem;">$${(parseFloat(item.price) || 0).toLocaleString()}</td>
-                <td style="padding: 12px 0; text-align: right; font-weight: 600; font-size: 0.9rem;">$${(parseFloat(item.price) * parseInt(item.qty)).toLocaleString()}</td>
+                <td style="padding: 12px 0; text-align: right; font-weight: 600; font-size: 0.9rem;">$${(parseFloat(item.price) * parseInt(item.quantity)).toLocaleString()}</td>
             </tr>
         `).join('');
 
@@ -300,7 +302,12 @@ window.PDFManager = {
 
 // Auto-init logic if script loaded
 if (typeof document !== 'undefined') {
-    document.addEventListener('DOMContentLoaded', () => {
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            if(window.PDFManager) window.PDFManager.init();
+        });
+    } else {
+        // DOM already loaded
         if(window.PDFManager) window.PDFManager.init();
-    });
+    }
 }
