@@ -1,7 +1,7 @@
 -- ERP AC DATABASE SCHEMA (V2 - Strict CamelCase matching Frontend JS)
 -- WARNING: This will drop existing tables and recreate them to match the JS codebase perfectly.
 
-DROP TABLE IF EXISTS public.products, public.clients, public.sales, public.accounts, public.movements, public.expenses, public.recurring_expenses, public.cash_closings, public.transit_orders, public.payments, public.sellers, public.tucompras_sales, public.campaigns, public.tucompras_customers CASCADE;
+DROP TABLE IF EXISTS public.products, public.clients, public.sales, public.accounts, public.movements, public.expenses, public.recurring_expenses, public.cash_closings, public.transit_orders, public.payments, public.sellers, public.tucompras_sales, public.campaigns, public.tucompras_customers, public.stock_entries CASCADE;
 
 CREATE TABLE IF NOT EXISTS public.products (
     "id" TEXT PRIMARY KEY,
@@ -215,6 +215,19 @@ CREATE TABLE IF NOT EXISTS public.tucompras_customers (
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
+CREATE TABLE IF NOT EXISTS public.stock_entries (
+    "id" TEXT PRIMARY KEY,
+    "date" TEXT,
+    "productId" TEXT,
+    "productName" TEXT,
+    "quantity" INTEGER,
+    "company" TEXT,
+    "source" TEXT,
+    "notes" TEXT,
+    "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
 -- RLS Configuration
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.clients ENABLE ROW LEVEL SECURITY;
@@ -230,6 +243,7 @@ ALTER TABLE public.sellers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tucompras_sales ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.campaigns ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.tucompras_customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.stock_entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Allow all" ON public.products FOR ALL USING (true);
 CREATE POLICY "Allow all" ON public.clients FOR ALL USING (true);
@@ -245,3 +259,4 @@ CREATE POLICY "Allow all" ON public.sellers FOR ALL USING (true);
 CREATE POLICY "Allow all" ON public.tucompras_sales FOR ALL USING (true);
 CREATE POLICY "Allow all" ON public.campaigns FOR ALL USING (true);
 CREATE POLICY "Allow all" ON public.tucompras_customers FOR ALL USING (true);
+CREATE POLICY "Allow all" ON public.stock_entries FOR ALL USING (true);
