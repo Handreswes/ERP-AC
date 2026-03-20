@@ -105,6 +105,25 @@ window.Inventory = {
                 </div>
             </div>
 
+            <div id="inventory-history-view" style="display: ${this.activeTab === 'history' ? 'block' : 'none'};">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Producto</th>
+                                <th>Empresa</th>
+                                <th class="text-right">Cantidad</th>
+                                <th>Origen / Nota</th>
+                            </tr>
+                        </thead>
+                        <tbody id="history-list">
+                            <!-- History content -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
             <!-- Add/Edit Modal -->
             <div id="product-modal" class="modal">
                 <div class="modal-content">
