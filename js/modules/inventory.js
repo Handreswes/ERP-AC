@@ -48,6 +48,7 @@ window.Inventory = {
                     <button class="tab-btn ${this.activeTab === 'stock' ? 'active' : ''}" data-tab="stock">Inventario Disponible</button>
                     <button class="tab-btn ${this.activeTab === 'limbo' ? 'active' : ''}" data-tab="limbo">🌪️ El Limbo (Agotados)</button>
                     <button class="tab-btn ${this.activeTab === 'transit' ? 'active' : ''}" data-tab="transit">📦 En Tránsito / Importaciones</button>
+                    <button class="tab-btn ${this.activeTab === 'history' ? 'active' : ''}" data-tab="history">📜 Historial de Entradas</button>
                 </div>
             </div>
 
@@ -210,7 +211,30 @@ window.Inventory = {
             </div>
         `;
 
-        this.activeTab === 'transit' ? this.updateTransitList() : this.updateInventoryList();
+        if (this.activeTab === 'transit') this.updateTransitList();
+        else if (this.activeTab === 'history') this.updateHistoryList();
+        else this.updateInventoryList();
+    },
+
+    updateHistoryList() {
+        const list = document.getElementById('history-list');
+        if (!list) return;
+
+        const entries = Storage.get(STORAGE_KEYS.STOCK_ENTRIES).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        list.innerHTML = entries.map(e => `
+            <tr>
+                <td>${new Date(e.date).toLocaleString()}</td>
+                <td><strong>${e.productName}</strong></td>
+                <td><span class="badge ${e.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${e.company}</span></td>
+                <td class="text-right"><strong style="color: var(--success);">+${e.quantity}</strong></td>
+                <td><small>${e.source || 'Entrada Manual'} ${e.notes ? `(${e.notes})` : ''}</small></td>
+            </tr>
+        `).join('');
+
+        if (entries.length === 0) {
+            list.innerHTML = '<tr><td colspan="5" class="text-center text-secondary" style="padding: 2rem;">No hay registros de entradas todavía</td></tr>';
+        }
     },
 
     updateTransitList() {
@@ -277,8 +301,24 @@ window.Inventory = {
         order.receivedAt = new Date().toISOString();
         await Storage.updateItem(STORAGE_KEYS.TRANSIT_ORDERS, id, order);
 
+        // Record History
+        await this.recordStockEntry(selection.id, selection.name, qty, order.company, 'Importación / Tránsito', order.concept);
+
         alert(`¡Stock actualizado! ${qty} unidades añadidas a ${selection.name}.`);
         this.renderPanel();
+    },
+
+    async recordStockEntry(productId, productName, quantity, company, source, notes = '') {
+        const entry = {
+            date: new Date().toISOString(),
+            productId,
+            productName,
+            quantity,
+            company,
+            source,
+            notes
+        };
+        await Storage.addItem(STORAGE_KEYS.STOCK_ENTRIES, entry);
     },
 
     updateInventoryList(searchTerm = '') {
@@ -327,6 +367,7 @@ window.Inventory = {
                     </span>
                 </td>
                 <td class="table-actions">
+                    <button class="icon-btn receive-btn" data-id="${p.id}" title="Recibir Mercancía (Sumar)" style="color: var(--success);"><i class="fas fa-plus-circle"></i></button>
                     <button class="icon-btn edit-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
                     <button class="icon-btn delete-btn" data-id="${p.id}"><i class="fas fa-trash"></i></button>
                 </td>
@@ -445,6 +486,30 @@ window.Inventory = {
                 testProducts.forEach(p => this.addProduct(p));
                 this.updateInventoryList();
                 alert('Datos de prueba cargados.');
+                return;
+            }
+
+            if (actionBtn.classList.contains('receive-btn')) {
+                const id = actionBtn.dataset.id;
+                const product = this.getProducts().find(p => p.id === id);
+                
+                const qty = parseInt(prompt(`Recibir Mercancía (Sumar stock)\nProducto: ${product.name}\n\n¿Cuántas unidades llegaron?`));
+                if (isNaN(qty) || qty <= 0) return;
+
+                const company = prompt(`¿A qué inventario desea sumarlas? (m = Millenio, v = Vulcano)`, 'm').toLowerCase();
+                const targetCompany = (company === 'v' || company === 'vulcano') ? 'vulcano' : 'millenio';
+
+                const notes = prompt(`¿Alguna nota o número de factura?`, 'Entrada Manual');
+
+                // Update stock
+                if (targetCompany === 'millenio') product.stockMillenio = (parseInt(product.stockMillenio) || 0) + qty;
+                else product.stockVulcano = (parseInt(product.stockVulcano) || 0) + qty;
+
+                await this.updateProduct(product.id, product);
+                await this.recordStockEntry(product.id, product.name, qty, targetCompany, 'Entrada Directa', notes);
+
+                alert(`¡Éxito! Se sumaron ${qty} unidades a ${product.name} (${targetCompany}). Total ahora: ${targetCompany === 'millenio' ? product.stockMillenio : product.stockVulcano}`);
+                this.updateInventoryList(document.getElementById('inventory-search')?.value || '');
                 return;
             }
 
