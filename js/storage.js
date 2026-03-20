@@ -18,7 +18,8 @@ window.STORAGE_KEYS = {
     SELLERS: 'sellers',
     TUCOMPRAS_SALES: 'tucompras_sales',
     CAMPAIGNS: 'campaigns',
-    TUCOMPRAS_CUSTOMERS: 'tucompras_customers'
+    TUCOMPRAS_CUSTOMERS: 'tucompras_customers',
+    STOCK_ENTRIES: 'stock_entries'
 };
 
 // Map storage keys to Supabase table names
@@ -36,7 +37,8 @@ const TABLE_MAP = {
     [STORAGE_KEYS.SELLERS]: 'sellers',
     [STORAGE_KEYS.TUCOMPRAS_SALES]: 'tucompras_sales',
     [STORAGE_KEYS.CAMPAIGNS]: 'campaigns',
-    [STORAGE_KEYS.TUCOMPRAS_CUSTOMERS]: 'tucompras_customers'
+    [STORAGE_KEYS.TUCOMPRAS_CUSTOMERS]: 'tucompras_customers',
+    [STORAGE_KEYS.STOCK_ENTRIES]: 'stock_entries'
 };
 
 window.Storage = {
