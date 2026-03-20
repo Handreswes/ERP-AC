@@ -3,6 +3,8 @@ window.TuCompras = {
     activeStatus: 'despachado',
     cart: [],
     selectedLiquidations: new Set(),
+    activeStep: 1,
+    activeCompanyFilter: 'all',
 
     init() {
         this.renderPanel();
@@ -49,124 +51,129 @@ window.TuCompras = {
                 <!-- Data will be loaded here -->
             </div>
 
-            <!-- New Sale Modal - Improved Responsiveness -->
+            <!-- New Sale Modal - WIZARD STYLE -->
             <div id="tucompras-sale-modal" class="modal">
-                <div class="modal-content" style="max-width: 1100px; width: 95%;">
-                    <div class="modal-header">
-                        <h2>Nueva Venta Ecommerce</h2>
+                <div class="modal-content" style="max-width: 900px; width: 95%; border-radius: 24px; overflow: hidden; background: var(--bg-dark);">
+                    <div class="modal-header" style="background: var(--bg-sidebar); border-bottom: 1px solid var(--border); padding: 1.5rem 2rem;">
+                        <h2 id="tc-wizard-title" style="margin:0; font-size: 1.25rem; display: flex; align-items: center; gap: 10px;">
+                            <span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">1</span>
+                            Información del Cliente
+                        </h2>
                         <span class="close-modal">&times;</span>
                     </div>
-                    <div class="modal-body" style="padding: 1rem;">
-                        <div class="pos-container">
-                            
-                            <!-- Left: Product Selection & Customer -->
-                            <div class="selection-area" style="display: flex; flex-direction: column; gap: 1rem;">
-                                
-                                <!-- CUSTOMER SECTION -->
-                                <div class="card" style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border);">
-                                    <h3 style="font-size: 1rem; margin-bottom: 1rem;"><i class="fas fa-user-circle"></i> Información del Cliente</h3>
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label>Nombre Completo *</label>
-                                            <input type="text" id="tc-cust-name" class="form-control" placeholder="Nombre completo" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Teléfono *</label>
-                                            <input type="text" id="tc-cust-phone" class="form-control" placeholder="300 000 0000" required>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Departamento</label>
-                                            <select id="tc-cust-dept" class="form-control"></select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Ciudad *</label>
-                                            <select id="tc-cust-city" class="form-control" required>
-                                                <option value="">Seleccione depto primero...</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group" id="tc-cust-city-other-group" style="display: none;">
-                                            <label>Escriba Ciudad *</label>
-                                            <input type="text" id="tc-cust-city-other" class="form-control" placeholder="Nombre de la ciudad">
-                                        </div>
-                                        <div class="form-group" style="grid-column: 1 / -1;">
-                                            <label>Dirección (Opcional)</label>
-                                            <input type="text" id="tc-cust-address" class="form-control" placeholder="Calle, Carrera, Apto...">
-                                        </div>
-                                    </div>
+                    
+                    <div class="modal-body" style="padding: 2rem;">
+                        
+                        <!-- STEP 1: CLIENTE -->
+                        <div id="tc-step-1" class="wizard-step">
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                                <div class="form-group">
+                                    <label>Nombre Completo *</label>
+                                    <input type="text" id="tc-cust-name" class="form-control" placeholder="Nombre completo" required>
                                 </div>
-
-                                <!-- PRODUCT GRID -->
-                                <div class="card" style="background: rgba(255,255,255,0.02); padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border); min-height: 400px; display: flex; flex-direction: column;">
-                                    <h3 style="font-size: 1rem; margin-bottom: 1rem;"><i class="fas fa-box-open"></i> Elegir Productos</h3>
-                                    <div class="search-bar" style="width: 100%; margin: 0 0 1rem 0; background: var(--bg-dark); border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem 1rem;">
-                                        <i class="fas fa-search" style="color: var(--text-secondary);"></i>
-                                        <input type="text" id="tc-product-search" placeholder="Buscar por nombre..." style="background: none; border: none; color: white; width: 100%; outline: none; margin-left: 8px;">
-                                    </div>
-                                    <div id="tc-product-grid" class="product-grid-tiny" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; flex: 1; overflow-y: auto;">
-                                        <!-- Products -->
-                                    </div>
+                                <div class="form-group">
+                                    <label>Teléfono *</label>
+                                    <input type="text" id="tc-cust-phone" class="form-control" placeholder="300 000 0000" required>
                                 </div>
-                            </div>
-
-                            <!-- Right: Logistics & Cart -->
-                            <div class="cart-form-area" style="background: var(--bg-sidebar); border-radius: 12px; padding: 1.25rem; display: flex; flex-direction: column; gap: 1.25rem; border: 1px solid var(--border);">
-                                <h3 style="font-size: 1rem;"><i class="fas fa-shipping-fast"></i> Logística y Comisión</h3>
-                                <form id="tucompras-sale-form" style="display: flex; flex-direction: column; gap: 1rem;">
-                                    <div class="form-grid">
-                                        <div class="form-group">
-                                            <label>Transportadora</label>
-                                            <select name="carrier" class="form-control">
-                                                <option value="Interrapidisimo">Interrapidisimo</option>
-                                                <option value="Servientrega">Servientrega</option>
-                                                <option value="Envía">Envía</option>
-                                                <option value="Coordinadora">Coordinadora</option>
-                                                <option value="TCC">TCC</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Número de Guía</label>
-                                            <input type="text" name="tracking_number" class="form-control" placeholder="Guía #">
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Vendedor</label>
-                                            <select id="tc-seller-select" name="seller_id" class="form-control" required></select>
-                                        </div>
-                                        <div class="form-group">
-                                            <label>Bodega</label>
-                                            <select name="inventory_source" class="form-control" required id="tc-source-select">
-                                                <option value="millenio">Millenio</option>
-                                                <option value="vulcano">Vulcano</option>
-                                            </select>
-                                        </div>
-                                    </div>
-
-                                    <div id="tc-cart-items" style="display: flex; flex-direction: column; gap: 10px; min-height: 100px;">
-                                        <!-- Cart -->
-                                    </div>
-
-                                    <div class="summary-card" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; border: 1px solid var(--border);">
-                                        <div class="form-group" style="margin-bottom: 0.75rem;">
-                                            <label style="font-size: 0.75rem;">Flete (Valor Cobrado por Dropi)</label>
-                                            <input type="number" name="shipping_cost" class="form-control" required value="0" style="height: 36px; font-weight: 700;">
-                                        </div>
-                                        <div style="display: flex; flex-direction: column; gap: 6px;">
-                                            <div class="summary-line" style="display: flex; justify-content: space-between; font-size: 0.95rem;">
-                                                <span>Subtotal Venta:</span>
-                                                <strong id="tc-total-sale-text" style="color: var(--accent-vibrant);">$0</strong>
-                                            </div>
-                                            <div class="summary-line" style="display: flex; justify-content: space-between; font-size: 0.95rem;">
-                                                <span>Subtotal Comisión:</span>
-                                                <strong id="tc-total-commission-text" style="color: var(--warning);">$0</strong>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 0.5rem; height: 56px; border-radius: 16px;">
-                                        REGISTRAR DESPACHO
-                                    </button>
-                                </form>
+                                <div class="form-group">
+                                    <label>Departamento</label>
+                                    <select id="tc-cust-dept" class="form-control"></select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Ciudad *</label>
+                                    <select id="tc-cust-city" class="form-control" required>
+                                        <option value="">Seleccione depto primero...</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label>Dirección (Opcional)</label>
+                                    <input type="text" id="tc-cust-address" class="form-control" placeholder="Calle, Carrera, Apto...">
+                                </div>
+                                <div class="form-group" id="tc-cust-city-other-group" style="display: none; grid-column: span 2;">
+                                    <label>Escriba Ciudad *</label>
+                                    <input type="text" id="tc-cust-city-other" class="form-control" placeholder="Nombre de la ciudad">
+                                </div>
                             </div>
                         </div>
+
+                        <!-- STEP 2: PRODUCTOS -->
+                        <div id="tc-step-2" class="wizard-step" style="display: none;">
+                            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
+                                    <div class="search-bar" style="flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
+                                        <i class="fas fa-search" style="color: var(--text-secondary);"></i>
+                                        <input type="text" id="tc-product-search" placeholder="Buscar por nombre..." style="background: none; border: none; color: white; width: 100%; outline: none;">
+                                    </div>
+                                    <div class="filter-group" style="display: flex; gap: 5px; background: var(--bg-card); padding: 5px; border-radius: 12px; border: 1px solid var(--border);">
+                                        <button class="tab-btn btn-sm tc-filter-btn active" data-filter="all">Todas</button>
+                                        <button class="tab-btn btn-sm tc-filter-btn" data-filter="millenio">Millenio</button>
+                                        <button class="tab-btn btn-sm tc-filter-btn" data-filter="vulcano">Vulcano</button>
+                                    </div>
+                                </div>
+
+                                <div id="tc-product-grid" class="product-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; max-height: 450px; overflow-y: auto; padding-right: 10px;">
+                                    <!-- Dynamic products -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- STEP 3: LOGÍSTICA & RESUMEN -->
+                        <div id="tc-step-3" class="wizard-step" style="display: none;">
+                            <form id="tucompras-sale-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                                <div class="logistics-section" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">LOGÍSTICA</h4>
+                                    <div class="form-group">
+                                        <label>Vendedor *</label>
+                                        <select id="tc-seller-select" name="seller_id" class="form-control" required></select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Transportadora</label>
+                                        <select name="carrier" class="form-control">
+                                            <option value="Interrapidisimo">Interrapidisimo</option>
+                                            <option value="Servientrega">Servientrega</option>
+                                            <option value="Envía">Envía</option>
+                                            <option value="Coordinadora">Coordinadora</option>
+                                            <option value="TCC">TCC</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Número de Guía</label>
+                                        <input type="text" name="tracking_number" class="form-control" placeholder="Guía #">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Flete (Valor Cobrado por Dropi)</label>
+                                        <input type="number" name="shipping_cost" class="form-control" required value="0">
+                                    </div>
+                                </div>
+
+                                <div class="summary-section" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">RESUMEN DE PRODUCTOS</h4>
+                                    <div id="tc-cart-items" style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border); padding: 1rem; display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto;">
+                                        <!-- Items -->
+                                    </div>
+                                    <div class="totals-card" style="background: var(--bg-sidebar); border: 1px solid var(--accent); border-radius: 16px; padding: 1.25rem;">
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <span>Subtotal Venta:</span>
+                                            <strong id="tc-total-sale-text" style="color: var(--accent-vibrant);">$0</strong>
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 8px;">
+                                            <span>Comisión:</span>
+                                            <strong id="tc-total-commission-text" style="color: var(--warning);">$0</strong>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-block btn-lg" style="height: 56px; border-radius: 16px;">
+                                        REGISTRAR DESPACHO
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer" style="background: var(--bg-sidebar); border-top: 1px solid var(--border); padding: 1.5rem 2rem; display: flex; justify-content: space-between;">
+                        <button id="tc-wizard-prev" class="btn btn-outline" style="border-radius: 12px; display: none;">Anterior</button>
+                        <div style="flex: 1;"></div>
+                        <button id="tc-wizard-next" class="btn btn-primary" style="border-radius: 12px; min-width: 120px;">Siguiente</button>
                     </div>
                 </div>
             </div>
@@ -440,6 +447,25 @@ window.TuCompras = {
                 return;
             }
 
+            if (e.target.id === 'tc-wizard-next') {
+                this.navigateWizard(1);
+                return;
+            }
+
+            if (e.target.id === 'tc-wizard-prev') {
+                this.navigateWizard(-1);
+                return;
+            }
+
+            const filterBtn = e.target.closest('.tc-filter-btn');
+            if (filterBtn) {
+                document.querySelectorAll('.tc-filter-btn').forEach(b => b.classList.remove('active'));
+                filterBtn.classList.add('active');
+                this.activeCompanyFilter = filterBtn.dataset.filter;
+                this.renderProductGrid(document.getElementById('tc-product-search')?.value || '');
+                return;
+            }
+
             const updateBtn = e.target.closest('.tc-update-btn');
             if (updateBtn) {
                 this.openStatusModal(updateBtn.dataset.id);
@@ -545,41 +571,116 @@ window.TuCompras = {
 
     openNewSaleModal() {
         this.cart = [];
+        this.activeStep = 1;
+        this.activeCompanyFilter = 'all';
         this.updateCartUI();
         this.renderProductGrid();
+        this.updateWizardUI();
 
         // Location Data
         Locations.populateDepartments('tc-cust-dept');
 
         // Sellers
         const sellersSel = document.getElementById('tc-seller-select');
-        const sellers = Vendedores.getSellers().filter(s => s.status === 'active');
+        const sellers = Vendedores.getSellers().filter(s => s.status === 'active' || s.active !== false);
         sellersSel.innerHTML = '<option value="">Seleccione...</option>' + sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
 
-        document.getElementById('tucompras-sale-form').reset();
+        const form = document.getElementById('tucompras-sale-form');
+        if (form) form.reset();
+        
         document.getElementById('tc-cust-name').value = '';
         document.getElementById('tc-cust-phone').value = '';
         document.getElementById('tucompras-sale-modal').classList.add('show');
+    },
+
+    navigateWizard(stepChange) {
+        if (stepChange === 1) {
+            // Validation
+            if (this.activeStep === 1) {
+                if (!document.getElementById('tc-cust-name').value || !document.getElementById('tc-cust-phone').value || !document.getElementById('tc-cust-city').value) {
+                    alert("Por favor complete los datos obligatorios del cliente.");
+                    return;
+                }
+            }
+            if (this.activeStep === 2 && this.cart.length === 0) {
+                alert("Seleccione al menos un producto.");
+                return;
+            }
+        }
+
+        const newStep = this.activeStep + stepChange;
+        if (newStep >= 1 && newStep <= 3) {
+            this.activeStep = newStep;
+            this.updateWizardUI();
+        }
+    },
+
+    updateWizardUI() {
+        // Steps visibility
+        document.querySelectorAll('.wizard-step').forEach((s, idx) => {
+            s.style.display = (idx + 1 === this.activeStep) ? 'block' : 'none';
+        });
+
+        // Title and Indicator
+        const title = document.getElementById('tc-wizard-title');
+        const indicator = title.querySelector('.step-indicator');
+        indicator.textContent = this.activeStep;
+        
+        const titles = ["Información del Cliente", "Selección de Productos", "Logística y Resumen"];
+        title.innerHTML = `<span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem; margin-right: 10px;">${this.activeStep}</span> ${titles[this.activeStep - 1]}`;
+
+        // Buttons
+        document.getElementById('tc-wizard-prev').style.display = (this.activeStep === 1) ? 'none' : 'block';
+        document.getElementById('tc-wizard-next').style.display = (this.activeStep === 3) ? 'none' : 'block';
+        
+        if (this.activeStep === 2) this.renderProductGrid(document.getElementById('tc-product-search')?.value || '');
     },
 
     renderProductGrid(query = '') {
         const grid = document.getElementById('tc-product-grid');
         if (!grid) return;
 
-        const products = Inventory.getProducts().filter(p => p.active !== false && p.name.toLowerCase().includes(query.toLowerCase()));
-        grid.innerHTML = products.map(p => `
-            <div class="product-item-tiny" style="background: var(--bg-card); padding: 5px; border-radius: 6px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 3px;">
-                <img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/60'}" style="width: 100%; height: 50px; object-fit: cover; border-radius: 3px;">
-                <h4 style="font-size: 0.65rem; margin:0; line-height: 1.1;">${p.name}</h4>
-                <p style="font-size: 0.6rem; color: var(--text-secondary); margin:0;">Stock: ${parseInt(p.stockMillenio) + parseInt(p.stockVulcano)}</p>
-                <button class="btn btn-sm btn-primary tc-add-btn" data-id="${p.id}" style="padding: 1px; font-size: 0.6rem;">+Añadir</button>
-            </div>
-        `).join('');
+        let products = Inventory.getProducts().filter(p => p.active !== false && p.name.toLowerCase().includes(query.toLowerCase()));
+        
+        if (this.activeCompanyFilter !== 'all') {
+            products = products.filter(p => {
+                if (this.activeCompanyFilter === 'millenio') return p.stockMillenio > 0 || p.company === 'millenio';
+                if (this.activeCompanyFilter === 'vulcano') return p.stockVulcano > 0 || p.company === 'vulcano';
+                return true;
+            });
+        }
+
+        grid.innerHTML = products.map(p => {
+            const hasMillenio = (parseInt(p.stockMillenio) > 0);
+            const hasVulcano = (parseInt(p.stockVulcano) > 0);
+            const totalStock = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
+
+            return `
+                <div class="product-item" style="background: var(--bg-card); padding: 12px; border-radius: 12px; border: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; transition: all 0.2s ease;">
+                    <img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/100'}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px;">
+                    <h4 style="font-size: 0.85rem; margin:0; line-height: 1.2; height: 2.4rem; overflow: hidden;">${p.name}</h4>
+                    <div style="display: flex; gap: 4px; flex-wrap: wrap;">
+                        ${hasMillenio ? '<span class="badge bg-blue" style="font-size: 0.6rem; padding: 2px 5px;">M: '+p.stockMillenio+'</span>' : ''}
+                        ${hasVulcano ? '<span class="badge bg-orange" style="font-size: 0.6rem; padding: 2px 5px;">V: '+p.stockVulcano+'</span>' : ''}
+                    </div>
+                    <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
+                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-vibrant);">$${parseFloat(p.priceFinal || 0).toLocaleString()}</span>
+                        <button class="btn btn-sm btn-primary tc-add-btn" data-id="${p.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 50%;"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+            `;
+        }).join('');
     },
 
     addToCart(productId) {
         const product = Inventory.getProducts().find(p => p.id === productId);
         if (!product) return;
+
+        // Auto-determine source based on stock
+        let source = 'millenio';
+        if (product.stockVulcano > 0 && product.stockMillenio <= 0) source = 'vulcano';
+        else if (product.stockMillenio > 0) source = 'millenio';
+        else if (product.company === 'vulcano') source = 'vulcano';
 
         const existing = this.cart.find(i => i.product_id === productId);
         if (existing) {
@@ -591,10 +692,23 @@ window.TuCompras = {
                 qty: 1,
                 cost_price: product.priceWholesale || product.cost || 0,
                 sale_price: product.priceFinal || product.priceInternet || 0,
-                commission_paid: product.commissionBase || 0
+                commission_paid: product.commissionBase || 0,
+                inventory_source: source
             });
         }
         this.updateCartUI();
+        
+        // Visual feedback
+        const btn = document.querySelector(`.tc-add-btn[data-id="${productId}"]`);
+        if (btn) {
+            const original = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i>';
+            btn.classList.replace('btn-primary', 'btn-success');
+            setTimeout(() => {
+                btn.innerHTML = original;
+                btn.classList.replace('btn-success', 'btn-primary');
+            }, 800);
+        }
     },
 
     removeFromCart(productId) {
@@ -681,7 +795,6 @@ window.TuCompras = {
             return;
         }
 
-        // Calculate total commission (sum across all cart items x qty)
         const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
 
         const sale = {
@@ -691,10 +804,10 @@ window.TuCompras = {
             seller_id: formData.get('seller_id'),
             carrier: formData.get('carrier'),
             tracking_number: formData.get('tracking_number'),
-            inventory_source: source,
+            inventory_source: this.cart[0].inventory_source, // Use the source of the first product as primary
             status: 'despachado',
             shipping_cost: parseFloat(formData.get('shipping_cost')) || 0,
-            commission_paid: totalCommission, // ← total commission stored at root for quick access
+            commission_paid: totalCommission,
             items: this.cart,
             money_confirmed: false,
             is_paid_to_inventory: false
@@ -715,7 +828,8 @@ window.TuCompras = {
         for (const item of this.cart) {
             const product = Inventory.getProducts().find(p => p.id === item.product_id);
             if (product) {
-                if (source === 'millenio') product.stockMillenio -= item.qty;
+                const itemSource = item.inventory_source || 'millenio';
+                if (itemSource === 'millenio') product.stockMillenio -= item.qty;
                 else product.stockVulcano -= item.qty;
                 await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
             }
