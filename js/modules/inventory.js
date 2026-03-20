@@ -466,29 +466,40 @@ window.Inventory = {
                         this.updateInventoryList(searchEl ? searchEl.value : '');
                     }
                 } else if (actionBtn.classList.contains('receive-btn')) {
-                    const product = this.getProducts().find(p => p.id == id);
-                    if (!product) {
-                        console.error("Producto no encontrado para ID:", id);
-                        return;
+                    try {
+                        const product = this.getProducts().find(p => p.id == id);
+                        if (!product) {
+                            alert("Error: Producto no encontrado.");
+                            return;
+                        }
+                        
+                        const qtyStr = prompt(`Recibir Mercancía (Sumar stock)\nProducto: ${product.name}\n\n¿Cuántas unidades llegaron?`);
+                        if (qtyStr === null) return;
+                        
+                        const qty = parseInt(qtyStr);
+                        if (isNaN(qty) || qty <= 0) return;
+
+                        const companyChoice = prompt(`¿A qué inventario desea sumarlas? (m = Millenio, v = Vulcano)`, 'm');
+                        if (companyChoice === null) return;
+                        
+                        const company = companyChoice.toLowerCase();
+                        const targetCompany = (company === 'v' || company === 'vulcano') ? 'vulcano' : 'millenio';
+
+                        const notes = prompt(`¿Alguna nota o número de factura?`, 'Entrada Manual');
+
+                        // Update stock
+                        if (targetCompany === 'millenio') product.stockMillenio = (parseInt(product.stockMillenio) || 0) + qty;
+                        else product.stockVulcano = (parseInt(product.stockVulcano) || 0) + qty;
+
+                        await this.updateProduct(product.id, product);
+                        await this.recordStockEntry(product.id, product.name, qty, targetCompany, 'Entrada Directa', notes);
+
+                        alert(`¡Éxito! Se sumaron ${qty} unidades a ${product.name} (${targetCompany}). Total ahora: ${targetCompany === 'millenio' ? product.stockMillenio : product.stockVulcano}`);
+                        this.updateInventoryList(document.getElementById('inventory-search')?.value || '');
+                    } catch (err) {
+                        console.error("Error receiving stock:", err);
+                        alert("❌ Error al registrar entrada: " + err.message + "\n\nSi el error dice que la tabla 'stock_entries' no existe, por favor contacte a soporte para actualizar la base de datos.");
                     }
-                    
-                    const qty = parseInt(prompt(`Recibir Mercancía (Sumar stock)\nProducto: ${product.name}\n\n¿Cuántas unidades llegaron?`));
-                    if (isNaN(qty) || qty <= 0) return;
-
-                    const company = prompt(`¿A qué inventario desea sumarlas? (m = Millenio, v = Vulcano)`, 'm').toLowerCase();
-                    const targetCompany = (company === 'v' || company === 'vulcano') ? 'vulcano' : 'millenio';
-
-                    const notes = prompt(`¿Alguna nota o número de factura?`, 'Entrada Manual');
-
-                    // Update stock
-                    if (targetCompany === 'millenio') product.stockMillenio = (parseInt(product.stockMillenio) || 0) + qty;
-                    else product.stockVulcano = (parseInt(product.stockVulcano) || 0) + qty;
-
-                    await this.updateProduct(product.id, product);
-                    await this.recordStockEntry(product.id, product.name, qty, targetCompany, 'Entrada Directa', notes);
-
-                    alert(`¡Éxito! Se sumaron ${qty} unidades a ${product.name} (${targetCompany}). Total ahora: ${targetCompany === 'millenio' ? product.stockMillenio : product.stockVulcano}`);
-                    this.updateInventoryList(document.getElementById('inventory-search')?.value || '');
                 }
                 return;
             }
