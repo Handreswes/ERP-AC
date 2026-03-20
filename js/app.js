@@ -1,4 +1,4 @@
-﻿console.log('--- ERP AC SYSTEM V67 LOADING (CLOUD SYNC) ---');
+console.log('--- ERP AC SYSTEM V67 LOADING (CLOUD SYNC) ---');
 
 // Visual Logger (Console only for production V67)
 window.ERP_LOG = function (msg, type = 'info') {
@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { ERP_LOG('Error Storage: ' + e.message, 'error'); }
 
     // 2. Initialize Modules
-    const mods = [Inventory, CRM, Sales, Dashboard, Finances, TuCompras, Vendedores, Settings, Consultas, Catalog];
+    const mods = [Inventory, CRM, Sales, Dashboard, Finances, TuCompras, Vendedores, Settings, Consultas, Catalog, PDFManager];
     mods.forEach(m => {
-        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo: ' + m?.constructor?.name + ': ' + e.message, 'error'); }
+        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo: ' + (m?.constructor?.name || 'Unknown') + ': ' + e.message, 'error'); }
     });
 
     // 3. Navigation
