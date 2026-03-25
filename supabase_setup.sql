@@ -45,6 +45,11 @@ CREATE TABLE IF NOT EXISTS sales (
     "totalV" DECIMAL DEFAULT 0,
     method TEXT,
     "accountId" TEXT,
+    "delivery_type" TEXT,
+    "delivery_status" TEXT,
+    "carrier" TEXT,
+    "tracking_number" TEXT,
+    "shipped_at" TEXT,
     date TIMESTAMPTZ DEFAULT now(),
     "createdAt" TIMESTAMPTZ DEFAULT now()
 );
