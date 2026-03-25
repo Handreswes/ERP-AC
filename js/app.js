@@ -38,9 +38,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { ERP_LOG('Error Storage: ' + e.message, 'error'); }
 
     // 2. Initialize Modules
-    const mods = [Inventory, CRM, Sales, Dashboard, Finances, TuCompras, Vendedores, Settings, Consultas, Catalog, PDFManager];
+    const mods = [Inventory, CRM, Sales, Dashboard, Finances, TuCompras, Vendedores, Settings, Consultas, Catalog, PDFManager, TuComprasCRM, Logistics];
     mods.forEach(m => {
-        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo: ' + (m?.constructor?.name || 'Unknown') + ': ' + e.message, 'error'); }
+        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo Initializing: ' + e.message, 'error'); }
     });
 
     // 3. Navigation
@@ -111,7 +111,8 @@ function initNavigation() {
             'vendedores': () => { if (window.Vendedores && window.Vendedores.renderPanel) window.Vendedores.renderPanel(); },
             'tucompras-crm': () => { if (window.TuComprasCRM && window.TuComprasCRM.renderPanel) window.TuComprasCRM.renderPanel(); },
             'consultas': () => { if (window.Consultas && window.Consultas.renderPanel) window.Consultas.renderPanel(); },
-            'catalog': () => { if (window.Catalog && window.Catalog.renderPanel) window.Catalog.renderPanel(); }
+            'catalog': () => { if (window.Catalog && window.Catalog.renderPanel) window.Catalog.renderPanel(); },
+            'logistics': () => { if (window.Logistics && window.Logistics.renderPanel) window.Logistics.renderPanel(); }
         };
 
         if (modMap[panelName]) {
