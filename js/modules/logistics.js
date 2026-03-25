@@ -106,7 +106,8 @@ window.Logistics = {
         const panel = document.getElementById('logistics-panel');
         if (!panel) return;
 
-        panel.onclick = (e) => {
+        // Use delegation for clicks AND submits
+        panel.addEventListener('click', (e) => {
             const editBtn = e.target.closest('.edit-logistic-btn');
             if (editBtn) {
                 const saleId = editBtn.dataset.id;
@@ -123,11 +124,10 @@ window.Logistics = {
             if (e.target.classList.contains('close-modal')) {
                 e.target.closest('.modal').classList.remove('show');
             }
-        };
+        });
 
-        const form = document.getElementById('logistic-form');
-        if (form) {
-            form.onsubmit = async (e) => {
+        panel.addEventListener('submit', async (e) => {
+            if (e.target.id === 'logistic-form') {
                 e.preventDefault();
                 const saleId = document.getElementById('logistic-sale-id').value;
                 const carrier = document.getElementById('logistic-carrier').value;
@@ -136,20 +136,28 @@ window.Logistics = {
                 try {
                     const sale = Storage.getById(STORAGE_KEYS.SALES, saleId);
                     if (sale) {
-                        sale.carrier = carrier;
-                        sale.tracking_number = tracking;
-                        sale.delivery_status = 'shipped';
-                        sale.shipped_at = new Date().toISOString();
+                        // Create a clone to avoid direct mutation issues if any
+                        const updatedSale = { 
+                            ...sale,
+                            carrier: carrier,
+                            tracking_number: tracking,
+                            delivery_status: 'shipped',
+                            shipped_at: new Date().toISOString()
+                        };
                         
-                        await Storage.updateItem(STORAGE_KEYS.SALES, saleId, sale);
+                        await Storage.updateItem(STORAGE_KEYS.SALES, saleId, updatedSale);
                         alert('✅ Despacho registrado correctamente.');
-                        document.getElementById('logistic-modal').classList.remove('show');
-                        this.renderPanel();
+                        
+                        const modal = document.getElementById('logistic-modal');
+                        if (modal) modal.classList.remove('show');
+                        
+                        // Small delay to ensure DB sync before refresh
+                        setTimeout(() => this.renderPanel(), 100);
                     }
                 } catch (err) {
                     alert('Error al actualizar despacho: ' + err.message);
                 }
-            };
-        }
+            }
+        });
     }
 };
