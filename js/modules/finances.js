@@ -99,24 +99,40 @@ window.Finances = {
                     </div>
                     <div class="modal-body">
                         <form id="account-form">
-                            <div class="form-group">
-                                <label>Empresa</label>
-                                <select name="company" required>
-                                    <option value="millenio">Millenio</option>
-                                    <option value="vulcano">Vulcano</option>
-                                </select>
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div class="form-group">
+                                    <label>Empresa</label>
+                                    <select name="company" class="form-control" required>
+                                        <option value="millenio">Millenio</option>
+                                        <option value="vulcano">Vulcano</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Banco</label>
+                                    <input type="text" name="bankName" class="form-control" placeholder="Ej: Bancolombia" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tipo de Cuenta</label>
+                                    <select name="accountType" class="form-control" required>
+                                        <option value="savings">Ahorros</option>
+                                        <option value="checking">Corriente</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Número de Cuenta</label>
+                                    <input type="text" name="accountNumber" class="form-control" placeholder="000-000000-00" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Nombre Personalizado</label>
+                                    <input type="text" name="name" class="form-control" placeholder="Ej: Cuenta Principal" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Saldo Inicial</label>
+                                    <input type="text" name="balance" class="form-control currency-input" placeholder="0" required>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <label>Nombre Personalizado</label>
-                                <input type="text" name="name" placeholder="Ej: Cuenta Nomina" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Saldo Inicial</label>
-                                <input type="text" name="balance" class="currency-input" placeholder="0" required>
-                            </div>
-                        </div>
-                        <button type="button" id="save-account-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1rem;">Agregar Cuenta</button>
-                    </form>
+                            <button type="button" id="save-account-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Agregar Cuenta</button>
+                        </form>
                     <hr style="margin: 1.5rem 0;">
                     <div class="table-container">
                         <table class="data-table">
