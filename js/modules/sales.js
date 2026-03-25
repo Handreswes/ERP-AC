@@ -84,6 +84,15 @@ window.Sales = {
                             <!-- Dynamic Bank Select -->
                         </div>
 
+                        <!-- Delivery Type Selection -->
+                        <div style="margin-top: 1rem; padding: 10px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px;">
+                            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 5px;">Tipo de Entrega</label>
+                            <select id="pos-delivery-type" class="form-control">
+                                <option value="pickup">Entregado en Tienda</option>
+                                <option value="shipping">Para Despachar (Envío)</option>
+                            </select>
+                        </div>
+
                         <!-- Remission Box -->
                         <div style="margin-top: 1rem; padding: 10px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
@@ -306,6 +315,12 @@ window.Sales = {
                     return;
                 }
 
+                if (e.target.id === 'manage-accounts-btn') {
+                    const modal = document.getElementById('accounts-modal'); // Corrected ID
+                    if (modal) modal.classList.add('show');
+                    return;
+                }
+
                 if (btn.id === 'select-client-btn') {
                     document.getElementById('client-picker-modal').classList.add('show');
                     this.renderPickerList();
@@ -425,6 +440,8 @@ window.Sales = {
                 // Update deferred to after sale is securely saved
             }
 
+            const deliveryType = document.getElementById('pos-delivery-type')?.value || 'pickup';
+            
             const sale = {
                 clientId: this.selectedClient.id,
                 clientName: this.selectedClient.name,
@@ -439,6 +456,8 @@ window.Sales = {
                 totalV: totalV,
                 method: method,
                 accountId: accountId,
+                delivery_type: deliveryType,
+                delivery_status: deliveryType === 'shipping' ? 'pending' : 'completed',
                 date: new Date().toISOString()
             };
 
