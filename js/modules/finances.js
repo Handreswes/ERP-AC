@@ -494,7 +494,7 @@ window.Finances = {
 
             // Other Action Buttons
             if (e.target.id === 'manage-accounts-btn') {
-                const modal = document.getElementById('accounts-modal');
+                const modal = document.getElementById('account-modal');
                 if (modal) modal.classList.add('show');
                 return;
             }
@@ -665,6 +665,8 @@ window.Finances = {
             data.balance = parseFloat(data.balance.replace(/\./g, '')) || 0;
             await Storage.addItem(STORAGE_KEYS.ACCOUNTS, data);
             form.reset();
+            const modal = form.closest('.modal');
+            if (modal) modal.classList.remove('show');
             this.updateBalancesUI();
             alert('✅ Cuenta agregada.');
         } catch (err) {
