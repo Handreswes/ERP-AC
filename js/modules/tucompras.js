@@ -664,7 +664,7 @@ window.TuCompras = {
                         ${hasVulcano ? '<span class="badge bg-orange" style="font-size: 0.6rem; padding: 2px 5px;">V: '+p.stockVulcano+'</span>' : ''}
                     </div>
                     <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center;">
-                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-vibrant);">$${parseFloat(p.priceFinal || 0).toLocaleString()}</span>
+                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-vibrant);">$${parseFloat(p.priceFinal || p.priceInternet || 0).toLocaleString()}</span>
                         <button class="btn btn-sm btn-primary tc-add-btn" data-id="${p.id}" style="width: 32px; height: 32px; padding: 0; border-radius: 50%;"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
