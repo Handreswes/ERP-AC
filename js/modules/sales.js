@@ -174,7 +174,7 @@ window.Sales = {
                         style="width:100%;height:110px;object-fit:cover;display:block;flex-shrink:0;">
                     <div style="padding:8px 10px;">
                         <div style="font-size:0.78rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</div>
-                        <div style="font-size:0.85rem;font-weight:700;color:#10b981;">$${(parseFloat(p.priceWholesale) || parseFloat(p.priceInternet) || 0).toLocaleString('es-CO')}</div>
+                        <div style="font-size:0.85rem;font-weight:700;color:#10b981;">$${(parseFloat(p.priceWholesale) || parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0).toLocaleString('es-CO')}</div>
                         <div style="font-size:0.7rem;color:#94a3b8;">S: ${stock}</div>
                     </div>
                 </div>
@@ -220,7 +220,7 @@ window.Sales = {
     addToCart(product) {
         const existing = this.cart.find(item => item.id === product.id);
         // Default to wholesale price as requested
-        const defaultPrice = product.priceWholesale || product.priceInternet;
+        const defaultPrice = product.priceWholesale || product.priceFinal || product.priceInternet;
 
         if (existing) {
             existing.quantity++;
