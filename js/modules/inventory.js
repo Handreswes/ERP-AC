@@ -187,7 +187,7 @@ window.Inventory = {
                                  </div>
                                  <div class="form-group">
                                      <label>Precio Internet / Final ($)</label>
-                                     <input type="text" name="priceInternet" placeholder="0" inputmode="numeric"
+                                     <input type="text" name="priceFinal" placeholder="0" inputmode="numeric"
                                          oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
                                  </div>
                                  <div class="form-group">
@@ -661,7 +661,7 @@ window.Inventory = {
                 provider: formData.get('provider'),
                 cost: cleanCurrency(formData.get('cost')),
                 priceWholesale: cleanCurrency(formData.get('priceWholesale')),
-                priceFinal: cleanCurrency(formData.get('priceInternet')),
+                priceFinal: cleanCurrency(formData.get('priceFinal')),
                 commissionBase: cleanCurrency(formData.get('commissionBase')),
                 stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
                 stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
