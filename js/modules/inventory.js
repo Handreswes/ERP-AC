@@ -165,7 +165,10 @@ window.Inventory = {
                                 </div>
                                 <div class="form-group">
                                     <label>Categoría</label>
-                                    <input type="text" name="category" required>
+                                    <select name="category" id="product-category-select" required>
+                                        <option value="">Seleccione Categoría...</option>
+                                        <!-- Opciones cargadas dinámicamente -->
+                                    </select>
                                 </div>
                                 <div class="form-group" style="grid-column: span 2;">
                                     <label>Descripción (Sólo visible en Catálogo)</label>
@@ -233,13 +236,30 @@ window.Inventory = {
         if (this.activeTab === 'transit') this.updateTransitList();
         else if (this.activeTab === 'history') this.updateHistoryList();
         else this.updateInventoryList();
+
+        this.loadCategoryOptions();
+    },
+
+    loadCategoryOptions() {
+        const select = document.getElementById('product-category-select');
+        if (!select || !window.CategoriesModule) return;
+
+        const currentVal = select.value;
+        select.innerHTML = '<option value="">Seleccione Categoría...</option>';
+        window.CategoriesModule.categories.forEach(cat => {
+            const option = document.createElement('option');
+            option.value = cat.name;
+            option.textContent = cat.name;
+            select.appendChild(option);
+        });
+        if (currentVal) select.value = currentVal;
     },
 
     updateHistoryList() {
         const list = document.getElementById('history-list');
         if (!list) return;
 
-        const entries = Storage.get(STORAGE_KEYS.STOCK_ENTRIES).sort((a,b) => new Date(b.date) - new Date(a.date));
+        const entries = Storage.get(STORAGE_KEYS.STOCK_ENTRIES).sort((a, b) => new Date(b.date) - new Date(a.date));
 
         list.innerHTML = entries.map(e => `
             <tr>
@@ -472,16 +492,16 @@ window.Inventory = {
                             alert("Error: Producto no encontrado.");
                             return;
                         }
-                        
+
                         const qtyStr = prompt(`Recibir Mercancía (Sumar stock)\nProducto: ${product.name}\n\n¿Cuántas unidades llegaron?`);
                         if (qtyStr === null) return;
-                        
+
                         const qty = parseInt(qtyStr);
                         if (isNaN(qty) || qty <= 0) return;
 
                         const companyChoice = prompt(`¿A qué inventario desea sumarlas? (m = Millenio, v = Vulcano)`, 'm');
                         if (companyChoice === null) return;
-                        
+
                         const company = companyChoice.toLowerCase();
                         const targetCompany = (company === 'v' || company === 'vulcano') ? 'vulcano' : 'millenio';
 
@@ -589,7 +609,7 @@ window.Inventory = {
                 canvas.width = width;
                 canvas.height = height;
                 const ctx = canvas.getContext('2d');
-                
+
                 // Clear and draw image with white background in case of transparent PNGs
                 ctx.fillStyle = "#FFFFFF";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -695,16 +715,16 @@ window.Inventory = {
             // Visual Success instead of blocking alert
             btn.innerHTML = '<i class="fas fa-check"></i> ¡GUARDADO!';
             btn.classList.replace('btn-primary', 'btn-success');
-            
+
             setTimeout(() => {
                 form.reset();
                 this.editingId = null;
                 const modal = document.getElementById('product-modal');
                 if (modal) modal.classList.remove('show');
-                
+
                 // Re-render UI to update tabs and lists
                 this.renderPanel();
-                
+
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PRODUCTO';
                 btn.classList.replace('btn-success', 'btn-primary');
