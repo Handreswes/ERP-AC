@@ -5,7 +5,7 @@ window.Logistics = {
         this.setupEventListeners();
     },
 
-    renderPanel() {
+    async renderPanel() {
         const contentArea = document.getElementById('content-area');
 
         if (!document.getElementById('logistics-panel')) {
@@ -16,7 +16,9 @@ window.Logistics = {
         }
 
         const panel = document.getElementById('logistics-panel');
-        const pendingSales = this.getPendingShipments();
+        panel.innerHTML = '<div class="loader">Cargando despachos...</div>';
+
+        const pendingSales = await this.getPendingShipments();
 
         panel.innerHTML = `
             <div class="panel-header">
@@ -32,8 +34,11 @@ window.Logistics = {
                         <tr>
                             <th>Fecha</th>
                             <th>Cliente</th>
+                            <th>Ubicación</th>
+                            <th>Dirección</th>
                             <th>Productos</th>
                             <th>Total</th>
+                            <th>Origen</th>
                             <th>Transportadora</th>
                             <th>Nro. Guía</th>
                             <th>Acciones</th>
@@ -75,10 +80,40 @@ window.Logistics = {
         }
     },
 
-    getPendingShipments() {
-        // Only include POS sales for now as requested
-        const sales = Storage.get(STORAGE_KEYS.SALES) || [];
-        return sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending');
+    async getPendingShipments() {
+        try {
+            // 1. Fetch POS Sales from Storage/DB
+            const sales = Storage.get(STORAGE_KEYS.SALES) || [];
+            const pendingPOS = sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending');
+
+            // 2. Fetch Website Orders from Supabase
+            const { data: webOrders, error } = await supabase
+                .from('orders')
+                .select('*')
+                .eq('status', 'Pendiente por Confirmar');
+
+            if (error) throw error;
+
+            // Map web orders to match logistics format
+            const mappedWeb = (webOrders || []).map(o => ({
+                id: o.id,
+                date: o.createdAt,
+                clientName: o.customerName,
+                address: o.customerAddress,
+                city: `${o.customerCity}, ${o.customerDept}`,
+                items: o.items,
+                total: o.total,
+                carrier: '',
+                tracking_number: '',
+                source: 'web',
+                original_order: o
+            }));
+
+            return [...pendingPOS, ...mappedWeb];
+        } catch (err) {
+            ERP_LOG('Error fetching logistics: ' + err.message, 'error');
+            return [];
+        }
     },
 
     updateListUI(sales) {
@@ -89,8 +124,11 @@ window.Logistics = {
             <tr>
                 <td>${new Date(s.date).toLocaleDateString()}</td>
                 <td><strong>${s.clientName || 'Cliente Genérico'}</strong></td>
-                <td>${s.items.map(i => `${i.quantity}x ${i.name}`).join('<br>')}</td>
+                <td>${s.city || '--'}</td>
+                <td><small>${s.address || '--'}</small></td>
+                <td>${s.items.map(i => `${i.qty || i.quantity}x ${i.name}`).join('<br>')}</td>
                 <td>$${(s.total || 0).toLocaleString()}</td>
+                <td><span class="badge ${s.source === 'web' ? 'bg-blue' : 'bg-success'}">${s.source === 'web' ? 'WEB' : 'POS'}</span></td>
                 <td>${s.carrier || '<span class="text-secondary">--</span>'}</td>
                 <td>${s.tracking_number || '<span class="text-secondary">--</span>'}</td>
                 <td class="table-actions">
@@ -134,23 +172,42 @@ window.Logistics = {
                 const tracking = document.getElementById('logistic-tracking').value;
 
                 try {
-                    const sale = Storage.getById(STORAGE_KEYS.SALES, saleId);
+                    let sale = Storage.getById(STORAGE_KEYS.SALES, saleId);
+
+                    if (!sale) {
+                        // Check if it's a web order
+                        const pending = await this.getPendingShipments();
+                        sale = pending.find(p => p.id === saleId);
+                    }
+
                     if (sale) {
-                        // Create a clone to avoid direct mutation issues if any
-                        const updatedSale = { 
-                            ...sale,
-                            carrier: carrier,
-                            tracking_number: tracking,
-                            delivery_status: 'shipped',
-                            shipped_at: new Date().toISOString()
-                        };
-                        
-                        await Storage.updateItem(STORAGE_KEYS.SALES, saleId, updatedSale);
+                        if (sale.source === 'web') {
+                            // Update Web Order in Supabase
+                            const { error } = await supabase
+                                .from('orders')
+                                .update({
+                                    status: 'Despachado',
+                                    carrier: carrier,
+                                    tracking_number: tracking
+                                })
+                                .eq('id', saleId);
+                            if (error) throw error;
+                        } else {
+                            // Update POS Sale
+                            const updatedSale = {
+                                ...sale,
+                                carrier: carrier,
+                                tracking_number: tracking,
+                                delivery_status: 'shipped',
+                                shipped_at: new Date().toISOString()
+                            };
+                            await Storage.updateItem(STORAGE_KEYS.SALES, saleId, updatedSale);
+                        }
                         alert('✅ Despacho registrado correctamente.');
-                        
+
                         const modal = document.getElementById('logistic-modal');
                         if (modal) modal.classList.remove('show');
-                        
+
                         // Small delay to ensure DB sync before refresh
                         setTimeout(() => this.renderPanel(), 100);
                     }
