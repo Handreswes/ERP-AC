@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuCompras Col | Herramientas, Hogar y Protección</title>
+    <meta name="description"
+        content="Encuentra las mejores marcas en herramientas, protección y hogar con envíos a todo el país. Calidad y rapidez en TuCompras Col.">
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#home" class="logo" style="text-decoration: none;">
+                <div class="logo-circle">
+                    <i class="fas fa-shopping-cart" style="color: white; font-size: 1.2rem;"></i>
+                </div>
+                <span style="font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; color: var(--text-primary);">
+                    TuCompras <span style="color: var(--primary);">Col</span>
+                </span>
+            </a>
+            <div class="nav-links">
+                <a href="#productos">Productos</a>
+                <a href="#categorias">Categorías</a>
+                <a href="#contacto">Contacto</a>
+            </div>
+            <div class="cart-btn" onclick="window.location.hash = 'checkout'">
+                <i class="fas fa-shopping-basket"></i>
+                <span id="cart-count">0</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Home View -->
+        <section id="home-view" class="view">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container hero-grid">
+                    <div class="hero-text animate">
+                        <h1>En el 2025 vendimos más de 1.300 productos</h1>
+                        <p>Más de 1.300 productos entregados y clientes 100% satisfechos en toda Colombia. Compra con
+                            seguridad y paga al recibir en tu puerta.</p>
+                        <div class="hero-btns">
+                            <a href="#productos" class="btn btn-primary">VER CATÁLOGO <i
+                                    class="fas fa-shopping-bag"></i></a>
+                            <a href="#contacto" class="btn btn-outline">HABLAR CON ASESOR</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual animate">
+                        <div class="cylinder-wrap">
+                            <div class="cylinder-item"><img src="product_showcase_1.png" alt="Showcase 1"></div>
+                            <div class="cylinder-item"><img src="product_showcase_2.png" alt="Showcase 2"></div>
+                            <div class="cylinder-item"><img src="product_showcase_3.png" alt="Showcase 3"></div>
+                            <div class="cylinder-item"><img src="product_showcase_1.png" alt="Showcase 4"></div>
+                            <div class="cylinder-item"><img src="product_showcase_2.png" alt="Showcase 5"></div>
+                            <div class="cylinder-item"><img src="product_showcase_3.png" alt="Showcase 6"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section class="section" id="categorias" style="padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Explora por Categoría</h2>
+                        <p>Todo lo que necesitas en un solo lugar</p>
+                    </div>
+                    <div class="products-grid" id="category-grid">
+                        <!-- Dynamic categories -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section class="section" id="productos" style="background: rgba(255,255,255,0.02); padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Nuestros Productos</h2>
+                        <p>Sincronizado en tiempo real con nuestro inventario</p>
+                    </div>
+                    <div class="products-grid" id="product-grid">
+                        <!-- Dynamic products from Supabase -->
+                        <div class="loader" id="loader">Cargando productos...</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Product Landing View -->
+        <section id="product-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" id="product-landing-content">
+                <!-- Loaded via JS -->
+            </div>
+        </section>
+
+        <!-- Checkout View -->
+        <section id="checkout-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" style="max-width: 600px;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="#home"
+                        style="text-decoration: none; color: var(--text-secondary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-arrow-left"></i> Volver al Catálogo
+                    </a>
+                </div>
+                <div class="glass checkout-card" style="padding: 3rem; border-radius: 30px;">
+                    <h2 style="margin-bottom: 2rem; text-align: center;">Finalizar Pedido</h2>
+                    <form id="checkout-form">
+                        <div class="form-group">
+                            <label>Nombre Completo *</label>
+                            <input type="text" id="cust-name" class="form-control" placeholder="Ej: Juan Perez"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono de Contacto (WhatsApp) *</label>
+                            <input type="tel" id="cust-phone" class="form-control" placeholder="Ej: 300 000 0000"
+                                required>
+                        </div>
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                            <div class="form-group">
+                                <label>Departamento *</label>
+                                <input type="text" id="cust-dept" class="form-control" placeholder="Antioquia" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Ciudad *</label>
+                                <input type="text" id="cust-city" class="form-control" placeholder="Medellín" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Dirección Exacta *</label>
+                            <input type="text" id="cust-address" class="form-control" placeholder="Calle ... #"
+                                required>
+                        </div>
+
+                        <div class="glass"
+                            style="padding: 1rem; margin: 1.5rem 0; border: 1px solid var(--accent); background: rgba(0,242,254,0.05);">
+                            <div style="display: flex; align-items: center; gap: 10px; color: var(--accent);">
+                                <i class="fas fa-truck-fast"></i>
+                                <strong>Pago Contra Entrega (COD)</strong>
+                            </div>
+                            <p style="font-size: 0.85rem; margin-top: 5px; color: var(--text-secondary);">Recuerda:
+                                Pagas en efectivo al recibir el producto en tu casa o trabajo.</p>
+                        </div>
+
+                        <div id="checkout-summary" style="margin-bottom: 2rem;">
+                            <!-- Products summary -->
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block"
+                            style="width: 100%; height: 60px; font-weight: 700;">
+                            CONFIRMAR PEDIDO <i class="fas fa-check"></i>
+                        </button>
+                        <a href="#home"
+                            style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">Seguir
+                            Comprando</a>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Success View -->
+        <section id="success-view" class="view section animate"
+            style="display: none; padding: 15vh 0; text-align: center;">
+            <div class="container">
+                <div class="glass"
+                    style="max-width: 500px; margin: 0 auto; padding: 4rem; border-radius: 40px; border: 1px solid var(--success);">
+                    <i class="fas fa-check-circle"
+                        style="font-size: 6rem; color: var(--success); margin-bottom: 2rem;"></i>
+                    <h1 style="margin-bottom: 1rem;">¡Pedido Realizado!</h1>
+                    <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 3rem;">Hemos recibido tu
+                        solicitud. Nos pondremos en contacto contigo pronto para confirmar el
+                        envío.<br><br><strong>Pagas al recibir.</strong></p>
+                    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Volver a la
+                        Tienda</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/573220000000" class="wp-float" target="_blank" id="wa-link">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Scripts -->
+    <script src="js/web.js"></script>
+</body>
+
+</html>
