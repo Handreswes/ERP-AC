@@ -1,0 +1,12 @@
+# Environment Variables
+.env
+.env.local
+
+# Project Specific
+sync_github.ps1.bak
+
+# Common excludes
+node_modules/
+dist/
+.DS_Store
+Thumbs.db
