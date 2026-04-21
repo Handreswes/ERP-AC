@@ -72,11 +72,12 @@ window.Locations = {
 };
 
 window.TuComprasCRM = {
-    init() {
-        // No distinct panel yet, used primarily within TuCompras or separately
+    async init() {
+        this.customers = await this.getCustomers();
     },
 
-    renderPanel() {
+    async renderPanel() {
+        this.customers = await this.getCustomers();
         const contentArea = document.getElementById('content-area');
         if (!document.getElementById('tucompras-crm-panel')) {
             const panel = document.createElement('div');
@@ -97,7 +98,7 @@ window.TuComprasCRM = {
             <div class="stats-grid" style="margin-top: 1rem;">
                 <div class="stat-card">
                     <h3>Total Clientes</h3>
-                    <p class="stat-value">${this.getCustomers().length}</p>
+                    <p class="stat-value">${this.customers.length}</p>
                 </div>
             </div>
 
@@ -113,7 +114,7 @@ window.TuComprasCRM = {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.getCustomers().map(c => `
+                        ${this.customers.map(c => `
                             <tr>
                                 <td><strong>${c.name}</strong></td>
                                 <td>${c.phone}</td>
@@ -128,8 +129,9 @@ window.TuComprasCRM = {
         `;
     },
 
-    getCustomers() {
-        return Storage.get(STORAGE_KEYS.TUCOMPRAS_CUSTOMERS);
+    async getCustomers() {
+        const { data, error } = await window.supabaseClient.from('tucompras_customers').select('*').order('created_at', { ascending: false });
+        return error ? [] : data;
     },
 
     async addCustomer(customer) {
