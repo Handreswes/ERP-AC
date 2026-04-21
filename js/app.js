@@ -1,6 +1,6 @@
-console.log('--- ERP AC SYSTEM V67 LOADING (CLOUD SYNC) ---');
+console.log('--- ERP AC SYSTEM V102 LOADING (CLOUD SYNC) ---');
 
-// Visual Logger (Console only for production V67)
+// Visual Logger (Console only for production V102)
 window.ERP_LOG = function (msg, type = 'info') {
     console.log(`[ERP ${type.toUpperCase()}]`, msg);
     // Visual tray removed by user request
@@ -13,23 +13,23 @@ window.onerror = function (msg, url, line) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     window.erpStarted = true;
-    ERP_LOG('Iniciando Sistema V67...');
+    ERP_LOG('Iniciando Sistema V102...');
 
-    // 0. Initialize Auth FIRST
-    try {
-        if (typeof Auth !== 'undefined') {
-            await Auth.init();
-            ERP_LOG('Auth Listo', 'success');
-        }
-    } catch (e) { ERP_LOG('Error Auth: ' + e.message, 'error'); }
-
-    // 0.1 Initialize Supabase
+    // 0. Initialize Supabase FIRST
     try {
         if (typeof window.initSupabase === 'function') {
             window.initSupabase();
             ERP_LOG('Supabase Listo', 'success');
         }
     } catch (e) { ERP_LOG('Error Supabase: ' + e.message, 'error'); }
+
+    // 0.1 Initialize Auth
+    try {
+        if (typeof Auth !== 'undefined') {
+            await Auth.init();
+            ERP_LOG('Auth Listo', 'success');
+        }
+    } catch (e) { ERP_LOG('Error Auth: ' + e.message, 'error'); }
 
     // 1. Initialize Storage
     try {
@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     } catch (e) { ERP_LOG('Error Storage: ' + e.message, 'error'); }
 
     // 2. Initialize Modules
-    const mods = [Inventory, CRM, Sales, Dashboard, Finances, TuCompras, Vendedores, Settings, Consultas, Catalog, PDFManager, TuComprasCRM, Logistics];
+    const mods = [Inventory, CRM, Sales, Dashboard, Finances, Marketing, TuCompras, Vendedores, CategoriesModule, Settings, Consultas, Catalog, PDFManager, TuComprasCRM, Logistics, UserManagement];
     mods.forEach(m => {
         try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo Initializing: ' + e.message, 'error'); }
     });
@@ -110,9 +110,12 @@ function initNavigation() {
             'tucompras': () => { if (window.TuCompras && window.TuCompras.renderPanel) window.TuCompras.renderPanel(); },
             'vendedores': () => { if (window.Vendedores && window.Vendedores.renderPanel) window.Vendedores.renderPanel(); },
             'tucompras-crm': () => { if (window.TuComprasCRM && window.TuComprasCRM.renderPanel) window.TuComprasCRM.renderPanel(); },
+            'marketing': () => { if (window.Marketing && window.Marketing.renderPanel) window.Marketing.renderPanel(); },
             'consultas': () => { if (window.Consultas && window.Consultas.renderPanel) window.Consultas.renderPanel(); },
             'catalog': () => { if (window.Catalog && window.Catalog.renderPanel) window.Catalog.renderPanel(); },
-            'logistics': () => { if (window.Logistics && window.Logistics.renderPanel) window.Logistics.renderPanel(); }
+            'logistics': () => { if (window.Logistics && window.Logistics.renderPanel) window.Logistics.renderPanel(); },
+            'categories': () => { if (window.CategoriesModule && window.CategoriesModule.init) window.CategoriesModule.init(); },
+            'user-management': () => { if (window.UserManagement && window.UserManagement.init) window.UserManagement.init(); }
         };
 
         if (modMap[panelName]) {
