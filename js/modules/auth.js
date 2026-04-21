@@ -23,28 +23,33 @@ window.Auth = {
         }
     },
 
-    async login(username, password) {
+    async login(email, password) {
         const supabase = window.supabaseClient;
         if (!supabase) return false;
 
         try {
-            const { data, error } = await supabase
-                .from('users')
-                .select('*')
-                .eq('username', username.toLowerCase())
-                .eq('password', password)
-                .single();
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
 
-            if (error || !data) {
-                console.warn('Login failed:', error?.message || 'User not found');
+            if (error || !data.user) {
+                console.warn('Login failed:', error?.message);
                 return false;
             }
 
+            // Fetch Profile Role
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role')
+                .eq('id', data.user.id)
+                .single();
+
             this.currentUser = {
-                id: data.id,
-                username: data.username,
-                name: data.full_name,
-                role: data.role
+                id: data.user.id,
+                email: data.user.email,
+                name: data.user.user_metadata?.full_name || email.split('@')[0],
+                role: profile?.role || 'customer'
             };
 
             localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
@@ -74,10 +79,12 @@ window.Auth = {
                 const user = loginForm.elements['username'].value;
                 const pass = loginForm.elements['password'].value;
 
-                if (await this.login(user, pass)) {
+                const result = await this.login(user, pass);
+                if (result) {
                     window.location.reload();
                 } else {
-                    alert('Usuario o contraseña incorrectos');
+                    const errorMsg = !window.supabaseClient ? 'Error de conexión con la base de datos' : 'Email o contraseña incorrectos';
+                    alert(errorMsg);
                     btn.disabled = false;
                     btn.innerHTML = 'Iniciar Sesión';
                 }
