@@ -180,6 +180,9 @@ function showView(viewId, productId = null) {
         const prompt = document.getElementById('guest-register-prompt');
         if (prompt) prompt.style.display = currentUser ? 'none' : 'block';
     }
+    if (viewId === 'privacy' || viewId === 'refunds') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
     if (viewId === 'account') {
         renderAccountView();
     }
