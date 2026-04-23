@@ -9,6 +9,7 @@ let cart = JSON.parse(localStorage.getItem('tc-cart')) || [];
 let activeCategory = 'all';
 let checkoutSource = 'cart';
 let checkoutItem = null;
+let currentUser = null;
 
 // DOM Elements
 const productGrid = document.getElementById('product-grid');
@@ -17,10 +18,132 @@ const cartCount = document.getElementById('cart-count');
 const navbar = document.getElementById('navbar');
 
 // Initialize
+// Auth Functions
+function setupAuthForms() {
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const pass = document.getElementById('login-pass').value;
+            const btn = loginForm.querySelector('button');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Entrando...';
+
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password: pass });
+            if (error) {
+                alert('Error: ' + error.message);
+                btn.disabled = false; btn.innerHTML = 'INICIAR SESIÓN';
+            } else {
+                await fetchUserProfile(data.user);
+                showView('home');
+            }
+        };
+    }
+
+    const regForm = document.getElementById('register-form');
+    if (regForm) {
+        regForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('reg-name').value;
+            const phone = document.getElementById('reg-phone').value;
+            const email = document.getElementById('reg-email').value;
+            const pass = document.getElementById('reg-pass').value;
+            const btn = regForm.querySelector('button');
+            btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creando...';
+
+            const { data, error } = await _supabase.auth.signUp({ email, password: pass, options: { data: { full_name: name, phone: phone } } });
+            if (error) {
+                alert('Error: ' + error.message);
+                btn.disabled = false; btn.innerHTML = 'CREAR CUENTA';
+            } else {
+                await syncCustomerToCRM(data.user, { name, phone, email });
+                alert('Cuenta creada. Por favor verifica tu correo.');
+                currentUser = { id: data.user.id, name, email, phone };
+                showView('home');
+            }
+        };
+    }
+}
+
+async function fetchUserProfile(user) {
+    if (!user) return;
+    const { data, error } = await _supabase.from('tucompras_customers').select('*').eq('auth_id', user.id).single();
+    if (data) {
+        currentUser = { ...data };
+    } else {
+        currentUser = { id: user.id, name: user.user_metadata.full_name || 'Usuario', email: user.email };
+    }
+}
+
+async function logout() {
+    await _supabase.auth.signOut();
+    currentUser = null;
+    showView('home');
+    location.reload();
+}
+
+async function syncCustomerToCRM(user, profile) {
+    const customerData = {
+        id: user.id,
+        auth_id: user.id,
+        name: profile.name,
+        phone: profile.phone,
+        email: profile.email,
+        created_at: new Date().toISOString()
+    };
+    await _supabase.from('tucompras_customers').upsert([customerData]);
+}
+
+async function fetchOrderHistory() {
+    if (!currentUser) return;
+    const list = document.getElementById('order-history-list');
+    const { data, error } = await _supabase.from('orders').select('*').eq('customerPhone', currentUser.phone).order('createdAt', { ascending: false });
+    
+    if (error || !data || data.length === 0) {
+        list.innerHTML = '<p style="text-align:center; padding:2rem;">No tienes pedidos aún.</p>';
+        return;
+    }
+
+    list.innerHTML = data.map(o => `
+        <div class="glass" style="padding:1.5rem; margin-bottom:1rem; border-left: 4px solid var(--primary);">
+            <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
+                <strong>${o.id}</strong>
+                <span class="badge" style="background:var(--primary); color:white; padding:2px 10px; border-radius:10px; font-size:0.8rem;">${o.status}</span>
+            </div>
+            <div style="font-size:0.9rem; color:var(--text-secondary);">
+                ${new Date(o.createdAt).toLocaleDateString()} - $${o.total.toLocaleString()}
+            </div>
+            <div style="margin-top:0.5rem; font-size:0.85rem;">
+                ${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
+            </div>
+        </div>
+    `).join('');
+}
+
+// Check initial session
+async function checkSession() {
+    const { data: { session } } = await _supabase.auth.getSession();
+    if (session) {
+        await fetchUserProfile(session.user);
+        updateBottomNav();
+    }
+}
+
 async function init() {
     setupEventListeners();
+    await checkSession();
     await fetchProducts();
+    subscribeToProducts();
     updateCartUI();
+}
+
+function subscribeToProducts() {
+    _supabase
+        .channel('public:products')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'products' }, (payload) => {
+            fetchProducts();
+        })
+        .subscribe();
 }
 
 // Router & View Management
@@ -38,6 +161,10 @@ function showView(viewId, productId = null) {
     if (viewId === 'checkout') {
         renderCheckoutSummary();
     }
+    if (viewId === 'account') {
+        renderAccountView();
+    }
+    updateBottomNav();
 }
 
 function handleRouting() {
@@ -50,9 +177,12 @@ function handleRouting() {
         showView('product', id);
     } else if (view === 'checkout') {
         showView('checkout');
+    } else if (view === 'account') {
+        showView('account');
     } else {
         showView('home');
     }
+    updateBottomNav();
 }
 
 // Fetch Products from Supabase
@@ -199,6 +329,8 @@ function renderProductLanding(id) {
             </div>
         </div>
     `;
+    if (window.fbq) fbq('track', 'ViewContent', { content_ids: [id], content_type: 'product', content_name: p.name, value: p.priceFinal, currency: 'COP' });
+    if (window.ttq) ttq.track('ViewContent', { content_id: id, content_name: p.name, value: p.priceFinal, currency: 'COP' });
 }
 
 // Render Categories
@@ -243,6 +375,9 @@ window.addToCart = (id) => {
     if (existing) existing.qty++; else cart.push({ ...p, qty: 1 });
     updateCartUI();
     showToast(`¡${p.name} añadido!`);
+    
+    if (window.fbq) fbq('track', 'AddToCart', { content_ids: [p.id], content_type: 'product', content_name: p.name, value: p.priceFinal, currency: 'COP' });
+    if (window.ttq) ttq.track('AddToCart', { content_id: p.id, content_name: p.name, value: p.priceFinal, currency: 'COP' });
 };
 
 function updateCartUI() {
@@ -264,6 +399,84 @@ function renderCheckoutSummary() {
     summary.innerHTML = `<h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Resumen del Pedido</h4>${html}<div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-top: 15px; border-top: 2px solid var(--accent); padding-top: 10px;"><strong>TOTAL:</strong><strong style="color: var(--accent);">$${total.toLocaleString()}</strong></div>`;
 }
 
+// Account View Rendering
+async function renderAccountView() {
+    const container = document.getElementById('account-content');
+    if (!currentUser) {
+        container.innerHTML = `
+            <div style="max-width: 450px; margin: 0 auto;">
+                <div class="glass" style="padding: 3rem; border-radius: 30px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
+                        <button class="btn btn-primary" onclick="toggleAuthTab('login')" id="tab-login" style="flex:1">Entrar</button>
+                        <button class="btn btn-outline" onclick="toggleAuthTab('register')" id="tab-register" style="flex:1">Registrar</button>
+                    </div>
+                    
+                    <form id="login-form">
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="login-email" class="form-control" required placeholder="tu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="login-pass" class="form-control" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 1rem;">INICIAR SESIÓN</button>
+                    </form>
+
+                    <form id="register-form" style="display:none">
+                        <div class="form-group">
+                            <label>Nombre Completo</label>
+                            <input type="text" id="reg-name" class="form-control" required placeholder="Juan Perez">
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono</label>
+                            <input type="tel" id="reg-phone" class="form-control" required placeholder="300 000 0000">
+                        </div>
+                        <div class="form-group">
+                            <label>Correo Electrónico</label>
+                            <input type="email" id="reg-email" class="form-control" required placeholder="tu@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Contraseña</label>
+                            <input type="password" id="reg-pass" class="form-control" required placeholder="••••••••">
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%; margin-top: 1rem;">CREAR CUENTA</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        setupAuthForms();
+    } else {
+        container.innerHTML = `
+            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+                <div class="glass" style="padding: 2rem; border-radius: 30px; height: fit-content;">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem;">
+                            ${currentUser.name.charAt(0)}
+                        </div>
+                        <h3>${currentUser.name}</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem;">${currentUser.email}</p>
+                    </div>
+                    <button class="btn btn-outline btn-block" onclick="logout()" style="width: 100%; border-color: var(--danger); color: var(--danger);">Cerrar Sesión</button>
+                </div>
+                <div class="glass" style="padding: 2rem; border-radius: 30px;">
+                    <h3 style="margin-bottom: 1.5rem;">Mis Pedidos</h3>
+                    <div id="order-history-list">Cargando pedidos...</div>
+                </div>
+            </div>
+        `;
+        fetchOrderHistory();
+    }
+}
+
+window.toggleAuthTab = (tab) => {
+    const isLogin = tab === 'login';
+    document.getElementById('login-form').style.display = isLogin ? 'block' : 'none';
+    document.getElementById('register-form').style.display = isLogin ? 'none' : 'block';
+    document.getElementById('tab-login').className = isLogin ? 'btn btn-primary' : 'btn btn-outline';
+    document.getElementById('tab-register').className = isLogin ? 'btn btn-outline' : 'btn btn-primary';
+};
+
 // Submit Order
 document.getElementById('checkout-form').onsubmit = async (e) => {
     e.preventDefault();
@@ -283,8 +496,27 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
     try {
         const { error } = await _supabase.from('orders').insert([orderData]);
         if (error) throw error;
+
+        // Update Customer Stats in CRM if logged in
+        if (currentUser) {
+            const newTotalSpent = (Number(currentUser.totalSpent) || 0) + orderData.total;
+            const newTotalPurchases = (Number(currentUser.totalPurchases) || 0) + 1;
+            await _supabase.from('tucompras_customers').update({
+                totalSpent: newTotalSpent,
+                totalPurchases: newTotalPurchases,
+                lastPurchase: new Date().toISOString()
+            }).eq('id', currentUser.id);
+            
+            // Refresh local state
+            currentUser.totalSpent = newTotalSpent;
+            currentUser.totalPurchases = newTotalPurchases;
+        }
+
         if (checkoutSource === 'cart') { cart = []; updateCartUI(); }
         showView('success');
+
+        if (window.fbq) fbq('track', 'Purchase', { value: orderData.total, currency: 'COP', content_ids: orderData.items.map(i => i.product_id), content_type: 'product' });
+        if (window.ttq) ttq.track('CompletePayment', { value: orderData.total, currency: 'COP', content_id: orderData.items.map(i => i.product_id) });
     } catch (err) { alert('Error: ' + err.message); btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>'; }
 };
 
@@ -299,7 +531,23 @@ function setupEventListeners() {
     window.onscroll = () => { if (window.scrollY > 50) navbar.classList.add('scrolled'); else navbar.classList.remove('scrolled'); };
     window.showView = showView;
     window.addEventListener('hashchange', handleRouting);
+    
+    // Mobile Menu
+    document.getElementById('menu-toggle').onclick = () => document.getElementById('mobile-menu').classList.add('active');
+    document.getElementById('close-menu').onclick = () => document.getElementById('mobile-menu').classList.remove('active');
+    document.querySelectorAll('.mobile-links a').forEach(a => {
+        a.onclick = () => document.getElementById('mobile-menu').classList.remove('active');
+    });
+
     handleRouting(); // Call once on start
+}
+
+function updateBottomNav() {
+    const hash = window.location.hash || '#home';
+    const view = hash.split('?')[0];
+    document.querySelectorAll('.bottom-nav a').forEach(a => {
+        a.classList.toggle('active', a.getAttribute('href') === view);
+    });
 }
 
 init();
