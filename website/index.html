@@ -184,6 +184,19 @@
                 </div>
                 <div class="glass checkout-card" style="padding: 3rem; border-radius: 30px;">
                     <h2 style="margin-bottom: 2rem; text-align: center;">Finalizar Pedido</h2>
+                    
+                    <div id="checkout-login-prompt" style="margin-bottom: 2rem; text-align: center; background: rgba(59,130,246,0.05); padding: 1.5rem; border-radius: 15px; border: 1px dashed var(--border);">
+                        <p style="font-size: 0.85rem; margin-bottom: 1rem; color: var(--text-secondary);">¿Quieres guardar tus pedidos y rastrearlos?</p>
+                        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                            <button onclick="window.Auth.loginWith('google')" class="btn btn-sm" style="background: white; color: #444; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                                <img src="https://www.google.com/favicon.ico" style="width: 14px;"> Google
+                            </button>
+                            <button onclick="window.Auth.loginWith('facebook')" class="btn btn-sm" style="background: #1877f2; color: white; display: flex; align-items: center; gap: 8px; font-weight: 600;">
+                                <i class="fab fa-facebook"></i> Facebook
+                            </button>
+                        </div>
+                    </div>
+
                     <form id="checkout-form">
                         <div class="form-group">
                             <label>Nombre Completo *</label>
