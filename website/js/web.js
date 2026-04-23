@@ -176,6 +176,10 @@ function showView(viewId, productId = null) {
         const prompt = document.getElementById('checkout-login-prompt');
         if (prompt) prompt.style.display = currentUser ? 'none' : 'block';
     }
+    if (viewId === 'success') {
+        const prompt = document.getElementById('guest-register-prompt');
+        if (prompt) prompt.style.display = currentUser ? 'none' : 'block';
+    }
     if (viewId === 'account') {
         renderAccountView();
     }
@@ -417,6 +421,9 @@ function renderCheckoutSummary() {
     if (currentUser) {
         if (document.getElementById('cust-name')) document.getElementById('cust-name').value = currentUser.name || '';
         if (document.getElementById('cust-phone')) document.getElementById('cust-phone').value = currentUser.phone || '';
+        if (document.getElementById('cust-address')) document.getElementById('cust-address').value = currentUser.address || '';
+        if (document.getElementById('cust-city')) document.getElementById('cust-city').value = currentUser.city || '';
+        if (document.getElementById('cust-dept')) document.getElementById('cust-dept').value = currentUser.dept || '';
     }
 }
 
@@ -522,9 +529,19 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
 
     const items = checkoutSource === 'landing' ? [{ product_id: checkoutItem.id, name: checkoutItem.name, qty: 1, price: checkoutItem.priceFinal }] : cart.map(i => ({ product_id: i.id, name: i.name, qty: i.qty, price: i.priceFinal }));
     const orderData = {
-        id: 'TC-' + Date.now().toString().slice(-8), customerName: document.getElementById('cust-name').value, customerPhone: phone, customerAddress: document.getElementById('cust-address').value,
-        customerCity: document.getElementById('cust-city').value, customerDept: document.getElementById('cust-dept').value, items, total: items.reduce((s, i) => s + (i.price * i.qty), 0),
-        status: 'Pendiente por Confirmar', source: checkoutSource
+        id: 'TC-' + Date.now().toString().slice(-8), 
+        customerName: document.getElementById('cust-name').value, 
+        customerPhone: phone, 
+        customerAddress: document.getElementById('cust-address').value,
+        customerCity: document.getElementById('cust-city').value, 
+        customerDept: document.getElementById('cust-dept').value, 
+        items, 
+        total: items.reduce((s, i) => s + (i.price * i.qty), 0),
+        status: 'Pendiente por Confirmar', 
+        source: checkoutSource,
+        hasAccount: !!currentUser,
+        acceptNotifications: document.getElementById('accept-notifications').checked,
+        createdAt: new Date().toISOString()
     };
 
     try {
