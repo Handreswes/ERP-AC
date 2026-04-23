@@ -1,4 +1,4 @@
-console.log('--- ERP AC SYSTEM V102 LOADING (CLOUD SYNC) ---');
+console.log('--- ERP AC SYSTEM V104 LOADING (CLOUD SYNC) ---');
 
 // Visual Logger (Console only for production V102)
 window.ERP_LOG = function (msg, type = 'info') {
