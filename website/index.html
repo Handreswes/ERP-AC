@@ -234,6 +234,13 @@
                                 Pagas en efectivo al recibir el producto en tu casa o trabajo.</p>
                         </div>
 
+                        <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px; margin: 1.5rem 0;">
+                            <input type="checkbox" id="accept-notifications" checked style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
+                            <label for="accept-notifications" style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; text-align: left;">
+                                Acepto recibir notificaciones sobre mi pedido y ofertas exclusivas de TuCompras Col por WhatsApp o correo.
+                            </label>
+                        </div>
+
                         <div id="checkout-summary" style="margin-bottom: 2rem;">
                             <!-- Products summary -->
                         </div>
@@ -269,8 +276,11 @@
                     <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 3rem;">Hemos recibido tu
                         solicitud. Nos pondremos en contacto contigo pronto para confirmar el
                         envío.<br><br><strong>Pagas al recibir.</strong></p>
-                    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'">Volver a la
-                        Tienda</button>
+                    <div id="guest-register-prompt" style="display: none; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;">¿Quieres crear una cuenta para rastrear tus pedidos y comprar más rápido la próxima vez?</p>
+                        <button class="btn btn-outline" onclick="showView('account')" style="width: 100%;">CREAR MI CUENTA <i class="fas fa-user-plus"></i></button>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" style="margin-top: 2rem; width: 100%;">Volver a la Tienda</button>
                 </div>
             </div>
         </section>
