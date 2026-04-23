@@ -49,7 +49,7 @@ window.Storage = {
      * Initial Load: Fetches all data from Supabase into memory
      */
     async init() {
-        console.log('--- STORAGE: INITIALIZING (V102) ---');
+        console.log('--- STORAGE: INITIALIZING (V103) ---');
         const keys = Object.values(STORAGE_KEYS);
         const supabase = window.supabaseClient;
 
