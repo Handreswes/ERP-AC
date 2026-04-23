@@ -551,19 +551,26 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         const { error } = await _supabase.from('orders').insert([orderData]);
         if (error) throw error;
 
-        // Update Customer Stats in CRM if logged in
+        // Update Customer Stats and Shipping Info in CRM if logged in
         if (currentUser) {
             const newTotalSpent = (Number(currentUser.totalSpent) || 0) + orderData.total;
             const newTotalPurchases = (Number(currentUser.totalPurchases) || 0) + 1;
-            await _supabase.from('tucompras_customers').update({
+            
+            const updateData = {
                 totalSpent: newTotalSpent,
                 totalPurchases: newTotalPurchases,
-                lastPurchase: new Date().toISOString()
-            }).eq('id', currentUser.id);
+                lastPurchase: new Date().toISOString(),
+                // Update shipping info if it changed or was empty
+                phone: orderData.customerPhone,
+                address: orderData.customerAddress,
+                city: orderData.customerCity,
+                dept: orderData.customerDept
+            };
+
+            await _supabase.from('tucompras_customers').update(updateData).eq('id', currentUser.id);
             
             // Refresh local state
-            currentUser.totalSpent = newTotalSpent;
-            currentUser.totalPurchases = newTotalPurchases;
+            Object.assign(currentUser, updateData);
         }
 
         if (checkoutSource === 'cart') { cart = []; updateCartUI(); }
