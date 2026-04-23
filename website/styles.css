@@ -1,9 +1,9 @@
 :root {
-    --primary: #0061f2;
-    --primary-hover: #004ecc;
-    --secondary: #ffb100;
-    --accent: #ffb100;
-    --accent-vibrant: #ffc107;
+    --primary: #ff8c00;
+    --primary-hover: #ff7b00;
+    --secondary: #ffc145;
+    --accent: #ffc145;
+    --accent-vibrant: #ffc145;
     --danger: #ef4444;
     --success: #10b981;
     --warning: #f59e0b;
@@ -238,8 +238,8 @@ body {
     position: relative;
     padding-top: 80px;
     background:
-        radial-gradient(circle at 10% 20%, rgba(0, 97, 242, 0.05), transparent),
-        radial-gradient(circle at 90% 80%, rgba(255, 177, 0, 0.05), transparent);
+        radial-gradient(circle at 10% 20%, rgba(255, 140, 0, 0.05), transparent),
+        radial-gradient(circle at 90% 80%, rgba(255, 193, 69, 0.05), transparent);
     overflow: hidden;
 }
 
