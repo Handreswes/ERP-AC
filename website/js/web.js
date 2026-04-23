@@ -65,6 +65,19 @@ function setupAuthForms() {
     }
 }
 
+// Social Login
+window.Auth = {
+    loginWith: async (provider) => {
+        const { data, error } = await _supabase.auth.signInWithOAuth({
+            provider: provider,
+            options: {
+                redirectTo: window.location.origin + window.location.pathname
+            }
+        });
+        if (error) alert('Error Social Login: ' + error.message);
+    }
+};
+
 async function fetchUserProfile(user) {
     if (!user) return;
     const { data, error } = await _supabase.from('tucompras_customers').select('*').eq('auth_id', user.id).single();
@@ -160,6 +173,8 @@ function showView(viewId, productId = null) {
     }
     if (viewId === 'checkout') {
         renderCheckoutSummary();
+        const prompt = document.getElementById('checkout-login-prompt');
+        if (prompt) prompt.style.display = currentUser ? 'none' : 'block';
     }
     if (viewId === 'account') {
         renderAccountView();
@@ -397,6 +412,12 @@ function renderCheckoutSummary() {
     });
 
     summary.innerHTML = `<h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Resumen del Pedido</h4>${html}<div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-top: 15px; border-top: 2px solid var(--accent); padding-top: 10px;"><strong>TOTAL:</strong><strong style="color: var(--accent);">$${total.toLocaleString()}</strong></div>`;
+
+    // Auto-fill form if logged in
+    if (currentUser) {
+        if (document.getElementById('cust-name')) document.getElementById('cust-name').value = currentUser.name || '';
+        if (document.getElementById('cust-phone')) document.getElementById('cust-phone').value = currentUser.phone || '';
+    }
 }
 
 // Account View Rendering
@@ -409,6 +430,19 @@ async function renderAccountView() {
                     <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
                         <button class="btn btn-primary" onclick="toggleAuthTab('login')" id="tab-login" style="flex:1">Entrar</button>
                         <button class="btn btn-outline" onclick="toggleAuthTab('register')" id="tab-register" style="flex:1">Registrar</button>
+                    </div>
+
+                    <div style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 10px;">
+                        <button onclick="window.Auth.loginWith('google')" class="btn" style="background: white; color: #444; border: 1px solid #ddd; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600;">
+                            <img src="https://www.google.com/favicon.ico" style="width: 18px;"> Continuar con Google
+                        </button>
+                        <button onclick="window.Auth.loginWith('facebook')" class="btn" style="background: #1877f2; color: white; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600;">
+                            <i class="fab fa-facebook"></i> Continuar con Facebook
+                        </button>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
+                        <hr style="flex:1; border: 0; border-top: 1px solid var(--border);"> o con tu correo <hr style="flex:1; border: 0; border-top: 1px solid var(--border);">
                     </div>
                     
                     <form id="login-form">
