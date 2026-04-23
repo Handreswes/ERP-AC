@@ -176,6 +176,17 @@ body.logged-out .app-container {
 .sidebar-nav {
     flex: 1;
     padding: 0 1rem;
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+    width: 4px;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
 }
 
 .nav-item {
