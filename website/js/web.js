@@ -65,18 +65,7 @@ function setupAuthForms() {
     }
 }
 
-// Social Login
-window.Auth = {
-    loginWith: async (provider) => {
-        const { data, error } = await _supabase.auth.signInWithOAuth({
-            provider: provider,
-            options: {
-                redirectTo: window.location.origin + window.location.pathname
-            }
-        });
-        if (error) alert('Error Social Login: ' + error.message);
-    }
-};
+// Social Login removed for simplicity
 
 async function fetchUserProfile(user) {
     if (!user) return;
@@ -442,17 +431,9 @@ async function renderAccountView() {
                         <button class="btn btn-outline" onclick="toggleAuthTab('register')" id="tab-register" style="flex:1">Registrar</button>
                     </div>
 
-                    <div style="margin-bottom: 2rem; display: flex; flex-direction: column; gap: 10px;">
-                        <button onclick="window.Auth.loginWith('google')" class="btn" style="background: white; color: #444; border: 1px solid #ddd; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600;">
-                            <img src="https://www.google.com/favicon.ico" style="width: 18px;"> Continuar con Google
-                        </button>
-                        <button onclick="window.Auth.loginWith('facebook')" class="btn" style="background: #1877f2; color: white; width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600;">
-                            <i class="fab fa-facebook"></i> Continuar con Facebook
-                        </button>
-                    </div>
-
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 2rem; color: var(--text-secondary); font-size: 0.8rem;">
-                        <hr style="flex:1; border: 0; border-top: 1px solid var(--border);"> o con tu correo <hr style="flex:1; border: 0; border-top: 1px solid var(--border);">
+                    <div style="text-align: center; margin-bottom: 2rem;">
+                        <h2 style="margin-bottom: 0.5rem;">Bienvenido</h2>
+                        <p style="color: var(--text-secondary);">Inicia sesión o crea una cuenta para gestionar tus pedidos.</p>
                     </div>
                     
                     <form id="login-form">
@@ -490,6 +471,16 @@ async function renderAccountView() {
             </div>
         `;
         setupAuthForms();
+        
+        // Pre-fill if coming from checkout
+        if (window.lastOrderData) {
+            toggleAuthTab('register');
+            setTimeout(() => {
+                if (document.getElementById('reg-name')) document.getElementById('reg-name').value = window.lastOrderData.customerName || '';
+                if (document.getElementById('reg-phone')) document.getElementById('reg-phone').value = window.lastOrderData.customerPhone || '';
+                if (document.getElementById('reg-email')) document.getElementById('reg-email').value = window.lastOrderData.customerEmail || '';
+            }, 100);
+        }
     } else {
         container.innerHTML = `
             <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
@@ -535,6 +526,7 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         id: 'TC-' + Date.now().toString().slice(-8), 
         customerName: document.getElementById('cust-name').value, 
         customerPhone: phone, 
+        customerEmail: document.getElementById('cust-email').value,
         customerAddress: document.getElementById('cust-address').value,
         customerCity: document.getElementById('cust-city').value, 
         customerDept: document.getElementById('cust-dept').value, 
@@ -574,6 +566,11 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         }
 
         if (checkoutSource === 'cart') { cart = []; updateCartUI(); }
+        
+        // Show success and set data for possible registration
+        document.getElementById('guest-register-prompt').style.display = currentUser ? 'none' : 'block';
+        window.lastOrderData = orderData; 
+        
         showView('success');
 
         if (window.fbq) fbq('track', 'Purchase', { value: orderData.total, currency: 'COP', content_ids: orderData.items.map(i => i.product_id), content_type: 'product' });
