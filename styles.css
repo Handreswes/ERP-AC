@@ -1,14 +1,14 @@
 :root {
     color-scheme: dark;
-    --bg-dark: #020617;
+    --bg-dark: #0f172a;
     --bg-card: rgba(30, 41, 59, 0.7);
-    --bg-sidebar: #020617;
-    --bg-topbar: rgba(2, 6, 23, 0.8);
+    --bg-sidebar: #0f172a;
+    --bg-topbar: rgba(15, 23, 42, 0.8);
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
-    --accent: #3b82f6;
-    --accent-vibrant: #60a5fa;
-    --accent-gradient: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    --accent: #ff8c00; /* Naranja TuCompras */
+    --accent-vibrant: #ffc145; /* Oro TuCompras */
+    --accent-gradient: linear-gradient(135deg, #ffc145 0%, #ff8c00 50%, #ff4b4b 100%);
     --danger: #ef4444;
     --success: #10b981;
     --warning: #f59e0b;
