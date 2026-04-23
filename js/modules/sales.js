@@ -96,7 +96,7 @@ window.Sales = {
                         <!-- Remission Box -->
                         <div style="margin-top: 1rem; padding: 10px; background: rgba(59,130,246,0.05); border: 1px solid rgba(59,130,246,0.2); border-radius: 8px;">
                             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                                <input type="checkbox" id="generate-remision-chk" checked style="width: 16px; height: 16px; cursor: pointer;">
+                                <input type="checkbox" id="generate-remision-chk" style="width: 16px; height: 16px; cursor: pointer;">
                                 <label for="generate-remision-chk" style="margin: 0; cursor: pointer; font-weight: 600; color: var(--accent);">Generar Remisión PDF</label>
                             </div>
                             <div id="remision-number-wrapper">
