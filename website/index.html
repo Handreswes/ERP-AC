@@ -4,9 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuCompras Col | Herramientas, Hogar y Protección</title>
-    <meta name="description"
-        content="Encuentra las mejores marcas en herramientas, protección y hogar con envíos a todo el país. Calidad y rapidez en TuCompras Col.">
+    <title>TuCompras Col | Herramientas y Hogar con Envíos en Colombia</title>
+    <meta name="description" content="Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.">
+    <meta name="keywords" content="herramientas, ferretería colombia, millenio, vulcano, tucompras col, pago contra entrega, protección industrial">
+    <link rel="canonical" href="https://tucomprascol.com/">
+
+    <!-- Open Graph / Facebook / TikTok -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tucomprascol.com/">
+    <meta property="og:title" content="TuCompras Col | Calidad y Rapidez en Herramientas">
+    <meta property="og:description" content="Compra herramientas profesionales y artículos para el hogar con pago contra entrega. Calidad garantizada.">
+    <meta property="og:image" content="https://tucomprascol.com/product_showcase_1.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://tucomprascol.com/">
+    <meta property="twitter:title" content="TuCompras Col | Herramientas y Hogar">
+    <meta property="twitter:description" content="Más de 1.300 productos entregados. Compra seguro en Colombia.">
+    <meta property="twitter:image" content="https://tucomprascol.com/product_showcase_1.png">
+
+    <!-- Google / Schema.org (Datos Estructurados) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "TuCompras Col",
+      "description": "Tienda líder en herramientas y hogar en Colombia",
+      "url": "https://tucomprascol.com/",
+      "telephone": "+573220000000",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CO"
+      }
+    }
+    </script>
 
     <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,6 +52,29 @@
 
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'TU_PIXEL_ID_FB'); 
+    fbq('track', 'PageView');
+    </script>
+
+    <!-- TikTok Pixel Code -->
+    <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n;var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+      ttq.load('TU_PIXEL_ID_TIKTOK');
+      ttq.page();
+    }(window, document, 'ttq');
+    </script>
 </head>
 
 <body>
@@ -37,13 +91,19 @@
                 </span>
             </a>
             <div class="nav-links">
+                <a href="#home">Inicio</a>
                 <a href="#productos">Productos</a>
                 <a href="#categorias">Categorías</a>
                 <a href="#contacto">Contacto</a>
             </div>
-            <div class="cart-btn" onclick="window.location.hash = 'checkout'">
-                <i class="fas fa-shopping-basket"></i>
-                <span id="cart-count">0</span>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="cart-btn" onclick="window.location.hash = 'checkout'">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span id="cart-count">0</span>
+                </div>
+                <div class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
             </div>
         </div>
     </nav>
@@ -177,6 +237,13 @@
             </div>
         </section>
 
+        <!-- Account View -->
+        <section id="account-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" id="account-content">
+                <!-- Loaded via JS (Login/Register or Profile) -->
+            </div>
+        </section>
+
         <!-- Success View -->
         <section id="success-view" class="view section animate"
             style="display: none; padding: 15vh 0; text-align: center;">
@@ -195,6 +262,30 @@
             </div>
         </section>
     </main>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-header">
+            <span class="logo">TuCompras <span style="color:var(--primary)">Col</span></span>
+            <div class="close-menu" id="close-menu"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="mobile-links">
+            <a href="#home">Inicio</a>
+            <a href="#productos">Productos</a>
+            <a href="#categorias">Categorías</a>
+            <a href="#contacto">Contacto</a>
+            <hr style="opacity: 0.1; margin: 1rem 0;">
+            <a href="#account" class="auth-link">Mi Cuenta</a>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#home" class="active"><i class="fas fa-home"></i><span>Inicio</span></a>
+        <a href="#productos"><i class="fas fa-th-large"></i><span>Tienda</span></a>
+        <a href="#checkout"><i class="fas fa-shopping-cart"></i><span>Carrito</span></a>
+        <a href="#account"><i class="fas fa-user-circle"></i><span>Perfil</span></a>
+    </nav>
 
     <!-- WhatsApp Floating Button -->
     <a href="https://wa.me/573220000000" class="wp-float" target="_blank" id="wa-link">
