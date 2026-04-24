@@ -147,6 +147,22 @@ body {
     transform: scale(1.05);
 }
 
+.shipping-option {
+    border: 1.5px solid var(--glass-border) !important;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.shipping-option:has(input:checked) {
+    border-color: var(--primary) !important;
+    background: rgba(255, 140, 0, 0.05);
+    box-shadow: 0 5px 15px rgba(255, 140, 0, 0.1);
+}
+
+.shipping-option:hover {
+    background: rgba(255, 140, 0, 0.02);
+    transform: translateY(-2px);
+}
+
 .cart-btn {
     position: relative;
     cursor: pointer;
