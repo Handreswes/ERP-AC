@@ -330,6 +330,14 @@ function renderProductLanding(id) {
                     <button class="btn btn-outline btn-block" onclick="showView('home')" style="width: 100%; padding: 1.2rem; font-weight: 700; border-width: 2px;">
                         <i class="fas fa-plus-circle"></i> AGREGAR MÁS PRODUCTOS A ESTA COMPRA
                     </button>
+
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                        <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px;">Paga en cuotas con:</p>
+                        <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
+                            <img src="https://logodownload.org/wp-content/uploads/2021/06/addi-logo.png" alt="Addi" style="height: 22px; filter: grayscale(0.5); opacity: 0.8;">
+                            <img src="https://seeklogo.com/images/S/sistecredito-logo-4E38A3A401-seeklogo.com.png" alt="Sistecrédito" style="height: 22px; filter: grayscale(0.5); opacity: 0.8;">
+                        </div>
+                    </div>
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; text-align: center;">
