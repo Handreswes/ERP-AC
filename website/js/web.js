@@ -522,14 +522,20 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
     if (!/^3[0-9]{9}$/.test(phone)) { alert('Ingresa un teléfono válido de Colombia (10 dígitos).'); btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>'; return; }
 
     const items = checkoutSource === 'landing' ? [{ product_id: checkoutItem.id, name: checkoutItem.name, qty: 1, price: checkoutItem.priceFinal }] : cart.map(i => ({ product_id: i.id, name: i.name, qty: i.qty, price: i.priceFinal }));
+    
+    const shippingType = document.querySelector('input[name="shipping-type"]:checked').value;
+    const carrier = shippingType === 'oficina' ? document.getElementById('cust-carrier').value : null;
+
     const orderData = {
         id: 'TC-' + Date.now().toString().slice(-8), 
         customerName: document.getElementById('cust-name').value, 
         customerPhone: phone, 
         customerEmail: document.getElementById('cust-email').value,
-        customerAddress: document.getElementById('cust-address').value,
+        customerAddress: shippingType === 'domicilio' ? document.getElementById('cust-address').value : ('Oficina Principal ' + carrier),
         customerCity: document.getElementById('cust-city').value, 
         customerDept: document.getElementById('cust-dept').value, 
+        shippingType,
+        carrier,
         items, 
         total: items.reduce((s, i) => s + (i.price * i.qty), 0),
         status: 'Pendiente por Confirmar', 
@@ -576,6 +582,22 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         if (window.fbq) fbq('track', 'Purchase', { value: orderData.total, currency: 'COP', content_ids: orderData.items.map(i => i.product_id), content_type: 'product' });
         if (window.ttq) ttq.track('CompletePayment', { value: orderData.total, currency: 'COP', content_id: orderData.items.map(i => i.product_id) });
     } catch (err) { alert('Error: ' + err.message); btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>'; }
+};
+
+window.toggleShippingFields = (type) => {
+    const addressField = document.getElementById('address-field');
+    const carrierField = document.getElementById('carrier-field');
+    const addressInput = document.getElementById('cust-address');
+    
+    if (type === 'domicilio') {
+        addressField.style.display = 'block';
+        carrierField.style.display = 'none';
+        addressInput.required = true;
+    } else {
+        addressField.style.display = 'none';
+        carrierField.style.display = 'block';
+        addressInput.required = false;
+    }
 };
 
 function showToast(msg) {
