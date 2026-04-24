@@ -333,10 +333,15 @@ function renderProductLanding(id) {
 
                     <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
                         <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px;">Paga en cuotas con:</p>
-                        <div style="display: flex; align-items: center; justify-content: center; gap: 25px;">
-                            <img src="https://logodownload.org/wp-content/uploads/2021/06/addi-logo.png" alt="Addi" style="height: 22px; filter: grayscale(0.5); opacity: 0.8;">
-                            <img src="https://seeklogo.com/images/S/sistecredito-logo-4E38A3A401-seeklogo.com.png" alt="Sistecrédito" style="height: 22px; filter: grayscale(0.5); opacity: 0.8;">
-                        </div>
+                        <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 25px; transition: var(--transition);">
+                            <img src="https://logodownload.org/wp-content/uploads/2021/06/addi-logo.png" alt="Addi" style="height: 22px;">
+                            <img src="https://seeklogo.com/images/S/sistecredito-logo-4E38A3A401-seeklogo.com.png" alt="Sistecrédito" style="height: 22px;">
+                        </a>
+                        <p style="font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-top: 10px;">
+                             <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20pagos%20con%20crédito" target="_blank" style="color: inherit; text-decoration: none;">
+                                ¿Quieres crédito? Habla con un asesor <i class="fab fa-whatsapp"></i>
+                             </a>
+                        </p>
                     </div>
                 </div>
 
