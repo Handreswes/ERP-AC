@@ -44,9 +44,6 @@ window.CRM = {
                 </button>
             </div>
 
-            <div class="search-filter-row">
-                <input type="text" id="crm-search" placeholder="Buscar por nombre, celular o empresa..." class="form-control">
-            </div>
 
             <div class="table-container">
                 <table class="data-table">
