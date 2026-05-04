@@ -98,8 +98,13 @@ window.TuComprasCRM = {
             <div class="stats-grid" style="margin-top: 1rem;">
                 <div class="stat-card">
                     <h3>Total Clientes</h3>
-                    <p class="stat-value">${this.customers.length}</p>
+                    <p class="stat-value" id="tc-crm-total-count">${this.customers.length}</p>
                 </div>
+            </div>
+
+            <div class="search-bar" style="margin-top: 1.5rem; background: var(--bg-card); border: 1px solid var(--accent); border-radius: 12px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 0 15px rgba(59,130,246,0.1);">
+                <i class="fas fa-search" style="color: var(--accent);"></i>
+                <input type="text" id="tc-crm-search" placeholder="Buscar por nombre, teléfono, ciudad o depto..." style="background: none; border: none; color: white; width: 100%; outline: none; font-size: 1rem;">
             </div>
 
             <div class="table-container" style="margin-top: 1.5rem;">
@@ -113,20 +118,43 @@ window.TuComprasCRM = {
                             <th>Último Pedido</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        ${this.customers.map(c => `
-                            <tr>
-                                <td><strong>${c.name}</strong></td>
-                                <td>${c.phone}</td>
-                                <td>${c.city || '-'}, ${c.dept || '-'}</td>
-                                <td>${c.address || '-'}</td>
-                                <td>${c.created_at ? new Date(c.created_at).toLocaleDateString() : 'N/A'}</td>
-                            </tr>
-                        `).join('') || '<tr><td colspan="5" class="text-center">No hay clientes registrados</td></tr>'}
+                    <tbody id="tc-crm-list">
+                        ${this.renderListItems(this.customers)}
                     </tbody>
                 </table>
             </div>
         `;
+
+        this.setupEventListeners();
+    },
+
+    renderListItems(customers) {
+        return customers.map(c => `
+            <tr>
+                <td><strong>${c.name}</strong></td>
+                <td>${c.phone}</td>
+                <td>${c.city || '-'}, ${c.dept || '-'}</td>
+                <td>${c.address || '-'}</td>
+                <td>${c.created_at ? new Date(c.created_at).toLocaleDateString() : 'N/A'}</td>
+            </tr>
+        `).join('') || '<tr><td colspan="5" class="text-center">No hay clientes registrados</td></tr>';
+    },
+
+    setupEventListeners() {
+        const searchInput = document.getElementById('tc-crm-search');
+        if (searchInput) {
+            searchInput.oninput = (e) => {
+                const term = e.target.value.toLowerCase();
+                const filtered = this.customers.filter(c => 
+                    (c.name || '').toLowerCase().includes(term) ||
+                    (c.phone || '').toLowerCase().includes(term) ||
+                    (c.city || '').toLowerCase().includes(term) ||
+                    (c.dept || '').toLowerCase().includes(term)
+                );
+                document.getElementById('tc-crm-list').innerHTML = this.renderListItems(filtered);
+                document.getElementById('tc-crm-total-count').textContent = filtered.length;
+            };
+        }
     },
 
     async getCustomers() {
