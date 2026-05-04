@@ -1,0 +1,11 @@
+# Environment Variables
+.env
+.env.local
+
+# Assets
+assets/temp/
+
+# Common
+node_modules/
+dist/
+.DS_Store
