@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Script Anti-Error 431 (Clear Bloated Cookies) -->
+    <script>
+        (function () {
+            const cookies = document.cookie.split(";");
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i];
+                const eqPos = cookie.indexOf("=");
+                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+            }
+            console.log("Cookies cleared to prevent 431 error");
+        })();
+    </script>
+    <title>ERP Multinegocio - Millenio / Vulcano / TuCompras</title>
+    <link rel="stylesheet" href="styles.css?v=104">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+</head>
+
+<body class="dark-theme">
+
+    <!-- Login Overlay (Outside app-container to avoid display:none conflicts) -->
+    <div id="login-overlay" class="login-overlay hidden">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>ERP <span style="color: white;">AC</span></h1>
+                <p>Inicia sesión para continuar</p>
+            </div>
+            <form id="login-form">
+                <div class="form-group" style="margin-bottom: 1rem;">
+                    <label>Email Corporativo</label>
+                    <input type="email" name="username" class="form-control" required placeholder="tu@email.com">
+                </div>
+                <div class="form-group" style="margin-bottom: 1.5rem;">
+                    <label>Contraseña</label>
+                    <div style="position: relative;">
+                        <input type="password" name="password" id="login-password" class="form-control" required
+                            placeholder="••••••••" style="padding-right: 40px;">
+                        <i id="toggle-password" class="fas fa-eye"
+                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary);"></i>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Iniciar Sesión</button>
+            </form>
+            <div class="login-footer">
+                ERP AC - v104 Production Ready
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (Mobile Only) -->
+    <nav class="bottom-nav">
+        <a href="javascript:void(0)" class="bottom-nav-item active" data-panel="dashboard"
+            onclick="window.handleNavClick('dashboard')">
+            <i class="fas fa-th-large"></i>
+            <span>Inicio</span>
+        </a>
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="inventory"
+            onclick="window.handleNavClick('inventory')">
+            <i class="fas fa-boxes"></i>
+            <span>Stock</span>
+        </a>
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="sales"
+            onclick="window.handleNavClick('sales')">
+            <i class="fas fa-cash-register"></i>
+            <span>Ventas</span>
+        </a>
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="crm" onclick="window.handleNavClick('crm')">
+            <i class="fas fa-users"></i>
+            <span>Clientes</span>
+        </a>
+        <a href="javascript:void(0)" id="mobile-menu-trigger" class="bottom-nav-item">
+            <i class="fas fa-bars"></i>
+            <span>Menú</span>
+        </a>
+    </nav>
+
+    <!-- Bottom Sheet Menu (Mobile) -->
+    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
+    <div id="bottom-sheet" class="bottom-sheet">
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-header">
+            <h3>Menú del Sistema</h3>
+            <button id="close-mobile-menu" class="icon-btn"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="bottom-sheet-grid">
+            <a href="#" class="menu-grid-item" data-panel="finances">
+                <i class="fas fa-chart-line" style="color: #6366f1;"></i>
+                <span>Finanzas</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="tucompras">
+                <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
+                <span>TuCompras</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="catalog">
+                <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
+                <span>Catálogo</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="vendedores">
+                <i class="fas fa-user-tie" style="color: #ec4899;"></i>
+                <span>Vendedores</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="categories">
+                <i class="fas fa-tags" style="color: #6366f1;"></i>
+                <span>Categorías</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="consultas">
+                <i class="fas fa-search-plus" style="color: #06b6d4;"></i>
+                <span>Consultas</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="logistics">
+                <i class="fas fa-truck" style="color: #8b5cf6;"></i>
+                <span>Logística</span>
+            </a>
+            <a href="#" class="menu-grid-item" data-panel="config">
+                <i class="fas fa-cog" style="color: #94a3b8;"></i>
+                <span>Ajustes</span>
+            </a>
+        </div>
+    </div>
+
+    <div id="app" class="app-container">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="logo_tucompras.png.jpg" alt="Logo TuCompras" style="width: 40px; height: 40px; border-radius: 8px;">
+                    <span class="logo-text">TuCompras <span style="color: var(--accent);">Col</span></span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-panel="dashboard">
+                    <i class="fas fa-th-large"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="inventory">
+                    <i class="fas fa-boxes"></i>
+                    <span>Inventarios</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="categories">
+                    <i class="fas fa-tags"></i>
+                    <span>Categorías</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="sales">
+                    <i class="fas fa-cash-register"></i>
+                    <span>Ventas POS</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="crm">
+                    <i class="fas fa-users"></i>
+                    <span>Clientes / CRM</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="finances">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Finanzas</span>
+                </a>
+                <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+                <a href="#" class="nav-item" data-panel="tucompras">
+                    <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
+                    <span>TUCOMPRAS</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="vendedores">
+                    <i class="fas fa-user-tie" style="color: #f59e0b;"></i>
+                    <span>Vendedores</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="tucompras-crm">
+                    <i class="fas fa-address-book" style="color: #6366f1;"></i>
+                    <span>CRM Ecommerce</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="marketing">
+                    <i class="fas fa-bullhorn" style="color: #f43f5e;"></i>
+                    <span>Marketing / Campañas</span>
+                </a>
+                <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
+                <a href="#" class="nav-item" data-panel="logistics">
+                    <i class="fas fa-truck" style="color: #8b5cf6;"></i>
+                    <span>Logística</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="consultas">
+                    <i class="fas fa-search-dollar" style="color: #06b6d4;"></i>
+                    <span>Consultas</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="catalog">
+                    <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
+                    <span>Catálogo PDF</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="user-management">
+                    <i class="fas fa-shield-alt" style="color: #f87171;"></i>
+                    <span>Seguridad / Usuarios</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="config">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="company-badge"
+                    style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <span id="active-company">Multinegocio</span>
+                    <i id="supabase-status" class="fas fa-circle" style="font-size: 0.6rem; color: #ef4444;"
+                        title="Sin conexión (Offline)"></i>
+                </div>
+                <button onclick="clearAllSystemData()" class="btn btn-outline btn-sm"
+                    style="margin-top: 10px; width: 100%; font-size: 0.7rem; border-color: rgba(255,0,0,0.3); color: #ff6b6b;">
+                    <i class="fas fa-trash-alt"></i> Limpiar Sistema
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-bar">
+
+                <div class="top-bar-actions">
+                    <button id="notif-btn" class="icon-btn"><i class="fas fa-bell"></i></button>
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff" alt="User">
+                        <div style="display: flex; flex-direction: column; line-height: 1;">
+                            <span style="font-size: 0.85rem; font-weight: 600;">Cargando...</span>
+                            <a href="#" id="logout-btn"
+                                style="font-size: 0.7rem; color: #ef4444; text-decoration: none;">Cerrar Sesión</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section id="content-area" class="content-area">
+                <!-- Content will be dynamically loaded here -->
+                <div id="user-management-panel" class="panel"></div>
+                <div id="dashboard-panel" class="panel active">
+                    <div class="panel-header">
+                        <h1>Panel General</h1>
+                        <div class="dashboard-filters">
+                            <select id="dashboard-date-range" class="form-select">
+                                <option value="today">Hoy</option>
+                                <option value="week">Esta Semana</option>
+                                <option value="month">Este Mes</option>
+                                <option value="custom">Rango Personalizado</option>
+                            </select>
+                            <div id="custom-date-inputs" style="display: none; gap: 0.5rem; align-items: center;">
+                                <input type="date" id="date-start" class="form-control">
+                                <span>a</span>
+                                <input type="date" id="date-end" class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" style="margin-top: 1.5rem;">
+                        <div class="stat-card clickable" id="stat-sales" style="cursor:pointer;">
+                            <h3 id="stat-sales-title">Ventas Hoy</h3>
+                            <p class="stat-value">$0.00</p>
+                            <span class="stat-label">0 transacciones</span>
+                        </div>
+                        <div class="stat-card clickable" id="stat-stock" style="cursor:pointer;">
+                            <h3 id="stat-stock-title">Stock Crítico</h3>
+                            <p class="stat-value">0</p>
+                            <span class="stat-label">Productos por agotar</span>
+                        </div>
+                        <div class="stat-card clickable" id="stat-credits" style="cursor:pointer;">
+                            <h3 id="stat-credits-title">Créditos Pendientes</h3>
+                            <p class="stat-value">$0.00</p>
+                            <span class="stat-label">Por cobrar</span>
+                        </div>
+                        <div class="stat-card clickable" id="stat-commissions" style="cursor:pointer;">
+                            <h3 id="stat-commissions-title">Comisiones Pendientes</h3>
+                            <p class="stat-value" style="color: var(--warning);">$0.00</p>
+                            <span class="stat-label">Por pagar a vendedores</span>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-details">
+                        <div class="detail-section">
+                            <h2 class="section-title millenio-title">Resumen Millenio</h2>
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <h4 id="millenio-sales-header">Ventas Hoy</h4>
+                                    <p id="millenio-sales-today-detail" class="detail-value text-success">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>Gastos Hoy</h4>
+                                    <p id="millenio-expenses-today" class="detail-value text-danger">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>Efectivo Hoy</h4>
+                                    <p id="millenio-cash-today" class="detail-value text-success">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>Consignación Hoy</h4>
+                                    <p id="millenio-consignment-today" class="detail-value text-blue">$0.00</p>
+                                </div>
+                                <div class="detail-card" style="grid-column: span 2;">
+                                    <h4>Créditos Hoy</h4>
+                                    <div id="millenio-credits-today" class="credits-list">
+                                        <p class="text-secondary">Sin créditos hoy</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h2 class="section-title vulcano-title">Resumen Vulcano</h2>
+                            <div class="detail-grid">
+                                <div class="detail-card">
+                                    <h4 id="vulcano-sales-header">Ventas Hoy</h4>
+                                    <p id="vulcano-sales-today-detail" class="detail-value text-success">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>Gastos Hoy</h4>
+                                    <p id="vulcano-expenses-today" class="detail-value text-danger">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>Efectivo Hoy</h4>
+                                    <p id="vulcano-cash-today" class="detail-value text-success">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>Consignación Hoy</h4>
+                                    <p id="vulcano-consignment-today" class="detail-value text-blue">$0.00</p>
+                                </div>
+                                <div class="detail-card" style="grid-column: span 2;">
+                                    <h4>Créditos Hoy</h4>
+                                    <div id="vulcano-credits-today" class="credits-list">
+                                        <p class="text-secondary">Sin créditos hoy</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Product Rotation Section -->
+                        <div class="detail-section" style="grid-column: 1 / -1;">
+                            <h2 class="section-title" style="color: var(--accent);">Rotación de Productos</h2>
+                            <div class="detail-grid" style="grid-template-columns: 1fr 1fr;">
+                                <div class="detail-card">
+                                    <h4>🔥 Más Vendidos (Top 5)</h4>
+                                    <div id="top-products-rotation" class="credits-list">
+                                        <p class="text-secondary">Calculando...</p>
+                                    </div>
+                                </div>
+                                <div class="detail-card">
+                                    <h4>❄️ Menos Vendidos (Top 5)</h4>
+                                    <div id="bottom-products-rotation" class="credits-list">
+                                        <p class="text-secondary">Calculando...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- closes dashboard-panel -->
+
+                <!-- Categories Panel -->
+                <div id="categories-panel" class="panel">
+                    <div class="panel-header">
+                        <h1>Gestión de Categorías</h1>
+                        <button class="btn btn-primary" id="add-category-btn">
+                            <i class="fas fa-plus"></i> Nueva Categoría
+                        </button>
+                    </div>
+                    <div class="table-container" style="margin-top: 1.5rem;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>ID</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="categories-list">
+                                <!-- Categorías cargadas dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section> <!-- closes content-area -->
+        </main> <!-- closes main-content -->
+    </div> <!-- closes app-container -->
+
+    <!-- Dashboard Detail Modal -->
+    <div id="dashboard-detail-modal" class="modal">
+        <div class="modal-content" style="max-width: 1000px;">
+            <div class="modal-header">
+                <h2 id="dashboard-detail-title">Detalle de Información</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body" style="display: flex; gap: 1.5rem; padding: 1.5rem; overflow: hidden;">
+                <!-- Sidebar: Summary (5cm) -->
+                <div id="dashboard-detail-sidebar"
+                    style="width: 250px; flex-shrink: 0; background: rgba(0,0,0,0.1); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem;">
+                    <div id="dashboard-detail-summary-content">
+                        <!-- Dynamic content -->
+                    </div>
+                </div>
+
+                <!-- Main Area: Content (15cm) -->
+                <div class="history-main"
+                    style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.05); border-radius: var(--radius); border: 1px solid var(--border);">
+                    <div id="dashboard-detail-list-container" class="table-container"
+                        style="flex: 1; margin: 0; border: none; border-radius: 0; overflow-y: auto;">
+                        <table class="data-table">
+                            <tbody id="dashboard-detail-list-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Payment Modal -->
+    <div id="payment-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Registrar Abono / Pago</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="payment-form">
+                    <input type="hidden" name="clientId" id="payment-client-id">
+                    <div class="crm-responsive-grid">
+                        <div class="form-group">
+                            <label>Empresa</label>
+                            <select name="company" required>
+                                <option value="millenio">Millenio</option>
+                                <option value="vulcano">Vulcano</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto del Abono</label>
+                            <input type="text" name="amount" id="payment-amount-input" class="form-control" required
+                                placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Método de Pago</label>
+                            <select name="method" required id="payment-method-select">
+                                <option value="cash">Efectivo</option>
+                                <option value="transfer">Consignación / Transferencia</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="payment-bank-group" style="display: none;">
+                            <label>Banco / Nro Cuenta</label>
+                            <input type="text" name="paymentDetails" placeholder="Ej: Bancolombia...">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Notas</label>
+                            <input type="text" name="notes" placeholder="Opcional...">
+                        </div>
+                    </div>
+                    <button type="button" id="save-payment-manual-btn" class="btn btn-primary btn-block"
+                        style="margin-top: 1.5rem; padding: 1rem;">Registrar Pago / Abono</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Movement Modal (Consignations / Outflows) -->
+    <div id="movement-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="movement-modal-title">Registrar Movimiento</h2>
+                <span class="close-modal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="movement-form">
+                    <div class="crm-responsive-grid">
+                        <div class="form-group">
+                            <label>Tipo de Movimiento</label>
+                            <select name="type" id="movement-type" required>
+                                <option value="outflow">Salida de Dinero (Gasto/Pago)</option>
+                                <option value="transfer">Consignación (Efectivo -> Banco)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Empresa</label>
+                            <select name="company" id="movement-company" required>
+                                <option value="millenio">Millenio</option>
+                                <option value="vulcano">Vulcano</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="origin-account-group">
+                            <label>Cuenta Origen</label>
+                            <select name="originAccount" id="movement-origin" required>
+                                <option value="cash">Caja Efectivo</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="destination-account-group" style="display: none;">
+                            <label>Cuenta Destino</label>
+                            <select name="destinationAccount" id="movement-destination">
+                                <!-- Dynamic accounts -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Monto</label>
+                            <input type="text" name="amount" id="movement-amount-input" class="form-control" required
+                                placeholder="0">
+                        </div>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Concepto / Notas</label>
+                            <input type="text" name="notes" placeholder="Ej: Pago arriendo, Consignación diaria..."
+                                required>
+                        </div>
+                        <div class="form-group" id="transit-group"
+                            style="grid-column: span 2; display: flex; align-items: center; gap: 8px; margin-top: 0.5rem; background: rgba(59,130,246,0.1); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
+                            <input type="checkbox" name="isTransit" id="is-transit-checkbox"
+                                style="width: 18px; height: 18px; cursor: pointer;">
+                            <label for="is-transit-checkbox"
+                                style="margin: 0; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.85rem;">¿Es
+                                mercancía en tránsito? (Se registrará en Inventario)</label>
+                        </div>
+                    </div>
+                    <button type="button" id="save-movement-manual-btn" class="btn btn-primary btn-block"
+                        style="margin-top: 1.5rem; padding: 1rem;">Registrar Movimiento</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Core System (v101) - Loaded in Order -->
+    <script src="js/supabase.js?v=104"></script>
+    <script src="js/storage.js?v=104"></script>
+    <script src="js/modules/auth.js?v=104"></script>
+    <script src="js/modules/inventory.js?v=104"></script>
+    <script src="js/modules/catalog.js?v=104"></script>
+    <script src="js/modules/crm.js?v=104"></script>
+    <script src="js/modules/pdf_manager.js?v=104"></script>
+    <script src="js/modules/sales.js?v=104"></script>
+    <script src="js/modules/dashboard.js?v=104"></script>
+    <script src="js/modules/finances.js?v=104"></script>
+    <script src="js/modules/marketing.js?v=104"></script>
+    <script src="js/modules/user_management.js?v=104"></script>
+    <script src="js/modules/tucompras_crm.js?v=104"></script>
+    <script src="js/modules/tucompras.js?v=104"></script>
+    <script src="js/modules/logistics.js?v=104"></script>
+    <script src="js/modules/vendedores.js?v=104"></script>
+    <script src="js/modules/categories.js?v=104"></script>
+    <script src="js/modules/settings.js?v=104"></script>
+    <script src="js/modules/consultas.js?v=104"></script>
+    <script src="js/app.js?v=104"></script>
+</body>
+
+</html>
