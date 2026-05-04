@@ -32,9 +32,6 @@ window.Sales = {
 
             <div class="pos-container">
                 <div class="pos-main">
-                    <div class="search-row">
-                        <input type="text" id="pos-product-search" placeholder="Buscar producto..." class="form-control">
-                    </div>
                     
                     <div id="pos-product-grid" class="pos-grid">
                         <!-- Product grid will be rendered here -->
@@ -118,7 +115,7 @@ window.Sales = {
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
-                        <input type="text" id="picker-search" placeholder="Buscar cliente..." class="form-control">
+
                         <div id="picker-list" class="picker-list"></div>
                     </div>
                 </div>
