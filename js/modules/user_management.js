@@ -56,7 +56,7 @@ window.UserManagement = {
     },
 
     async loadUsers() {
-        const { data, error } = await supabase
+        const { data, error } = await window.supabaseClient
             .from('profiles')
             .select('*')
             .order('createdAt', { ascending: false });
@@ -116,7 +116,7 @@ window.UserManagement = {
 
         if (!confirm(confirmMsg)) return;
 
-        const { error } = await supabase
+        const { error } = await window.supabaseClient
             .from('profiles')
             .update({ role: newRole })
             .eq('id', userId);
