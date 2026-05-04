@@ -22,7 +22,7 @@ window.Inventory = {
         return await Storage.updateItem(STORAGE_KEYS.PRODUCTS, id, product);
     },
 
-    renderPanel() {
+    async renderPanel() {
         const contentArea = document.getElementById('content-area');
 
         // Check if panel already exists
@@ -39,6 +39,7 @@ window.Inventory = {
                 <h1>Inventarios</h1>
                 <div class="actions">
                     <button id="load-test-data" class="btn btn-secondary" style="margin-right: 10px;">Cargar Datos Prueba</button>
+                    <button id="cleanup-products-btn" class="btn btn-outline" style="margin-right: 10px; color: #ef4444; border-color: #ef4444;"><i class="fas fa-broom"></i> Depurar Fantasmas</button>
                     <button id="add-product-btn" class="btn btn-primary">Nuevo Producto</button>
                 </div>
             </div>
@@ -59,8 +60,11 @@ window.Inventory = {
                     <button class="tab-btn ${this.activeCompanyFilter === 'vulcano' ? 'active' : ''}" data-company="vulcano" style="font-size: 0.8rem; padding: 4px 15px;">Vulcano</button>
                 </div>
 
-                <div class="search-filter-row">
-                    <input type="text" id="inventory-search" placeholder="Buscar por nombre o categoría..." class="form-control">
+                <div class="search-filter-row" style="margin-bottom: 1.5rem; display: flex; gap: 10px; align-items: center;">
+                    <div class="search-input-wrapper" style="flex: 1; position: relative;">
+                        <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                        <input type="text" id="inventory-search" class="form-control" placeholder="Buscar por nombre, categoría o referencia..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                    </div>
                 </div>
 
                 <div class="table-container">
@@ -86,14 +90,18 @@ window.Inventory = {
             </div>
 
             <div id="inventory-transit-view" style="display: ${this.activeTab === 'transit' ? 'block' : 'none'};">
+                <div style="display: flex; justify-content: flex-end; margin-bottom: 1rem;">
+                    <button id="add-import-btn" class="btn btn-primary"><i class="fas fa-ship"></i> Nueva Importación</button>
+                </div>
                 <div class="table-container">
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Fecha Pago</th>
-                                <th>Empresa</th>
-                                <th>Concepto / Proveedor</th>
-                                <th class="text-right">Monto Invertido</th>
+                                <th>Fecha / Empresa</th>
+                                <th>Proveedor</th>
+                                <th class="text-right">Total FOB</th>
+                                <th class="text-right">Logística</th>
+                                <th class="text-right">Total Neto</th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -231,20 +239,130 @@ window.Inventory = {
                     </div>
                 </div>
             </div>
+
+            <!-- Transit / Import Modal -->
+            <div id="transit-modal" class="modal">
+                <div class="modal-content" style="max-width: 900px;">
+                    <div class="modal-header">
+                        <h2 id="transit-modal-title">Nueva Importación</h2>
+                        <span class="close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <form id="transit-form">
+                            <input type="hidden" name="id" id="transit-id">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Proveedor / Concepto</label>
+                                    <input type="text" name="concept" required placeholder="Ej: Proveedor China">
+                                </div>
+                                <div class="form-group">
+                                    <label>Empresa Dueña</label>
+                                    <select name="company" required>
+                                        <option value="both">Ambas Empresas</option>
+                                        <option value="millenio">Millenio</option>
+                                        <option value="vulcano">Vulcano</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Fecha de Creación</label>
+                                    <input type="date" name="date" required>
+                                </div>
+                            </div>
+                            
+                            <h3 style="margin-top: 1.5rem; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">Gastos Financieros / Logísticos ($)</h3>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Pago Inicial (50% u otro)</label>
+                                    <input type="text" name="initialPayment" id="transit-initial" placeholder="0" inputmode="numeric" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals();">
+                                </div>
+                                <div class="form-group">
+                                    <label>Pago Final</label>
+                                    <input type="text" name="finalPayment" id="transit-final" placeholder="0" inputmode="numeric" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals();">
+                                </div>
+                                <div class="form-group">
+                                    <label>Flete Marítimo</label>
+                                    <input type="text" name="maritimeFreight" id="transit-maritime" placeholder="0" inputmode="numeric" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals();">
+                                </div>
+                                <div class="form-group">
+                                    <label>Flete Local (Colombia)</label>
+                                    <input type="text" name="localFreight" id="transit-local" placeholder="0" inputmode="numeric" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals();">
+                                </div>
+                                <div class="form-group">
+                                    <label>Gastos Nacionalización/Otros</label>
+                                    <input type="text" name="additionalExpenses" id="transit-additional" placeholder="0" inputmode="numeric" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals();">
+                                </div>
+                            </div>
+
+                            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px; padding: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                <span><i class="fas fa-truck-loading" style="color: #10b981;"></i> Total Gastos Logísticos (Prorrateables):</span>
+                                <strong id="transit-logistics-total" style="font-size: 1.2rem; color: #10b981;">$0</strong>
+                            </div>
+
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">
+                                <h3>Productos a Importar (Ítems)</h3>
+                                <button type="button" class="btn btn-sm btn-outline" onclick="window.Inventory.addTransitItemRow()">
+                                    <i class="fas fa-plus"></i> Agregar Ítem
+                                </button>
+                            </div>
+                            
+                            <div class="table-container" style="margin-top: 10px;">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Ref</th>
+                                            <th>Nombre</th>
+                                            <th>Cant.</th>
+                                            <th>Costo Unit. FOB ($)</th>
+                                            <th>Total FOB ($)</th>
+                                            <th style="background: rgba(16,185,129,0.1); color: #10b981;" title="Costo Unitario + Gasto Logístico Prorrateado">Costo Neto Proyectado</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="transit-items-list">
+                                        <!-- Dynamic items -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="display: flex; justify-content: flex-end; margin-top: 10px; font-size: 1.1rem;">
+                                <span>Total Mercancía (FOB): <strong id="transit-fob-total" style="color: #60a5fa;">$0</strong></span>
+                            </div>
+
+                            <div class="form-group" style="margin-top: 2rem;">
+                                 <button type="button" id="save-transit-btn" class="btn btn-primary btn-block" style="padding: 1rem; border-radius: 16px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
+                                     <i class="fas fa-save"></i> GUARDAR PROGRESO DE IMPORTACIÓN
+                                 </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
         `;
 
         if (this.activeTab === 'transit') this.updateTransitList();
         else if (this.activeTab === 'history') this.updateHistoryList();
         else this.updateInventoryList();
 
-        this.loadCategoryOptions();
+        await this.loadCategoryOptions();
     },
 
-    loadCategoryOptions() {
+    async loadCategoryOptions() {
         const select = document.getElementById('product-category-select');
         if (!select || !window.CategoriesModule) return;
 
         const currentVal = select.value;
+        select.innerHTML = '<option value="">Cargando categorías...</option>';
+
+        // Force fetch from database to ensure fresh data
+        if (window.CategoriesModule.fetchCategories) {
+            await window.CategoriesModule.fetchCategories();
+        }
+
+        if (!window.CategoriesModule.categories || window.CategoriesModule.categories.length === 0) {
+            select.innerHTML = '<option value="">No hay categorías (Cree una primero)</option>';
+            return;
+        }
+
         select.innerHTML = '<option value="">Seleccione Categoría...</option>';
         window.CategoriesModule.categories.forEach(cat => {
             const option = document.createElement('option');
@@ -282,23 +400,34 @@ window.Inventory = {
 
         const transit = Storage.get(STORAGE_KEYS.TRANSIT_ORDERS).filter(o => o.status === 'pending');
 
-        list.innerHTML = transit.map(o => `
+        list.innerHTML = transit.map(o => {
+            const logisticsTotal = (parseFloat(o.maritimeFreight) || 0) + (parseFloat(o.localFreight) || 0) + (parseFloat(o.additionalExpenses) || 0);
+            const fobTotal = parseFloat(o.fobTotal) || 0;
+            const netTotal = fobTotal + logisticsTotal;
+
+            return `
             <tr>
-                <td>${new Date(o.date).toLocaleDateString()}</td>
-                <td><span class="badge ${o.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${o.company}</span></td>
+                <td>${new Date(o.date).toLocaleDateString()}<br><span class="badge ${o.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${o.company}</span></td>
                 <td><strong>${o.concept}</strong></td>
-                <td class="text-right"><strong>$${parseFloat(o.amount).toLocaleString()}</strong></td>
-                <td><span class="badge" style="background: #f59e0b22; color: #f59e0b;">En Camino</span></td>
+                <td class="text-right"><strong>$${fobTotal.toLocaleString('es-CO')}</strong></td>
+                <td class="text-right" style="color:#10b981;"><strong>+$${logisticsTotal.toLocaleString('es-CO')}</strong></td>
+                <td class="text-right"><strong style="color:var(--text);">$${netTotal.toLocaleString('es-CO')}</strong></td>
+                <td><span class="badge" style="background: #f59e0b22; color: #f59e0b;">En Proceso</span></td>
                 <td>
-                    <button class="btn btn-success btn-sm receive-transit-btn" data-id="${o.id}">
-                        <i class="fas fa-check-circle"></i> Recibir Mercancía
-                    </button>
+                    <div style="display:flex; gap:5px; justify-content:center;">
+                        <button class="btn btn-outline btn-sm edit-transit-btn" data-id="${o.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-success btn-sm receive-transit-btn" data-id="${o.id}">
+                            <i class="fas fa-box-open"></i> Recibir
+                        </button>
+                    </div>
                 </td>
             </tr>
-        `).join('');
+        `}).join('');
 
         if (transit.length === 0) {
-            list.innerHTML = '<tr><td colspan="6" class="text-center text-secondary" style="padding: 2rem;">No hay mercancía en tránsito pendiente</td></tr>';
+            list.innerHTML = '<tr><td colspan="7" class="text-center text-secondary" style="padding: 2rem;">No hay mercancía en tránsito pendiente</td></tr>';
         }
     },
 
@@ -306,45 +435,62 @@ window.Inventory = {
         const order = Storage.getById(STORAGE_KEYS.TRANSIT_ORDERS, id);
         if (!order) return;
 
-        const products = this.getProducts();
-        const searchTerm = prompt(`Recibiendo: ${order.concept}\n¿Qué producto del inventario llegó? (Escriba parte del nombre)`);
-
-        if (!searchTerm) return;
-
-        const matches = products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
-
-        if (matches.length === 0) {
-            alert('No se encontró ningún producto con ese nombre.');
+        if (!order.items || order.items.length === 0) {
+            alert('Esta importación no tiene productos listados. Agréguelos editándola primero.');
             return;
         }
 
-        let selection = matches[0];
-        if (matches.length > 1) {
-            const options = matches.map((p, i) => `${i + 1}. ${p.name}`).join('\n');
-            const choice = prompt(`Se encontraron varios productos. Elija el número correcto:\n${options}`);
-            if (!choice || isNaN(choice) || choice < 1 || choice > matches.length) return;
-            selection = matches[parseInt(choice) - 1];
+        if (!confirm(`¿Está seguro de RECIBIR esta importación?\n\nSe añadirán ${order.items.length} productos al inventario general automáticamente con su costo neto real prorrateado.\nPodrá editar sus fotos y márgenes de ganancia después en "Inventario Disponible".`)) {
+            return;
         }
 
-        const qty = parseInt(prompt(`¿Cuántas unidades de "${selection.name}" llegaron para ${order.company}?`));
-        if (isNaN(qty) || qty <= 0) return;
+        const logisticsTotal = (parseFloat(order.maritimeFreight) || 0) + (parseFloat(order.localFreight) || 0) + (parseFloat(order.additionalExpenses) || 0);
+        const fobTotal = parseFloat(order.fobTotal) || 0;
 
-        // Update stock
-        if (order.company === 'millenio') selection.stockMillenio = (selection.stockMillenio || 0) + qty;
-        else selection.stockVulcano = (selection.stockVulcano || 0) + qty;
+        try {
+            for (let item of order.items) {
+                const qty = parseInt(item.qty) || 0;
+                const unitFob = parseFloat(item.unitFob) || 0;
+                const totalItemFob = qty * unitFob;
+                
+                let assignedLogistics = 0;
+                if (fobTotal > 0) {
+                    const weight = totalItemFob / fobTotal;
+                    assignedLogistics = logisticsTotal * weight;
+                }
+                const netUnitCost = unitFob + (qty > 0 ? (assignedLogistics / qty) : 0);
 
-        await this.updateProduct(selection.id, selection);
+                const productId = 'PROD-' + Date.now() + '-' + Math.floor(Math.random()*1000);
+                const newProduct = {
+                    id: productId,
+                    name: item.name,
+                    ref: item.ref,
+                    cost: Math.round(netUnitCost),
+                    priceWholesale: 0,
+                    priceFinal: 0,
+                    company: order.company,
+                    stockMillenio: order.company === 'millenio' || order.company === 'both' ? qty : 0,
+                    stockVulcano: order.company === 'vulcano' || order.company === 'both' ? qty : 0,
+                    active: true,
+                    category: '',
+                    description: 'Importación: ' + order.concept,
+                    image: []
+                };
+                await Storage.addItem(STORAGE_KEYS.PRODUCTS, newProduct);
+                await this.recordStockEntry(productId, item.name, qty, order.company, 'Importación', order.concept);
+            }
 
-        // Update order status
-        order.status = 'received';
-        order.receivedAt = new Date().toISOString();
-        await Storage.updateItem(STORAGE_KEYS.TRANSIT_ORDERS, id, order);
+            order.status = 'received';
+            order.receivedAt = new Date().toISOString();
+            await Storage.updateItem(STORAGE_KEYS.TRANSIT_ORDERS, id, order);
 
-        // Record History
-        await this.recordStockEntry(selection.id, selection.name, qty, order.company, 'Importación / Tránsito', order.concept);
-
-        alert(`¡Stock actualizado! ${qty} unidades añadidas a ${selection.name}.`);
-        this.renderPanel();
+            alert('¡Importación recibida con éxito!\\nLos productos ya están en el Inventario Disponible.');
+            this.updateTransitList();
+            this.updateInventoryList();
+        } catch (err) {
+            console.error(err);
+            alert('Error recibiendo importación: ' + err.message);
+        }
     },
 
     async recordStockEntry(productId, productName, quantity, company, source, notes = '') {
@@ -368,13 +514,18 @@ window.Inventory = {
         let filtered = products.filter(p => {
             const name = p.name || '';
             const category = p.category || '';
+            const ref = p.ref || '';
             return name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                category.toLowerCase().includes(searchTerm.toLowerCase());
+                category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                ref.toLowerCase().includes(searchTerm.toLowerCase());
         });
 
         // Filter by company tab
         if (this.activeCompanyFilter !== 'all') {
-            filtered = filtered.filter(p => p.company === 'both' || p.company === this.activeCompanyFilter);
+            filtered = filtered.filter(p => {
+                const company = p.company || 'both'; // Default to both if missing
+                return company === 'both' || company === this.activeCompanyFilter;
+            });
         }
 
         // FILTER BY DISPONIBLE VS LIMBO
@@ -443,6 +594,10 @@ window.Inventory = {
                     this.editingId = id;
                     const product = this.getProducts().find(p => p.id === id);
                     document.getElementById('modal-title').textContent = 'Editar Producto';
+                    
+                    // Refresh categories before opening
+                    await this.loadCategoryOptions();
+                    
                     const form = document.getElementById('product-form');
                     Object.keys(product).forEach(key => {
                         const input = form.elements[key];
@@ -531,6 +686,23 @@ window.Inventory = {
                 return;
             }
 
+            // Transit / Import Modal Hooks
+            if (e.target.id === 'add-import-btn' || e.target.closest('#add-import-btn')) {
+                this.openTransitModal();
+                return;
+            }
+
+            const editTransitBtn = e.target.closest('.edit-transit-btn');
+            if (editTransitBtn) {
+                this.openTransitModal(editTransitBtn.dataset.id);
+                return;
+            }
+
+            if (e.target.id === 'save-transit-btn') {
+                this.saveTransitOrder();
+                return;
+            }
+
             // 3. Manual Save Button (Killer for blank screen)
             if (e.target.id === 'save-product-manual-btn') {
                 this.handleSaveProduct();
@@ -540,6 +712,10 @@ window.Inventory = {
             if (e.target.id === 'add-product-btn') {
                 this.editingId = null;
                 document.getElementById('modal-title').textContent = 'Nuevo Producto';
+                
+                // Refresh categories before opening
+                await this.loadCategoryOptions();
+                
                 const slots = document.querySelectorAll('.image-slot');
                 slots.forEach(slot => {
                     slot.classList.add('empty');
@@ -560,6 +736,11 @@ window.Inventory = {
                 testProducts.forEach(p => this.addProduct(p));
                 this.updateInventoryList();
                 alert('Datos de prueba cargados.');
+                return;
+            }
+
+            if (e.target.id === 'cleanup-products-btn') {
+                this.handleCleanupProducts();
                 return;
             }
 
@@ -735,6 +916,213 @@ window.Inventory = {
             alert('❌ ERROR AL GUARDAR: ' + err.message);
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PRODUCTO';
+        }
+    },
+
+    async handleCleanupProducts() {
+        const products = this.getProducts();
+        // Ghost products: No price, or "MILLENIO TOOLS" from old site that user says they never created.
+        // We will show a confirmation with the count.
+        const ghostCount = products.filter(p => !p.priceFinal && !p.priceInternet && !p.priceWholesale).length;
+        
+        if (ghostCount === 0) {
+            alert("No se detectaron productos 'fantasma' (sin precios).");
+            return;
+        }
+
+        if (confirm(`Se han detectado ${ghostCount} productos sin precios (posibles remanentes de la web antigua).\n\n¿Desea eliminarlos permanentemente del sistema?`)) {
+            const productsToKeep = products.filter(p => p.priceFinal || p.priceInternet || p.priceWholesale);
+            
+            // Sync with Supabase (this might take a while if done one by one)
+            // But Storage.addItem/updateItem are already async.
+            // We need a Storage.setAll ideally.
+            
+            if (window.supabaseClient) {
+                try {
+                    const idsToRemove = products.filter(p => !p.priceFinal && !p.priceInternet && !p.priceWholesale).map(p => p.id);
+                    const { error } = await window.supabaseClient.from('products').delete().in('id', idsToRemove);
+                    if (error) throw error;
+                } catch (err) {
+                    console.error("Error cleaning up cloud products:", err);
+                    alert("Error al limpiar en la nube: " + err.message);
+                }
+            }
+
+            // Local update
+            localStorage.setItem(`erp_${STORAGE_KEYS.PRODUCTS}`, JSON.stringify(productsToKeep));
+            Storage.cache[STORAGE_KEYS.PRODUCTS] = productsToKeep;
+            
+            alert(`¡Limpieza completada! Se eliminaron ${ghostCount} productos.`);
+            this.renderPanel();
+        }
+    },
+
+    openTransitModal(orderId = null) {
+        const form = document.getElementById('transit-form');
+        form.reset();
+        document.getElementById('transit-items-list').innerHTML = '';
+        document.getElementById('transit-fob-total').textContent = '$0';
+        document.getElementById('transit-logistics-total').textContent = '$0';
+
+        if (orderId) {
+            document.getElementById('transit-modal-title').textContent = 'Editar Importación';
+            const order = Storage.getById(STORAGE_KEYS.TRANSIT_ORDERS, orderId);
+            if (order) {
+                document.getElementById('transit-id').value = order.id;
+                form.elements['concept'].value = order.concept || '';
+                form.elements['company'].value = order.company || 'both';
+                form.elements['date'].value = order.date || '';
+                
+                form.elements['initialPayment'].value = (order.initialPayment || 0).toLocaleString('es-CO');
+                form.elements['finalPayment'].value = (order.finalPayment || 0).toLocaleString('es-CO');
+                form.elements['maritimeFreight'].value = (order.maritimeFreight || 0).toLocaleString('es-CO');
+                form.elements['localFreight'].value = (order.localFreight || 0).toLocaleString('es-CO');
+                form.elements['additionalExpenses'].value = (order.additionalExpenses || 0).toLocaleString('es-CO');
+
+                if (order.items && Array.isArray(order.items)) {
+                    order.items.forEach(item => this.addTransitItemRow(item));
+                }
+            }
+        } else {
+            document.getElementById('transit-modal-title').textContent = 'Nueva Importación';
+            document.getElementById('transit-id').value = '';
+            form.elements['date'].value = new Date().toISOString().split('T')[0];
+            this.addTransitItemRow();
+        }
+        
+        this.calculateTransitTotals();
+        document.getElementById('transit-modal').classList.add('show');
+    },
+
+    addTransitItemRow(item = null) {
+        const tbody = document.getElementById('transit-items-list');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" class="transit-item-ref" placeholder="Ej: REF-01" value="${item ? item.ref : ''}"></td>
+            <td><input type="text" class="transit-item-name" placeholder="Ej: Producto..." required value="${item ? item.name : ''}"></td>
+            <td><input type="number" class="transit-item-qty" value="${item ? item.qty : 1}" min="1" oninput="window.Inventory.calculateTransitTotals()"></td>
+            <td><input type="text" class="transit-item-fob" placeholder="0" inputmode="numeric" value="${item ? (item.unitFob || 0).toLocaleString('es-CO') : ''}" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals()"></td>
+            <td class="transit-item-total-fob text-right" style="font-weight:bold;">$0</td>
+            <td class="transit-item-net-cost text-right" style="font-weight:bold; color:#10b981;">$0</td>
+            <td><button type="button" class="btn btn-sm btn-outline text-danger" onclick="window.Inventory.removeTransitItemRow(this)"><i class="fas fa-trash"></i></button></td>
+        `;
+        tbody.appendChild(tr);
+        this.calculateTransitTotals();
+    },
+
+    removeTransitItemRow(btn) {
+        const tr = btn.closest('tr');
+        if (tr) {
+            tr.remove();
+            this.calculateTransitTotals();
+        }
+    },
+
+    calculateTransitTotals() {
+        // Parse Form
+        const maritime = parseFloat(document.getElementById('transit-maritime').value.replace(/\./g, '')) || 0;
+        const local = parseFloat(document.getElementById('transit-local').value.replace(/\./g, '')) || 0;
+        const additional = parseFloat(document.getElementById('transit-additional').value.replace(/\./g, '')) || 0;
+        
+        const logisticsTotal = maritime + local + additional;
+        document.getElementById('transit-logistics-total').textContent = '$' + logisticsTotal.toLocaleString('es-CO');
+
+        // Parse Items
+        const rows = document.querySelectorAll('#transit-items-list tr');
+        let fobTotal = 0;
+
+        rows.forEach(row => {
+            const qty = parseInt(row.querySelector('.transit-item-qty').value) || 0;
+            const unitFob = parseFloat(row.querySelector('.transit-item-fob').value.replace(/\./g, '')) || 0;
+            const rowFob = qty * unitFob;
+            row.querySelector('.transit-item-total-fob').textContent = '$' + rowFob.toLocaleString('es-CO');
+            fobTotal += rowFob;
+        });
+
+        document.getElementById('transit-fob-total').textContent = '$' + fobTotal.toLocaleString('es-CO');
+
+        // Prorate Items
+        rows.forEach(row => {
+            const qty = parseInt(row.querySelector('.transit-item-qty').value) || 0;
+            const unitFob = parseFloat(row.querySelector('.transit-item-fob').value.replace(/\./g, '')) || 0;
+            const rowFob = qty * unitFob;
+            
+            let assignedLogistics = 0;
+            if (fobTotal > 0) {
+                assignedLogistics = logisticsTotal * (rowFob / fobTotal);
+            }
+
+            const netUnitCost = unitFob + (qty > 0 ? (assignedLogistics / qty) : 0);
+            row.querySelector('.transit-item-net-cost').textContent = '$' + netUnitCost.toLocaleString('es-CO', {maximumFractionDigits:2});
+        });
+    },
+
+    async saveTransitOrder() {
+        const form = document.getElementById('transit-form');
+        if (!form.reportValidity()) return;
+
+        const id = document.getElementById('transit-id').value;
+        const btn = document.getElementById('save-transit-btn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> GUARDANDO...';
+
+        try {
+            // Collect items
+            const items = [];
+            const rows = document.querySelectorAll('#transit-items-list tr');
+            rows.forEach(row => {
+                const name = row.querySelector('.transit-item-name').value.trim();
+                if (name) {
+                    items.push({
+                        ref: row.querySelector('.transit-item-ref').value.trim(),
+                        name: name,
+                        qty: parseInt(row.querySelector('.transit-item-qty').value) || 0,
+                        unitFob: parseFloat(row.querySelector('.transit-item-fob').value.replace(/\./g, '')) || 0
+                    });
+                }
+            });
+
+            // Calculate FOB
+            const fobTotal = items.reduce((sum, item) => sum + (item.qty * item.unitFob), 0);
+
+            const orderData = {
+                company: form.elements['company'].value,
+                concept: form.elements['concept'].value,
+                date: form.elements['date'].value,
+                initialPayment: parseFloat(form.elements['initialPayment'].value.replace(/\./g, '')) || 0,
+                finalPayment: parseFloat(form.elements['finalPayment'].value.replace(/\./g, '')) || 0,
+                maritimeFreight: parseFloat(form.elements['maritimeFreight'].value.replace(/\./g, '')) || 0,
+                localFreight: parseFloat(form.elements['localFreight'].value.replace(/\./g, '')) || 0,
+                additionalExpenses: parseFloat(form.elements['additionalExpenses'].value.replace(/\./g, '')) || 0,
+                fobTotal: fobTotal,
+                amount: fobTotal, // For backwards compatibility
+                items: items,
+                status: 'pending'
+            };
+
+            if (id) {
+                orderData.id = id;
+                await Storage.updateItem(STORAGE_KEYS.TRANSIT_ORDERS, id, orderData);
+            } else {
+                await Storage.addItem(STORAGE_KEYS.TRANSIT_ORDERS, orderData);
+            }
+
+            btn.innerHTML = '<i class="fas fa-check"></i> ¡GUARDADO!';
+            btn.classList.replace('btn-primary', 'btn-success');
+
+            setTimeout(() => {
+                form.reset();
+                document.getElementById('transit-modal').classList.remove('show');
+                this.updateTransitList();
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PROGRESO DE IMPORTACIÓN';
+                btn.classList.replace('btn-success', 'btn-primary');
+            }, 1000);
+        } catch (err) {
+            console.error("Error saving transit order", err);
+            alert("Error al guardar: " + err.message);
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PROGRESO DE IMPORTACIÓN';
         }
     }
 };
