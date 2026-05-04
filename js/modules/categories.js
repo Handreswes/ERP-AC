@@ -9,6 +9,30 @@ window.CategoriesModule = {
         this.render();
     },
 
+    async seedBaseCategories() {
+        if (!confirm('¿Desea cargar las categorías base (Inalámbricas, Eléctricas, Cuadros, Agro)?')) return;
+        
+        const base = [
+            { id: 'cat_inalambricas', name: 'Herramientas Inalámbricas' },
+            { id: 'cat_electricas', name: 'Herramientas Eléctricas' },
+            { id: 'cat_cuadros', name: 'Cuadros' },
+            { id: 'cat_agro', name: 'Agro' },
+            { id: 'cat_anclaje', name: 'Anclaje o Fijacion' }
+        ];
+
+        try {
+            const supabase = window.initSupabase();
+            const { error } = await supabase.from('categories').upsert(base);
+            if (error) throw error;
+            
+            await this.fetchCategories();
+            this.render();
+            alert('Categorías base cargadas con éxito.');
+        } catch (err) {
+            alert('Error al sembrar: ' + err.message);
+        }
+    },
+
     async fetchCategories() {
         try {
             const supabase = window.initSupabase();
@@ -31,6 +55,10 @@ window.CategoriesModule = {
         if (addBtn) {
             addBtn.onclick = () => this.showAddDialog();
         }
+        const seedBtn = document.getElementById('seed-categories-btn');
+        if (seedBtn) {
+            seedBtn.onclick = () => this.seedBaseCategories();
+        }
     },
 
     async showAddDialog() {
@@ -51,8 +79,8 @@ window.CategoriesModule = {
             this.render();
 
             // Notify other modules if needed
-            if (window.InventoryModule && window.InventoryModule.loadCategories) {
-                await window.InventoryModule.loadCategories();
+            if (window.Inventory && window.Inventory.loadCategoryOptions) {
+                await window.Inventory.loadCategoryOptions();
             }
         } catch (err) {
             alert('Error al crear categoría: ' + err.message);
@@ -96,6 +124,36 @@ window.CategoriesModule = {
             `;
             list.appendChild(tr);
         });
+    },
+
+    renderPanel() {
+        const contentArea = document.getElementById('content-area');
+        contentArea.innerHTML = `
+            <div id="categories-panel" class="panel animate">
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                    <h1>Gestión de Categorías</h1>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="seed-categories-btn" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);"><i class="fas fa-seedling"></i> Sembrar Base</button>
+                        <button id="add-category-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Categoría</button>
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>ID</th>
+                                <th style="width: 100px;">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categories-list">
+                            <!-- Categories will be rendered here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+        this.init();
     }
 };
 
