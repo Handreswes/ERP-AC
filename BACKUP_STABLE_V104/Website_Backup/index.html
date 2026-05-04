@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TuCompras Col | Herramientas y Hogar con Envíos en Colombia</title>
+    <meta name="description" content="Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.">
+    <meta name="keywords" content="herramientas, ferretería colombia, millenio, vulcano, tucompras col, pago contra entrega, protección industrial">
+    <link rel="canonical" href="https://tucomprascol.com/">
+
+    <!-- Open Graph / Facebook / TikTok -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tucomprascol.com/">
+    <meta property="og:title" content="TuCompras Col | Calidad y Rapidez en Herramientas">
+    <meta property="og:description" content="Compra herramientas profesionales y artículos para el hogar con pago contra entrega. Calidad garantizada.">
+    <meta property="og:image" content="https://tucomprascol.com/product_showcase_1.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://tucomprascol.com/">
+    <meta property="twitter:title" content="TuCompras Col | Herramientas y Hogar">
+    <meta property="twitter:description" content="Más de 1.300 productos entregados. Compra seguro en Colombia.">
+    <meta property="twitter:image" content="https://tucomprascol.com/product_showcase_1.png">
+
+    <!-- Google / Schema.org (Datos Estructurados) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "TuCompras Col",
+      "description": "Tienda líder en herramientas y hogar en Colombia",
+      "url": "https://tucomprascol.com/",
+      "telephone": "+573167862554",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CO"
+      }
+    }
+    </script>
+
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'TU_PIXEL_ID_FB'); 
+    fbq('track', 'PageView');
+    </script>
+
+    <!-- TikTok Pixel Code -->
+    <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n;var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+      ttq.load('TU_PIXEL_ID_TIKTOK');
+      ttq.page();
+    }(window, document, 'ttq');
+    </script>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#home" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 12px;">
+                <img src="logo_tucompras.png.jpg" alt="TuCompras Logo" style="width: 55px; height: 55px; border-radius: 12px; box-shadow: 0 4px 15px rgba(255, 140, 0, 0.2);">
+                <span style="font-weight: 800; font-size: 1.6rem; letter-spacing: -0.5px; color: var(--text-primary);">
+                    TuCompras <span style="color: var(--primary);">Col</span>
+                </span>
+            </a>
+            <div class="nav-links">
+                <a href="#home">Inicio</a>
+                <a href="#productos">Productos</a>
+                <a href="#categorias">Categorías</a>
+                <a href="#mayoristas">Mayoristas</a>
+                <a href="#contacto">Contacto</a>
+                <a href="#account" class="btn btn-sm btn-outline" style="margin-left: 10px; padding: 8px 15px;">Mi Cuenta</a>
+            </div>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="cart-btn" onclick="window.location.hash = 'checkout'">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span id="cart-count">0</span>
+                </div>
+                <div class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Home View -->
+        <section id="home-view" class="view">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container hero-grid">
+                    <div class="hero-text animate">
+                        <h1>En el 2025 vendimos más de 1.300 productos</h1>
+                        <p>Más de 1.300 productos entregados y clientes 100% satisfechos en toda Colombia. Compra con
+                            seguridad y paga al recibir en tu puerta.</p>
+                        <div class="hero-btns">
+                            <a href="#productos" class="btn btn-primary">VER CATÁLOGO <i
+                                    class="fas fa-shopping-bag"></i></a>
+                            <a href="https://wa.me/573167862554" class="btn btn-outline">HABLAR CON ASESOR</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual animate">
+                        <div class="cylinder-wrap">
+                            <div class="cylinder-item"><img src="product_showcase_1.png" alt="Showcase 1"></div>
+                            <div class="cylinder-item"><img src="product_showcase_2.png" alt="Showcase 2"></div>
+                            <div class="cylinder-item"><img src="product_showcase_3.png" alt="Showcase 3"></div>
+                            <div class="cylinder-item"><img src="product_showcase_1.png" alt="Showcase 4"></div>
+                            <div class="cylinder-item"><img src="product_showcase_2.png" alt="Showcase 5"></div>
+                            <div class="cylinder-item"><img src="product_showcase_3.png" alt="Showcase 6"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Categories Section -->
+            <section class="section" id="categorias" style="padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Explora por Categoría</h2>
+                        <p>Todo lo que necesitas en un solo lugar</p>
+                    </div>
+                    <div class="products-grid" id="category-grid">
+                        <!-- Dynamic categories -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section class="section" id="productos" style="background: rgba(255,255,255,0.02); padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Nuestros Productos</h2>
+                        <p>Sincronizado en tiempo real con nuestro inventario</p>
+                    </div>
+                    <div class="products-grid" id="product-grid">
+                        <!-- Dynamic products from Supabase -->
+                        <div class="loader" id="loader">Cargando productos...</div>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+        <!-- Product Landing View -->
+        <section id="product-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" id="product-landing-content">
+                <!-- Loaded via JS -->
+            </div>
+        </section>
+
+        <!-- Checkout View -->
+        <section id="checkout-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" style="max-width: 600px;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="#home"
+                        style="text-decoration: none; color: var(--text-secondary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-arrow-left"></i> Volver al Catálogo
+                    </a>
+                </div>
+                <div class="glass checkout-card" style="padding: 3rem; border-radius: 30px;">
+                    <h2 style="margin-bottom: 2rem; text-align: center;">Finalizar Pedido</h2>
+                    
+                    <!-- Removed Social Login for simplicity -->
+
+                    <form id="checkout-form">
+                        <div class="form-group">
+                            <label>Nombre Completo *</label>
+                            <input type="text" id="cust-name" class="form-control" placeholder="Ej: Juan Perez"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Teléfono de Contacto (WhatsApp) *</label>
+                            <input type="tel" id="cust-phone" class="form-control" placeholder="Ej: 300 000 0000"
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label>Correo Electrónico *</label>
+                            <input type="email" id="cust-email" class="form-control" placeholder="tu@email.com"
+                                required>
+                        </div>
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label>Método de Envío *</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
+                                <label class="shipping-option" style="padding: 12px; border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: var(--transition);">
+                                    <input type="radio" name="shipping-type" value="domicilio" checked onchange="toggleShippingFields('domicilio')" style="accent-color: var(--primary);">
+                                    <span style="font-size: 0.85rem; font-weight: 600;">Domicilio</span>
+                                </label>
+                                <label class="shipping-option" style="padding: 12px; border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: var(--transition);">
+                                    <input type="radio" name="shipping-type" value="oficina" onchange="toggleShippingFields('oficina')" style="accent-color: var(--primary);">
+                                    <span style="font-size: 0.85rem; font-weight: 600;">Oficina</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>Departamento *</label>
+                                <input type="text" id="cust-dept" class="form-control" placeholder="Antioquia" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Ciudad / Municipio *</label>
+                                <input type="text" id="cust-city" class="form-control" placeholder="Medellín" required>
+                            </div>
+                        </div>
+
+                        <div id="address-field" class="form-group" style="margin-top: 1rem;">
+                            <label>Dirección Exacta *</label>
+                            <input type="text" id="cust-address" class="form-control" placeholder="Calle ... #" required>
+                        </div>
+
+                        <div id="carrier-field" class="form-group" style="margin-top: 1rem; display: none;">
+                            <label>Transportadora de su elección *</label>
+                            <select id="cust-carrier" class="form-control">
+                                <option value="Interrapidísimo">Interrapidísimo</option>
+                                <option value="Servientrega">Servientrega</option>
+                                <option value="Envia">Envía</option>
+                                <option value="Coordinadora">Coordinadora</option>
+                                <option value="TCC">TCC</option>
+                            </select>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 5px;">* El pedido se enviará a la oficina principal del municipio indicado.</p>
+                        </div>
+
+                        <div class="glass"
+                            style="padding: 1rem; margin: 1.5rem 0; border: 1px solid var(--accent); background: rgba(0,242,254,0.05);">
+                            <div style="display: flex; align-items: center; gap: 10px; color: var(--accent);">
+                                <i class="fas fa-truck-fast"></i>
+                                <strong>Pago Contra Entrega (COD)</strong>
+                            </div>
+                            <p style="font-size: 0.85rem; margin-top: 5px; color: var(--text-secondary);">Recuerda:
+                                Pagas en efectivo al recibir el producto en tu casa o trabajo.</p>
+                        </div>
+
+                        <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px; margin: 1.5rem 0;">
+                            <input type="checkbox" id="accept-notifications" checked style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
+                            <label for="accept-notifications" style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; text-align: left;">
+                                Acepto recibir notificaciones sobre mi pedido y ofertas exclusivas de TuCompras Col por WhatsApp o correo.
+                            </label>
+                        </div>
+
+                        <div class="glass" style="margin: 1.5rem 0; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 20px;">
+                            <p style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">FINANCIACIÓN DISPONIBLE:</p>
+                            <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 20px; transition: var(--transition);" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <img src="https://logodownload.org/wp-content/uploads/2021/06/addi-logo.png" alt="Addi" style="height: 25px; opacity: 0.9;">
+                                <div style="width: 1px; height: 30px; background: #e2e8f0;"></div>
+                                <img src="https://seeklogo.com/images/S/sistecredito-logo-4E38A3A401-seeklogo.com.png" alt="Sistecrédito" style="height: 25px; opacity: 0.9;">
+                            </a>
+                            <p style="font-size: 0.75rem; color: var(--primary); text-align: center; margin-top: 12px; font-weight: 700;">
+                                <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="color: inherit; text-decoration: none;">
+                                    ¿Pagar con crédito? Habla con un asesor aquí <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </p>
+                        </div>
+
+                        <div id="checkout-summary" style="margin-bottom: 2rem;">
+                            <!-- Products summary -->
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block"
+                            style="width: 100%; height: 60px; font-weight: 700;">
+                            CONFIRMAR PEDIDO <i class="fas fa-check"></i>
+                        </button>
+                        <a href="#home"
+                            style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">Seguir
+                            Comprando</a>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Account View -->
+        <section id="account-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" id="account-content">
+                <!-- Loaded via JS (Login/Register or Profile) -->
+            </div>
+        </section>
+
+        <!-- Success View -->
+        <section id="success-view" class="view section animate"
+            style="display: none; padding: 15vh 0; text-align: center;">
+            <div class="container">
+                <div class="glass"
+                    style="max-width: 500px; margin: 0 auto; padding: 4rem; border-radius: 40px; border: 1px solid var(--success);">
+                    <i class="fas fa-check-circle"
+                        style="font-size: 6rem; color: var(--success); margin-bottom: 2rem;"></i>
+                    <h1 style="margin-bottom: 1rem;">¡Pedido Realizado en TuCompras!</h1>
+                    <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 3rem;">Hemos recibido tu
+                        solicitud. Nos pondremos en contacto contigo pronto para confirmar el
+                        envío.<br><br><strong>Pagas al recibir.</strong></p>
+                    <div id="guest-register-prompt" style="display: none; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;"><strong>¿Quieres ahorrar tiempo?</strong><br>Crea una contraseña para guardar tus datos y rastrear tus pedidos fácilmente.</p>
+                        <button class="btn btn-primary" onclick="showView('account')" style="width: 100%; height: 55px; font-weight: 700;">SÍ, CREAR MI CUENTA <i class="fas fa-magic"></i></button>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" style="margin-top: 2rem; width: 100%;">Volver a la Tienda</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy Policy View -->
+        <section id="privacy-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container">
+                <div class="glass" style="padding: 3rem; border-radius: 30px; text-align: left; max-width: 900px; margin: 0 auto;">
+                    <h1 style="margin-bottom: 2rem;">Política de Privacidad</h1>
+                    <div style="color: var(--text-secondary); line-height: 1.8;">
+                        <p>En <strong>tucomprascol.com</strong>, nos tomamos muy en serio la privacidad de nuestros clientes. Esta política de privacidad describe cómo recopilamos, usamos y protegemos la información personal que nos proporciona al utilizar nuestro sitio web.</p>
+                        
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">1. Información que recopilamos:</h3>
+                        <ul>
+                            <li>Información de contacto: Nombre, dirección de correo electrónico, número de teléfono, dirección de envío y facturación.</li>
+                            <li>Información de la cuenta: Nombre de usuario y contraseña (si aplica).</li>
+                            <li>Información de uso: Páginas visitadas, productos vistos y compras realizadas.</li>
+                            <li>Información del dispositivo: Dirección IP, tipo de navegador y sistema operativo.</li>
+                        </ul>
+
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">2. Cómo utilizamos tu información:</h3>
+                        <ul>
+                            <li>Para procesar tus pedidos y gestionar tu cuenta.</li>
+                            <li>Para enviarte información sobre nuestros productos y promociones.</li>
+                            <li>Para mejorar nuestro sitio web y la experiencia del cliente.</li>
+                            <li>Para prevenir el fraude y proteger nuestra seguridad.</li>
+                        </ul>
+
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">3. Seguridad:</h3>
+                        <p>Implementamos medidas de seguridad para proteger su información contra el acceso no autorizado. Utilizamos cifrado SSL para proteger la información de pago durante la transmisión.</p>
+
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">4. Contacto:</h3>
+                        <p>Si tienes alguna pregunta sobre esta política de privacidad, puedes ponerte en contacto con nosotros a través de nuestra línea de WhatsApp oficial.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Refund Policy View -->
+        <section id="refunds-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container">
+                <div class="glass" style="padding: 3rem; border-radius: 30px; text-align: left; max-width: 900px; margin: 0 auto;">
+                    <h1 style="margin-bottom: 2rem;">Política de Reembolsos y Devoluciones</h1>
+                    <div style="color: var(--text-secondary); line-height: 1.8;">
+                        <p>En <strong>tucomprascol.com</strong>, queremos que estés completamente satisfecho con tu compra. Si por alguna razón no estás contento con tu producto, puedes solicitar una devolución o un reembolso siguiendo los pasos descritos a continuación:</p>
+                        
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">1. Condiciones de Devolución:</h3>
+                        <ul>
+                            <li>El producto debe ser devuelto en su estado original, con todos los accesorios y empaque original.</li>
+                            <li>La solicitud de devolución debe realizarse dentro de los primeros días tras la recepción del producto.</li>
+                            <li>El producto no debe mostrar signos de uso indebido o daño intencional.</li>
+                        </ul>
+
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">2. Proceso de Devolución:</h3>
+                        <ul>
+                            <li><strong>Solicitud:</strong> Ponte en contacto con nuestro servicio de atención al cliente a través de nuestro WhatsApp oficial o correo tucompras90@gmail.com.</li>
+                            <li><strong>Revisión Técnica:</strong> Una vez que recibamos el producto, nuestro equipo técnico realizará una revisión para verificar su estado.</li>
+                            <li><strong>Decisión:</strong> Basándonos en el informe técnico, decidiremos si procedemos con un cambio del producto o un reembolso.</li>
+                        </ul>
+
+                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">3. Garantía:</h3>
+                        <p>Todos nuestros productos cuentan con garantía por defectos de fábrica. La garantía no cubre daños causados por uso indebido, accidentes o desgaste normal.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Wholesale Section -->
+        <section id="mayoristas" class="section animate" style="padding: 120px 0; background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; color: white;">
+            <div class="container" style="text-align: center;">
+                <span class="badge" style="background: var(--primary); color: white; margin-bottom: 2rem;">B2B & DISTRIBUCIÓN</span>
+                <h2 style="font-size: 3.5rem; margin-bottom: 1.5rem; color: white;">¿Eres Comerciante o Ferretero?</h2>
+                <p style="font-size: 1.25rem; max-width: 800px; margin: 0 auto 3rem; color: #94a3b8; line-height: 1.8;">
+                    En <strong>TuCompras Col</strong> somos importadores y distribuidores directos. Potencia tu negocio con nuestro catálogo mayorista, precios competitivos y envíos prioritarios a toda Colombia.
+                </p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20compras%20al%20por%20mayor" class="btn btn-primary btn-lg" style="min-width: 250px;">
+                        QUIERO SER MAYORISTA <i class="fas fa-handshake" style="margin-left: 10px;"></i>
+                    </a>
+                    <a href="#contacto" class="btn btn-outline btn-lg" style="border-color: white; color: white; min-width: 250px;">
+                        SOLICITAR CATÁLOGO B2B
+                    </a>
+                </div>
+                <div style="margin-top: 4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem;">
+                    <div>
+                        <i class="fas fa-tags" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h4 style="color: white;">Precios de Fábrica</h4>
+                        <p style="font-size: 0.9rem; color: #64748b;">Márgenes de ganancia superiores para tu negocio.</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-truck-ramp-box" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h4 style="color: white;">Logística Nacional</h4>
+                        <p style="font-size: 0.9rem; color: #64748b;">Despachos inmediatos a cualquier rincón de Colombia.</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-user-tie" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h4 style="color: white;">Asesoría VIP</h4>
+                        <p style="font-size: 0.9rem; color: #64748b;">Atención personalizada para gestionar tus inventarios.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contacto" class="section animate" style="padding: 100px 0; text-align: center; background: rgba(255,140,0,0.02);">
+            <div class="container">
+                <div class="section-title">
+                    <h2>¿Necesitas asesoría personalizada?</h2>
+                    <p>Escríbenos directamente y un asesor te ayudará con tu compra.</p>
+                </div>
+                <a href="https://wa.me/573167862554" class="btn btn-primary btn-lg" style="margin-top: 2rem;">
+                    HABLAR POR WHATSAPP <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-header">
+            <span class="logo">TuCompras <span style="color:var(--primary)">Col</span></span>
+            <div class="close-menu" id="close-menu"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="mobile-links">
+            <a href="#home">Inicio</a>
+            <a href="#productos">Productos</a>
+            <a href="#categorias">Categorías</a>
+            <a href="#mayoristas">Mayoristas</a>
+            <a href="#contacto">Contacto</a>
+            <hr style="opacity: 0.1; margin: 1rem 0;">
+            <a href="#account" class="auth-link">Mi Cuenta</a>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#home" class="active"><i class="fas fa-home"></i><span>Inicio</span></a>
+        <a href="#productos"><i class="fas fa-th-large"></i><span>Tienda</span></a>
+        <a href="#checkout"><i class="fas fa-shopping-cart"></i><span>Carrito</span></a>
+        <a href="#account"><i class="fas fa-user-circle"></i><span>Perfil</span></a>
+    </nav>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/573167862554" class="wp-float" target="_blank" id="wa-link">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer style="padding: 4rem 0; background: #0f172a; color: white; text-align: center;">
+        <div class="container">
+            <div style="margin-bottom: 2rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                <a href="#account" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 700;">Mi Cuenta / Registrarse</a>
+                <a href="#privacy" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Política de Privacidad</a>
+                <a href="#refunds" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Reembolsos y Devoluciones</a>
+                <a href="#contacto" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Contacto</a>
+            </div>
+            
+            <div style="margin-bottom: 2.5rem; display: flex; justify-content: center; align-items: center; gap: 2.5rem; opacity: 0.8;">
+                <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20créditos%20Addi" target="_blank"><img src="https://logodownload.org/wp-content/uploads/2021/06/addi-logo.png" style="height: 20px; filter: grayscale(0.5);"></a>
+                <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20créditos%20Sistecrédito" target="_blank"><img src="https://seeklogo.com/images/S/sistecredito-logo-4E38A3A401-seeklogo.com.png" style="height: 20px; filter: grayscale(0.5);"></a>
+                <img src="https://upload.wikimedia.org/wikipedia/commons/e/e1/Logo_PSE.png" style="height: 25px; opacity: 0.5; filter: grayscale(1);">
+            </div>
+            <p style="color: #64748b; font-size: 0.9rem;">&copy; 2025 TuCompras Col. Todos los derechos reservados.</p>
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 2.5rem; color: #94a3b8; font-size: 1.5rem;">
+                <a href="https://www.facebook.com/share/1RpydiVLKN/" target="_blank" style="color: inherit;"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/1tucompras?utm_source=qr&igsh=MWRybzZoNnF2ODZ6ZA==" target="_blank" style="color: inherit;"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@tucomprascol?_r=1&_t=ZS-95oEWPXGCIC" target="_blank" style="color: inherit;"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/web.js"></script>
+</body>
+
+</html>
