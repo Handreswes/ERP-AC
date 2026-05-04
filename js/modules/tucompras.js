@@ -100,11 +100,7 @@ window.TuCompras = {
                         <div id="tc-step-2" class="wizard-step" style="display: none;">
                             <div style="display: flex; flex-direction: column; gap: 1.5rem;">
                                 <div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap;">
-                                    <div class="search-bar" style="flex: 1; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; display: flex; align-items: center; gap: 10px;">
-                                        <i class="fas fa-search" style="color: var(--text-secondary);"></i>
-                                        <input type="text" id="tc-product-search" placeholder="Buscar por nombre..." style="background: none; border: none; color: white; width: 100%; outline: none;">
-                                    </div>
-                                    <div class="filter-group" style="display: flex; gap: 5px; background: var(--bg-card); padding: 5px; border-radius: 12px; border: 1px solid var(--border);">
+                                    <div class="filter-group" style="display: flex; gap: 5px; background: var(--bg-card); padding: 5px; border-radius: 12px; border: 1px solid var(--border); margin-left: auto;">
                                         <button class="tab-btn btn-sm tc-filter-btn active" data-filter="all">Todas</button>
                                         <button class="tab-btn btn-sm tc-filter-btn" data-filter="millenio">Millenio</button>
                                         <button class="tab-btn btn-sm tc-filter-btn" data-filter="vulcano">Vulcano</button>
