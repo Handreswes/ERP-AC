@@ -206,7 +206,10 @@ async function fetchProducts() {
             .order('name', { ascending: true });
 
         if (error) throw error;
-        products = data;
+        
+        // Filter out ghost products (no price)
+        products = data.filter(p => (p.priceInternet || p.priceFinal || p.priceWholesale) > 0);
+        
         renderProducts(products);
         renderCategories();
         populateCylinder();
