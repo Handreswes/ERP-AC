@@ -158,6 +158,12 @@
                         <h2>Nuestros Productos</h2>
                         <p>Sincronizado en tiempo real con nuestro inventario</p>
                     </div>
+                    
+                    <div class="search-filter-container" style="max-width: 600px; margin: 0 auto 3rem auto; display: flex; gap: 10px;">
+                        <input type="text" id="search-input" class="form-control" placeholder="Buscar por palabra clave..." style="flex-grow: 1;" oninput="filterBySearch(this.value)">
+                        <button class="btn btn-primary" id="btn-clear-filter" onclick="clearFilters()" style="display: none; white-space: nowrap;">Ver Todos</button>
+                    </div>
+
                     <div class="products-grid" id="product-grid">
                         <!-- Dynamic products from Supabase -->
                         <div class="loader" id="loader">Cargando productos...</div>
