@@ -326,8 +326,18 @@ function renderProductLanding(id) {
         return;
     }
 
-    const img = (Array.isArray(p.image) ? p.image[0] : (p.image || p.imageUrl)) || 'https://via.placeholder.com/600';
+    const images = Array.isArray(p.image) ? p.image : (p.image || p.imageUrl ? [p.image || p.imageUrl] : ['https://via.placeholder.com/600']);
+    const mainImg = images[0];
     const price = (p.priceFinal || p.priceInternet || 0).toLocaleString();
+    
+    let galleryHtml = '';
+    if (images.length > 1) {
+        galleryHtml = '<div style="display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 10px;">';
+        images.forEach((imgSrc, idx) => {
+            galleryHtml += `<img src="${imgSrc}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; cursor: pointer; border: ${idx === 0 ? '2px solid var(--accent)' : '2px solid transparent'}" onclick="document.getElementById('main-product-img').src=this.src; document.querySelectorAll('.prod-thumb').forEach(t=>t.style.border='2px solid transparent'); this.style.border='2px solid var(--accent)';" class="prod-thumb">`;
+        });
+        galleryHtml += '</div>';
+    }
 
     content.innerHTML = `
         <div style="margin-bottom: 2rem;">
@@ -337,7 +347,8 @@ function renderProductLanding(id) {
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: center;">
             <div class="animate">
-                <img src="${img}" style="width: 100%; border-radius: 30px; box-shadow: var(--shadow-lg);">
+                <img id="main-product-img" src="${mainImg}" style="width: 100%; border-radius: 30px; box-shadow: var(--shadow-lg); object-fit: cover; aspect-ratio: 1/1;">
+                ${galleryHtml}
             </div>
             <div class="animate" style="animation-delay: 0.1s;">
                 <span class="badge" style="background: var(--accent); color: var(--bg-dark); padding: 5px 15px; border-radius: 20px; font-weight: 700; margin-bottom: 1.5rem; display: inline-block;">${p.category || 'General'}</span>
