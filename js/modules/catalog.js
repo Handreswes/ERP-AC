@@ -54,6 +54,11 @@ window.Catalog = {
                 </div>
             </div>
 
+            <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
+                <input type="text" id="catalog-search" class="form-control" placeholder="Buscar productos para el catálogo..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+            </div>
+
             <div id="catalog-preview-container" class="catalog-preview">
                 <div class="desktop-only table-container">
                     <table class="data-table">
@@ -79,11 +84,21 @@ window.Catalog = {
     },
 
     updatePreview() {
+        const searchInput = document.getElementById('catalog-search');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         const products = Inventory.getProducts().filter(p => p.active !== false);
         let filtered = products;
 
         if (this.currentCompany !== 'all') {
             filtered = products.filter(p => p.company === 'both' || p.company === this.currentCompany);
+        }
+
+        if (searchTerm) {
+            filtered = filtered.filter(p => 
+                (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                (p.category && p.category.toLowerCase().includes(searchTerm)) ||
+                (p.description && p.description.toLowerCase().includes(searchTerm))
+            );
         }
 
         const list = document.getElementById('catalog-preview-list');
@@ -139,6 +154,12 @@ window.Catalog = {
             }
         };
 
+        panel.oninput = (e) => {
+            if (e.target.id === 'catalog-search') {
+                this.updatePreview();
+            }
+        };
+
         const viewBtn = document.getElementById('view-catalog-btn');
         if (viewBtn) {
             viewBtn.onclick = () => this.openCatalogView();
@@ -146,11 +167,21 @@ window.Catalog = {
     },
 
     openCatalogView() {
+        const searchInput = document.getElementById('catalog-search');
+        const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         const products = Inventory.getProducts().filter(p => p.active !== false);
         let filtered = products;
 
         if (this.currentCompany !== 'all') {
             filtered = products.filter(p => p.company === 'both' || p.company === this.currentCompany);
+        }
+
+        if (searchTerm) {
+            filtered = filtered.filter(p => 
+                (p.name && p.name.toLowerCase().includes(searchTerm)) ||
+                (p.category && p.category.toLowerCase().includes(searchTerm)) ||
+                (p.description && p.description.toLowerCase().includes(searchTerm))
+            );
         }
 
         const catalogWindow = window.open('', '_blank');
