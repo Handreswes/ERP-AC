@@ -33,6 +33,11 @@ window.Sales = {
             <div class="pos-container">
                 <div class="pos-main">
                     
+                    <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
+                        <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
+                        <input type="text" id="pos-product-search" class="form-control" placeholder="Buscar productos..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                    </div>
+
                     <div id="pos-product-grid" class="pos-grid">
                         <!-- Product grid will be rendered here -->
                     </div>
