@@ -63,12 +63,30 @@ function initNavigation() {
     const menuTrigger = document.getElementById('mobile-menu-trigger');
     const closeMenu = document.getElementById('close-mobile-menu');
 
+    // New Mobile Sidebar elements
+    const sidebar = document.getElementById('sidebar');
+    const openSidebarBtn = document.getElementById('open-sidebar-btn');
+    const closeSidebarBtn = document.getElementById('close-sidebar-btn');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    const toggleSidebar = (show) => {
+        if (sidebar && sidebarOverlay) {
+            sidebar.classList.toggle('open', show);
+            sidebarOverlay.classList.toggle('active', show);
+            document.body.style.overflow = show ? 'hidden' : '';
+        }
+    };
+
+    if (openSidebarBtn) openSidebarBtn.onclick = () => toggleSidebar(true);
+    if (closeSidebarBtn) closeSidebarBtn.onclick = () => toggleSidebar(false);
+    if (sidebarOverlay) sidebarOverlay.onclick = () => toggleSidebar(false);
+
     const toggleMenu = (show) => {
         if (sheet && overlay) {
             sheet.classList.toggle('active', show);
             overlay.classList.toggle('active', show);
         }
-        // Always reset overflow — never leave it stuck
+        // Always reset overflow - never leave it stuck
         document.body.style.overflow = show ? 'hidden' : '';
     };
 
@@ -87,6 +105,7 @@ function initNavigation() {
         if (!panelName) return;
 
         toggleMenu(false);
+        if (typeof toggleSidebar === 'function') toggleSidebar(false);
 
         // Update all related nav items (bottom, sidebar, sheet)
         document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item').forEach(el => {
