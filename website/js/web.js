@@ -7,9 +7,25 @@ const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let products = [];
 let cart = JSON.parse(localStorage.getItem('tc-cart')) || [];
 let activeCategory = 'all';
+let currentSearchQuery = '';
 let checkoutSource = 'cart';
 let checkoutItem = null;
 let currentUser = null;
+
+window.filterBySearch = function(keyword) {
+    currentSearchQuery = keyword.toLowerCase().trim();
+    renderProducts(products);
+};
+
+window.clearFilters = function() {
+    activeCategory = 'all';
+    currentSearchQuery = '';
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) searchInput.value = '';
+    renderProducts(products);
+    const prodSec = document.getElementById('productos');
+    if (prodSec) prodSec.scrollIntoView({ behavior: 'smooth' });
+};
 
 // DOM Elements
 const productGrid = document.getElementById('product-grid');
@@ -256,7 +272,16 @@ function populateCylinder() {
 // Render Products
 function renderProducts(items) {
     productGrid.innerHTML = '';
-    const filtered = activeCategory === 'all' ? items : items.filter(p => p.category === activeCategory);
+    let filtered = activeCategory === 'all' ? items : items.filter(p => p.category === activeCategory);
+
+    if (currentSearchQuery) {
+        filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(currentSearchQuery));
+    }
+
+    const clearBtn = document.getElementById('btn-clear-filter');
+    if (clearBtn) {
+        clearBtn.style.display = (activeCategory !== 'all' || currentSearchQuery !== '') ? 'inline-block' : 'none';
+    }
 
     if (filtered.length === 0) {
         productGrid.innerHTML = '<p class="text-center" style="grid-column: 1/-1;">No se encontraron productos.</p>';
@@ -351,7 +376,7 @@ function renderProductLanding(id) {
                 <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; text-align: center;">
                     <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-shield-check" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Garantía</small></div>
                     <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-box-open" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Original</small></div>
-                    <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-headset" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Soporte 24/7</small></div>
+                    <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-hand-holding-dollar" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Compra Segura</small></div>
                 </div>
             </div>
         </div>
@@ -386,7 +411,13 @@ async function renderCategories() {
             const card = document.createElement('div');
             card.className = 'glass product-card animate';
             card.style = 'cursor: pointer; padding: 2.5rem; text-align: center;';
-            card.onclick = () => { activeCategory = cat.name; renderProducts(products); window.location.hash = 'productos'; };
+            card.onclick = () => { 
+                activeCategory = cat.name; 
+                renderProducts(products); 
+                window.location.hash = 'productos'; 
+                const prodSec = document.getElementById('productos');
+                if (prodSec) prodSec.scrollIntoView({ behavior: 'smooth' });
+            };
             card.innerHTML = `<i class="fas ${icons[cat.name] || 'fa-tag'}" style="font-size: 3rem; color: var(--accent); margin-bottom: 1.2rem;"></i><h3>${cat.name}</h3>`;
             categoryGrid.appendChild(card);
         });
