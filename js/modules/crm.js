@@ -43,7 +43,10 @@ window.CRM = {
                     <i class="fas fa-plus-circle" style="margin-right: 8px;"></i> Crear Nuevo Cliente
                 </button>
             </div>
-
+            <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
+                <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
+                <input type="text" id="crm-search" class="form-control" placeholder="Buscar clientes..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+            </div>
 
             <div class="table-container">
                 <table class="data-table">
