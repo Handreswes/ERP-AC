@@ -248,6 +248,10 @@ body.logged-out .app-container {
     border-bottom: 1px solid var(--border);
 }
 
+.mobile-top-bar {
+    display: none;
+}
+
 .search-bar {
     display: flex;
     align-items: center;
@@ -392,6 +396,11 @@ body.logged-out .app-container {
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
 }
 
 .btn-primary {
@@ -409,6 +418,7 @@ body.logged-out .app-container {
     backdrop-filter: blur(10px);
     border-radius: var(--radius);
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     border: 1px solid var(--border);
     margin-top: 1rem;
     box-shadow: var(--shadow-premium);
@@ -494,8 +504,8 @@ body.logged-out .app-container {
 }
 
 .icon-btn {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border-radius: 6px;
     border: 1px solid var(--border);
     background-color: rgba(255, 255, 255, 0.05);
@@ -1173,8 +1183,71 @@ option:checked {
 }
 
 @media (max-width: 768px) {
+    .mobile-top-bar {
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 1rem;
+        height: 60px;
+        background: var(--bg-topbar);
+        border-bottom: 1px solid var(--border);
+        position: fixed;
+        width: 100%;
+        top: 0;
+        left: 0;
+        z-index: 1100;
+        backdrop-filter: blur(12px);
+    }
+    
+    .hamburger-btn {
+        width: 48px;
+        height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    #sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(4px);
+        z-index: 1400;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    #sidebar-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+
     .sidebar {
-        display: none !important;
+        display: flex !important;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1500;
+        box-shadow: 4px 0 15px rgba(0,0,0,0.5);
+    }
+    .sidebar.open {
+        transform: translateX(0);
+    }
+    .mobile-top-bar {
+        display: flex !important;
     }
 
     .top-bar {
@@ -1233,6 +1306,8 @@ option:checked {
         padding: 1.25rem;
         position: relative;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        box-sizing: border-box;
     }
 
     .data-table td {
@@ -1485,6 +1560,7 @@ textarea {
     transition: all 0.3s ease;
     width: 100%;
     box-sizing: border-box;
+    min-height: 44px;
 }
 
 .form-control:focus,
@@ -1504,6 +1580,14 @@ textarea:focus {
 
 /* --- PREMIUM MOBILE OVERHAUL (V77) --- */
 @media (max-width: 768px) {
+    .form-control,
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+        font-size: 16px !important;
+    }
+
     .modal-content {
         width: 100% !important;
         height: 94% !important;
