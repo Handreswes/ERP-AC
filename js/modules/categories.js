@@ -128,29 +128,37 @@ window.CategoriesModule = {
 
     renderPanel() {
         const contentArea = document.getElementById('content-area');
-        contentArea.innerHTML = `
-            <div id="categories-panel" class="panel animate">
-                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                    <h1>Gestión de Categorías</h1>
-                    <div style="display: flex; gap: 10px;">
-                        <button id="seed-categories-btn" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);"><i class="fas fa-seedling"></i> Sembrar Base</button>
-                        <button id="add-category-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Categoría</button>
-                    </div>
+        if (!contentArea) return;
+
+        let panel = document.getElementById('categories-panel');
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = 'categories-panel';
+            panel.className = 'panel';
+            contentArea.appendChild(panel);
+        }
+
+        panel.innerHTML = `
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h1>Gestión de Categorías</h1>
+                <div style="display: flex; gap: 10px;">
+                    <button id="seed-categories-btn" class="btn btn-outline" style="border-color: var(--accent); color: var(--accent);"><i class="fas fa-seedling"></i> Sembrar Base</button>
+                    <button id="add-category-btn" class="btn btn-primary"><i class="fas fa-plus"></i> Nueva Categoría</button>
                 </div>
-                <div class="table-container">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th>Nombre</th>
-                                <th>ID</th>
-                                <th style="width: 100px;">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="categories-list">
-                            <!-- Categories will be rendered here -->
-                        </tbody>
-                    </table>
-                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>ID</th>
+                            <th style="width: 100px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categories-list">
+                        <!-- Categories will be rendered here -->
+                    </tbody>
+                </table>
             </div>
         `;
         this.init();
