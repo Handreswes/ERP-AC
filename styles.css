@@ -602,7 +602,7 @@ body.logged-out .app-container {
     padding: 1.5rem;
 }
 
-.form-grid {
+.form-grid, .crm-responsive-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
@@ -1183,6 +1183,10 @@ option:checked {
 }
 
 @media (max-width: 768px) {
+    .top-bar {
+        display: none !important;
+    }
+
     .mobile-top-bar {
         display: flex !important;
         align-items: center;
@@ -1396,6 +1400,11 @@ option:checked {
         max-width: 100% !important;
         white-space: normal !important;
     }
+
+    .pos-container {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
 }
 
 /* Dashboard Details Section */
@@ -1606,9 +1615,16 @@ textarea:focus {
         overflow-y: auto !important;
     }
 
-    .form-grid {
+    .form-grid, .crm-responsive-grid {
         grid-template-columns: 1fr !important;
         gap: 1.25rem !important;
+    }
+    
+    .form-group input, 
+    .form-group select, 
+    .form-group textarea {
+        width: 100% !important;
+        max-width: 100% !important;
     }
 
     .image-gallery-grid {
