@@ -1545,6 +1545,12 @@ option:checked {
     overflow-y: auto;
 }
 
+@media (max-width: 768px) {
+    .modal-body {
+        padding: 16px !important;
+    }
+}
+
 .form-group label {
     font-size: 0.75rem;
     font-weight: 700;
@@ -1616,15 +1622,41 @@ textarea:focus {
     }
 
     .form-grid, .crm-responsive-grid {
+        display: flex !important;
+        flex-direction: column !important;
         grid-template-columns: 1fr !important;
         gap: 1.25rem !important;
     }
     
+    .form-group {
+        width: 100% !important;
+    }
+
     .form-group input, 
     .form-group select, 
     .form-group textarea {
         width: 100% !important;
         max-width: 100% !important;
+        min-height: 48px !important;
+        padding: 12px 16px !important;
+        font-size: 16px !important; /* Prevent iOS zoom */
+    }
+
+    /* Fix numeric inputs alignment */
+    input[type="number"] {
+        text-align: left !important;
+        padding-left: 16px !important;
+    }
+
+    .btn-block, 
+    #save-client-manual-btn, 
+    #save-payment-manual-btn, 
+    #save-movement-manual-btn {
+        width: 100% !important;
+        display: flex !important;
+        min-height: 52px !important;
+        font-size: 1rem !important;
+        margin-top: 1.5rem !important;
     }
 
     .image-gallery-grid {
