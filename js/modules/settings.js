@@ -101,7 +101,7 @@ window.Settings = {
                         <i class="fas fa-users-cog" style="color:var(--accent); font-size:1.2rem;"></i>
                         <h2 style="margin:0; font-size:1.1rem;">Gestión de Usuarios</h2>
                     </div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 2fr; gap: 2rem;">
+                    <div class="form-grid">
                         <!-- Add User Form -->
                         <div style="border-right: 1px solid var(--border); padding-right: 1.5rem;">
                             <h3 style="font-size: 0.9rem; margin-bottom: 1rem;">Crear Nuevo Usuario</h3>
