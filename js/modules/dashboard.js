@@ -33,7 +33,7 @@ window.Dashboard = {
                 const id = card.id;
                 if (id === 'stat-sales') this.showSalesDetail();
                 if (id === 'stat-stock') this.showCriticalStockDetail();
-                if (id === 'stat-credits') this.showCreditsDetail();
+                if (id === 'stat-credits-millenio' || id === 'stat-credits-vulcano') this.showCreditsDetail();
                 if (id === 'stat-commissions') {
                     // Navigate to Vendedores settlements tab
                     const btn = document.querySelector('.nav-item[data-panel="vendedores"]');
@@ -101,7 +101,8 @@ window.Dashboard = {
         // Global Totals
         const totalFiltered = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
         const criticalCount = products.filter(p => p.stockMillenio < 5 || p.stockVulcano < 5).length;
-        const pendingCredits = clients.reduce((sum, c) => sum + (c.balanceMillenio || 0) + (c.balanceVulcano || 0), 0);
+        const pendingCreditsMillenio = clients.reduce((sum, c) => sum + (c.balanceMillenio || 0), 0);
+        const pendingCreditsVulcano = clients.reduce((sum, c) => sum + (c.balanceVulcano || 0), 0);
 
         // Millenio Breakdown
         const mSales = filteredSales.reduce((acc, s) => {
@@ -133,11 +134,20 @@ window.Dashboard = {
             return d >= startDate && d <= endDate && e.company === 'vulcano';
         }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        // Update UI - Main Cards
-        document.querySelector('#dashboard-panel .stat-card:nth-child(1) .stat-value').textContent = `$${totalFiltered.toLocaleString()}`;
-        document.querySelector('#dashboard-panel .stat-card:nth-child(1) .stat-label').textContent = `${filteredSales.length} transacciones`;
-        document.querySelector('#dashboard-panel .stat-card:nth-child(2) .stat-value').textContent = criticalCount;
-        document.querySelector('#dashboard-panel .stat-card:nth-child(3) .stat-value').textContent = `$${pendingCredits.toLocaleString()}`;
+        const elSales = document.querySelector('#stat-sales .stat-value');
+        if (elSales) elSales.textContent = `$${totalFiltered.toLocaleString()}`;
+        
+        const elSalesLabel = document.querySelector('#stat-sales .stat-label');
+        if (elSalesLabel) elSalesLabel.textContent = `${filteredSales.length} transacciones`;
+
+        const elStock = document.querySelector('#stat-stock .stat-value');
+        if (elStock) elStock.textContent = criticalCount;
+
+        const elCredMillenio = document.querySelector('#stat-credits-millenio .stat-value');
+        if (elCredMillenio) elCredMillenio.textContent = `$${pendingCreditsMillenio.toLocaleString()}`;
+
+        const elCredVulcano = document.querySelector('#stat-credits-vulcano .stat-value');
+        if (elCredVulcano) elCredVulcano.textContent = `$${pendingCreditsVulcano.toLocaleString()}`;
 
         // Update UI - Millenio Details
         this.updateElText('millenio-sales-today-detail', `$${mSales.total.toLocaleString()}`);
