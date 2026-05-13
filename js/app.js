@@ -1,9 +1,7 @@
-console.log('--- ERP AC SYSTEM V104 LOADING (CLOUD SYNC) ---');
+console.log('--- ERP AC SYSTEM V105 LOADING (ROBUST INIT) ---');
 
-// Visual Logger (Console only for production V102)
 window.ERP_LOG = function (msg, type = 'info') {
     console.log(`[ERP ${type.toUpperCase()}]`, msg);
-    // Visual tray removed by user request
 };
 
 window.onerror = function (msg, url, line) {
@@ -13,9 +11,15 @@ window.onerror = function (msg, url, line) {
 
 document.addEventListener('DOMContentLoaded', async () => {
     window.erpStarted = true;
-    ERP_LOG('Iniciando Sistema V102...');
+    ERP_LOG('Iniciando Sistema V105...');
 
-    // 0. Initialize Supabase FIRST
+    // 0. Initialize Navigation FIRST so UI functions are available
+    try {
+        initNavigation();
+        ERP_LOG('Navegación Inicializada', 'success');
+    } catch (e) { ERP_LOG('Error Crítico Nav: ' + e.message, 'error'); }
+
+    // 1. Initialize Supabase
     try {
         if (typeof window.initSupabase === 'function') {
             window.initSupabase();
@@ -23,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (e) { ERP_LOG('Error Supabase: ' + e.message, 'error'); }
 
-    // 0.1 Initialize Auth
+    // 2. Initialize Auth
     try {
         if (typeof Auth !== 'undefined') {
             await Auth.init();
@@ -31,39 +35,54 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     } catch (e) { ERP_LOG('Error Auth: ' + e.message, 'error'); }
 
-    // 1. Initialize Storage
-    try {
-        await Storage.init();
-        ERP_LOG('Storage Listo', 'success');
-    } catch (e) { ERP_LOG('Error Storage: ' + e.message, 'error'); }
+    // Initialization Guard
+    window.isERPInitializing = true;
 
-    // 2. Initialize Modules
+    // 3. Storage Init (Cache + Cloud Sync)
+    try {
+        ERP_LOG('Iniciando Sincronización de Datos...');
+        const storageTimeout = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Storage timeout')), 10000)
+        );
+        
+        window.addEventListener('erp_storage_ready', () => {
+            ERP_LOG('Sincronización Completa (Evento)', 'success');
+            updateUIAfterSync();
+        });
+
+        await Promise.race([Storage.init(), storageTimeout]);
+        ERP_LOG('Sincronización Finalizada', 'success');
+        window.isERPInitializing = false;
+        updateUIAfterSync();
+    } catch (e) {
+        ERP_LOG('Storage Timeout/Error: ' + e.message, 'warning');
+        window.isERPInitializing = false;
+        updateUIAfterSync();
+    }
+
+    // 4. Initialize All Modules
     const mods = [Inventory, CRM, Sales, Dashboard, Finances, Marketing, TuCompras, Vendedores, CategoriesModule, Settings, Consultas, Catalog, PDFManager, TuComprasCRM, Logistics, UserManagement, WebsiteAdmin];
     mods.forEach(m => {
-        try { if (m && m.init) m.init(); } catch (e) { ERP_LOG('Error Modulo Initializing: ' + e.message, 'error'); }
+        try { if (m && m.init) m.init(); } catch (e) { console.warn('Modulo Init Error:', e.message); }
     });
 
-    // 3. Navigation
-    try {
-        initNavigation();
-        loadActivePanel();
-    } catch (e) { ERP_LOG('Error Nav: ' + e.message, 'error'); }
+    // 5. Final UI Polish
+    loadActivePanel();
 
-    // 4. Cleanup
+    // 6. SW Cleanup
     if ('serviceWorker' in navigator) {
-        const regs = await navigator.serviceWorker.getRegistrations();
-        for (let r of regs) await r.unregister();
+        navigator.serviceWorker.getRegistrations().then(regs => {
+            for (let r of regs) r.unregister();
+        }).catch(() => {});
     }
 });
 
 function initNavigation() {
-    const navLinks = document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item');
     const sheet = document.getElementById('bottom-sheet');
     const overlay = document.getElementById('bottom-sheet-overlay');
     const menuTrigger = document.getElementById('mobile-menu-trigger');
     const closeMenu = document.getElementById('close-mobile-menu');
 
-    // New Mobile Sidebar elements
     const sidebar = document.getElementById('sidebar');
     const openSidebarBtn = document.getElementById('open-sidebar-btn');
     const closeSidebarBtn = document.getElementById('close-sidebar-btn');
@@ -86,7 +105,6 @@ function initNavigation() {
             sheet.classList.toggle('active', show);
             overlay.classList.toggle('active', show);
         }
-        // Always reset overflow - never leave it stuck
         document.body.style.overflow = show ? 'hidden' : '';
     };
 
@@ -100,26 +118,16 @@ function initNavigation() {
     if (closeMenu) closeMenu.onclick = () => toggleMenu(false);
     if (overlay) overlay.onclick = () => toggleMenu(false);
 
-    // Global navigation handler exposed for direct onclick calls
     window.handleNavClick = function (panelName) {
         if (!panelName) return;
 
         toggleMenu(false);
-        if (typeof toggleSidebar === 'function') toggleSidebar(false);
+        toggleSidebar(false);
 
-        // Update all related nav items (bottom, sidebar, sheet)
         document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item').forEach(el => {
             el.classList.toggle('active', el.getAttribute('data-panel') === panelName);
         });
 
-        // Switch panels
-        document.querySelectorAll('.panel').forEach(p => {
-            p.classList.toggle('active', p.id === `${panelName}-panel`);
-        });
-
-        console.log(`Navigation: Switching to ${panelName}`);
-
-        // Module specific refreshes
         const modMap = {
             'dashboard': () => { if (window.Dashboard && window.Dashboard.updateStats) window.Dashboard.updateStats(); },
             'inventory': () => { if (window.Inventory && window.Inventory.updateInventoryList) window.Inventory.updateInventoryList(); },
@@ -142,18 +150,24 @@ function initNavigation() {
             try { modMap[panelName](); } catch (err) { console.error(`Error refreshing ${panelName}:`, err); }
         }
 
-        localStorage.setItem('erp_active_panel', panelName);
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(p => {
+            const isActive = p.id === `${panelName}-panel`;
+            p.classList.toggle('active', isActive);
+            if (isActive) p.setAttribute('aria-hidden', 'false');
+            else p.setAttribute('aria-hidden', 'true');
+        });
 
-        // Scroll to top on mobile when switching panels
+        localStorage.setItem('erp_active_panel', panelName);
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // Attach to existing elements just in case they don't have inline handlers
     document.querySelectorAll('.nav-item, .bottom-nav-item, .menu-grid-item').forEach(el => {
         if (el.id !== 'mobile-menu-trigger') {
             el.addEventListener('click', (e) => {
                 e.preventDefault();
-                window.handleNavClick(el.getAttribute('data-panel'));
+                const panel = el.getAttribute('data-panel');
+                if (panel) window.handleNavClick(panel);
             });
         }
     });
@@ -161,8 +175,21 @@ function initNavigation() {
 
 function loadActivePanel() {
     const last = localStorage.getItem('erp_active_panel') || 'dashboard';
-    const btn = document.querySelector(`[data-panel="${last}"]`);
-    if (btn) btn.click();
+    if (window.handleNavClick) {
+        window.handleNavClick(last);
+    }
+}
+
+function updateUIAfterSync() {
+    const loadingName = document.querySelector('.user-profile span');
+    if (loadingName && (loadingName.textContent === 'Cargando...' || !loadingName.textContent)) {
+        loadingName.textContent = window.Auth?.currentUser?.name || 'Usuario';
+    }
+
+    const last = localStorage.getItem('erp_active_panel') || 'dashboard';
+    if (window.handleNavClick) {
+        window.handleNavClick(last);
+    }
 }
 
 window.clearAllSystemData = async function () {
@@ -173,4 +200,3 @@ window.clearAllSystemData = async function () {
     });
     location.reload(true);
 };
-
