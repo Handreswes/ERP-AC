@@ -12,11 +12,16 @@ window.Auth = {
 
     checkSession() {
         const session = localStorage.getItem('erp_session');
-        if (session) {
-            this.currentUser = JSON.parse(session);
-            document.body.classList.remove('logged-out');
-            document.getElementById('login-overlay')?.classList.add('hidden');
-            this.updateProfileUI();
+        if (session && session !== 'undefined' && session !== 'null') {
+            try {
+                this.currentUser = JSON.parse(session);
+                document.body.classList.remove('logged-out');
+                document.getElementById('login-overlay')?.classList.add('hidden');
+                this.updateProfileUI();
+            } catch (e) {
+                console.warn('Invalid session format, clearing...');
+                this.logout();
+            }
         } else {
             document.body.classList.add('logged-out');
             document.getElementById('login-overlay')?.classList.remove('hidden');
