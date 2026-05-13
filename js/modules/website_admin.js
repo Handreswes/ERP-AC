@@ -98,6 +98,7 @@ window.WebsiteAdmin = {
                 <button class="tab-btn active" onclick="WebsiteAdmin.switchTab('general')">1. Configuración General & Redes</button>
                 <button class="tab-btn" onclick="WebsiteAdmin.switchTab('hero')">2. Textos de Inicio & Banners</button>
                 <button class="tab-btn" onclick="WebsiteAdmin.switchTab('legal')">3. Páginas Legales & Mayoristas</button>
+                <button class="tab-btn" onclick="WebsiteAdmin.switchTab('testimonials')">4. Testimonios & Reseñas</button>
             </div>
 
             <!-- Tab 1: General & Redes -->
@@ -187,6 +188,39 @@ window.WebsiteAdmin = {
                     </div>
                 </div>
             </div>
+
+            <!-- Tab 4: Testimonios -->
+            <div id="wa-tab-testimonials" class="wa-tab-content" style="display: none; margin-top: 2rem;">
+                <div class="form-grid">
+                    <div class="form-group glass" style="padding: 1.5rem; border-radius: 16px;">
+                        <h3 style="margin-bottom: 1rem; color: #ffc145;"><i class="fas fa-star"></i> Gestionar Testimonios</h3>
+                        <p class="text-secondary" style="font-size: 0.8rem; margin-bottom: 1.5rem;">Sube aquí los pantallazos de tus clientes (WhatsApp, Instagram, etc.) y añade sus testimonios para generar confianza.</p>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 12px; margin-bottom: 2rem; border: 1px dashed var(--accent);">
+                            <h4 style="margin-bottom: 1rem;">Agregar Nuevo Testimonio</h4>
+                            <label>Nombre del Cliente</label>
+                            <input type="text" id="new-testim-name" class="form-control" placeholder="Ej: Juan Perez">
+                            
+                            <label style="margin-top: 1rem;">Ciudad</label>
+                            <input type="text" id="new-testim-city" class="form-control" placeholder="Ej: Medellín">
+                            
+                            <label style="margin-top: 1rem;">Comentario / Reseña</label>
+                            <textarea id="new-testim-text" class="form-control" style="height: 60px;" placeholder="Ej: Excelente servicio..."></textarea>
+                            
+                            <label style="margin-top: 1rem;">Pantallazo o Foto del Cliente</label>
+                            <input type="file" id="new-testim-img" accept="image/*" class="form-control">
+                            
+                            <button class="btn btn-primary" style="margin-top: 1.5rem; width: 100%;" onclick="WebsiteAdmin.addTestimonial()">
+                                <i class="fas fa-plus"></i> Añadir Testimonio a la Web
+                            </button>
+                        </div>
+
+                        <div id="wa-testimonials-list" style="display: grid; gap: 1rem;">
+                            <!-- Testimonios listados aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
         `;
     },
 
@@ -228,6 +262,7 @@ window.WebsiteAdmin = {
         this.setVal('wa-wholesale-bg', s.wholesale_bg_image);
         this.setVal('wa-privacy', s.privacy_policy_text);
         this.setVal('wa-refunds', s.refund_policy_text);
+        this.renderTestimonialsList();
     },
 
     setVal(id, value) {
@@ -305,6 +340,97 @@ window.WebsiteAdmin = {
                 <img src="\${url}" style="width: 100%; height: 100%; object-fit: cover;">
                 <button onclick="WebsiteAdmin.removeHeroImage(\${index})" style="position: absolute; top: 4px; right: 4px; background: rgba(239, 68, 68, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 0.7rem;">
                     <i class="fas fa-times"></i>
+                </button>
+            </div>
+        \`).join('');
+    },
+
+    async addTestimonial() {
+        const name = document.getElementById('new-testim-name').value;
+        const city = document.getElementById('new-testim-city').value;
+        const text = document.getElementById('new-testim-text').value;
+        const fileInput = document.getElementById('new-testim-img');
+        const file = fileInput.files[0];
+
+        if (!name || !text) {
+            alert('Por favor completa el nombre y el comentario.');
+            return;
+        }
+
+        let imageUrl = '';
+        if (file) {
+            try {
+                const fileExt = file.name.split('.').pop();
+                const fileName = \`testim_\${Date.now()}.\${fileExt}\`;
+                const filePath = \`website/testimonials/\${fileName}\`;
+
+                const { error: uploadError } = await supabaseClient.storage
+                    .from('products')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabaseClient.storage
+                    .from('products')
+                    .getPublicUrl(filePath);
+
+                imageUrl = publicUrl;
+            } catch (e) {
+                alert('Error subiendo imagen: ' + e.message);
+                return;
+            }
+        }
+
+        const newTestim = {
+            id: Date.now(),
+            name,
+            city,
+            text,
+            image: imageUrl,
+            stars: 5,
+            date: new Date().toISOString()
+        };
+
+        if (!this.settings.testimonials) this.settings.testimonials = [];
+        this.settings.testimonials.unshift(newTestim);
+        
+        this.renderTestimonialsList();
+        
+        // Reset form
+        document.getElementById('new-testim-name').value = '';
+        document.getElementById('new-testim-city').value = '';
+        document.getElementById('new-testim-text').value = '';
+        fileInput.value = '';
+        
+        alert('✅ Testimonio añadido localmente. No olvides Guardar los Cambios para que aparezca en la web.');
+    },
+
+    removeTestimonial(id) {
+        if (!confirm('¿Seguro que quieres eliminar este testimonio?')) return;
+        this.settings.testimonials = this.settings.testimonials.filter(t => t.id !== id);
+        this.renderTestimonialsList();
+    },
+
+    renderTestimonialsList() {
+        const container = document.getElementById('wa-testimonials-list');
+        if (!container) return;
+
+        const list = this.settings?.testimonials || [];
+        
+        if (list.length === 0) {
+            container.innerHTML = '<p class="text-secondary text-center">Aún no hay testimonios configurados.</p>';
+            return;
+        }
+
+        container.innerHTML = list.map(t => \`
+            <div class="glass" style="padding: 1rem; border-radius: 12px; display: flex; gap: 15px; align-items: center; border-left: 4px solid var(--accent);">
+                \${t.image ? \`<img src="\${t.image}" style="width: 60px; height: 60px; border-radius: 8px; object-fit: cover;">\` : \`<div style="width: 60px; height: 60px; background: var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-user"></i></div>\`}
+                <div style="flex-grow: 1;">
+                    <h4 style="margin: 0;">\${t.name} <small style="color: var(--text-secondary); font-weight: 400;">- \${t.city || ''}</small></h4>
+                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin: 4px 0;">"\${t.text}"</p>
+                </div>
+                <button onclick="WebsiteAdmin.removeTestimonial(\${t.id})" class="btn btn-sm btn-outline" style="border-color: var(--danger); color: var(--danger); padding: 5px 10px;">
+                    <i class="fas fa-trash"></i>
                 </button>
             </div>
         \`).join('');
