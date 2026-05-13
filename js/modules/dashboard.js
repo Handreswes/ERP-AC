@@ -1,8 +1,8 @@
 // Dashboard Module
 window.Dashboard = {
-    init() {
+    async init() {
         this.currentRange = 'today';
-        this.renderFilters();
+        await this.renderFilters();
         this.updateStats();
     },
 
