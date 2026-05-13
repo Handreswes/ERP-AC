@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <!-- Script Anti-Error 431 (Clear Bloated Cookies) -->
     <script>
         (function () {
@@ -18,7 +18,7 @@
         })();
     </script>
     <title>ERP Multinegocio - Millenio / Vulcano / TuCompras</title>
-    <link rel="stylesheet" href="styles.css?v=104">
+    <link rel="stylesheet" href="styles.css?v=106">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -131,6 +131,10 @@
                 <i class="fas fa-cog" style="color: #94a3b8;"></i>
                 <span>Ajustes</span>
             </a>
+            <a href="#" class="menu-grid-item" data-panel="website_admin">
+                <i class="fas fa-globe" style="color: #0ea5e9;"></i>
+                <span>Sitio Web</span>
+            </a>
         </div>
     </div>
 
@@ -198,8 +202,12 @@
                     <span>CRM Ecommerce</span>
                 </a>
                 <a href="#" class="nav-item" data-panel="marketing">
-                    <i class="fas fa-bullhorn" style="color: #f43f5e;"></i>
-                    <span>Marketing / Campañas</span>
+                    <i class="fas fa-bullhorn" style="color: #ec4899;"></i>
+                    <span>Marketing CRM</span>
+                </a>
+                <a href="#" class="nav-item" data-panel="website_admin">
+                    <i class="fas fa-globe" style="color: #0ea5e9;"></i>
+                    <span>Admin. Website</span>
                 </a>
                 <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
                 <a href="#" class="nav-item" data-panel="logistics">
@@ -286,9 +294,14 @@
                             <p class="stat-value">0</p>
                             <span class="stat-label">Productos por agotar</span>
                         </div>
-                        <div class="stat-card clickable" id="stat-credits" style="cursor:pointer;">
-                            <h3 id="stat-credits-title">Créditos Pendientes</h3>
-                            <p class="stat-value">$0.00</p>
+                        <div class="stat-card clickable" id="stat-credits-millenio" style="cursor:pointer; border-color: rgba(59, 130, 246, 0.3);">
+                            <h3 id="stat-credits-millenio-title" style="color: #3b82f6;">Deuda Millenio</h3>
+                            <p class="stat-value text-danger" style="color: #ef4444;">$0.00</p>
+                            <span class="stat-label">Por cobrar</span>
+                        </div>
+                        <div class="stat-card clickable" id="stat-credits-vulcano" style="cursor:pointer; border-color: rgba(245, 158, 11, 0.3);">
+                            <h3 id="stat-credits-vulcano-title" style="color: #f59e0b;">Deuda Vulcano</h3>
+                            <p class="stat-value text-danger" style="color: #ef4444;">$0.00</p>
                             <span class="stat-label">Por cobrar</span>
                         </div>
                         <div class="stat-card clickable" id="stat-commissions" style="cursor:pointer;">
@@ -542,26 +555,28 @@
     </div>
 
     <!-- 5. Core System (v101) - Loaded in Order -->
-    <script src="js/supabase.js?v=104"></script>
-    <script src="js/storage.js?v=104"></script>
-    <script src="js/modules/auth.js?v=104"></script>
-    <script src="js/modules/inventory.js?v=105"></script>
-    <script src="js/modules/catalog.js?v=104"></script>
-    <script src="js/modules/crm.js?v=104"></script>
-    <script src="js/modules/pdf_manager.js?v=104"></script>
-    <script src="js/modules/sales.js?v=104"></script>
-    <script src="js/modules/dashboard.js?v=104"></script>
-    <script src="js/modules/finances.js?v=104"></script>
-    <script src="js/modules/marketing.js?v=104"></script>
-    <script src="js/modules/user_management.js?v=104"></script>
-    <script src="js/modules/tucompras_crm.js?v=104"></script>
-    <script src="js/modules/tucompras.js?v=104"></script>
-    <script src="js/modules/logistics.js?v=104"></script>
-    <script src="js/modules/vendedores.js?v=104"></script>
-    <script src="js/modules/categories.js?v=105"></script>
-    <script src="js/modules/settings.js?v=104"></script>
-    <script src="js/modules/consultas.js?v=104"></script>
-    <script src="js/app.js?v=104"></script>
+    <script src="js/supabase.js?v=106"></script>
+    <script src="js/storage.js?v=106"></script>
+    <script src="js/modules/auth.js?v=106"></script>
+    <script src="js/modules/inventory.js?v=106"></script>
+    <script src="js/modules/catalog.js?v=106"></script>
+    <script src="js/modules/crm.js?v=106"></script>
+    <script src="js/modules/pdf_manager.js?v=106"></script>
+    <script src="js/modules/sales.js?v=106"></script>
+    <script src="js/modules/dashboard.js?v=106"></script>
+    <script src="js/modules/finances.js?v=106"></script>
+    <script src="js/modules/marketing.js?v=106"></script>
+    <script src="js/modules/user_management.js?v=106"></script>
+    <script src="js/modules/tucompras_crm.js?v=106"></script>
+    <script src="js/modules/tucompras.js?v=106"></script>
+    <script src="js/modules/logistics.js?v=106"></script>
+    <script src="js/modules/vendedores.js?v=106"></script>
+    <script src="js/modules/categories.js?v=106"></script>
+    <script src="js/modules/settings.js?v=106"></script>
+    <script src="js/modules/marketing.js"></script>
+    <script src="js/modules/website_admin.js"></script>
+    <script src="js/modules/consultas.js?v=106"></script>
+    <script src="js/app.js?v=106"></script>
 </body>
 
 </html>
