@@ -65,20 +65,7 @@ window.CRM = {
                 </table>
             </div>
 
-            <!-- Client Modal -->
-            <style>
-                .crm-responsive-grid {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr;
-                    gap: 1.5rem;
-                }
-                @media (max-width: 768px) {
-                    .crm-responsive-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 1.25rem;
-                    }
-                }
-            </style>
+
             <div id="client-modal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
