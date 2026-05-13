@@ -399,3 +399,35 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 7. Website Settings (CMS)
+CREATE TABLE IF NOT EXISTS public.website_settings (
+    "id" TEXT PRIMARY KEY DEFAULT 'default',
+    "whatsapp" TEXT,
+    "facebook_url" TEXT,
+    "instagram_url" TEXT,
+    "tiktok_url" TEXT,
+    "hero_title" TEXT,
+    "hero_subtitle" TEXT,
+    "hero_images" JSONB DEFAULT '[]'::jsonb,
+    "wholesale_title" TEXT,
+    "wholesale_text" TEXT,
+    "wholesale_bg_image" TEXT,
+    "privacy_policy_text" TEXT,
+    "refund_policy_text" TEXT,
+    "meta_title" TEXT,
+    "meta_description" TEXT,
+    "meta_pixel_id" TEXT,
+    "tiktok_pixel_id" TEXT,
+    "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
+);
+
+ALTER TABLE public.website_settings ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Allow all" ON public.website_settings;
+CREATE POLICY "Public Read Website Settings" ON public.website_settings FOR SELECT USING (true);
+CREATE POLICY "Admin Write Website Settings" ON public.website_settings FOR ALL TO authenticated USING (true);
+
+-- Insert default row if not exists
+INSERT INTO public.website_settings (id) 
+VALUES ('default') 
+ON CONFLICT (id) DO NOTHING;
