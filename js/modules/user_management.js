@@ -9,9 +9,19 @@ window.UserManagement = {
     },
 
     render() {
-        const container = document.getElementById('main-content');
-        container.innerHTML = `
-            <div id="user-management-panel" class="panel-fade-in">
+        const contentArea = document.getElementById('content-area');
+        if (!contentArea) return;
+
+        let panel = document.getElementById('user-management-panel');
+        if (!panel) {
+            panel = document.createElement('div');
+            panel.id = 'user-management-panel';
+            panel.className = 'panel';
+            contentArea.appendChild(panel);
+        }
+
+        panel.innerHTML = `
+            <div class="panel-header">
                 <div class="header-flex">
                     <div>
                         <h1 class="text-gradient">Seguridad y Usuarios</h1>
