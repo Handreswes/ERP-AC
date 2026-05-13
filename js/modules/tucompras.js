@@ -66,7 +66,7 @@ window.TuCompras = {
                         
                         <!-- STEP 1: CLIENTE -->
                         <div id="tc-step-1" class="wizard-step">
-                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="form-grid">
                                 <div class="form-group">
                                     <label>Nombre Completo *</label>
                                     <input type="text" id="tc-cust-name" class="form-control" placeholder="Nombre completo" required>
@@ -115,7 +115,7 @@ window.TuCompras = {
 
                         <!-- STEP 3: LOGÍSTICA & RESUMEN -->
                         <div id="tc-step-3" class="wizard-step" style="display: none;">
-                            <form id="tucompras-sale-form" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                            <form id="tucompras-sale-form" class="form-grid">
                                 <div class="logistics-section" style="display: flex; flex-direction: column; gap: 1.25rem;">
                                     <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">LOGÍSTICA</h4>
                                     <div class="form-group">
