@@ -1,4 +1,4 @@
-// SW v61 - KILL SWITCH
+// SW v62 - KILL SWITCH
 // This script unregisters itself and reloads to clear any SW loops
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (event) => {
