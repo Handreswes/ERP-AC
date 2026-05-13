@@ -2,14 +2,39 @@
 window.WebsiteAdmin = {
     settings: null,
 
-    init() {
+    async init() {
+        await this.loadSettings();
         this.renderPanel();
-        this.loadSettings();
+    },
+
+    populateForms() {
+        const container = document.getElementById('website-admin-content');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="website-admin-grid">
+                <!-- Secciones de edición -->
+                <div class="card glass">
+                    <h3>Hero Section (Principal)</h3>
+                    <div class="form-group">
+                        <label>Título Principal</label>
+                        <input type="text" value="${this.settings.hero_title}" onchange="WebsiteAdmin.updateSetting('hero_title', this.value)" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label>Subtítulo</label>
+                        <textarea onchange="WebsiteAdmin.updateSetting('hero_subtitle', this.value)" class="form-control">${this.settings.hero_subtitle}</textarea>
+                    </div>
+                </div>
+                <!-- ... resto de campos ... -->
+            </div>
+        `;
     },
 
     async loadSettings() {
+        const supabase = window.supabaseClient;
+        if (!supabase) return;
         try {
-            const { data, error } = await supabaseClient
+            const { data, error } = await supabase
                 .from('website_settings')
                 .select('*')
                 .eq('id', 'default')
@@ -52,7 +77,7 @@ window.WebsiteAdmin = {
         try {
             this.settings.updated_at = new Date().toISOString();
             
-            const { error } = await supabaseClient
+            const { error } = await window.supabaseClient
                 .from('website_settings')
                 .upsert(this.settings, { onConflict: 'id' });
 
