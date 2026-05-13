@@ -1593,7 +1593,7 @@ textarea:focus {
     margin: 1rem 0;
 }
 
-/* --- PREMIUM MOBILE OVERHAUL (V77) --- */
+/* --- PREMIUM MOBILE OVERHAUL (V108) --- */
 @media (max-width: 768px) {
     .form-control,
     input[type="text"],
@@ -1621,63 +1621,178 @@ textarea:focus {
         overflow-y: auto !important;
     }
 
-    .form-grid, .crm-responsive-grid {
+    /* Universal Flex Stack for Grids and Forms */
+    .form-grid, .crm-responsive-grid, .stats-grid, .dashboard-details {
         display: flex !important;
         flex-direction: column !important;
         grid-template-columns: 1fr !important;
-        gap: 1.25rem !important;
+        gap: 1rem !important;
     }
     
+    /* Global Modal Overrides for Mobile */
+    .modal-content {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 94% !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        margin: 0 !important;
+        border-radius: 24px 24px 0 0 !important;
+        background: #0f172a !important;
+        border-top: 3px solid var(--accent) !important;
+        z-index: 2000 !important;
+    }
+
+    .modal-body {
+        padding: 16px !important;
+        overflow-y: auto !important;
+        display: block !important; /* Fix for flex layouts in modals */
+    }
+
+    /* History Modal Fix (Finances) */
+    .history-modal .modal-body, 
+    #history-modal .modal-body {
+        flex-direction: column !important;
+        overflow-y: auto !important;
+    }
+
+    .history-sidebar, 
+    #history-modal .history-sidebar {
+        width: 100% !important;
+        flex-shrink: 1 !important;
+        margin-bottom: 1rem !important;
+    }
+
+    /* Form Ergonomics */
     .form-group {
         width: 100% !important;
+        margin-bottom: 1rem !important;
     }
 
     .form-group input, 
     .form-group select, 
-    .form-group textarea {
+    .form-group textarea,
+    .form-control {
         width: 100% !important;
         max-width: 100% !important;
         min-height: 48px !important;
         padding: 12px 16px !important;
-        font-size: 16px !important; /* Prevent iOS zoom */
+        font-size: 16px !important;
     }
 
-    /* Fix numeric inputs alignment */
-    input[type="number"] {
-        text-align: left !important;
-        padding-left: 16px !important;
+    /* Tabs & Filters (Scrollable) */
+    .inventory-tabs, .tabs-container {
+        display: flex !important;
+        overflow-x: auto !important;
+        white-space: nowrap !important;
+        padding-bottom: 8px !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        width: 100% !important;
+    }
+    .inventory-tabs::-webkit-scrollbar { display: none; }
+    
+    .tab-btn {
+        flex-shrink: 0 !important;
     }
 
+    /* Buttons & Actions */
     .btn-block, 
-    #save-client-manual-btn, 
-    #save-payment-manual-btn, 
-    #save-movement-manual-btn {
+    .panel-header .actions .btn,
+    [id*="save-"][id*="-manual-btn"] {
         width: 100% !important;
         display: flex !important;
         min-height: 52px !important;
-        font-size: 1rem !important;
-        margin-top: 1.5rem !important;
+        margin-top: 10px !important;
     }
 
-    .image-gallery-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
+    .panel-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 1rem !important;
+    }
+
+    .panel-header .actions {
+        width: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
         gap: 8px !important;
     }
 
-    .image-slot {
-        border-radius: 12px !important;
+    /* Table to Cards Transformation */
+    .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr {
+        display: block !important;
     }
 
-    /* Catalog Cards (Mobile) */
-    .catalog-mobile-card {
-        background: var(--bg-card);
-        border: 1px solid var(--border);
-        border-radius: 16px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-        display: flex;
-        gap: 1rem;
-        align-items: center;
+    .data-table thead {
+        position: absolute !important;
+        top: -9999px !important;
+        left: -9999px !important;
+    }
+
+    .data-table tr {
+        margin-bottom: 1rem !important;
+        border: 1px solid var(--border) !important;
+        border-radius: 12px !important;
+        background: rgba(255,255,255,0.02) !important;
+        padding: 0.5rem !important;
+    }
+
+    .data-table td {
+        border: none !important;
+        position: relative !important;
+        padding-left: 50% !important;
+        text-align: right !important;
+        min-height: 35px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+    }
+
+    .data-table td:before {
+        content: attr(data-label) !important;
+        position: absolute !important;
+        left: 12px !important;
+        width: 45% !important;
+        padding-right: 10px !important;
+        white-space: nowrap !important;
+        text-align: left !important;
+        font-weight: 700 !important;
+        color: var(--accent) !important;
+        font-size: 0.75rem !important;
+        text-transform: uppercase !important;
+    }
+
+    /* Search row fix */
+    .search-filter-row {
+        flex-direction: column !important;
+    }
+    .search-input-wrapper {
+        width: 100% !important;
+    }
+    
+    .pos-container {
+        display: flex !important;
+        flex-direction: column !important;
+        height: auto !important;
+        overflow: visible !important;
+    }
+    .pos-main, .pos-sidebar {
+        width: 100% !important;
+        position: static !important;
+        overflow: visible !important;
+    }
+    .pos-grid {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        gap: 10px !important;
+    }
+    .pos-card {
+        margin-top: 1rem !important;
+    }
+    .pos-sidebar {
+        margin-top: 2rem !important;
+        padding-bottom: 50px !important;
     }
 
     .catalog-mobile-img {
