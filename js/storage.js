@@ -49,33 +49,47 @@ window.Storage = {
      * Initial Load: Fetches all data from Supabase into memory
      */
     async init() {
-        console.log('--- STORAGE: INITIALIZING (V104) ---');
+        console.log('--- STORAGE: INITIALIZING (V105) ---');
         const keys = Object.values(STORAGE_KEYS);
         const supabase = window.supabaseClient;
 
         // Reset connection status
         this.updateStatus(!!supabase);
 
-        for (const key of keys) {
+        // Parallelize loading and syncing for speed
+        const syncPromises = keys.map(async (key) => {
             const table = TABLE_MAP[key];
 
             // 1. Always load local first for speed
-            const localData = localStorage.getItem(`erp_${key}`);
-            this.cache[key] = localData ? JSON.parse(localData) : [];
+            const storageKey = `erp_${key}`;
+            const localData = localStorage.getItem(storageKey);
+            this.cache[key] = [];
+            
+            if (localData && localData !== 'undefined' && localData !== 'null') {
+                try {
+                    this.cache[key] = JSON.parse(localData);
+                } catch (e) {
+                    console.warn(`Corruption in ${key}, resetting local cache.`);
+                    localStorage.removeItem(storageKey);
+                }
+            }
 
             // 2. Try to sync with cloud if available
             if (table && supabase) {
                 try {
                     const { data, error } = await supabase.from(table).select('*').limit(1000);
                     if (!error && data) {
-                        // CRITICAL FIX: Only overwrite local if cloud has data
-                        // This prevents wiping local products if cloud is empty
+                        // Only overwrite local if cloud has data
                         if (data.length > 0) {
                             this.cache[key] = data;
-                            localStorage.setItem(`erp_${key}`, JSON.stringify(data));
+                            try {
+                                localStorage.setItem(storageKey, JSON.stringify(data));
+                            } catch (e) {
+                                console.warn(`Could not persist ${key} to LocalStorage:`, e.message);
+                            }
                             console.log(`Cloud Sync: ${table} (${data.length} items loaded)`);
                         } else {
-                            console.log(`Cloud Table ${table} is empty. Preserving local data for migration.`);
+                            console.log(`Cloud Table ${table} is empty. Preserving local data.`);
                         }
                         this.updateStatus(true);
                     } else if (error) {
@@ -85,13 +99,17 @@ window.Storage = {
                     console.warn(`Sync failed for ${table}:`, err.message);
                 }
             }
-        }
+        });
+
+        await Promise.all(syncPromises);
 
         // 3. Auto-Migration check
         if (supabase) {
             this.migrateLocalToCloud();
         }
 
+        // Notify that sync is complete
+        window.dispatchEvent(new CustomEvent('erp_storage_ready'));
         return true;
     },
 
@@ -121,7 +139,6 @@ window.Storage = {
                     window.ERP_LOG(`Migración de ${table} exitosa`, 'success');
                 } else {
                     // If cloud has data, we assume migration already happened or cloud is master
-                    // In a more complex setup, we'd do a delta sync
                     console.log(`Cloud table ${table} already has data, skipping bulk migration.`);
                 }
             } catch (err) {
@@ -141,7 +158,11 @@ window.Storage = {
 
     save(key, data) {
         this.cache[key] = data;
-        localStorage.setItem(`erp_${key}`, JSON.stringify(data));
+        try {
+            localStorage.setItem(`erp_${key}`, JSON.stringify(data));
+        } catch (e) {
+            console.warn(`LocalStorage Full: Could not save ${key} locally.`);
+        }
     },
 
     get(key) {
@@ -183,9 +204,16 @@ window.Storage = {
         }
 
         // 2. UPDATE CACHE & LOCALSTORAGE ONLY ON SUCCESS
+        // Always update memory first
         if (!this.cache[key]) this.cache[key] = [];
-        this.cache[key].push(newItem);
-        localStorage.setItem(`erp_${key}`, JSON.stringify(this.cache[key]));
+        this.cache[key].unshift(newItem);
+        
+        // Try persisting to LocalStorage, but don't fail if it's full
+        try {
+            localStorage.setItem(`erp_${key}`, JSON.stringify(this.cache[key]));
+        } catch (e) {
+            console.warn(`LocalStorage Full: Could not save ${key} locally, data exists in Cloud and Memory.`);
+        }
 
         return newItem;
     },
@@ -218,7 +246,11 @@ window.Storage = {
             // Local Update
             items[index] = finalItem;
             this.cache[key] = items;
-            localStorage.setItem(`erp_${key}`, JSON.stringify(items));
+            try {
+                localStorage.setItem(`erp_${key}`, JSON.stringify(items));
+            } catch (e) {
+                console.warn(`LocalStorage Full: Could not update ${key} locally.`);
+            }
         }
         return items;
     },
@@ -246,7 +278,11 @@ window.Storage = {
 
         const filtered = items.filter(item => item.id !== id);
         this.cache[key] = filtered;
-        localStorage.setItem(`erp_${key}`, JSON.stringify(filtered));
+        try {
+            localStorage.setItem(`erp_${key}`, JSON.stringify(filtered));
+        } catch (e) {
+            console.warn(`LocalStorage Full: Could not delete ${key} locally.`);
+        }
 
         return filtered;
     }
