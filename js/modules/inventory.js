@@ -768,9 +768,9 @@ window.Inventory = {
         reader.onload = (ev) => {
             const tempImg = new Image();
             tempImg.onload = () => {
-                // Resize rules for LocalStorage limits
-                const MAX_WIDTH = 600;
-                const MAX_HEIGHT = 600;
+                // Resize rules for better resolution while balancing database size
+                const MAX_WIDTH = 1024;
+                const MAX_HEIGHT = 1024;
                 let width = tempImg.width;
                 let height = tempImg.height;
 
@@ -796,8 +796,8 @@ window.Inventory = {
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
                 ctx.drawImage(tempImg, 0, 0, width, height);
 
-                // Compress heavily to avoid 5MB quota errors
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                // Compress with higher quality
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
 
                 const slot = document.querySelector(`.image-slot[data-index="${index}"]`);
                 if (slot) {
