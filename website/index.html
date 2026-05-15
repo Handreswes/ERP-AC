@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TuCompras Col | Herramientas y Hogar con Envíos en Colombia</title>
-    <meta name="description" content="Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.">
+    <title id="meta-title-tag">TuCompras Col | Herramientas y Hogar con Envíos en Colombia</title>
+    <meta name="description" id="meta-description-tag" content="Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.">
     <meta name="keywords" content="herramientas, ferretería colombia, millenio, vulcano, tucompras col, pago contra entrega, protección industrial">
     <link rel="canonical" href="https://tucomprascol.com/">
 
@@ -116,23 +116,25 @@
             <section class="hero">
                 <div class="container hero-grid">
                     <div class="hero-text animate">
-                        <h1>En el 2025 vendimos más de 1.300 productos</h1>
-                        <p>Más de 1.300 productos entregados y clientes 100% satisfechos en toda Colombia. Compra con
+                        <h1 id="hero-title-text">En el 2025 vendimos más de 1.300 productos</h1>
+                        <p id="hero-subtitle-text">Más de 1.300 productos entregados y clientes 100% satisfechos en toda Colombia. Compra con
                             seguridad y paga al recibir en tu puerta.</p>
                         <div class="hero-btns">
                             <a href="#productos" class="btn btn-primary">VER CATÁLOGO <i
                                     class="fas fa-shopping-bag"></i></a>
-                            <a href="https://wa.me/573167862554" class="btn btn-outline">HABLAR CON ASESOR</a>
+                            <a href="https://wa.me/573167862554" class="btn btn-outline wa-dynamic-link">HABLAR CON ASESOR</a>
                         </div>
                     </div>
                     <div class="hero-visual animate">
-                        <div class="cylinder-wrap">
+                        <div class="cylinder-wrap" id="hero-cylinder-wrap">
                             <div class="cylinder-item"><img src="product_showcase_1.png" alt="Showcase 1"></div>
                             <div class="cylinder-item"><img src="product_showcase_2.png" alt="Showcase 2"></div>
                             <div class="cylinder-item"><img src="product_showcase_3.png" alt="Showcase 3"></div>
-                            <div class="cylinder-item"><img src="product_showcase_1.png" alt="Showcase 4"></div>
-                            <div class="cylinder-item"><img src="product_showcase_2.png" alt="Showcase 5"></div>
-                            <div class="cylinder-item"><img src="product_showcase_3.png" alt="Showcase 6"></div>
+                            <div class="cylinder-item"><img src="testimonio_1.png" alt="Testimonio 1"></div>
+                            <div class="cylinder-item"><img src="testimonio_2.png" alt="Testimonio 2"></div>
+                            <div class="cylinder-item"><img src="testimonio_3.png" alt="Testimonio 3"></div>
+                            <div class="cylinder-item"><img src="testimonio_4.png" alt="Testimonio 4"></div>
+                            <div class="cylinder-item"><img src="testimonio_5.png" alt="Testimonio 5"></div>
                         </div>
                     </div>
                 </div>
@@ -167,6 +169,57 @@
                     <div class="products-grid" id="product-grid">
                         <!-- Dynamic products from Supabase -->
                         <div class="loader" id="loader">Cargando productos...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Testimonials Section -->
+            <section class="section" id="testimonios" style="padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Lo que dicen nuestros clientes</h2>
+                        <p>Más de 1.300 familias ya confían en nosotros</p>
+                    </div>
+                    <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px; position: relative;">
+                            <div style="color: #ffc145; margin-bottom: 1rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"Excelente servicio. Pedí un taladro y me llegó al día siguiente a Medellín. Lo mejor es que pagué en la puerta de mi casa."</p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 45px; height: 45px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">CH</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1rem;">Carlos H.</h4>
+                                    <small style="color: #94a3b8;">Cliente Verificado - Medellín</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px;">
+                            <div style="color: #ffc145; margin-bottom: 1rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"Muy cumplidos con la garantía. Tuve un pequeño detalle con un artículo y me lo cambiaron sin problemas. Recomendados 100%."</p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 45px; height: 45px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">MA</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1rem;">Martha A.</h4>
+                                    <small style="color: #94a3b8;">Cliente Verificado - Cali</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px;">
+                            <div style="color: #ffc145; margin-bottom: 1rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"Los precios son muy competitivos y la calidad de las herramientas es profesional. Ya he comprado varias veces para mi taller."</p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 45px; height: 45px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">JR</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1rem;">Jorge R.</h4>
+                                    <small style="color: #94a3b8;">Cliente Verificado - Bogotá</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -271,9 +324,7 @@
                         <div class="glass" style="margin: 1.5rem 0; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 20px;">
                             <p style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">FINANCIACIÓN DISPONIBLE:</p>
                             <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 20px; transition: var(--transition);" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                <img src="https://static.wixstatic.com/media/27f354_8992e5c84305417da5a7824b219088ba~mv2.png" alt="Addi" style="height: 30px; opacity: 1;">
-                                <div style="width: 1px; height: 30px; background: #e2e8f0;"></div>
-                                <img src="https://www.sistecredito.com/wp-content/uploads/2021/04/Logo-Sistecredito-1.png" alt="Sistecrédito" style="height: 30px; opacity: 1;">
+                                <img src="logos%20addi%20y%20sistecredito/WhatsApp%20Image%202026-05-05%20at%2012.11.26%20PM.jpeg" alt="Addi y Sistecredito" style="height: 40px; opacity: 1; background: white; padding: 5px; border-radius: 8px;">
                             </a>
                             <p style="font-size: 0.75rem; color: var(--primary); text-align: center; margin-top: 12px; font-weight: 700;">
                                 <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="color: inherit; text-decoration: none;">
@@ -331,30 +382,8 @@
             <div class="container">
                 <div class="glass" style="padding: 3rem; border-radius: 30px; text-align: left; max-width: 900px; margin: 0 auto;">
                     <h1 style="margin-bottom: 2rem;">Política de Privacidad</h1>
-                    <div style="color: var(--text-secondary); line-height: 1.8;">
-                        <p>En <strong>tucomprascol.com</strong>, nos tomamos muy en serio la privacidad de nuestros clientes. Esta política de privacidad describe cómo recopilamos, usamos y protegemos la información personal que nos proporciona al utilizar nuestro sitio web.</p>
-                        
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">1. Información que recopilamos:</h3>
-                        <ul>
-                            <li>Información de contacto: Nombre, dirección de correo electrónico, número de teléfono, dirección de envío y facturación.</li>
-                            <li>Información de la cuenta: Nombre de usuario y contraseña (si aplica).</li>
-                            <li>Información de uso: Páginas visitadas, productos vistos y compras realizadas.</li>
-                            <li>Información del dispositivo: Dirección IP, tipo de navegador y sistema operativo.</li>
-                        </ul>
-
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">2. Cómo utilizamos tu información:</h3>
-                        <ul>
-                            <li>Para procesar tus pedidos y gestionar tu cuenta.</li>
-                            <li>Para enviarte información sobre nuestros productos y promociones.</li>
-                            <li>Para mejorar nuestro sitio web y la experiencia del cliente.</li>
-                            <li>Para prevenir el fraude y proteger nuestra seguridad.</li>
-                        </ul>
-
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">3. Seguridad:</h3>
-                        <p>Implementamos medidas de seguridad para proteger su información contra el acceso no autorizado. Utilizamos cifrado SSL para proteger la información de pago durante la transmisión.</p>
-
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">4. Contacto:</h3>
-                        <p>Si tienes alguna pregunta sobre esta política de privacidad, puedes ponerte en contacto con nosotros a través de nuestra línea de WhatsApp oficial.</p>
+                    <div id="privacy-policy-content" style="color: var(--text-secondary); line-height: 1.8;">
+                        <p>Cargando políticas...</p>
                     </div>
                 </div>
             </div>
@@ -365,25 +394,8 @@
             <div class="container">
                 <div class="glass" style="padding: 3rem; border-radius: 30px; text-align: left; max-width: 900px; margin: 0 auto;">
                     <h1 style="margin-bottom: 2rem;">Política de Reembolsos y Devoluciones</h1>
-                    <div style="color: var(--text-secondary); line-height: 1.8;">
-                        <p>En <strong>tucomprascol.com</strong>, queremos que estés completamente satisfecho con tu compra. Si por alguna razón no estás contento con tu producto, puedes solicitar una devolución o un reembolso siguiendo los pasos descritos a continuación:</p>
-                        
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">1. Condiciones de Devolución:</h3>
-                        <ul>
-                            <li>El producto debe ser devuelto en su estado original, con todos los accesorios y empaque original.</li>
-                            <li>La solicitud de devolución debe realizarse dentro de los primeros días tras la recepción del producto.</li>
-                            <li>El producto no debe mostrar signos de uso indebido o daño intencional.</li>
-                        </ul>
-
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">2. Proceso de Devolución:</h3>
-                        <ul>
-                            <li><strong>Solicitud:</strong> Ponte en contacto con nuestro servicio de atención al cliente a través de nuestro WhatsApp oficial o correo tucompras90@gmail.com.</li>
-                            <li><strong>Revisión Técnica:</strong> Una vez que recibamos el producto, nuestro equipo técnico realizará una revisión para verificar su estado.</li>
-                            <li><strong>Decisión:</strong> Basándonos en el informe técnico, decidiremos si procedemos con un cambio del producto o un reembolso.</li>
-                        </ul>
-
-                        <h3 style="color: var(--text-primary); margin-top: 1.5rem;">3. Garantía:</h3>
-                        <p>Todos nuestros productos cuentan con garantía por defectos de fábrica. La garantía no cubre daños causados por uso indebido, accidentes o desgaste normal.</p>
+                    <div id="refunds-policy-content" style="color: var(--text-secondary); line-height: 1.8;">
+                        <p>Cargando políticas...</p>
                     </div>
                 </div>
             </div>
@@ -392,12 +404,12 @@
         <section id="mayoristas" class="section animate" style="padding: 120px 0; background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; color: white;">
             <div class="container" style="text-align: center;">
                 <span class="badge" style="background: var(--primary); color: white; margin-bottom: 2rem;">B2B & DISTRIBUCIÓN</span>
-                <h2 style="font-size: 3.5rem; margin-bottom: 1.5rem; color: white;">¿Eres Comerciante o Ferretero?</h2>
-                <p style="font-size: 1.25rem; max-width: 800px; margin: 0 auto 3rem; color: #94a3b8; line-height: 1.8;">
+                <h2 id="wholesale-title-text" style="font-size: 3.5rem; margin-bottom: 1.5rem; color: white;">¿Eres Comerciante o Ferretero?</h2>
+                <p id="wholesale-desc-text" style="font-size: 1.25rem; max-width: 800px; margin: 0 auto 3rem; color: #94a3b8; line-height: 1.8;">
                     En <strong>TuCompras Col</strong> somos importadores y distribuidores directos. Potencia tu negocio con nuestro catálogo mayorista, precios competitivos y envíos prioritarios a toda Colombia.
                 </p>
                 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
-                    <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20compras%20al%20por%20mayor" class="btn btn-primary btn-lg" style="min-width: 250px;">
+                    <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20compras%20al%20por%20mayor" class="btn btn-primary btn-lg wa-dynamic-link" style="min-width: 250px;">
                         QUIERO SER MAYORISTA <i class="fas fa-handshake" style="margin-left: 10px;"></i>
                     </a>
                     <a href="#contacto" class="btn btn-outline btn-lg" style="border-color: white; color: white; min-width: 250px;">
@@ -431,7 +443,7 @@
                     <h2>¿Necesitas asesoría personalizada?</h2>
                     <p>Escríbenos directamente y un asesor te ayudará con tu compra.</p>
                 </div>
-                <a href="https://wa.me/573167862554" class="btn btn-primary btn-lg" style="margin-top: 2rem;">
+                <a href="https://wa.me/573167862554" class="btn btn-primary btn-lg wa-dynamic-link" style="margin-top: 2rem;">
                     HABLAR POR WHATSAPP <i class="fab fa-whatsapp"></i>
                 </a>
             </div>
@@ -464,7 +476,7 @@
     </nav>
 
     <!-- WhatsApp Floating Button -->
-    <a href="https://wa.me/573167862554" class="wp-float" target="_blank" id="wa-link">
+    <a href="https://wa.me/573167862554" class="wp-float wa-dynamic-link" target="_blank" id="wa-link">
         <i class="fab fa-whatsapp"></i>
     </a>
 
@@ -482,16 +494,16 @@
                 <p style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem;">Financia tu compra con</p>
                 <div style="display: flex; justify-content: center; align-items: center; gap: 4rem; flex-wrap: wrap;">
                     <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20comprar%20a%20cuotas" target="_blank" style="transition: transform 0.3s; background: white; padding: 10px 20px; border-radius: 12px; display: inline-block;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                        <img src="payment_methods_combined.jpeg" style="height: 60px; object-fit: contain;" alt="Addi y Sistecredito">
+                        <img src="logos%20addi%20y%20sistecredito/WhatsApp%20Image%202026-05-05%20at%2012.11.26%20PM.jpeg" style="height: 60px; object-fit: contain;" alt="Addi y Sistecredito">
                     </a>
                 </div>
                 <p style="margin-top: 1.5rem; font-size: 0.85rem; color: #64748b;">¿Quieres pagar a cuotas? <a href="https://wa.me/573167862554?text=Hola,%20quiero%20pagar%20a%20cuotas" style="color: var(--primary); font-weight: 700; text-decoration: none;">Habla con un asesor aquí <i class="fab fa-whatsapp"></i></a></p>
             </div>
             <p style="color: #64748b; font-size: 0.9rem;">&copy; 2025 TuCompras Col. Todos los derechos reservados.</p>
             <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 2.5rem; color: #94a3b8; font-size: 1.5rem;">
-                <a href="https://www.facebook.com/share/1RpydiVLKN/" target="_blank" style="color: inherit;"><i class="fab fa-facebook-f"></i></a>
-                <a href="https://www.instagram.com/1tucompras?utm_source=qr&igsh=MWRybzZoNnF2ODZ6ZA==" target="_blank" style="color: inherit;"><i class="fab fa-instagram"></i></a>
-                <a href="https://www.tiktok.com/@tucomprascol?_r=1&_t=ZS-95oEWPXGCIC" target="_blank" style="color: inherit;"><i class="fab fa-tiktok"></i></a>
+                <a href="https://www.facebook.com/share/1RpydiVLKN/" id="social-fb-link" target="_blank" style="color: inherit;"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/1tucompras?utm_source=qr&igsh=MWRybzZoNnF2ODZ6ZA==" id="social-ig-link" target="_blank" style="color: inherit;"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@tucomprascol?_r=1&_t=ZS-95oEWPXGCIC" id="social-tk-link" target="_blank" style="color: inherit;"><i class="fab fa-tiktok"></i></a>
             </div>
         </div>
     </footer>
