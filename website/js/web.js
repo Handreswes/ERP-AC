@@ -150,9 +150,129 @@ async function checkSession() {
 async function init() {
     setupEventListeners();
     await checkSession();
+    await loadWebsiteSettings();
     await fetchProducts();
     subscribeToProducts();
     updateCartUI();
+}
+
+async function loadWebsiteSettings() {
+    try {
+        const { data, error } = await _supabase.from('website_settings').select('*').eq('id', 'default').single();
+        if (error || !data) return; // Fallback to hardcoded HTML if not found
+
+        // 1. Meta Tags (SEO)
+        if (data.meta_title) {
+            document.title = data.meta_title;
+            const metaTitleTag = document.getElementById('meta-title-tag');
+            if (metaTitleTag) metaTitleTag.innerText = data.meta_title;
+        }
+        if (data.meta_description) {
+            const metaDesc = document.getElementById('meta-description-tag');
+            if (metaDesc) metaDesc.content = data.meta_description;
+        }
+
+        // 2. Hero Section
+        if (data.hero_title) {
+            const el = document.getElementById('hero-title-text');
+            if (el) el.innerText = data.hero_title;
+        }
+        if (data.hero_subtitle) {
+            const el = document.getElementById('hero-subtitle-text');
+            if (el) el.innerText = data.hero_subtitle;
+        }
+        if (data.hero_images && Array.isArray(data.hero_images) && data.hero_images.length > 0) {
+            const wrap = document.getElementById('hero-cylinder-wrap');
+            if (wrap) {
+                wrap.innerHTML = data.hero_images.map(url => \`
+                    <div class="cylinder-item"><img src="\${url}" alt="Banner"></div>
+                \`).join('');
+            }
+        }
+
+        // 3. Wholesale Section
+        if (data.wholesale_title) {
+            const el = document.getElementById('wholesale-title-text');
+            if (el) el.innerText = data.wholesale_title;
+        }
+        if (data.wholesale_text) {
+            const el = document.getElementById('wholesale-desc-text');
+            if (el) el.innerText = data.wholesale_text;
+        }
+        if (data.wholesale_bg_image) {
+            const sec = document.getElementById('mayoristas');
+            if (sec) sec.style.backgroundImage = \`linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('\${data.wholesale_bg_image}')\`;
+        }
+
+        // 4. Legal Policies
+        if (data.privacy_policy_text) {
+            const el = document.getElementById('privacy-policy-content');
+            if (el) el.innerHTML = data.privacy_policy_text;
+        }
+        if (data.refund_policy_text) {
+            const el = document.getElementById('refunds-policy-content');
+            if (el) el.innerHTML = data.refund_policy_text;
+        }
+
+        // 5. Contact & Social Links
+        if (data.whatsapp) {
+            document.querySelectorAll('.wa-dynamic-link').forEach(link => {
+                try {
+                    const url = new URL(link.href);
+                    url.pathname = '/' + data.whatsapp;
+                    link.href = url.toString();
+                } catch(e) {
+                    link.href = \`https://wa.me/\${data.whatsapp}\`;
+                }
+            });
+        }
+        if (data.facebook_url) {
+            const el = document.getElementById('social-fb-link');
+            if (el) el.href = data.facebook_url;
+        }
+        if (data.instagram_url) {
+            const el = document.getElementById('social-ig-link');
+            if (el) el.href = data.instagram_url;
+        }
+        if (data.tiktok_url) {
+            const el = document.getElementById('social-tk-link');
+            if (el) el.href = data.tiktok_url;
+        }
+        
+        // 7. Testimonials
+        if (data.testimonials && Array.isArray(data.testimonials) && data.testimonials.length > 0) {
+            const container = document.querySelector('.testimonials-grid');
+            if (container) {
+                container.innerHTML = data.testimonials.map(t => `
+                    <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px; position: relative;">
+                        <div style="color: #ffc145; margin-bottom: 1rem;">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                        </div>
+                        <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"${t.text}"</p>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            ${t.image ? `<img src="${t.image}" style="width: 45px; height: 45px; border-radius: 50%; object-fit: cover;">` : `<div style="width: 45px; height: 45px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">${t.name.charAt(0)}</div>`}
+                            <div>
+                                <h4 style="margin: 0; font-size: 1rem;">${t.name}</h4>
+                                <small style="color: #94a3b8;">Cliente Verificado - ${t.city || 'Colombia'}</small>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 6. Pixels (Dynamic Injection)
+        if (data.meta_pixel_id && window.fbq) {
+            fbq('init', data.meta_pixel_id);
+            fbq('track', 'PageView');
+        }
+        if (data.tiktok_pixel_id && window.ttq) {
+            ttq.load(data.tiktok_pixel_id);
+            ttq.page();
+        }
+    } catch (e) {
+        console.error('Error loading website settings:', e);
+    }
 }
 
 function subscribeToProducts() {
@@ -339,6 +459,10 @@ function renderProductLanding(id) {
         galleryHtml += '</div>';
     }
 
+    // Urgency & Social Proof Generators
+    const viewers = Math.floor(Math.random() * (25 - 8 + 1)) + 8;
+    const stockLeft = Math.floor(Math.random() * (12 - 3 + 1)) + 3;
+
     content.innerHTML = `
         <div style="margin-bottom: 2rem;">
             <a href="#home" style="color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; gap: 10px;">
@@ -351,43 +475,59 @@ function renderProductLanding(id) {
                 ${galleryHtml}
             </div>
             <div class="animate" style="animation-delay: 0.1s;">
-                <span class="badge" style="background: var(--accent); color: var(--bg-dark); padding: 5px 15px; border-radius: 20px; font-weight: 700; margin-bottom: 1.5rem; display: inline-block;">${p.category || 'General'}</span>
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 1rem;">
+                    <span class="badge" style="background: var(--accent); color: var(--bg-dark); padding: 5px 15px; border-radius: 20px; font-weight: 700;">${p.category || 'General'}</span>
+                    <span style="font-size: 0.8rem; color: #ef4444; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                        <i class="fas fa-fire"></i> ${viewers} personas viendo ahora
+                    </span>
+                </div>
                 <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;">${p.name}</h1>
+                
                 <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6;">${p.description || 'Experimenta la máxima calidad y rendimiento con este producto diseñado para los estándares más exigentes. Ideal para uso industrial y profesional.'}</p>
                 
-                <div class="glass" style="padding: 2.5rem; border-radius: 25px; margin-bottom: 3rem;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <div class="glass" style="padding: 2.5rem; border-radius: 25px; margin-bottom: 3rem; border: 2px solid var(--accent);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <span style="font-size: 1.1rem; color: var(--text-secondary);">Precio para Ti:</span>
                         <span style="font-size: 3rem; font-weight: 800; color: var(--accent);">$${price}</span>
                     </div>
+                    
+                    <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 700; margin-bottom: 1.5rem;">
+                        ⚡ ¡Solo quedan ${stockLeft} unidades disponibles!
+                    </div>
+
                     <div style="display: flex; align-items: center; gap: 15px; color: var(--success); font-weight: 600; margin-bottom: 2rem;">
                         <i class="fas fa-truck-fast" style="font-size: 1.5rem;"></i> Envío a Nivel Nacional + Pago Contra Entrega
                     </div>
-                    <button class="btn btn-primary btn-block btn-lg" onclick="quickBuy('${p.id}')" style="width: 100%; height: 70px; font-size: 1.25rem; margin-bottom: 1.5rem;">
+
+                    <button class="btn btn-primary btn-block btn-lg" onclick="quickBuy('${p.id}')" style="width: 100%; height: 70px; font-size: 1.25rem; margin-bottom: 1.5rem; box-shadow: 0 10px 30px rgba(255, 140, 0, 0.4);">
                         COMPRAR AHORA <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
                     </button>
+                    
                     <button class="btn btn-outline btn-block" onclick="showView('home')" style="width: 100%; padding: 1.2rem; font-weight: 700; border-width: 2px;">
-                        <i class="fas fa-plus-circle"></i> AGREGAR MÁS PRODUCTOS A ESTA COMPRA
+                        <i class="fas fa-plus-circle"></i> AGREGAR MÁS PRODUCTOS
                     </button>
 
-                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.1); text-align: center;">
+                    <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(0,0,0,0.05); text-align: center;">
                         <p style="font-size: 0.8rem; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px;">Paga en cuotas con:</p>
                         <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 25px; transition: var(--transition);">
-                            <img src="https://logodownload.org/wp-content/uploads/2021/06/addi-logo.png" alt="Addi" style="height: 22px;">
-                            <img src="https://seeklogo.com/images/S/sistecredito-logo-4E38A3A401-seeklogo.com.png" alt="Sistecrédito" style="height: 22px;">
+                            <img src="payment_methods_combined.jpeg" alt="Addi y Sistecredito" style="height: 35px; background: white; padding: 5px; border-radius: 8px;">
                         </a>
-                        <p style="font-size: 0.7rem; color: var(--primary); font-weight: 700; margin-top: 10px;">
-                             <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20información%20sobre%20pagos%20con%20crédito" target="_blank" style="color: inherit; text-decoration: none;">
-                                ¿Quieres crédito? Habla con un asesor <i class="fab fa-whatsapp"></i>
-                             </a>
-                        </p>
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; text-align: center;">
-                    <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-shield-check" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Garantía</small></div>
-                    <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-box-open" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Original</small></div>
-                    <div class="glass" style="padding: 1rem; border-radius: 15px;"><i class="fas fa-hand-holding-dollar" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i><small>Compra Segura</small></div>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
+                    <div class="glass" style="padding: 1rem; border-radius: 15px; border-bottom: 4px solid var(--accent);">
+                        <i class="fas fa-shield-alt" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i>
+                        <small style="font-weight: 700;">Garantía 3 Meses<br><span style="font-size: 0.65rem; opacity: 0.8;">(Motor / Fábrica)</span></small>
+                    </div>
+                    <div class="glass" style="padding: 1rem; border-radius: 15px; border-bottom: 4px solid var(--success);">
+                        <i class="fas fa-certificate" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--success);"></i>
+                        <small style="font-weight: 700;">100% Original</small>
+                    </div>
+                    <div class="glass" style="padding: 1rem; border-radius: 15px; border-bottom: 4px solid #6366f1;">
+                        <i class="fas fa-lock" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: #6366f1;"></i>
+                        <small style="font-weight: 700;">Compra Segura</small>
+                    </div>
                 </div>
             </div>
         </div>
@@ -465,7 +605,16 @@ function renderCheckoutSummary() {
         html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>${i.qty}x ${i.name}</span><span>$${(p * i.qty).toLocaleString()}</span></div>`;
     });
 
-    summary.innerHTML = `<h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Resumen del Pedido</h4>${html}<div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-top: 15px; border-top: 2px solid var(--accent); padding-top: 10px;"><strong>TOTAL:</strong><strong style="color: var(--accent);">$${total.toLocaleString()}</strong></div>`;
+    summary.innerHTML = `
+        <h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Resumen del Pedido</h4>
+        ${html}
+        <div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-top: 15px; border-top: 2px solid var(--accent); padding-top: 10px;">
+            <strong>TOTAL:</strong><strong style="color: var(--accent);">$${total.toLocaleString()}</strong>
+        </div>
+        <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--success); font-weight: 700; text-align: center; background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 8px;">
+            <i class="fas fa-shield-alt"></i> Tu compra incluye 3 meses de garantía por motor o defectos de fábrica.
+        </div>
+    `;
 
     // Auto-fill form if logged in
     if (currentUser) {
