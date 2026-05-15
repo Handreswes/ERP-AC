@@ -367,35 +367,24 @@ async function fetchProducts() {
 
 function populateCylinder() {
     const wrap = document.querySelector('.cylinder-wrap');
-    if (!wrap || products.length === 0) return;
+    if (!wrap) return;
 
-    // Filter products with images
-    const withImages = products.filter(p => p.image && (Array.isArray(p.image) ? p.image.length > 0 : true));
+    const customerPhotos = [
+        'fotos clientes/cliente 1.jpeg',
+        'fotos clientes/cliente 2.jpeg',
+        'fotos clientes/cleinte 3.jpeg',
+        'fotos clientes/cliente 4.jpeg',
+        'fotos clientes/cliente 5.jpeg',
+        'fotos clientes/cliente 1.jpeg',
+        'fotos clientes/cliente 2.jpeg',
+        'fotos clientes/cleinte 3.jpeg'
+    ];
 
-    // Select 2 Cuadros
-    const cuadros = withImages.filter(p => (p.category || '').toLowerCase().includes('cuadros')).slice(0, 2);
-
-    // Select 4 Tools (Inalambricas or Electricas)
-    const herramientas = withImages.filter(p => (p.category || '').toLowerCase().includes('herramienta')).slice(0, 4);
-
-    // Combine
-    let featured = [...cuadros, ...herramientas];
-
-    // Fill if not enough
-    if (featured.length < 6) {
-        const others = withImages.filter(p => !featured.find(f => f.id === p.id)).slice(0, 6 - featured.length);
-        featured = [...featured, ...others];
-    }
-
-    // Take exactly 6 and shuffle slightly or just use
-    featured = featured.slice(0, 6);
-
-    wrap.innerHTML = featured.map((p, i) => {
-        const img = Array.isArray(p.image) ? p.image[0] : p.image;
-        return `<div class="cylinder-item" onclick="window.location.hash = 'product?id=${p.id}'" style="cursor:pointer">
-            <img src="${img}" alt="${p.name}">
-        </div>`;
-    }).join('');
+    wrap.innerHTML = customerPhotos.map((img, i) => `
+        <div class="cylinder-item">
+            <img src="${img}" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;">
+        </div>
+    `).join('');
 }
 
 // Render Products
