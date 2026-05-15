@@ -148,6 +148,7 @@ async function checkSession() {
 }
 
 async function init() {
+    console.log('INIT START');
     setupEventListeners();
     await checkSession();
     await loadWebsiteSettings();
@@ -335,17 +336,25 @@ function handleRouting() {
 // Fetch Products from Supabase
 async function fetchProducts() {
     try {
+        console.log('Fetching products from Supabase...');
         const { data, error } = await _supabase
             .from('products')
             .select('*')
             .eq('active', true)
             .order('name', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase query error:', error);
+            throw error;
+        }
         
+        console.log('Raw products fetched:', data ? data.length : 0);
+
         // Filter out ghost products (no price)
         products = data.filter(p => (p.priceInternet || p.priceFinal || p.priceWholesale) > 0);
         
+        console.log('Filtered products:', products.length);
+
         renderProducts(products);
         renderCategories();
         populateCylinder();
