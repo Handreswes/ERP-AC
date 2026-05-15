@@ -185,9 +185,9 @@ async function loadWebsiteSettings() {
         if (data.hero_images && Array.isArray(data.hero_images) && data.hero_images.length > 0) {
             const wrap = document.getElementById('hero-cylinder-wrap');
             if (wrap) {
-                wrap.innerHTML = data.hero_images.map(url => \`
-                    <div class="cylinder-item"><img src="\${url}" alt="Banner"></div>
-                \`).join('');
+                wrap.innerHTML = data.hero_images.map(url => `
+                    <div class="cylinder-item"><img src="${url}" alt="Banner"></div>
+                `).join('');
             }
         }
 
@@ -202,7 +202,7 @@ async function loadWebsiteSettings() {
         }
         if (data.wholesale_bg_image) {
             const sec = document.getElementById('mayoristas');
-            if (sec) sec.style.backgroundImage = \`linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('\${data.wholesale_bg_image}')\`;
+            if (sec) sec.style.backgroundImage = `linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('${data.wholesale_bg_image}')`;
         }
 
         // 4. Legal Policies
@@ -223,7 +223,7 @@ async function loadWebsiteSettings() {
                     url.pathname = '/' + data.whatsapp;
                     link.href = url.toString();
                 } catch(e) {
-                    link.href = \`https://wa.me/\${data.whatsapp}\`;
+                    link.href = `https://wa.me/${data.whatsapp}`;
                 }
             });
         }
