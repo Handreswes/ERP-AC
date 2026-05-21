@@ -65,22 +65,19 @@
 
     <!-- Bottom Navigation (Mobile Only) -->
     <nav class="bottom-nav">
-        <a href="javascript:void(0)" class="bottom-nav-item active" data-panel="dashboard"
-            onclick="window.handleNavClick('dashboard')">
+        <a href="javascript:void(0)" class="bottom-nav-item active" data-panel="dashboard">
             <i class="fas fa-th-large"></i>
             <span>Inicio</span>
         </a>
-        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="inventory"
-            onclick="window.handleNavClick('inventory')">
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="inventory">
             <i class="fas fa-boxes"></i>
             <span>Stock</span>
         </a>
-        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="sales"
-            onclick="window.handleNavClick('sales')">
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="sales">
             <i class="fas fa-cash-register"></i>
             <span>Ventas</span>
         </a>
-        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="crm" onclick="window.handleNavClick('crm')">
+        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="crm">
             <i class="fas fa-users"></i>
             <span>Clientes</span>
         </a>
@@ -127,7 +124,7 @@
                 <i class="fas fa-truck" style="color: #8b5cf6;"></i>
                 <span>Logística</span>
             </a>
-            <a href="#" class="menu-grid-item" data-panel="config">
+            <a href="#" class="menu-grid-item" data-panel="settings">
                 <i class="fas fa-cog" style="color: #94a3b8;"></i>
                 <span>Ajustes</span>
             </a>
@@ -205,7 +202,7 @@
                     <i class="fas fa-bullhorn" style="color: #ec4899;"></i>
                     <span>Marketing CRM</span>
                 </a>
-                <a href="#" class="nav-item" data-panel="website-admin">
+                <a href="#" class="nav-item" data-panel="website_admin">
                     <i class="fas fa-globe" style="color: #0ea5e9;"></i>
                     <span>Admin. Website</span>
                 </a>
@@ -283,12 +280,57 @@
                         </div>
                     </div>
 
-                    <div class="stats-grid" style="margin-top: 1.5rem;">
-                        <div class="stat-card clickable" id="stat-sales" style="cursor:pointer;">
-                            <h3 id="stat-sales-title">Ventas Hoy</h3>
-                            <p class="stat-value">$0.00</p>
-                            <span class="stat-label">0 transacciones</span>
+                    <div class="stats-grid" style="margin-top: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <!-- 1. Ingresos Brutos -->
+                        <div class="stat-card clickable" id="stat-revenue" style="cursor:pointer; background: linear-gradient(135deg, rgba(16,185,129,0.1), transparent); border-left: 4px solid var(--success);">
+                            <h3 id="stat-revenue-title">Ingresos (Ventas)</h3>
+                            <p class="stat-value text-success">$0.00</p>
+                            <span class="stat-label">Total bruto sin descontar costos</span>
                         </div>
+                        <!-- 2. Utilidad Bruta -->
+                        <div class="stat-card clickable" id="stat-gross-profit" style="cursor:pointer; background: linear-gradient(135deg, rgba(59,130,246,0.1), transparent); border-left: 4px solid var(--accent);">
+                            <h3 id="stat-gross-profit-title">Utilidad Bruta</h3>
+                            <p class="stat-value text-blue">$0.00</p>
+                            <span class="stat-label">Ventas menos costo de producto (COGS)</span>
+                        </div>
+                        <!-- 3. Gastos (OPEX) -->
+                        <div class="stat-card clickable" id="stat-opex" style="cursor:pointer; background: linear-gradient(135deg, rgba(239,68,68,0.1), transparent); border-left: 4px solid var(--danger);">
+                            <h3 id="stat-opex-title">Gastos / Salidas</h3>
+                            <p class="stat-value text-danger">$0.00</p>
+                            <span class="stat-label">Gastos fijos, variables y retiros</span>
+                        </div>
+                        <!-- 4. Utilidad Neta -->
+                        <div class="stat-card clickable" id="stat-net-profit" style="cursor:pointer; background: linear-gradient(135deg, rgba(139,92,246,0.1), transparent); border-left: 4px solid #8b5cf6;">
+                            <h3 id="stat-net-profit-title">Utilidad Neta (Caja)</h3>
+                            <p class="stat-value" style="color: #8b5cf6;">$0.00</p>
+                            <span class="stat-label">Ganancia real (Bruta - Gastos)</span>
+                        </div>
+                        <!-- 5. Margen Neto -->
+                        <div class="stat-card clickable" id="stat-margin" style="cursor:pointer; background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent); border-left: 4px solid var(--warning);">
+                            <h3 id="stat-margin-title">Margen Neto</h3>
+                            <p class="stat-value text-warning">0%</p>
+                            <span class="stat-label">Porcentaje de ganancia por venta</span>
+                        </div>
+                    </div>
+
+                    <!-- Charts Section -->
+                    <div class="charts-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 2rem;">
+                        <div class="detail-section" style="margin-top: 0; padding: 1.5rem; display: flex; flex-direction: column;">
+                            <h2 class="section-title" style="margin-bottom: 1rem;">Tendencia: Ingresos vs Gastos vs Utilidad</h2>
+                            <div style="position: relative; height: 300px; width: 100%; flex: 1;">
+                                <canvas id="dashboard-trend-chart"></canvas>
+                            </div>
+                        </div>
+                        <div class="detail-section" style="margin-top: 0; padding: 1.5rem; display: flex; flex-direction: column; align-items: center;">
+                            <h2 class="section-title" style="margin-bottom: 1rem; width: 100%; text-align: left;">Distribución del Ingreso</h2>
+                            <div style="position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center;">
+                                <canvas id="dashboard-distribution-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="section-title" style="margin-top: 2.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">Alertas y Métricas Operativas</h2>
+                    <div class="stats-grid" style="margin-top: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
                         <div class="stat-card clickable" id="stat-stock" style="cursor:pointer;">
                             <h3 id="stat-stock-title">Stock Crítico</h3>
                             <p class="stat-value">0</p>
@@ -310,6 +352,7 @@
                             <span class="stat-label">Por pagar a vendedores</span>
                         </div>
                     </div>
+
 
                     <div class="dashboard-details">
                         <div class="detail-section">
@@ -555,27 +598,27 @@
     </div>
 
     <!-- 5. Core System (v101) - Loaded in Order -->
-    <script src="js/supabase.js?v=107"></script>
-    <script src="js/storage.js?v=107"></script>
-    <script src="js/modules/auth.js?v=107"></script>
-    <script src="js/modules/inventory.js?v=107"></script>
-    <script src="js/modules/catalog.js?v=107"></script>
-    <script src="js/modules/crm.js?v=107"></script>
-    <script src="js/modules/pdf_manager.js?v=107"></script>
-    <script src="js/modules/sales.js?v=107"></script>
-    <script src="js/modules/dashboard.js?v=107"></script>
-    <script src="js/modules/finances.js?v=107"></script>
-    <script src="js/modules/marketing.js?v=107"></script>
-    <script src="js/modules/user_management.js?v=107"></script>
-    <script src="js/modules/tucompras_crm.js?v=107"></script>
-    <script src="js/modules/tucompras.js?v=107"></script>
-    <script src="js/modules/logistics.js?v=107"></script>
-    <script src="js/modules/vendedores.js?v=107"></script>
-    <script src="js/modules/categories.js?v=107"></script>
-    <script src="js/modules/settings.js?v=107"></script>
-    <script src="js/modules/website_admin.js?v=109"></script>
-    <script src="js/modules/consultas.js?v=107"></script>
-    <script src="js/app.js?v=107"></script>
+    <script src="js/supabase.js?v=111"></script>
+    <script src="js/storage.js?v=111"></script>
+    <script src="js/modules/auth.js?v=111"></script>
+    <script src="js/modules/inventory.js?v=111"></script>
+    <script src="js/modules/catalog.js?v=111"></script>
+    <script src="js/modules/crm.js?v=111"></script>
+    <script src="js/modules/pdf_manager.js?v=111"></script>
+    <script src="js/modules/sales.js?v=111"></script>
+    <script src="js/modules/dashboard.js?v=111"></script>
+    <script src="js/modules/finances.js?v=111"></script>
+    <script src="js/modules/marketing.js?v=111"></script>
+    <script src="js/modules/user_management.js?v=111"></script>
+    <script src="js/modules/tucompras_crm.js?v=111"></script>
+    <script src="js/modules/tucompras.js?v=111"></script>
+    <script src="js/modules/logistics.js?v=111"></script>
+    <script src="js/modules/vendedores.js?v=111"></script>
+    <script src="js/modules/categories.js?v=111"></script>
+    <script src="js/modules/settings.js?v=111"></script>
+    <script src="js/modules/website_admin.js?v=111"></script>
+    <script src="js/modules/consultas.js?v=111"></script>
+    <script src="js/app.js?v=111"></script>
 </body>
 
 </html>
