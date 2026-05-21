@@ -35,7 +35,7 @@ window.Sales = {
                     
                     <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
                         <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
-                        <input type="text" id="pos-product-search" class="form-control" placeholder="Buscar productos..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                        <input type="text" id="pos-product-search" class="form-control" placeholder="Buscar productos..." style="padding-left: 45px !important; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
                     </div>
 
                     <div id="pos-product-grid" class="pos-grid">
@@ -122,7 +122,7 @@ window.Sales = {
                     <div class="modal-body">
                         <div style="position: relative; margin-bottom: 15px;">
                             <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
-                            <input type="text" id="client-search-input" class="form-control" placeholder="Buscar por nombre o teléfono..." style="padding-left: 35px;">
+                            <input type="text" id="client-search-input" class="form-control" placeholder="Buscar por nombre o teléfono..." style="padding-left: 35px !important;">
                         </div>
                         <div id="picker-list" class="picker-list"></div>
                     </div>
