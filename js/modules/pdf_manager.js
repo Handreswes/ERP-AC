@@ -274,17 +274,26 @@ window.PDFManager = {
         const originalElement = document.getElementById('pdf-export-content');
         if (!originalElement) return;
 
-        // Clone the element and place it at the root of the body to prevent
-        // modal overflow/scroll from clipping the generated PDF content (el problema del 'pantallazo').
-        const clone = originalElement.cloneNode(true);
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.top = '-10000px';
-        container.style.left = '-10000px';
-        container.style.width = '800px'; // Match the modal content width
-        container.style.background = 'white';
-        container.appendChild(clone);
-        document.body.appendChild(container);
+        const modal = originalElement.closest('.modal');
+        const modalBody = originalElement.closest('.modal-body');
+        const modalContent = originalElement.closest('.modal-content');
+        
+        let origOverflow = '';
+        let origBodyOverflow = '';
+        let origMaxHeight = '';
+        let origContentMaxHeight = '';
+
+        if (modal && modalBody) {
+            origOverflow = modal.style.overflow;
+            origBodyOverflow = modalBody.style.overflow;
+            origMaxHeight = modalBody.style.maxHeight;
+            if (modalContent) origContentMaxHeight = modalContent.style.maxHeight;
+            
+            modal.style.overflow = 'visible';
+            modalBody.style.overflow = 'visible';
+            modalBody.style.maxHeight = 'none';
+            if (modalContent) modalContent.style.maxHeight = 'none';
+        }
 
         const opt = {
             margin:       10, // mm
@@ -295,8 +304,7 @@ window.PDFManager = {
                 useCORS: true, 
                 letterRendering: true, 
                 logging: false,
-                scrollY: 0,
-                windowWidth: 800
+                scrollY: 0
             },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
@@ -306,9 +314,12 @@ window.PDFManager = {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
         btn.disabled = true;
 
-        html2pdf().set(opt).from(container).save().then(() => {
-            if (document.body.contains(container)) {
-                document.body.removeChild(container);
+        html2pdf().set(opt).from(originalElement).save().then(() => {
+            if (modal && modalBody) {
+                modal.style.overflow = origOverflow;
+                modalBody.style.overflow = origBodyOverflow;
+                modalBody.style.maxHeight = origMaxHeight;
+                if (modalContent) modalContent.style.maxHeight = origContentMaxHeight;
             }
             setTimeout(() => {
                 btn.innerHTML = originalText;
@@ -316,8 +327,11 @@ window.PDFManager = {
             }, 1000);
         }).catch(err => {
             console.error("Error generating PDF:", err);
-            if (document.body.contains(container)) {
-                document.body.removeChild(container);
+            if (modal && modalBody) {
+                modal.style.overflow = origOverflow;
+                modalBody.style.overflow = origBodyOverflow;
+                modalBody.style.maxHeight = origMaxHeight;
+                if (modalContent) modalContent.style.maxHeight = origContentMaxHeight;
             }
             alert("Hubo un error al generar el PDF.");
             btn.innerHTML = originalText;
