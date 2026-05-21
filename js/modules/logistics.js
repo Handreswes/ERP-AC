@@ -1,7 +1,7 @@
 // Logistics Module
 window.Logistics = {
-    init() {
-        this.renderPanel();
+    async init() {
+        await this.renderPanel();
         this.setupEventListeners();
     },
 
