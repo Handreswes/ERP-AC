@@ -4,7 +4,7 @@ window.CategoriesModule = {
 
     async init() {
         console.log('CategoriesModule: Initializing...');
-        await this.fetchCategories();
+        this.fetchCategories();
         this.setupEventListeners();
         this.render();
     },
