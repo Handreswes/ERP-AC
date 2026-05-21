@@ -52,6 +52,7 @@ window.Dashboard = {
         const products = Storage.get(STORAGE_KEYS.PRODUCTS);
         const clients = Storage.get(STORAGE_KEYS.CLIENTS);
         const expenses = Storage.get(STORAGE_KEYS.EXPENSES);
+        const movements = Storage.get(STORAGE_KEYS.MOVEMENTS);
 
         // Date logic - Always use local day boundaries for consistency
         let startDate, endDate;
@@ -94,12 +95,25 @@ window.Dashboard = {
         if (salesHeader) salesHeader.textContent = `Ventas ${rangeText}`;
 
         this.lastFilteredSales = filteredSales; // Store for modal
-        this.renderFilteredStats(filteredSales, products, clients, expenses, startDate, endDate);
+        this.renderFilteredStats(filteredSales, products, clients, expenses, movements, startDate, endDate);
     },
 
-    renderFilteredStats(filteredSales, products, clients, expenses, startDate, endDate) {
-        // Global Totals
-        const totalFiltered = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
+    renderFilteredStats(filteredSales, products, clients, expenses, movements, startDate, endDate) {
+        // Global POS Totals
+        const totalFilteredPOS = filteredSales.reduce((sum, s) => sum + (s.total || 0), 0);
+        
+        // Calculate POS COGS
+        const posCOGS = filteredSales.reduce((sum, s) => {
+            let cost = 0;
+            if (s.items && Array.isArray(s.items)) {
+                s.items.forEach(item => {
+                    const product = products.find(p => p.id === item.id);
+                    const costPrice = product ? (parseFloat(product.costPrice) || 0) : 0;
+                    cost += costPrice * (parseFloat(item.quantity) || 0);
+                });
+            }
+            return sum + cost;
+        }, 0);
         const criticalCount = products.filter(p => p.stockMillenio < 5 || p.stockVulcano < 5).length;
         const pendingCreditsMillenio = clients.reduce((sum, c) => sum + (c.balanceMillenio || 0), 0);
         const pendingCreditsVulcano = clients.reduce((sum, c) => sum + (c.balanceVulcano || 0), 0);
@@ -114,10 +128,16 @@ window.Dashboard = {
             return acc;
         }, { total: 0, cash: 0, credit: 0, consignment: 0 });
 
-        const mExpenses = expenses.filter(e => {
+        let mExpenses = expenses.filter(e => {
             const d = new Date(e.createdAt);
             return d >= startDate && d <= endDate && e.company === 'millenio';
         }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+        // Add manual outflows (salidas) to expenses
+        mExpenses += movements.filter(m => {
+            const d = new Date(m.date);
+            return d >= startDate && d <= endDate && m.company === 'millenio' && m.type === 'outflow';
+        }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
 
         // Vulcano Breakdown
         const vSales = filteredSales.reduce((acc, s) => {
@@ -129,16 +149,65 @@ window.Dashboard = {
             return acc;
         }, { total: 0, cash: 0, credit: 0, consignment: 0 });
 
-        const vExpenses = expenses.filter(e => {
+        let vExpenses = expenses.filter(e => {
             const d = new Date(e.createdAt);
             return d >= startDate && d <= endDate && e.company === 'vulcano';
         }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
-        const elSales = document.querySelector('#stat-sales .stat-value');
-        if (elSales) elSales.textContent = `$${totalFiltered.toLocaleString()}`;
+        // Add manual outflows (salidas) to expenses
+        vExpenses += movements.filter(m => {
+            const d = new Date(m.date);
+            return d >= startDate && d <= endDate && m.company === 'vulcano' && m.type === 'outflow';
+        }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
+
+        // TUCOMPRAS Sales & Utilities
+        const tcSales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
+        const pendingCommissions = tcSales.filter(s =>
+            s.status === 'recibido' &&
+            s.money_confirmed === true &&
+            s.is_commission_paid !== true
+        ).reduce((sum, s) => sum + (parseFloat(s.commission_paid) || 0), 0);
+
+        const tcFiltered = tcSales.filter(s => {
+            const d = new Date(s.date);
+            return d >= startDate && d <= endDate;
+        });
+
+        const tcRevenue = tcFiltered.reduce((sum, s) => s.status === 'recibido' ? sum + parseFloat(s.sale_price || 0) : sum, 0);
+        const tcCogsAndExpenses = tcFiltered.reduce((sum, s) => {
+            if (s.status === 'recibido') {
+                return sum + parseFloat(s.cost_price || 0) + parseFloat(s.commission_paid || 0) + parseFloat(s.shipping_cost || 0);
+            }
+            if (s.status === 'devuelto') {
+                return sum + parseFloat(s.shipping_loss || 0);
+            }
+            return sum;
+        }, 0);
+
+        // MASTER FINANCIAL CALCULATIONS
+        const totalRevenue = totalFilteredPOS + tcRevenue;
+        const totalCOGS = posCOGS + tcCogsAndExpenses;
+        const grossProfit = totalRevenue - totalCOGS;
+        const totalOPEX = mExpenses + vExpenses;
+        const netProfit = grossProfit - totalOPEX;
+        const netMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : 0;
+
+        // Update Top Level Financial KPIs
+        this.updateElText('stat-revenue .stat-value', `$${totalRevenue.toLocaleString()}`);
+        this.updateElText('stat-gross-profit .stat-value', `$${grossProfit.toLocaleString()}`);
+        this.updateElText('stat-opex .stat-value', `$${totalOPEX.toLocaleString()}`);
         
-        const elSalesLabel = document.querySelector('#stat-sales .stat-label');
-        if (elSalesLabel) elSalesLabel.textContent = `${filteredSales.length} transacciones`;
+        const netEl = document.querySelector('#stat-net-profit .stat-value');
+        if (netEl) {
+            netEl.textContent = `$${netProfit.toLocaleString()}`;
+            netEl.style.color = netProfit >= 0 ? '#8b5cf6' : '#ef4444';
+        }
+
+        const marginEl = document.querySelector('#stat-margin .stat-value');
+        if (marginEl) {
+            marginEl.textContent = `${netMargin}%`;
+            marginEl.className = `stat-value ${netMargin >= 10 ? 'text-success' : (netMargin > 0 ? 'text-warning' : 'text-danger')}`;
+        }
 
         const elStock = document.querySelector('#stat-stock .stat-value');
         if (elStock) elStock.textContent = criticalCount;
@@ -161,31 +230,11 @@ window.Dashboard = {
         this.updateElText('vulcano-consignment-today', `$${vSales.consignment.toLocaleString()}`);
         this.updateElText('vulcano-expenses-today', `$${vExpenses.toLocaleString()}`);
 
-        // TUCOMPRAS Summary
-        const tcSales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
+        // Add TUCOMPRAS to Dashboard Summary
+        console.log(`[Dashboard] TUCOMPRAS Utility for period: $${(tcRevenue - tcCogsAndExpenses).toLocaleString()}`);
 
-        // Pending Commissions calculation (TOTAL liability, regardless of date range selects)
-        const pendingCommissions = tcSales.filter(s =>
-            s.status === 'recibido' &&
-            s.money_confirmed === true &&
-            s.is_commission_paid !== true
-        ).reduce((sum, s) => sum + (parseFloat(s.commission_paid) || 0), 0);
-
-        const commCardText = document.querySelector('#stat-commissions .stat-value');
-        if (commCardText) commCardText.textContent = `$${pendingCommissions.toLocaleString()}`;
-
-        const tcFiltered = tcSales.filter(s => {
-            const d = new Date(s.date);
-            return d >= startDate && d <= endDate;
-        });
-        const tcUtility = tcFiltered.reduce((sum, s) => {
-            if (s.status === 'recibido') return sum + (parseFloat(s.sale_price) - parseFloat(s.cost_price) - parseFloat(s.commission_paid) - parseFloat(s.shipping_cost));
-            if (s.status === 'devuelto') return sum - (parseFloat(s.shipping_loss) || 0);
-            return sum;
-        }, 0);
-
-        // Add TUCOMPRAS to Dashboard if space allows (or just log for now)
-        console.log(`[Dashboard] TUCOMPRAS Utility for period: $${tcUtility.toLocaleString()}`);
+        // Render Charts
+        this.renderCharts(totalRevenue, totalOPEX, grossProfit, netProfit, tcFiltered, filteredSales, startDate, endDate);
 
         // Credits Lists
         const mCredits = filteredSales.filter(s => s.method === 'credit' && (s.totalM || 0) > 0)
@@ -198,6 +247,124 @@ window.Dashboard = {
 
         // Product Rotation
         this.renderRotation(filteredSales, products);
+    },
+
+    renderCharts(totalRevenue, totalOPEX, grossProfit, netProfit, tcFiltered, filteredSales, startDate, endDate) {
+        // Destroy existing charts to prevent memory leaks / overlap
+        if (this.trendChart) this.trendChart.destroy();
+        if (this.distChart) this.distChart.destroy();
+
+        const trendCtx = document.getElementById('dashboard-trend-chart');
+        const distCtx = document.getElementById('dashboard-distribution-chart');
+        if (!trendCtx || !distCtx) return;
+
+        // Data preparation for Trend Chart (By Date/Day)
+        // We will group by Day if range <= 31 days, else by Month.
+        const daysDiff = (endDate - startDate) / (1000 * 60 * 60 * 24);
+        const labels = [];
+        const revenueData = [];
+        const opexData = [];
+        
+        if (daysDiff <= 31) {
+            // Daily grouping
+            const grouped = {};
+            let curr = new Date(startDate);
+            curr.setHours(0,0,0,0);
+            while (curr <= endDate) {
+                const dateStr = curr.toISOString().split('T')[0];
+                grouped[dateStr] = { rev: 0, exp: 0 };
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            filteredSales.forEach(s => {
+                const d = new Date(s.date).toISOString().split('T')[0];
+                if (grouped[d]) grouped[d].rev += (s.total || 0);
+            });
+            tcFiltered.forEach(s => {
+                const d = new Date(s.date).toISOString().split('T')[0];
+                if (grouped[d] && s.status === 'recibido') grouped[d].rev += (parseFloat(s.sale_price) || 0);
+            });
+            
+            // OPEX (Generic expenses from STORAGE_KEYS.EXPENSES and MOVEMENTS)
+            const expenses = Storage.get(STORAGE_KEYS.EXPENSES);
+            const movements = Storage.get(STORAGE_KEYS.MOVEMENTS);
+            expenses.forEach(e => {
+                const d = new Date(e.createdAt).toISOString().split('T')[0];
+                if (grouped[d]) grouped[d].exp += parseFloat(e.amount || 0);
+            });
+            movements.forEach(m => {
+                if (m.type === 'outflow') {
+                    const d = new Date(m.date).toISOString().split('T')[0];
+                    if (grouped[d]) grouped[d].exp += parseFloat(m.amount || 0);
+                }
+            });
+
+            Object.keys(grouped).sort().forEach(date => {
+                labels.push(date.split('-').slice(1).join('/'));
+                revenueData.push(grouped[date].rev);
+                opexData.push(grouped[date].exp);
+            });
+        } else {
+            // Fallback: simple bar chart of total
+            labels.push('Periodo Completo');
+            revenueData.push(totalRevenue);
+            opexData.push(totalOPEX);
+        }
+
+        this.trendChart = new Chart(trendCtx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Ingresos Brutos',
+                        data: revenueData,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    },
+                    {
+                        label: 'Gastos (OPEX)',
+                        data: opexData,
+                        borderColor: '#ef4444',
+                        backgroundColor: 'transparent',
+                        tension: 0.4,
+                        borderDash: [5, 5]
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+
+        // Data preparation for Distribution Chart (Doughnut)
+        const mSalesTot = filteredSales.reduce((sum, s) => sum + (s.totalM || 0), 0);
+        const vSalesTot = filteredSales.reduce((sum, s) => sum + (s.totalV || 0), 0);
+        const tcSalesTot = tcFiltered.reduce((sum, s) => s.status === 'recibido' ? sum + parseFloat(s.sale_price || 0) : sum, 0);
+
+        this.distChart = new Chart(distCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Millenio', 'Vulcano', 'TuCompras'],
+                datasets: [{
+                    data: [mSalesTot, vSalesTot, tcSalesTot],
+                    backgroundColor: ['#3b82f6', '#f59e0b', '#10b981'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
     },
 
     renderRotation(filteredSales, products) {
