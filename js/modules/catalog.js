@@ -56,7 +56,7 @@ window.Catalog = {
 
             <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
                 <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
-                <input type="text" id="catalog-search" class="form-control" placeholder="Buscar productos para el catálogo..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                <input type="text" id="catalog-search" class="form-control" placeholder="Buscar productos para el catálogo..." style="padding-left: 45px !important; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
             </div>
 
             <div id="catalog-preview-container" class="catalog-preview">
