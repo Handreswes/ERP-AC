@@ -4,8 +4,8 @@ window.Inventory = {
     activeTab: 'stock',
     editingId: null,
 
-    init() {
-        this.renderPanel();
+    async init() {
+        await this.renderPanel();
         this.setupEventListeners();
     },
 
@@ -343,7 +343,7 @@ window.Inventory = {
         else if (this.activeTab === 'history') this.updateHistoryList();
         else this.updateInventoryList();
 
-        await this.loadCategoryOptions();
+        this.loadCategoryOptions();
     },
 
     async loadCategoryOptions() {
