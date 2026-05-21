@@ -443,10 +443,14 @@ window.Sales = {
             }
 
             const deliveryType = document.getElementById('pos-delivery-type')?.value || 'pickup';
+            const remNumber = document.getElementById('remision-number-input')?.value || `REM-${Date.now()}`;
+            const generateRemision = document.getElementById('generate-remision-chk')?.checked;
             
             const sale = {
                 clientId: this.selectedClient.id,
                 clientName: this.selectedClient.name,
+                clientPhone: this.selectedClient.phone || '',
+                sellerName: Auth.currentUser?.name || "Caja Mostrador",
                 items: this.cart.map(item => ({
                     id: item.id,
                     name: item.name,
@@ -460,7 +464,9 @@ window.Sales = {
                 accountId: accountId,
                 delivery_type: deliveryType,
                 delivery_status: deliveryType === 'shipping' ? 'pending' : 'completed',
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                company: totalM >= totalV ? 'millenio' : 'vulcano',
+                remissionNumber: remNumber
             };
 
             // 1. SAVE SALE FIRST (Primary Data)
@@ -480,14 +486,6 @@ window.Sales = {
                 c.balanceVulcano = (c.balanceVulcano || 0) + totalV;
                 await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, c);
             }
-
-            const generateRemision = document.getElementById('generate-remision-chk')?.checked;
-            const remNumber = document.getElementById('remision-number-input')?.value || `REM-${Date.now()}`;
-            
-            // Add metadata for PDF rendering
-            sale.company = totalM >= totalV ? 'millenio' : 'vulcano'; 
-            sale.clientPhone = this.selectedClient.phone;
-            sale.sellerName = Auth.currentUser?.name || "Caja Mostrador";
 
             this.cart = [];
             this.selectedClient = null;
