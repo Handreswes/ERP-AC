@@ -106,7 +106,29 @@ document.addEventListener('DOMContentLoaded', async () => {
 // NAVIGATION ENGINE
 // ========================================================
 window.initNavigation = function() {
+    const sheet = document.getElementById('bottom-sheet');
+    const overlay = document.getElementById('bottom-sheet-overlay');
+    const closeMenu = document.getElementById('close-mobile-menu');
+
+    window.toggleMobileMenu = (show) => {
+        if (sheet && overlay) {
+            sheet.classList.toggle('active', show);
+            overlay.classList.toggle('active', show);
+            document.body.style.overflow = show ? 'hidden' : '';
+        }
+    };
+
+    if (closeMenu) closeMenu.addEventListener('click', () => window.toggleMobileMenu(false));
+    if (overlay) overlay.addEventListener('click', () => window.toggleMobileMenu(false));
+
     document.addEventListener('click', (e) => {
+        // Handle Mobile Menu Trigger
+        if (e.target.closest('#mobile-menu-trigger')) {
+            e.preventDefault();
+            window.toggleMobileMenu(true);
+            return;
+        }
+
         const navItem = e.target.closest('[data-panel]');
         if (navItem) {
             e.preventDefault();
@@ -126,6 +148,8 @@ window.initNavigation = function() {
 
 window.handleNavClick = function (panelName, updateHash = true) {
     if (!panelName) return;
+    
+    if (window.toggleMobileMenu) window.toggleMobileMenu(false);
     
     console.log(`Navigating to: ${panelName}`);
     
