@@ -105,7 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ========================================================
 // NAVIGATION ENGINE
 // ========================================================
-window.initNavigation = function() {
+window.initNavigation = initNavigation;
+function initNavigation() {
     const sheet = document.getElementById('bottom-sheet');
     const overlay = document.getElementById('bottom-sheet-overlay');
     const closeMenu = document.getElementById('close-mobile-menu');
