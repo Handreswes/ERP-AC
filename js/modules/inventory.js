@@ -63,7 +63,7 @@ window.Inventory = {
                 <div class="search-filter-row" style="margin-bottom: 1.5rem; display: flex; gap: 10px; align-items: center;">
                     <div class="search-input-wrapper" style="flex: 1; position: relative;">
                         <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
-                        <input type="text" id="inventory-search" class="form-control" placeholder="Buscar por nombre, categoría o referencia..." style="padding-left: 45px; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
+                        <input type="text" id="inventory-search" class="form-control" placeholder="Buscar por nombre, categoría o referencia..." style="padding-left: 45px !important; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
                     </div>
                 </div>
 
