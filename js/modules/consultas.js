@@ -37,7 +37,10 @@ window.Consultas = {
                         <i class="fas fa-hand-holding-usd"></i> Comisiones Pagadas
                     </button>
                     <button class="tab-btn ${this.activeTab === 'sales' ? 'active' : ''}" data-tab="sales">
-                        <i class="fas fa-history"></i> Ventas Históricas
+                        <i class="fas fa-globe"></i> Ventas Externas (Drop)
+                    </button>
+                    <button class="tab-btn ${this.activeTab === 'local_sales' ? 'active' : ''}" data-tab="local_sales">
+                        <i class="fas fa-store"></i> Ventas Locales (POS)
                     </button>
                 </div>
             </div>
@@ -60,6 +63,7 @@ window.Consultas = {
             case 'vulcano': this.renderInventoryPayments(content, 'vulcano'); break;
             case 'commissions': this.renderCommissionHistory(content); break;
             case 'sales': this.renderSalesHistory(content); break;
+            case 'local_sales': this.renderLocalSalesHistory(content); break;
         }
     },
 
@@ -355,6 +359,115 @@ window.Consultas = {
         }).join('');
     },
 
+    // ── VENTAS LOCALES (POS) ─────────────────────────────────────────────
+    renderLocalSalesHistory(container) {
+        const localSales = Storage.get(STORAGE_KEYS.SALES) || [];
+        localSales.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        container.innerHTML = `
+            <!-- Filters -->
+            <div class="search-filter-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+                <input type="text" id="q-local-search" class="form-control" placeholder="Buscar por cliente o remisión..." style="max-width: 280px;">
+                <input type="month" id="q-local-month" class="form-control" style="max-width: 160px;">
+                <select id="q-local-method" class="form-control" style="max-width: 170px;">
+                    <option value="all">Todos los métodos</option>
+                    <option value="cash">Efectivo</option>
+                    <option value="transfer">Transferencia</option>
+                    <option value="credit">Crédito</option>
+                </select>
+            </div>
+
+            <div id="q-local-summary" style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-secondary);"></div>
+
+            <div class="table-container">
+                <table class="data-table" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Remisión</th>
+                            <th>Cliente</th>
+                            <th>Productos</th>
+                            <th>Método Pago</th>
+                            <th>Vendedor</th>
+                            <th class="text-right">Total Venta</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="local-history-list">
+                        ${this.buildLocalSalesRows(localSales)}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        this.updateLocalSummary(localSales);
+
+        const search = document.getElementById('q-local-search');
+        const monthF = document.getElementById('q-local-month');
+        const methodF = document.getElementById('q-local-method');
+
+        const refilter = () => {
+            const q = (search?.value || '').toLowerCase();
+            const m = monthF?.value || '';
+            const me = methodF?.value || 'all';
+            let rows = localSales;
+            
+            if (q) rows = rows.filter(s => {
+                const rem = (s.remissionNumber || '').toLowerCase();
+                const client = (s.clientName || '').toLowerCase();
+                return rem.includes(q) || client.includes(q);
+            });
+            if (m) rows = rows.filter(s => s.date && s.date.startsWith(m));
+            if (me !== 'all') rows = rows.filter(s => s.method === me);
+            
+            document.getElementById('local-history-list').innerHTML = this.buildLocalSalesRows(rows);
+            this.updateLocalSummary(rows);
+        };
+
+        search?.addEventListener('input', refilter);
+        monthF?.addEventListener('change', refilter);
+        methodF?.addEventListener('change', refilter);
+    },
+
+    updateLocalSummary(rows) {
+        const el = document.getElementById('q-local-summary');
+        if (!el) return;
+        const totalSale = rows.reduce((sum, s) => sum + (parseFloat(s.total) || 0), 0);
+        el.innerHTML = `<strong>${rows.length}</strong> ventas encontradas · Valor total: <strong style="color:var(--success);">$${totalSale.toLocaleString()}</strong>`;
+    },
+
+    buildLocalSalesRows(rows) {
+        if (rows.length === 0) return `<tr><td colspan="8" class="text-center text-secondary" style="padding:2rem;">Sin resultados para los filtros aplicados.</td></tr>`;
+        
+        const methods = { cash: '💵 Efectivo', transfer: '🏦 Transf.', credit: '💳 Crédito' };
+        
+        return rows.map((s, idx) => {
+            const productNames = s.items ? s.items.map(i => `${i.quantity}x ${i.name}`).join(', ') : '—';
+            const remNumber = s.remissionNumber || `REM-V${String(idx+1).padStart(3, '0')}`;
+            const total = parseFloat(s.total) || 0;
+            const methodLabel = methods[s.method] || s.method;
+            
+            const safeSale = encodeURIComponent(JSON.stringify(s));
+
+            return `
+                <tr>
+                    <td>${s.date ? new Date(s.date).toLocaleString('es-CO', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—'}</td>
+                    <td><strong>${remNumber}</strong></td>
+                    <td>${s.clientName || 'Cliente de Mostrador'}</td>
+                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${productNames}">${productNames}</td>
+                    <td>${methodLabel}</td>
+                    <td>${s.sellerName || 'Caja'}</td>
+                    <td class="text-right"><strong>$${total.toLocaleString()}</strong></td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-primary btn-reprint-pdf" data-sale="${safeSale}" data-rem="${remNumber}">
+                            <i class="fas fa-file-pdf"></i> Ver Remisión
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+
     // ── HELPERS ─────────────────────────────────────────────────────────
     getTrackingUrl(carrier, number) {
         if (!carrier || !number) return '#';
@@ -378,6 +491,20 @@ window.Consultas = {
             if (tabBtn && tabBtn.dataset.tab) {
                 this.activeTab = tabBtn.dataset.tab;
                 this.renderPanel();
+                return;
+            }
+            
+            const pdfBtn = e.target.closest('.btn-reprint-pdf');
+            if (pdfBtn && window.PDFManager) {
+                try {
+                    const saleData = JSON.parse(decodeURIComponent(pdfBtn.dataset.sale));
+                    const remNumber = pdfBtn.dataset.rem;
+                    window.PDFManager.showRemission(saleData, remNumber);
+                } catch(err) {
+                    console.error("Error parsing sale data for PDF", err);
+                    alert("Error al intentar reconstruir la remisión.");
+                }
+                return;
             }
         };
     }
