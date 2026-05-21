@@ -6,14 +6,14 @@ window.Settings = {
 
     renderPanel() {
         const contentArea = document.getElementById('content-area');
-        if (!document.getElementById('config-panel')) {
+        if (!document.getElementById('settings-panel')) {
             const panel = document.createElement('div');
-            panel.id = 'config-panel';
+            panel.id = 'settings-panel';
             panel.className = 'panel';
             contentArea.appendChild(panel);
         }
 
-        const panel = document.getElementById('config-panel');
+        const panel = document.getElementById('settings-panel');
         const config = Storage.get(STORAGE_KEYS.CONFIG) || {};
 
         panel.innerHTML = `
