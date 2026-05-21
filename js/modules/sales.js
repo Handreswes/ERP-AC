@@ -120,7 +120,10 @@ window.Sales = {
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
-
+                        <div style="position: relative; margin-bottom: 15px;">
+                            <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                            <input type="text" id="client-search-input" class="form-control" placeholder="Buscar por nombre o teléfono..." style="padding-left: 35px;">
+                        </div>
                         <div id="picker-list" class="picker-list"></div>
                     </div>
                 </div>
@@ -346,6 +349,12 @@ window.Sales = {
                 return;
             }
 
+            // Client Search
+            if (e.target.id === 'client-search-input') {
+                this.renderPickerList(e.target.value);
+                return;
+            }
+
             // Price Manual Override
             if (e.target.classList.contains('cart-price-input')) {
                 const index = parseInt(e.target.dataset.index);
@@ -386,9 +395,22 @@ window.Sales = {
         };
     },
 
-    renderPickerList() {
+    renderPickerList(searchTerm = '') {
         const pickerList = document.getElementById('picker-list');
-        const clients = CRM.getClients();
+        const allClients = CRM.getClients();
+        
+        const clients = allClients.filter(c => {
+            const name = c.name || '';
+            const phone = c.phone || '';
+            const search = searchTerm.toLowerCase();
+            return name.toLowerCase().includes(search) || phone.toLowerCase().includes(search);
+        });
+
+        if (clients.length === 0) {
+            pickerList.innerHTML = '<div style="padding: 1rem; text-align: center; opacity: 0.6;">No se encontraron clientes</div>';
+            return;
+        }
+
         pickerList.innerHTML = clients.map(c => `
             <div class="picker-item" data-id="${c.id}">
                 <div>
