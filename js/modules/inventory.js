@@ -181,6 +181,9 @@ window.Inventory = {
                                 <div class="form-group" style="grid-column: span 2;">
                                     <label>Descripción (Sólo visible en Catálogo)</label>
                                     <textarea name="description" rows="3" placeholder="Ej: Excelente herramienta con motor de cobre..."></textarea>
+                                    <button type="button" id="generate-ai-desc-btn" class="btn btn-sm" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid #8b5cf6; margin-top: 8px; border-radius: 8px;">
+                                        <i class="fas fa-magic"></i> Mejorar con IA (SEO)
+                                    </button>
                                 </div>
                                 <div class="form-group">
                                     <label>Proveedor</label>
@@ -709,6 +712,11 @@ window.Inventory = {
                 return;
             }
 
+            if (e.target.id === 'generate-ai-desc-btn' || e.target.closest('#generate-ai-desc-btn')) {
+                this.handleGenerateAIDescription();
+                return;
+            }
+
             if (e.target.id === 'add-product-btn') {
                 this.editingId = null;
                 document.getElementById('modal-title').textContent = 'Nuevo Producto';
@@ -757,6 +765,79 @@ window.Inventory = {
             }
         });
 
+    },
+
+    async handleGenerateAIDescription() {
+        const nameInput = document.querySelector('#product-form input[name="name"]')?.value;
+        const catInput = document.querySelector('#product-form select[name="category"]')?.value;
+        const descTextarea = document.querySelector('#product-form textarea[name="description"]');
+        let currentDesc = descTextarea ? descTextarea.value : '';
+
+        if (!nameInput) {
+            alert('Por favor, ingresa al menos el Nombre del producto antes de generar la descripción con IA.');
+            return;
+        }
+
+        let apiKey = localStorage.getItem('GEMINI_API_KEY');
+        if (!apiKey) {
+            apiKey = prompt('Para usar la Inteligencia Artificial, ingresa tu llave de Google Gemini API (Empieza con AIza...):\\n\\nPuedes obtenerla gratis en aistudio.google.com');
+            if (!apiKey) return;
+            localStorage.setItem('GEMINI_API_KEY', apiKey.trim());
+        }
+
+        const btn = document.getElementById('generate-ai-desc-btn');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando magia...';
+        btn.disabled = true;
+
+        try {
+            const promptText = `Eres un experto en Marketing Digital y SEO para e-commerce. 
+Genera una descripción comercial, persuasiva y optimizada para SEO para el siguiente producto.
+La longitud debe ser mediana (unas 3 a 5 líneas de texto, con algunos bullet points para beneficios clave).
+No uses lenguaje excesivamente formal, hazlo vendedor y directo.
+Nombre del producto: ${nameInput}
+Categoría: ${catInput || 'General'}
+Información base: ${currentDesc || 'Haz una descripción atractiva sobre este producto útil.'}
+Solo devuelve el texto de la descripción, sin saludos ni frases como "Aquí tienes".`;
+
+            if (apiKey.startsWith('sk-')) {
+                 const res = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + apiKey },
+                    body: JSON.stringify({
+                        model: 'gpt-4o-mini',
+                        messages: [{role: 'user', content: promptText}]
+                    })
+                 });
+                 const data = await res.json();
+                 if (data.error) throw new Error(data.error.message);
+                 descTextarea.value = data.choices[0].message.content.trim();
+            } else {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: promptText }] }]
+                    })
+                });
+                const data = await res.json();
+                if (data.error) {
+                    if (data.error.code === 403) throw new Error("API Key inválida o sin permisos.");
+                    throw new Error(data.error.message);
+                }
+                descTextarea.value = data.candidates[0].content.parts[0].text.trim();
+            }
+        } catch (err) {
+            console.error(err);
+            alert('Error generando IA: ' + err.message + '\\nSi tu llave es incorrecta, bórrala e inténtalo de nuevo.');
+            if (err.message.includes('inválida') || err.message.includes('Incorrect API key')) {
+                localStorage.removeItem('GEMINI_API_KEY');
+            }
+        } finally {
+            btn.innerHTML = originalHtml;
+            btn.disabled = false;
+        }
     },
 
     handleImageUpload(e, index) {
