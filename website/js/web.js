@@ -263,6 +263,13 @@ async function loadWebsiteSettings() {
         }
 
         // 6. Pixels (Dynamic Injection)
+        if (data.google_analytics_id) {
+            gtag('js', new Date());
+            gtag('config', data.google_analytics_id);
+        }
+        if (data.google_ads_id) {
+            gtag('config', data.google_ads_id);
+        }
         if (data.meta_pixel_id && window.fbq) {
             fbq('init', data.meta_pixel_id);
             fbq('track', 'PageView');
@@ -532,6 +539,7 @@ function renderProductLanding(id) {
     `;
     if (window.fbq) fbq('track', 'ViewContent', { content_ids: [id], content_type: 'product', content_name: p.name, value: p.priceFinal, currency: 'COP' });
     if (window.ttq) ttq.track('ViewContent', { content_id: id, content_name: p.name, value: p.priceFinal, currency: 'COP' });
+    if (typeof gtag === 'function') gtag('event', 'view_item', { currency: 'COP', value: p.priceFinal, items: [{ item_id: id, item_name: p.name, item_category: p.category, price: p.priceFinal }] });
 }
 
 // Render Categories
@@ -585,6 +593,7 @@ window.addToCart = (id) => {
     
     if (window.fbq) fbq('track', 'AddToCart', { content_ids: [p.id], content_type: 'product', content_name: p.name, value: p.priceFinal, currency: 'COP' });
     if (window.ttq) ttq.track('AddToCart', { content_id: p.id, content_name: p.name, value: p.priceFinal, currency: 'COP' });
+    if (typeof gtag === 'function') gtag('event', 'add_to_cart', { currency: 'COP', value: p.priceFinal, items: [{ item_id: p.id, item_name: p.name, price: p.priceFinal, quantity: 1 }] });
 };
 
 function updateCartUI() {
@@ -786,6 +795,7 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
 
         if (window.fbq) fbq('track', 'Purchase', { value: orderData.total, currency: 'COP', content_ids: orderData.items.map(i => i.product_id), content_type: 'product' });
         if (window.ttq) ttq.track('CompletePayment', { value: orderData.total, currency: 'COP', content_id: orderData.items.map(i => i.product_id) });
+        if (typeof gtag === 'function') gtag('event', 'purchase', { transaction_id: orderData.id, value: orderData.total, currency: 'COP', items: orderData.items.map(i => ({ item_id: i.product_id, item_name: i.name, price: i.price, quantity: i.qty })) });
     } catch (err) { alert('Error: ' + err.message); btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>'; }
 };
 
