@@ -40,6 +40,8 @@ window.WebsiteAdmin = {
                     meta_description: 'Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.',
                     meta_pixel_id: '',
                     tiktok_pixel_id: '',
+                    google_analytics_id: '',
+                    google_ads_id: '',
                     testimonials: []
                 };
             }
@@ -67,6 +69,8 @@ window.WebsiteAdmin = {
         setVal('wa-meta-desc', s.meta_description);
         setVal('wa-pixel-fb', s.meta_pixel_id);
         setVal('wa-pixel-tk', s.tiktok_pixel_id);
+        setVal('wa-google-analytics', s.google_analytics_id);
+        setVal('wa-google-ads', s.google_ads_id);
 
         // Tab 2
         setVal('wa-hero-title', s.hero_title);
@@ -175,6 +179,10 @@ window.WebsiteAdmin = {
                         <input type="text" id="wa-pixel-fb" class="form-control" onchange="WebsiteAdmin.updateSetting('meta_pixel_id', this.value)">
                         <label>TikTok Pixel ID</label>
                         <input type="text" id="wa-pixel-tk" class="form-control" onchange="WebsiteAdmin.updateSetting('tiktok_pixel_id', this.value)">
+                        <label>Google Analytics 4 ID (G-XXXX)</label>
+                        <input type="text" id="wa-google-analytics" class="form-control" placeholder="Ej: G-123456789" onchange="WebsiteAdmin.updateSetting('google_analytics_id', this.value)">
+                        <label>Google Ads ID (AW-XXXX)</label>
+                        <input type="text" id="wa-google-ads" class="form-control" placeholder="Ej: AW-123456789" onchange="WebsiteAdmin.updateSetting('google_ads_id', this.value)">
                     </div>
                 </div>
             </div>
