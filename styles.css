@@ -759,28 +759,28 @@ option:checked {
     .cart-table th:nth-child(1),
     .cart-table td:nth-child(1) {
         width: 30%;
-        max-width: 120px;
+        max-width: 130px;
     }
 
     /* Precio */
     .cart-table th:nth-child(2),
     .cart-table td:nth-child(2) {
-        width: 22%;
-        min-width: 90px;
+        width: 20%;
+        min-width: 95px;
     }
 
     /* Cant */
     .cart-table th:nth-child(3),
     .cart-table td:nth-child(3) {
         width: 25%;
-        min-width: 110px;
+        min-width: 140px; /* Safe width for qty-control */
     }
 
     /* Total */
     .cart-table th:nth-child(4),
     .cart-table td:nth-child(4) {
-        width: 18%;
-        min-width: 80px;
+        width: 20%;
+        min-width: 90px;
     }
 
     /* Remove */
@@ -800,7 +800,8 @@ option:checked {
 
 .cart-price-input {
     width: 100%;
-    max-width: 85px;
+    max-width: 90px;
+    min-width: 80px;
     background: var(--bg-dark);
     border: 1px solid var(--border);
     color: var(--text-primary);
@@ -809,6 +810,7 @@ option:checked {
     font-size: 0.85rem;
     font-weight: 600;
     -moz-appearance: textfield;
+    flex-shrink: 0;
 }
 
 .cart-price-input::-webkit-outer-spin-button,
@@ -934,6 +936,7 @@ option:checked {
     align-items: center;
     gap: 8px;
     justify-content: center;
+    flex-shrink: 0;
 }
 
 .qty-btn {
@@ -1359,9 +1362,16 @@ option:checked {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.75rem 0;
+        padding: 0.85rem 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         text-align: right;
+        gap: 10px;
+    }
+
+    .data-table td > span {
+        flex: 1;
+        text-align: right;
+        display: block;
     }
 
     .data-table td:last-child {
