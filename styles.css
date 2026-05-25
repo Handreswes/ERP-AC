@@ -755,50 +755,66 @@ option:checked {
 }
 
 /* Specific column widths for desktop cart to prevent squishing */
-@media (min-width: 769px) {
-
+    /* Producto */
     .cart-table th:nth-child(1),
     .cart-table td:nth-child(1) {
-        width: 35%;
-        max-width: 130px;
-    }
-
-    /* Producto */
-    .cart-table th:nth-child(2),
-    .cart-table td:nth-child(2) {
-        width: 25%;
-        min-width: 80px;
+        width: 30%;
+        max-width: 120px;
     }
 
     /* Precio */
-    .cart-table th:nth-child(3),
-    .cart-table td:nth-child(3) {
-        width: 15%;
+    .cart-table th:nth-child(2),
+    .cart-table td:nth-child(2) {
+        width: 22%;
         min-width: 90px;
     }
 
     /* Cant */
-    .cart-table th:nth-child(4),
-    .cart-table td:nth-child(4) {
-        width: 20%;
-        min-width: 70px;
+    .cart-table th:nth-child(3),
+    .cart-table td:nth-child(3) {
+        width: 25%;
+        min-width: 110px;
     }
 
     /* Total */
-    .cart-table th:nth-child(5),
-    .cart-table td:nth-child(5) {
-        width: 5%;
-        min-width: 30px;
-        text-align: center;
+    .cart-table th:nth-child(4),
+    .cart-table td:nth-child(4) {
+        width: 18%;
+        min-width: 80px;
     }
 
     /* Remove */
+    .cart-table th:nth-child(5),
+    .cart-table td:nth-child(5) {
+        width: 5%;
+        min-width: 40px;
+        text-align: center;
+    }
 
     .cart-table td:nth-child(1) div {
         white-space: nowrap !important;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
+
+.cart-price-input {
+    width: 100%;
+    max-width: 85px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    padding: 6px 8px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    -moz-appearance: textfield;
+}
+
+.cart-price-input::-webkit-outer-spin-button,
+.cart-price-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 
@@ -914,32 +930,47 @@ option:checked {
 }
 
 .qty-control {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
+    background: var(--bg-dark);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    height: 32px;
 }
 
 .qty-btn {
-    width: 24px;
-    height: 24px;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    background: none;
+    width: 30px;
+    height: 100%;
+    border: none;
+    background: rgba(255,255,255,0.03);
     color: var(--text-primary);
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    transition: background 0.2s;
+}
+
+.qty-btn:hover {
+    background: rgba(255,255,255,0.1);
 }
 
 .qty-control input {
     width: 45px;
-    height: 28px;
+    height: 100%;
     text-align: center;
-    background: var(--bg-dark);
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    background: transparent;
+    border: none;
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
     color: var(--text-primary);
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
     -moz-appearance: textfield;
+    border-radius: 0;
+    padding: 0;
 }
 
 .qty-control input::-webkit-outer-spin-button,
