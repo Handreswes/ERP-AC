@@ -204,7 +204,7 @@ window.Sales = {
                     <td data-label="Cant.">
                         <div class="qty-control">
                             <button class="qty-btn" data-index="${index}" data-action="dec">-</button>
-                            <span>${item.quantity}</span>
+                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 50px; text-align: center; padding: 2px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); margin: 0 5px;">
                             <button class="qty-btn" data-index="${index}" data-action="inc">+</button>
                         </div>
                     </td>
@@ -310,7 +310,13 @@ window.Sales = {
                 if (btn.classList.contains('qty-btn')) {
                     if (btn.dataset.action === 'inc') this.cart[index].quantity++;
                     else if (this.cart[index].quantity > 1) this.cart[index].quantity--;
-                    this.updateCartUI();
+                    
+                    // Update input value directly without full re-render if possible
+                    const row = btn.closest('tr');
+                    const qtyInput = row.querySelector('.cart-qty-input');
+                    if (qtyInput) qtyInput.value = this.cart[index].quantity;
+                    
+                    this.updateCartUI(); // Keep full re-render for now to ensure consistency, though it breaks focus. 
                     return;
                 }
 
@@ -366,6 +372,24 @@ window.Sales = {
                 const row = e.target.closest('tr');
                 if (row) {
                     const subtotal = newPrice * this.cart[index].quantity;
+                    if (row.cells[3]) row.cells[3].textContent = `$${subtotal.toLocaleString()}`;
+
+                    const grandTotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                    const totalEl = document.getElementById('pos-total');
+                    if (totalEl) totalEl.textContent = `$${grandTotal.toLocaleString()}`;
+                }
+            }
+
+            // Quantity Manual Override
+            if (e.target.classList.contains('cart-qty-input')) {
+                const index = parseInt(e.target.dataset.index);
+                const newQty = parseInt(e.target.value) || 1;
+                this.cart[index].quantity = newQty;
+
+                // Update row subtotal and grand total
+                const row = e.target.closest('tr');
+                if (row) {
+                    const subtotal = this.cart[index].price * newQty;
                     if (row.cells[3]) row.cells[3].textContent = `$${subtotal.toLocaleString()}`;
 
                     const grandTotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
