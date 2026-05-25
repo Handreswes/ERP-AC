@@ -50,6 +50,7 @@ CREATE TABLE IF NOT EXISTS public.sales (
     "id" TEXT PRIMARY KEY,
     "clientId" TEXT,
     "clientName" TEXT,
+    "clientPhone" TEXT,
     "items" JSONB DEFAULT '[]'::jsonb,
     "total" DECIMAL(12, 2) DEFAULT 0,
     "totalM" DECIMAL(12, 2) DEFAULT 0,
@@ -419,6 +420,8 @@ CREATE TABLE IF NOT EXISTS public.website_settings (
     "meta_description" TEXT,
     "meta_pixel_id" TEXT,
     "tiktok_pixel_id" TEXT,
+    "google_analytics_id" TEXT,
+    "google_ads_id" TEXT,
     "updated_at" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
 
