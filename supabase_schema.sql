@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS public.sales (
     "sellerId" TEXT,
     "sellerName" TEXT,
     "commissionAmount" DECIMAL(12, 2) DEFAULT 0,
+    "remissionNumber" TEXT,
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
