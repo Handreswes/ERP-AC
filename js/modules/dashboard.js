@@ -223,12 +223,14 @@ window.Dashboard = {
         this.updateElText('millenio-cash-today', `$${mSales.cash.toLocaleString()}`);
         this.updateElText('millenio-consignment-today', `$${mSales.consignment.toLocaleString()}`);
         this.updateElText('millenio-expenses-today', `$${mExpenses.toLocaleString()}`);
+        this.updateElText('millenio-credit-total-today', `$${mSales.credit.toLocaleString()}`);
 
         // Update UI - Vulcano Details
         this.updateElText('vulcano-sales-today-detail', `$${vSales.total.toLocaleString()}`);
         this.updateElText('vulcano-cash-today', `$${vSales.cash.toLocaleString()}`);
         this.updateElText('vulcano-consignment-today', `$${vSales.consignment.toLocaleString()}`);
         this.updateElText('vulcano-expenses-today', `$${vExpenses.toLocaleString()}`);
+        this.updateElText('vulcano-credit-total-today', `$${vSales.credit.toLocaleString()}`);
 
         // Add TUCOMPRAS to Dashboard Summary
         console.log(`[Dashboard] TUCOMPRAS Utility for period: $${(tcRevenue - tcCogsAndExpenses).toLocaleString()}`);
