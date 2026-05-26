@@ -442,6 +442,55 @@ function renderProducts(items) {
     });
 }
 
+// Helper to parse basic markdown to HTML
+function parseMarkdown(text) {
+    if (!text) return '';
+    
+    const lines = text.split(/\r?\n/);
+    let html = '';
+    let inList = false;
+
+    for (let line of lines) {
+        line = line.trim();
+        if (!line) {
+            if (inList) {
+                html += '</ul>';
+                inList = false;
+            }
+            continue;
+        }
+
+        // Check if it's a list item starting with * or -
+        const listMatch = line.match(/^[\*\-]\s+(.*)/);
+        if (listMatch) {
+            if (!inList) {
+                html += '<ul style="margin-left: 20px; margin-bottom: 1.5rem; list-style-type: disc; padding-left: 15px;">';
+                inList = true;
+            }
+            let itemContent = listMatch[1];
+            // Format bold and italic in item content
+            itemContent = itemContent.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            itemContent = itemContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html += `<li style="margin-bottom: 0.5rem; line-height: 1.6; color: var(--text-secondary);">${itemContent}</li>`;
+        } else {
+            if (inList) {
+                html += '</ul>';
+                inList = false;
+            }
+            // Format bold and italic in normal paragraph
+            let paragraphContent = line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            paragraphContent = paragraphContent.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html += `<p style="margin-bottom: 1.25rem; line-height: 1.6; color: var(--text-secondary);">${paragraphContent}</p>`;
+        }
+    }
+
+    if (inList) {
+        html += '</ul>';
+    }
+
+    return html;
+}
+
 // Render Product Landing
 function renderProductLanding(id) {
     const p = products.find(prod => prod.id === id);
@@ -474,7 +523,7 @@ function renderProductLanding(id) {
                 <i class="fas fa-arrow-left"></i> Volver al Catálogo
             </a>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: center;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start;">
             <div class="animate">
                 <img id="main-product-img" src="${mainImg}" style="width: 100%; border-radius: 30px; box-shadow: var(--shadow-lg); object-fit: cover; aspect-ratio: 1/1;">
                 ${galleryHtml}
@@ -488,7 +537,7 @@ function renderProductLanding(id) {
                 </div>
                 <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;">${p.name}</h1>
                 
-                <p style="font-size: 1.2rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6;">${p.description || 'Experimenta la máxima calidad y rendimiento con este producto diseñado para los estándares más exigentes. Ideal para uso industrial y profesional.'}</p>
+                <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6;">${parseMarkdown(p.description) || 'Experimenta la máxima calidad y rendimiento con este producto diseñado para los estándares más exigentes. Ideal para uso industrial y profesional.'}</div>
                 
                 <div class="glass" style="padding: 2.5rem; border-radius: 25px; margin-bottom: 3rem; border: 2px solid var(--accent);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
