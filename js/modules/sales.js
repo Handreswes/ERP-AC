@@ -204,12 +204,12 @@ window.Sales = {
                     <td data-label="Cant.">
                         <div class="qty-control">
                             <button class="qty-btn" data-index="${index}" data-action="dec">-</button>
-                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 50px; text-align: center; padding: 2px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg-primary); color: var(--text-primary); margin: 0 5px;">
+                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1">
                             <button class="qty-btn" data-index="${index}" data-action="inc">+</button>
                         </div>
                     </td>
-                    <td data-label="Subtotal">$${subtotal.toLocaleString()}</td>
-                    <td class="table-actions"><button class="icon-btn text-danger remove-item" data-index="${index}"><i class="fas fa-times"></i></button></td>
+                    <td data-label="Subtotal"><span>$${subtotal.toLocaleString()}</span></td>
+                    <td class="table-actions" data-label="Acción"><button class="icon-btn text-danger remove-item" data-index="${index}"><i class="fas fa-times"></i></button></td>
                 </tr>
             `;
         }).join('');
