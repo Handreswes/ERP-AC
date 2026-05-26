@@ -334,6 +334,12 @@ function handleRouting() {
         showView('checkout');
     } else if (view === 'account') {
         showView('account');
+    } else if (view === 'privacy') {
+        showView('privacy');
+    } else if (view === 'refunds') {
+        showView('refunds');
+    } else if (view === 'success') {
+        showView('success');
     } else {
         showView('home');
     }
@@ -420,7 +426,7 @@ function renderProducts(items) {
         const price = (p.priceFinal || p.priceInternet || 0).toLocaleString();
 
         card.innerHTML = `
-            <div class="product-img" onclick="showView('product', '${p.id}')">
+            <div class="product-img" onclick="window.location.hash = '#product?id=${p.id}'">
                 <img src="${img}" alt="${p.name}">
                 <div class="product-overlay"><span>Ver Detalles</span></div>
             </div>
@@ -496,7 +502,11 @@ function renderProductLanding(id) {
     const p = products.find(prod => prod.id === id);
     const content = document.getElementById('product-landing-content');
     if (!p) {
-        content.innerHTML = '<div class="glass" style="padding:4rem; text-align:center;"><h2>Producto no encontrado</h2><button class="btn btn-primary" onclick="showView(\'home\')">Volver al Inicio</button></div>';
+        if (products.length === 0) {
+            content.innerHTML = '<div class="glass" style="padding:4rem; text-align:center;"><div style="font-size: 1.25rem; color: var(--text-secondary);"><i class="fas fa-spinner fa-spin" style="margin-right: 10px; color: var(--accent);"></i> Cargando detalles del producto...</div></div>';
+        } else {
+            content.innerHTML = '<div class="glass" style="padding:4rem; text-align:center;"><h2>Producto no encontrado</h2><button class="btn btn-primary" onclick="showView(\'home\')">Volver al Inicio</button></div>';
+        }
         return;
     }
 
@@ -631,7 +641,11 @@ async function renderCategories() {
 }
 
 // Purchase Functions
-window.quickBuy = (id) => { checkoutSource = 'landing'; checkoutItem = products.find(p => p.id === id); showView('checkout'); };
+window.quickBuy = (id) => { 
+    checkoutSource = 'landing'; 
+    checkoutItem = products.find(p => p.id === id); 
+    window.location.hash = 'checkout'; 
+};
 window.addToCart = (id) => {
     const p = products.find(prod => prod.id === id);
     if (!p) return;
