@@ -202,13 +202,13 @@ window.Sales = {
                         <!-- Price Input -->
                         <div style="display: flex; align-items: center; gap: 4px;">
                             <span style="color: var(--text-secondary); font-size: 0.8rem;">$</span>
-                            <input type="number" class="cart-price-input form-control" data-index="${index}" value="${item.price}" step="1" style="width: 85px; height: 28px; padding: 2px 6px !important; font-size: 0.8rem !important; min-height: unset !important; margin: 0; background: rgba(0,0,0,0.2) !important; border: 1px solid var(--border) !important; border-radius: 6px !important; color: white !important;">
+                            <input type="number" class="cart-price-input form-control" data-index="${index}" value="${item.price}" step="1" style="width: 85px !important; height: 28px !important; padding: 0px 8px !important; font-size: 0.85rem !important; min-height: unset !important; margin: 0 !important; background: rgba(0,0,0,0.2) !important; border: 1px solid var(--border) !important; border-radius: 6px !important; color: white !important; text-align: left !important; box-sizing: border-box !important;">
                         </div>
                         
                         <!-- Quantity Control -->
                         <div class="qty-control" style="gap: 4px;">
                             <button class="qty-btn" data-index="${index}" data-action="dec" style="width: 26px; height: 26px; font-size: 0.9rem; border-radius: 6px; padding: 0;">-</button>
-                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 36px; height: 26px; font-size: 0.85rem; border-radius: 6px; padding: 0;">
+                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 38px !important; height: 28px !important; padding: 0px !important; font-size: 0.9rem !important; min-height: unset !important; margin: 0 !important; background: rgba(255, 255, 255, 0.08) !important; border: 1px solid var(--border) !important; border-radius: 6px !important; color: white !important; text-align: center !important; font-weight: bold !important; box-sizing: border-box !important; -moz-appearance: textfield !important;">
                             <button class="qty-btn" data-index="${index}" data-action="inc" style="width: 26px; height: 26px; font-size: 0.9rem; border-radius: 6px; padding: 0;">+</button>
                         </div>
                         
