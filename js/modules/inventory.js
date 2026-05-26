@@ -813,20 +813,50 @@ Solo devuelve el texto de la descripción, sin saludos ni frases como "Aquí tie
                  if (data.error) throw new Error(data.error.message);
                  descTextarea.value = data.choices[0].message.content.trim();
             } else {
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-                const res = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{ parts: [{ text: promptText }] }]
-                    })
-                });
-                const data = await res.json();
-                if (data.error) {
-                    if (data.error.code === 403) throw new Error("API Key inválida o sin permisos.");
-                    throw new Error(data.error.message);
+                // Configurar URLs alternativas de Gemini para mayor compatibilidad
+                const endpoints = [
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+                    `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+                    `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`
+                ];
+                
+                let lastError = null;
+                let success = false;
+                
+                for (const url of endpoints) {
+                    try {
+                        const res = await fetch(url, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                contents: [{ parts: [{ text: promptText }] }]
+                            })
+                        });
+                        const data = await res.json();
+                        if (data.error) {
+                            if (data.error.code === 403) {
+                                throw new Error("API Key inválida o sin permisos.");
+                            }
+                            throw new Error(data.error.message);
+                        }
+                        if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                            descTextarea.value = data.candidates[0].content.parts[0].text.trim();
+                            success = true;
+                            break;
+                        } else {
+                            throw new Error("Formato de respuesta inesperado.");
+                        }
+                    } catch (err) {
+                        lastError = err;
+                        console.warn(`Intento fallido con Gemini en ${url.split('/models/')[1].split(':')[0]}: ${err.message}`);
+                        if (err.message.includes("inválida")) break; // No reintentar si el key es inválido
+                    }
                 }
-                descTextarea.value = data.candidates[0].content.parts[0].text.trim();
+                
+                if (!success) {
+                    throw lastError || new Error("No se pudo conectar con ningún modelo compatible de Gemini.");
+                }
             }
         } catch (err) {
             console.error(err);
