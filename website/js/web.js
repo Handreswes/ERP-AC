@@ -527,6 +527,33 @@ function renderProductLanding(id) {
     const viewers = Math.floor(Math.random() * (25 - 8 + 1)) + 8;
     const stockLeft = Math.floor(Math.random() * (12 - 3 + 1)) + 3;
 
+    // Fetch related products
+    const related = products.filter(prod => prod.category === p.category && prod.id !== p.id);
+    let relatedToShow = related.slice(0, 4);
+    if (relatedToShow.length === 0) {
+        relatedToShow = products.filter(prod => prod.id !== p.id).slice(0, 4);
+    }
+
+    const relatedHtml = relatedToShow.map(rp => {
+        const rpImg = (Array.isArray(rp.image) ? rp.image[0] : (rp.image || rp.imageUrl)) || 'https://via.placeholder.com/300';
+        const rpPrice = (rp.priceFinal || rp.priceInternet || 0).toLocaleString();
+        return `
+            <div class="glass product-card animate" style="padding: 1.5rem; border-radius: 20px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                <div onclick="window.location.hash = '#product?id=${rp.id}'" style="cursor: pointer;">
+                    <img src="${rpImg}" alt="${rp.name}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 15px; margin-bottom: 1rem;">
+                    <h3 style="font-size: 1.1rem; line-height: 1.3; margin-bottom: 0.5rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${rp.name}</h3>
+                    <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.75rem;">${rp.category || 'General'}</p>
+                </div>
+                <div>
+                    <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent); margin-bottom: 1rem;">$${rpPrice}</div>
+                    <button class="btn btn-primary btn-sm btn-block" onclick="window.location.hash = '#product?id=${rp.id}'" style="width: 100%; border-radius: 20px; font-weight: 700; height: 40px;">
+                        Ver Detalles
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
     content.innerHTML = `
         <div style="margin-bottom: 2rem;">
             <a href="#home" style="color: var(--text-secondary); text-decoration: none; display: flex; align-items: center; gap: 10px;">
@@ -567,7 +594,7 @@ function renderProductLanding(id) {
                         COMPRAR AHORA <i class="fas fa-arrow-right" style="margin-left: 10px;"></i>
                     </button>
                     
-                    <button class="btn btn-outline btn-block" onclick="showView('home')" style="width: 100%; padding: 1.2rem; font-weight: 700; border-width: 2px;">
+                    <button class="btn btn-outline btn-block" onclick="addToCart('${p.id}'); window.location.hash = '#productos';" style="width: 100%; padding: 1.2rem; font-weight: 700; border-width: 2px;">
                         <i class="fas fa-plus-circle"></i> AGREGAR MÁS PRODUCTOS
                     </button>
 
@@ -593,6 +620,14 @@ function renderProductLanding(id) {
                         <small style="font-weight: 700;">Compra Segura</small>
                     </div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Related Products Section -->
+        <div style="margin-top: 6rem; border-top: 1px solid var(--glass-border); padding-top: 4rem;">
+            <h2 style="font-size: 2.2rem; margin-bottom: 2rem; text-align: left;">Productos Relacionados</h2>
+            <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem; margin-top: 1.5rem;">
+                ${relatedHtml}
             </div>
         </div>
     `;
