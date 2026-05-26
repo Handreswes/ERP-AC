@@ -45,18 +45,10 @@ window.Sales = {
 
                 <aside class="pos-sidebar">
                     <div class="cart-container" style="margin-bottom: 1.5rem;">
-                        <table class="data-table cart-table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Precio</th>
-                                    <th>Cant.</th>
-                                    <th>Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="cart-list"></tbody>
-                        </table>
+                        <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; letter-spacing: 0.5px; padding-left: 5px;">Carrito de Compras</div>
+                        <div id="cart-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 5px;">
+                            <!-- Card items will be rendered here -->
+                        </div>
                     </div>
 
                     <div class="pos-card client-selection">
@@ -196,30 +188,45 @@ window.Sales = {
             const subtotal = item.price * item.quantity;
             total += subtotal;
             return `
-                <tr>
-                    <td data-label="Producto"><div style="max-width: 100px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${item.name}">${item.name}</div></td>
-                    <td data-label="Precio">
-                        <input type="number" class="cart-price-input" data-index="${index}" value="${item.price}" step="1">
-                    </td>
-                    <td data-label="Cant.">
-                        <div class="qty-control">
-                            <button class="qty-btn" data-index="${index}" data-action="dec">-</button>
-                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1">
-                            <button class="qty-btn" data-index="${index}" data-action="inc">+</button>
+                <div class="cart-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; position: relative;">
+                    <!-- Line 1: Name and Remove Button -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; padding-right: 25px;">
+                        <span style="font-weight: 600; font-size: 0.85rem; word-break: break-word; color: var(--text-primary); text-align: left;" title="${item.name}">${item.name}</span>
+                        <button class="icon-btn text-danger remove-item" data-index="${index}" style="position: absolute; right: 10px; top: 10px; background: none; border: none; padding: 5px; cursor: pointer; font-size: 0.95rem; width: auto; height: auto;">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    
+                    <!-- Line 2: Price, Qty and Subtotal -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 4px;">
+                        <!-- Price Input -->
+                        <div style="display: flex; align-items: center; gap: 4px;">
+                            <span style="color: var(--text-secondary); font-size: 0.8rem;">$</span>
+                            <input type="number" class="cart-price-input form-control" data-index="${index}" value="${item.price}" step="1" style="width: 85px; height: 28px; padding: 2px 6px !important; font-size: 0.8rem !important; min-height: unset !important; margin: 0; background: rgba(0,0,0,0.2) !important; border: 1px solid var(--border) !important; border-radius: 6px !important; color: white !important;">
                         </div>
-                    </td>
-                    <td data-label="Subtotal"><span>$${subtotal.toLocaleString()}</span></td>
-                    <td class="table-actions" data-label="Acción"><button class="icon-btn text-danger remove-item" data-index="${index}"><i class="fas fa-times"></i></button></td>
-                </tr>
+                        
+                        <!-- Quantity Control -->
+                        <div class="qty-control" style="gap: 4px;">
+                            <button class="qty-btn" data-index="${index}" data-action="dec" style="width: 26px; height: 26px; font-size: 0.9rem; border-radius: 6px; padding: 0;">-</button>
+                            <input type="number" class="cart-qty-input" data-index="${index}" value="${item.quantity}" min="1" style="width: 36px; height: 26px; font-size: 0.85rem; border-radius: 6px; padding: 0;">
+                            <button class="qty-btn" data-index="${index}" data-action="inc" style="width: 26px; height: 26px; font-size: 0.9rem; border-radius: 6px; padding: 0;">+</button>
+                        </div>
+                        
+                        <!-- Subtotal -->
+                        <div class="cart-item-subtotal" style="text-align: right; font-weight: 700; color: #10b981; font-size: 0.9rem; min-width: 80px;">
+                            $${subtotal.toLocaleString('es-CO')}
+                        </div>
+                    </div>
+                </div>
             `;
         }).join('');
 
         if (this.cart.length === 0) {
-            list.innerHTML = '<tr><td colspan="5" class="text-center">Vacio</td></tr>';
+            list.innerHTML = '<div style="padding: 2rem; text-align: center; color: var(--text-secondary); font-size: 0.9rem; opacity: 0.7;">Carrito Vacío</div>';
         }
 
         const totalEl = document.getElementById('pos-total');
-        if (totalEl) totalEl.textContent = `$${total.toLocaleString()}`;
+        if (totalEl) totalEl.textContent = `$${total.toLocaleString('es-CO')}`;
     },
 
     addToCart(product) {
@@ -312,8 +319,8 @@ window.Sales = {
                     else if (this.cart[index].quantity > 1) this.cart[index].quantity--;
                     
                     // Update input value directly without full re-render if possible
-                    const row = btn.closest('tr');
-                    const qtyInput = row.querySelector('.cart-qty-input');
+                    const card = btn.closest('.cart-item-card');
+                    const qtyInput = card ? card.querySelector('.cart-qty-input') : null;
                     if (qtyInput) qtyInput.value = this.cart[index].quantity;
                     
                     this.updateCartUI(); // Keep full re-render for now to ensure consistency, though it breaks focus. 
@@ -369,14 +376,15 @@ window.Sales = {
                 this.cart[index].manualPrice = true; // Mark as manually overridden
 
                 // Update row subtotal and grand total without full re-render (keep focus)
-                const row = e.target.closest('tr');
-                if (row) {
+                const card = e.target.closest('.cart-item-card');
+                if (card) {
                     const subtotal = newPrice * this.cart[index].quantity;
-                    if (row.cells[3]) row.cells[3].textContent = `$${subtotal.toLocaleString()}`;
+                    const subtotalEl = card.querySelector('.cart-item-subtotal');
+                    if (subtotalEl) subtotalEl.textContent = `$${subtotal.toLocaleString('es-CO')}`;
 
                     const grandTotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                     const totalEl = document.getElementById('pos-total');
-                    if (totalEl) totalEl.textContent = `$${grandTotal.toLocaleString()}`;
+                    if (totalEl) totalEl.textContent = `$${grandTotal.toLocaleString('es-CO')}`;
                 }
             }
 
@@ -387,14 +395,15 @@ window.Sales = {
                 this.cart[index].quantity = newQty;
 
                 // Update row subtotal and grand total
-                const row = e.target.closest('tr');
-                if (row) {
+                const card = e.target.closest('.cart-item-card');
+                if (card) {
                     const subtotal = this.cart[index].price * newQty;
-                    if (row.cells[3]) row.cells[3].textContent = `$${subtotal.toLocaleString()}`;
+                    const subtotalEl = card.querySelector('.cart-item-subtotal');
+                    if (subtotalEl) subtotalEl.textContent = `$${subtotal.toLocaleString('es-CO')}`;
 
                     const grandTotal = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
                     const totalEl = document.getElementById('pos-total');
-                    if (totalEl) totalEl.textContent = `$${grandTotal.toLocaleString()}`;
+                    if (totalEl) totalEl.textContent = `$${grandTotal.toLocaleString('es-CO')}`;
                 }
             }
 
