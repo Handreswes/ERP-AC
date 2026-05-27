@@ -179,12 +179,20 @@ window.Inventory = {
                                     </select>
                                 </div>
                                 <div class="form-group" style="grid-column: span 2;">
-                                    <label>Descripción (Sólo visible en Catálogo)</label>
-                                    <textarea name="description" rows="3" placeholder="Ej: Excelente herramienta con motor de cobre..."></textarea>
-                                    <button type="button" id="generate-ai-desc-btn" class="btn btn-sm" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid #8b5cf6; margin-top: 8px; border-radius: 8px;">
-                                        <i class="fas fa-magic"></i> Mejorar con IA (SEO)
+                                    <label>Descripción para la Página Web (Copywriting / Comercial)</label>
+                                    <textarea id="product-desc-web" rows="3" placeholder="Ej: Excelente herramienta con motor de cobre..."></textarea>
+                                    <button type="button" id="generate-ai-desc-web-btn" class="btn btn-sm" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border: 1px solid #8b5cf6; margin-top: 8px; border-radius: 8px;">
+                                        <i class="fas fa-magic"></i> Mejorar Web con IA (SEO Vendedor)
                                     </button>
                                 </div>
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label>Descripción para el Catálogo PDF (Especificaciones Técnicas Directas)</label>
+                                    <textarea id="product-desc-catalog" rows="3" placeholder="Ej: Funciones: 3 (Rotación, Percusión, Atornillado)..."></textarea>
+                                    <button type="button" id="generate-ai-desc-catalog-btn" class="btn btn-sm" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid #10b981; margin-top: 8px; border-radius: 8px;">
+                                        <i class="fas fa-magic"></i> Mejorar Catálogo con IA (Listado Directo)
+                                    </button>
+                                </div>
+                                <input type="hidden" name="description" id="product-description-hidden">
                                 <div class="form-group">
                                     <label>Proveedor</label>
                                     <input type="text" name="provider">
@@ -606,9 +614,18 @@ window.Inventory = {
                         const input = form.elements[key];
                         if (input) {
                             if (input.type === 'checkbox') input.checked = product[key] !== false;
-                            else if (input.type !== 'file') input.value = product[key] !== undefined ? product[key] : (input.type === 'number' ? 0 : '');
                         }
                     });
+                    
+                    const descValue = product.description || '';
+                    const parts = descValue.split('[CATALOGO]');
+                    const webDesc = parts[0].trim();
+                    const catDesc = parts[1] ? parts[1].trim() : '';
+
+                    document.getElementById('product-desc-web').value = webDesc;
+                    document.getElementById('product-desc-catalog').value = catDesc;
+                    document.getElementById('product-description-hidden').value = descValue;
+                    
                     const previewOld = document.getElementById('product-image-preview');
                     if (previewOld) previewOld.remove();
 
@@ -712,8 +729,12 @@ window.Inventory = {
                 return;
             }
 
-            if (e.target.id === 'generate-ai-desc-btn' || e.target.closest('#generate-ai-desc-btn')) {
-                this.handleGenerateAIDescription();
+            if (e.target.id === 'generate-ai-desc-web-btn' || e.target.closest('#generate-ai-desc-web-btn')) {
+                this.handleGenerateAIDescription('web');
+                return;
+            }
+            if (e.target.id === 'generate-ai-desc-catalog-btn' || e.target.closest('#generate-ai-desc-catalog-btn')) {
+                this.handleGenerateAIDescription('catalog');
                 return;
             }
 
@@ -732,6 +753,9 @@ window.Inventory = {
                     if (img) img.remove();
                     slot.querySelector('.image-base64').value = '';
                 });
+                document.getElementById('product-desc-web').value = '';
+                document.getElementById('product-desc-catalog').value = '';
+                document.getElementById('product-description-hidden').value = '';
                 document.getElementById('product-modal').classList.add('show');
                 return;
             }
@@ -767,11 +791,22 @@ window.Inventory = {
 
     },
 
-    async handleGenerateAIDescription() {
+    async handleGenerateAIDescription(type = 'web') {
         const nameInput = document.querySelector('#product-form input[name="name"]')?.value;
         const catInput = document.querySelector('#product-form select[name="category"]')?.value;
-        const descTextarea = document.querySelector('#product-form textarea[name="description"]');
-        let currentDesc = descTextarea ? descTextarea.value : '';
+        
+        const isWeb = type === 'web';
+        const descTextarea = document.getElementById(isWeb ? 'product-desc-web' : 'product-desc-catalog');
+        let currentDesc = descTextarea ? descTextarea.value.trim() : '';
+
+        // FALLBACK INTELIGENTE: Si el campo del catálogo está vacío, tomamos la descripción
+        // de la web como base para extraer y estructurar las especificaciones técnicas.
+        if (!isWeb && !currentDesc) {
+            const webDescText = document.getElementById('product-desc-web')?.value.trim();
+            if (webDescText) {
+                currentDesc = webDescText;
+            }
+        }
 
         if (!nameInput) {
             alert('Por favor, ingresa al menos el Nombre del producto antes de generar la descripción con IA.');
@@ -785,20 +820,46 @@ window.Inventory = {
             localStorage.setItem('GEMINI_API_KEY', apiKey.trim());
         }
 
-        const btn = document.getElementById('generate-ai-desc-btn');
+        const btn = document.getElementById(isWeb ? 'generate-ai-desc-web-btn' : 'generate-ai-desc-catalog-btn');
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando magia...';
         btn.disabled = true;
 
         try {
-            const promptText = `Eres un experto en Marketing Digital y SEO para e-commerce. 
-Genera una descripción comercial, persuasiva y optimizada para SEO para el siguiente producto.
-La longitud debe ser mediana (unas 3 a 5 líneas de texto, con algunos bullet points para beneficios clave).
-No uses lenguaje excesivamente formal, hazlo vendedor y directo.
+            let promptText = '';
+            if (isWeb) {
+                promptText = `Eres un experto en Copywriting de E-commerce y redacción comercial para la tienda TuCompras Col.
+Tu objetivo es generar una descripción de producto comercial, altamente persuasiva, profesional y limpia, al estilo de una tienda de comercio electrónico de lujo.
+
+Sigue estrictamente estas reglas fundamentales:
+1. Usa un tono profesional, claro, auténtico, convincente y sumamente vendedor. Evita sonar artificial.
+2. Comienza con un breve párrafo introductorio de 2 a 3 líneas que conecte de forma natural con el cliente y muestre el beneficio directo del producto.
+3. Continúa con una lista de 3 o 4 viñetas (bullet points) breves, claras e independientes destacando beneficios reales.
+4. NUNCA, BAJO NINGUNA CIRCUNSTANCIA, uses frases clichés de IA como: "llevar al siguiente nivel", "llevar tu ... al siguiente nivel", "solución perfecta", "el compañero ideal", "diseñado para durar", "revolucionario", o "innovador". Si la información base proporcionada contiene estas frases, ELIMÍNALAS por completo y reescríbelas de forma profesional y realista (por ejemplo, en vez de "lleva tu trabajo al siguiente nivel", di "optimiza tus tareas diarias con mayor comodidad y rapidez").
+
 Nombre del producto: ${nameInput}
 Categoría: ${catInput || 'General'}
 Información base: ${currentDesc || 'Haz una descripción atractiva sobre este producto útil.'}
-Solo devuelve el texto de la descripción, sin saludos ni frases como "Aquí tienes".`;
+
+Solo devuelve el texto de la descripción comercial en formato de texto plano con viñetas de asterisco (*) sin ningún saludo, introducción ni marcas de formato Markdown adicionales como bloques de código o asteriscos en los títulos de las secciones.`;
+            } else {
+                promptText = `Eres un asistente experto en organizar fichas y especificaciones técnicas para un catálogo comercial de ferretería y hogar.
+Tu trabajo es tomar la información base proporcionada (que puede ser prosa comercial, una descripción de ventas con clichés o apuntes rápidos desordenados) y extraer y estructurar ÚNICAMENTE los datos técnicos y características concretas.
+
+Sigue estrictamente estas reglas:
+1. Extrae solo los datos técnicos reales. ELIMINA y omite por completo toda la prosa comercial, introducciones, conclusiones y clichés (como "llevar al siguiente nivel" o "el compañero ideal").
+2. Corrige rigurosamente cualquier error ortográfico, de digitación o de abreviatura en los nombres de las propiedades o detalles (por ejemplo: "velocivdde" a "Velocidades", "toruqe" a "Torque", "mandril" a "Mandril", "funcione" a "Funciones", etc.).
+3. El formato de salida debe constar ÚNICAMENTE de líneas directas tipo 'Propiedad: Detalle'. Por ejemplo:
+Funciones: 3 (Rotación, Percusión, Atornillado)
+Velocidades: 2 mecánicas
+Torque: 20 niveles de ajuste
+Mandril: Metálico de alta resistencia
+
+Nombre del producto: ${nameInput}
+Información base a procesar: ${currentDesc || 'Lista los datos más importantes de este producto.'}
+
+Solo devuelve el listado técnico de especificaciones línea por línea en ese formato directo, sin viñetas de asterisco (*), sin saludos, ni marcas de formato Markdown.`;
+            }
 
             if (apiKey.startsWith('sk-')) {
                  const res = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -958,6 +1019,11 @@ Solo devuelve el texto de la descripción, sin saludos ni frases como "Aquí tie
         }
 
         try {
+            const webDesc = document.getElementById('product-desc-web').value.trim();
+            const catDesc = document.getElementById('product-desc-catalog').value.trim();
+            const fullDesc = catDesc ? `${webDesc}\n\n[CATALOGO]\n\n${catDesc}` : webDesc;
+            document.getElementById('product-description-hidden').value = fullDesc;
+
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
             window.ERP_LOG('Iniciando guardado manual (V66)...');
