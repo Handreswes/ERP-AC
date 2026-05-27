@@ -114,6 +114,16 @@ window.Catalog = {
                 <div class="alert alert-info" style="margin-top: 1.5rem; background: rgba(59,130,246,0.1); border: 1px solid var(--accent); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
                     <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos. El diseño es responsive y elegante.
                 </div>
+                <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px;">
+                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);"><i class="fas fa-link"></i> Enlace de Catálogo Compartible (Tiempo Real):</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="shareable-catalog-url" class="form-control" readonly value="https://Handreswes.github.io/ERP-AC/catalogo.html?price=wholesale" style="background: var(--bg-body); color: var(--text-primary); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem; flex-grow: 1;">
+                        <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('shareable-catalog-url').value); alert('¡Enlace de Catálogo copiado al portapapeles!');" style="white-space: nowrap;">
+                            <i class="fas fa-copy"></i> Copiar Enlace
+                        </button>
+                    </div>
+                    <small style="color: var(--text-secondary);">Envíale este enlace directo a tus clientes mayoristas. Se actualiza en tiempo real con los productos del ERP.</small>
+                </div>
             </div>
 
             <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
@@ -544,7 +554,7 @@ window.Catalog = {
                 </div>
                 <div class="footer-meta-item">
                     <i class="fas fa-truck-fast"></i>
-                    <span><strong>COBERTURA:</strong> ENVÍOS NACIONALES + CONTRAENTREGA</span>
+                    <span><strong>COBERTURA:</strong> ${this.currentPriceType === 'wholesale' ? 'ENVÍOS NACIONALES' : 'ENVÍOS NACIONALES + CONTRAENTREGA'}</span>
                 </div>
                 <div class="footer-meta-item">
                     <i class="fas fa-globe"></i>
