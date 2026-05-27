@@ -574,7 +574,13 @@ function renderProductLanding(id) {
                 </div>
                 <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;">${p.name}</h1>
                 
-                <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6;">${parseMarkdown(p.description) || 'Experimenta la máxima calidad y rendimiento con este producto diseñado para los estándares más exigentes. Ideal para uso industrial y profesional.'}</div>
+                <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6;">
+                    ${(() => {
+                        const parts = (p.description || '').split('[CATALOGO]');
+                        const webDesc = parts[0].trim();
+                        return parseMarkdown(webDesc) || 'Experimenta la máxima calidad y rendimiento con este producto diseñado para los estándares más exigentes. Ideal para uso industrial y profesional.';
+                    })()}
+                </div>
                 
                 <div class="glass" style="padding: 2.5rem; border-radius: 25px; margin-bottom: 3rem; border: 2px solid var(--accent);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
