@@ -228,7 +228,9 @@ window.Catalog = {
         if (viewBtn) {
             viewBtn.onclick = () => this.openCatalogView();
         }
-       openCatalogView() {
+    },
+
+    openCatalogView() {
         const searchInput = document.getElementById('catalog-search');
         const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
         const products = Inventory.getProducts().filter(p => p.active !== false);
