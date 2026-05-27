@@ -152,6 +152,7 @@ window.Catalog = {
         `;
 
         this.updatePreview();
+        this.updateShareableLink();
         this.setupEventListeners();
     },
 
@@ -213,6 +214,13 @@ window.Catalog = {
         }
     },
 
+    updateShareableLink() {
+        const urlInput = document.getElementById('shareable-catalog-url');
+        if (urlInput) {
+            urlInput.value = `https://Handreswes.github.io/ERP-AC/catalogo.html?price=${this.currentPriceType}&company=${this.currentCompany}`;
+        }
+    },
+
     setupEventListeners() {
         const panel = document.getElementById('catalog-panel');
         if (!panel) return;
@@ -221,10 +229,12 @@ window.Catalog = {
             if (e.target.id === 'catalog-company-filter') {
                 this.currentCompany = e.target.value;
                 this.updatePreview();
+                this.updateShareableLink();
             }
             if (e.target.id === 'catalog-price-type') {
                 this.currentPriceType = e.target.value;
                 this.updatePreview();
+                this.updateShareableLink();
             }
         };
 
