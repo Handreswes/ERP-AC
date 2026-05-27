@@ -117,7 +117,7 @@ window.Catalog = {
                 <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);"><i class="fas fa-link"></i> Enlace de Catálogo Compartible (Tiempo Real):</label>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="shareable-catalog-url" class="form-control" readonly value="https://Handreswes.github.io/ERP-AC/catalogo.html?price=wholesale" style="background: var(--bg-body); color: var(--text-primary); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem; flex-grow: 1;">
+                        <input type="text" id="shareable-catalog-url" class="form-control" readonly value="https://Handreswes.github.io/ERP%20AC/catalogo.html?price=wholesale" style="background: var(--bg-body); color: var(--text-primary); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem; flex-grow: 1;">
                         <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('shareable-catalog-url').value); alert('¡Enlace de Catálogo copiado al portapapeles!');" style="white-space: nowrap;">
                             <i class="fas fa-copy"></i> Copiar Enlace
                         </button>
