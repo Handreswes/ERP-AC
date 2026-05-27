@@ -13,7 +13,7 @@
             --accent: #3b82f6;
             --success: #10b981;
             --bg: #f8fafc;
-            --border: #cbd5e1;
+            --border: #e2e8f0;
             --text: #1e293b;
             --text-secondary: #64748b;
         }
@@ -33,7 +33,7 @@
         .controls-bar {
             background: #ffffff;
             border-bottom: 1px solid var(--border);
-            padding: 1rem 1.5rem;
+            padding: 0.75rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -59,15 +59,15 @@
 
         .filters-group {
             display: flex;
-            gap: 15px;
+            gap: 12px;
             align-items: center;
             flex-wrap: wrap;
         }
 
         .filter-select {
-            padding: 8px 16px;
+            padding: 8px 14px;
             border: 2px solid #e2e8f0;
-            border-radius: 10px;
+            border-radius: 12px;
             font-family: 'Outfit', sans-serif;
             font-weight: 600;
             font-size: 0.85rem;
@@ -80,14 +80,15 @@
 
         .filter-select:focus {
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
         .btn-print {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 8px 18px;
-            border-radius: 10px;
+            padding: 8px 16px;
+            border-radius: 12px;
             font-weight: 700;
             font-family: 'Outfit', sans-serif;
             font-size: 0.85rem;
@@ -107,7 +108,7 @@
         .header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: white;
-            padding: 3rem 1.5rem;
+            padding: 2.5rem 1.5rem;
             text-align: center;
         }
 
@@ -556,20 +557,21 @@
             }
         }
 
-        @media (max-width: 480px) {
-            .catalog-grid {
-                grid-template-columns: 1fr;
-            }
+        @media (max-width: 600px) {
             .controls-bar {
                 flex-direction: column;
                 gap: 12px;
                 align-items: stretch;
+                padding: 1rem;
             }
             .filters-group {
-                justify-content: space-between;
+                flex-direction: column;
+                align-items: stretch;
             }
-            .header h1 {
-                font-size: 1.8rem;
+            .filter-select, .btn-print {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
             }
         }
     </style>
@@ -579,7 +581,7 @@
     <!-- Loading Screen -->
     <div class="loading-screen" id="loading-screen">
         <div class="loading-spinner"></div>
-        <div style="font-weight: 600; font-size: 1.1rem; letter-spacing: 1px;">CARGANDO CATÁLOGO PREMIUM...</div>
+        <div style="font-weight: 600; font-size: 1.1rem; letter-spacing: 1px;">CARGANDO CATÁLOGO...</div>
     </div>
 
     <!-- Controls Bar (Visible only on web view, hidden during printing) -->
@@ -588,17 +590,18 @@
             TuCompras<span>Col</span>
         </a>
         <div class="filters-group">
-            <select id="select-company" class="filter-select" onchange="applyFilters()">
-                <option value="all">Todas las Empresas</option>
-                <option value="millenio">Millenio</option>
-                <option value="vulcano">Vulcano</option>
+            <!-- Dynamic Search input -->
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.85rem;"></i>
+                <input type="text" id="search-input" placeholder="Buscar productos..." class="filter-select" oninput="applyFilters()" style="padding-left: 35px; width: 180px; box-sizing: border-box;">
+            </div>
+            <!-- Dynamic Categories loaded dynamically -->
+            <select id="select-category" class="filter-select" onchange="applyFilters()">
+                <option value="all">Todas las Categorías</option>
             </select>
-            <select id="select-price" class="filter-select" onchange="applyFilters()">
-                <option value="wholesale" selected>Precios al POR MAYOR</option>
-                <option value="internet">Precios Minoristas (Internet)</option>
-            </select>
+            <!-- Print PDF Button -->
             <button class="btn-print" onclick="window.print()">
-                <i class="fas fa-print"></i> Guardar PDF / Imprimir
+                <i class="fas fa-print"></i> Guardar PDF
             </button>
         </div>
     </div>
@@ -665,10 +668,7 @@
         // Load query parameters on startup
         const urlParams = new URLSearchParams(window.location.search);
         const urlCompany = urlParams.get('company') || 'all';
-        const urlPrice = urlParams.get('price') || 'wholesale';
-
-        document.getElementById('select-company').value = urlCompany;
-        document.getElementById('select-price').value = urlPrice;
+        const urlPrice = urlParams.get('price') || 'wholesale'; // default is wholesale
 
         // Date population
         document.getElementById('cover-date').innerText = new Date().toLocaleDateString('es-CO', { 
@@ -702,6 +702,16 @@
                 // Filter out ghost products (without price)
                 allProducts = products.filter(p => (p.priceInternet || p.priceFinal || p.priceWholesale) > 0);
 
+                // Populate Category Filter dropdown dynamically from actual products
+                const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
+                const catSelect = document.getElementById('select-category');
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    catSelect.appendChild(opt);
+                });
+
                 applyFilters();
 
                 // Hide loading screen
@@ -724,33 +734,45 @@
 
         // Filter and Render Logic
         function applyFilters() {
-            const company = document.getElementById('select-company').value;
-            const priceType = document.getElementById('select-price').value;
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const activeCategory = document.getElementById('select-category').value;
 
-            // 1. Filter products
+            // 1. Base filter based on URL query parameters (Locked for the customer)
             let filtered = allProducts;
-            if (company !== 'all') {
-                filtered = allProducts.filter(p => p.company === 'both' || p.company === company);
+            if (urlCompany !== 'all') {
+                filtered = allProducts.filter(p => p.company === 'both' || p.company === urlCompany);
             }
 
-            // 2. Update cover page & headings titles
-            const companyTitle = company === 'all' ? 'Catálogo General' : 'Catálogo ' + company.toUpperCase();
-            document.title = companyTitle + " | TuCompras Col";
-            document.getElementById('web-title').innerText = companyTitle;
-            document.getElementById('cover-catalog-title').innerText = companyTitle.toUpperCase();
+            // 2. Customer interactive filters (Categories and Search)
+            if (activeCategory !== 'all') {
+                filtered = filtered.filter(p => p.category === activeCategory);
+            }
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    (p.name || '').toLowerCase().includes(searchTerm) ||
+                    (p.category || '').toLowerCase().includes(searchTerm) ||
+                    (p.ref || '').toLowerCase().includes(searchTerm)
+                );
+            }
 
-            // 3. Update cover page shipping (NO Contraentrega for B2B Wholesale)
+            // 3. Update cover page & headings titles
+            const catalogTitle = urlPrice === 'wholesale' ? 'Catálogo Mayorista' : 'Catálogo de Productos';
+            document.title = catalogTitle + " | TuCompras Col";
+            document.getElementById('web-title').innerText = catalogTitle;
+            document.getElementById('cover-catalog-title').innerText = catalogTitle.toUpperCase();
+
+            // 4. Update cover page shipping (NO Contraentrega for B2B Wholesale)
             const shippingText = document.getElementById('cover-shipping-text');
-            if (priceType === 'wholesale') {
+            if (urlPrice === 'wholesale') {
                 shippingText.innerText = 'ENVÍOS NACIONALES';
             } else {
                 shippingText.innerText = 'ENVÍOS NACIONALES + CONTRAENTREGA';
             }
 
-            // 4. Update WhatsApp floating button link & text
+            // 5. Update WhatsApp floating button link & text
             const waFloat = document.getElementById('whatsapp-float-btn');
             const waText = document.getElementById('whatsapp-btn-text');
-            if (priceType === 'wholesale') {
+            if (urlPrice === 'wholesale') {
                 waFloat.href = `https://wa.me/573113979396?text=Hola,%20quisiera%20consultar%20sobre%20ventas%20al%20por%20mayor%20del%20catálogo`;
                 waText.innerText = "Ventas al por Mayor";
             } else {
@@ -760,7 +782,7 @@
                 waText.innerText = "Consultar por WhatsApp";
             }
 
-            // 5. Render products
+            // 6. Render products
             const grid = document.getElementById('catalog-grid');
             if (filtered.length === 0) {
                 grid.innerHTML = `
@@ -773,7 +795,7 @@
             }
 
             grid.innerHTML = filtered.map(p => {
-                const price = priceType === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
+                const price = urlPrice === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
                 const displayDesc = getDisplayDescription(p);
                 const img = (Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/300?text=Premium+Product';
 
