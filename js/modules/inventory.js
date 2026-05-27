@@ -614,6 +614,7 @@ window.Inventory = {
                         const input = form.elements[key];
                         if (input) {
                             if (input.type === 'checkbox') input.checked = product[key] !== false;
+                            else if (input.type !== 'file') input.value = product[key] !== undefined ? product[key] : (input.type === 'number' ? 0 : '');
                         }
                     });
                     
