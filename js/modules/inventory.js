@@ -922,7 +922,11 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
             }
         } catch (err) {
             console.error(err);
-            alert('Error generando IA: ' + err.message + '\\nSi tu llave es incorrecta, bórrala e inténtalo de nuevo.');
+            let userMsg = err.message;
+            if (userMsg.includes('high demand') || userMsg.includes('overloaded') || userMsg.includes('temporary') || userMsg.includes('resource') || userMsg.includes('exhausted') || userMsg.includes('demand') || userMsg.includes('busy')) {
+                userMsg = "El servidor gratuito de Google Gemini está experimentando una alta demanda temporal en sus servidores. Por favor, espera de 10 a 15 segundos y vuelve a presionar el botón.";
+            }
+            alert('Error generando IA: ' + userMsg + '\n\nSi tu llave es incorrecta, bórrala e inténtalo de nuevo.');
             if (err.message.includes('inválida') || err.message.includes('Incorrect API key')) {
                 localStorage.removeItem('GEMINI_API_KEY');
             }
