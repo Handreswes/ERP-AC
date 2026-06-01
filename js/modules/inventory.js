@@ -923,7 +923,9 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
         } catch (err) {
             console.error(err);
             let userMsg = err.message;
-            if (userMsg.includes('high demand') || userMsg.includes('overloaded') || userMsg.includes('temporary') || userMsg.includes('resource') || userMsg.includes('exhausted') || userMsg.includes('demand') || userMsg.includes('busy')) {
+            if (userMsg.includes('quota') || userMsg.includes('Quota') || userMsg.includes('limit') || userMsg.includes('Limit')) {
+                userMsg = "Has superado el límite de consultas por minuto de la versión gratuita de Google Gemini (máximo 15 consultas por minuto).\n\nNo te preocupes, esto es normal en la cuenta gratuita de Google. Solo espera de 30 a 60 segundos y vuelve a presionar el botón.";
+            } else if (userMsg.includes('high demand') || userMsg.includes('overloaded') || userMsg.includes('temporary') || userMsg.includes('resource') || userMsg.includes('exhausted') || userMsg.includes('demand') || userMsg.includes('busy')) {
                 userMsg = "El servidor gratuito de Google Gemini está experimentando una alta demanda temporal en sus servidores. Por favor, espera de 10 a 15 segundos y vuelve a presionar el botón.";
             }
             alert('Error generando IA: ' + userMsg + '\n\nSi tu llave es incorrecta, bórrala e inténtalo de nuevo.');
