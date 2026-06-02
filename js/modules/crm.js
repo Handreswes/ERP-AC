@@ -400,6 +400,30 @@ window.CRM = {
             const client = Storage.getById(STORAGE_KEYS.CLIENTS, clientId);
             if (!client) throw new Error('Cliente no encontrado');
 
+            // Validación de abono duplicado en el mismo día para el mismo cliente con el mismo valor
+            const today = new Date();
+            const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+            const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+            
+            const todayPayments = (Storage.get(STORAGE_KEYS.PAYMENTS) || []).filter(p => {
+                const dateVal = p.date || p.createdAt;
+                if (!dateVal) return false;
+                const d = new Date(dateVal);
+                return d >= startOfDay && d <= endOfDay;
+            });
+            
+            const isDuplicatePayment = todayPayments.some(p => {
+                return p.clientId === clientId && Math.abs(parseFloat(p.amount) - amount) < 0.01;
+            });
+            
+            if (isDuplicatePayment) {
+                const confirmNew = confirm(`⚠️ ALERTA DE POSIBLE ABONO DUPLICADO\n\nYa existe hoy un abono para "${client.name}" por valor de $${amount.toLocaleString('es-CO')}.\n\n¿Este es un NUEVO ABONO o es un abono DUPLICADO?\n\n- Presiona ACEPTAR si es un NUEVO abono independiente.\n- Presiona CANCELAR si está DUPLICADO (no se registrará).`);
+                if (!confirmNew) {
+                    window.ERP_LOG('Abono cancelado: abono identificado como duplicado por el usuario.');
+                    return;
+                }
+            }
+
             if (data.company === 'millenio') client.balanceMillenio = (client.balanceMillenio || 0) - amount;
             else client.balanceVulcano = (client.balanceVulcano || 0) - amount;
 
