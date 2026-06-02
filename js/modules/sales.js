@@ -486,6 +486,43 @@ window.Sales = {
             const bankSelect = document.getElementById('pos-bank-account');
             const accountId = method === 'transfer' ? (bankSelect ? bankSelect.value : null) : null;
             const total = this.cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            // Validación de venta duplicada en el mismo día para el mismo cliente
+            const today = new Date();
+            const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+            const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+            
+            const todaySales = (Storage.get(STORAGE_KEYS.SALES) || []).filter(s => {
+                if (!s.date) return false;
+                const d = new Date(s.date);
+                return d >= startOfDay && d <= endOfDay;
+            });
+            
+            const isDuplicate = todaySales.some(s => {
+                // Obligatorio: Mismo cliente
+                if (s.clientId !== this.selectedClient.id) return false;
+                
+                // Opcional 1: Mismo valor
+                const sameTotal = Math.abs(parseFloat(s.total) - total) < 0.01;
+                
+                // Opcional 2: Mismos productos
+                const sItems = s.items || [];
+                const sameProducts = sItems.length === this.cart.length && sItems.every(item => {
+                    const cartItem = this.cart.find(c => c.id === item.id);
+                    return cartItem && cartItem.quantity === item.quantity;
+                });
+                
+                return sameTotal || sameProducts;
+            });
+            
+            if (isDuplicate) {
+                const confirmNew = confirm(`⚠️ ALERTA DE POSIBLE DUPLICADO\n\nYa existe una venta hoy para "${this.selectedClient.name}" con el mismo valor o los mismos productos.\n\n¿Esta es una NUEVA VENTA o es una venta DUPLICADA?\n\n- Presiona ACEPTAR si es una NUEVA venta independiente.\n- Presiona CANCELAR si está DUPLICADA (no se registrará).`);
+                if (!confirmNew) {
+                    window.ERP_LOG('Checkout cancelado: venta identificada como duplicada por el usuario.');
+                    return;
+                }
+            }
+
             let totalM = 0;
             let totalV = 0;
 
