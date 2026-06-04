@@ -699,8 +699,12 @@
 
                 if (pErr) throw pErr;
 
-                // Filter out ghost products (without price)
-                allProducts = products.filter(p => (p.priceInternet || p.priceFinal || p.priceWholesale) > 0);
+                // Filter out ghost products (no price) and products without images
+                allProducts = products.filter(p => {
+                    const hasPrice = (p.priceInternet || p.priceFinal || p.priceWholesale) > 0;
+                    const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
+                    return hasPrice && hasImage;
+                });
 
                 // Populate Category Filter dropdown dynamically from actual products
                 const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
