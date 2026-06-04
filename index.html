@@ -470,7 +470,7 @@
         <div class="modal-content" style="max-width: 1000px;">
             <div class="modal-header">
                 <h2 id="dashboard-detail-title">Detalle de Información</h2>
-                <span class="close-modal">&times;</span>
+                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
             </div>
             <div class="modal-body" style="display: flex; gap: 1.5rem; padding: 1.5rem; overflow: hidden;">
                 <!-- Sidebar: Summary (5cm) -->
@@ -500,38 +500,57 @@
         <div class="modal-content" style="max-width: 500px;">
             <div class="modal-header">
                 <h2>Registrar Abono / Pago</h2>
-                <span class="close-modal">&times;</span>
+                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="payment-form">
                     <input type="hidden" name="clientId" id="payment-client-id">
+                    
+                    <!-- Deudas actuales de Millenio y Vulcano -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 1.5rem; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
+                        <div style="flex: 1; text-align: center; border-right: 1px solid var(--border); padding-right: 5px;">
+                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary);">Deuda Millenio</span>
+                            <h3 id="payment-debt-millenio" style="margin: 4px 0 0 0; color: var(--danger); font-size: 1.15rem;">$0</h3>
+                        </div>
+                        <div style="flex: 1; text-align: center; padding-left: 5px;">
+                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary);">Deuda Vulcano</span>
+                            <h3 id="payment-debt-vulcano" style="margin: 4px 0 0 0; color: var(--danger); font-size: 1.15rem;">$0</h3>
+                        </div>
+                    </div>
+
                     <div class="crm-responsive-grid">
+                        <!-- Abono Millenio -->
                         <div class="form-group">
-                            <label>Empresa</label>
-                            <select name="company" required>
-                                <option value="millenio">Millenio</option>
-                                <option value="vulcano">Vulcano</option>
-                            </select>
+                            <label style="color: #3b82f6; font-weight: 700;">Abonar a Millenio</label>
+                            <input type="text" id="payment-amount-millenio" class="form-control" placeholder="0">
                         </div>
+                        <!-- Abono Vulcano -->
                         <div class="form-group">
-                            <label>Monto del Abono</label>
-                            <input type="text" name="amount" id="payment-amount-input" class="form-control" required
-                                placeholder="0">
+                            <label style="color: #f59e0b; font-weight: 700;">Abonar a Vulcano</label>
+                            <input type="text" id="payment-amount-vulcano" class="form-control" placeholder="0">
                         </div>
-                        <div class="form-group">
+
+                        <!-- Método de Pago -->
+                        <div class="form-group" style="grid-column: span 2;">
                             <label>Método de Pago</label>
                             <select name="method" required id="payment-method-select">
                                 <option value="cash">Efectivo</option>
                                 <option value="transfer">Consignación / Transferencia</option>
                             </select>
                         </div>
-                        <div class="form-group" id="payment-bank-group" style="display: none;">
-                            <label>Banco / Nro Cuenta</label>
-                            <input type="text" name="paymentDetails" placeholder="Ej: Bancolombia...">
+
+                        <!-- Bancos Millenio (Visible si ingresa abono a Millenio y es Transferencia) -->
+                        <div class="form-group" id="payment-bank-group-millenio" style="display: none; grid-column: span 2;">
+                            <!-- Dinámico -->
                         </div>
+                        <!-- Bancos Vulcano (Visible si ingresa abono a Vulcano y es Transferencia) -->
+                        <div class="form-group" id="payment-bank-group-vulcano" style="display: none; grid-column: span 2;">
+                            <!-- Dinámico -->
+                        </div>
+
                         <div class="form-group" style="grid-column: span 2;">
                             <label>Notas</label>
-                            <input type="text" name="notes" placeholder="Opcional...">
+                            <input type="text" name="notes" id="payment-notes" placeholder="Opcional...">
                         </div>
                     </div>
                     <button type="button" id="save-payment-manual-btn" class="btn btn-primary btn-block"
@@ -546,7 +565,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h2 id="movement-modal-title">Registrar Movimiento</h2>
-                <span class="close-modal">&times;</span>
+                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
             </div>
             <div class="modal-body">
                 <form id="movement-form">
