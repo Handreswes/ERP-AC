@@ -165,7 +165,7 @@ window.CRM = {
                 <td data-label="Deuda Vulcano" class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
                 <td data-label="Total Deuda"><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
                 <td class="table-actions">
-                    <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono" onclick="document.getElementById('payment-client-id').value = this.dataset.id; document.getElementById('payment-modal').classList.add('show');"><i class="fas fa-hand-holding-usd"></i></button>
+                    <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono" onclick="window.CRM.openPaymentModal(this.dataset.id);"><i class="fas fa-hand-holding-usd"></i></button>
                     <button class="icon-btn state-btn" data-id="${c.id}" title="Estado de Cuenta"><i class="fas fa-file-invoice-dollar"></i></button>
                     <button class="icon-btn edit-btn" data-id="${c.id}" title="Editar Cliente"><i class="fas fa-edit"></i></button>
                     <button class="icon-btn delete-btn" data-id="${c.id}" title="Eliminar Cliente" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
@@ -178,49 +178,99 @@ window.CRM = {
         return Storage.get(STORAGE_KEYS.ACCOUNTS).filter(a => a.company === company);
     },
 
+    openPaymentModal(clientId) {
+        const client = this.getClients().find(c => c.id === clientId);
+        if (!client) return;
+
+        document.getElementById('payment-client-id').value = clientId;
+        
+        // Mostrar deudas actuales
+        const mDebt = parseFloat(client.balanceMillenio) || 0;
+        const vDebt = parseFloat(client.balanceVulcano) || 0;
+        document.getElementById('payment-debt-millenio').textContent = `$${mDebt.toLocaleString('es-CO')}`;
+        document.getElementById('payment-debt-vulcano').textContent = `$${vDebt.toLocaleString('es-CO')}`;
+
+        // Resetear inputs a cero/vacíos
+        document.getElementById('payment-amount-millenio').value = '';
+        document.getElementById('payment-amount-vulcano').value = '';
+        document.getElementById('payment-notes').value = '';
+        document.getElementById('payment-method-select').value = 'cash';
+        
+        // Ocultar selectores de bancos
+        document.getElementById('payment-bank-group-millenio').style.display = 'none';
+        document.getElementById('payment-bank-group-vulcano').style.display = 'none';
+
+        document.getElementById('payment-modal').classList.add('show');
+    },
+
+    updateBankSelectorVisibility() {
+        const method = document.getElementById('payment-method-select').value;
+        const amountRawM = document.getElementById('payment-amount-millenio').value;
+        const amountRawV = document.getElementById('payment-amount-vulcano').value;
+
+        const amountM = parseFloat(amountRawM.replace(/\./g, '').replace(/,/g, '')) || 0;
+        const amountV = parseFloat(amountRawV.replace(/\./g, '').replace(/,/g, '')) || 0;
+
+        const bankGroupM = document.getElementById('payment-bank-group-millenio');
+        const bankGroupV = document.getElementById('payment-bank-group-vulcano');
+
+        if (method === 'transfer') {
+            // Bancos de Millenio
+            if (amountM > 0) {
+                const banks = this.getCompanyBanks('millenio');
+                let html = '<label>Banco Destino Millenio</label><select id="payment-bank-select-millenio" class="form-control" required>';
+                html += banks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+                if (banks.length === 0) html += '<option value="" disabled selected>No hay cuentas de Millenio registradas</option>';
+                html += '</select>';
+                bankGroupM.innerHTML = html;
+                bankGroupM.style.display = 'block';
+            } else {
+                bankGroupM.style.display = 'none';
+            }
+
+            // Bancos de Vulcano
+            if (amountV > 0) {
+                const banks = this.getCompanyBanks('vulcano');
+                let html = '<label>Banco Destino Vulcano</label><select id="payment-bank-select-vulcano" class="form-control" required>';
+                html += banks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
+                if (banks.length === 0) html += '<option value="" disabled selected>No hay cuentas de Vulcano registradas</option>';
+                html += '</select>';
+                bankGroupV.innerHTML = html;
+                bankGroupV.style.display = 'block';
+            } else {
+                bankGroupV.style.display = 'none';
+            }
+        } else {
+            bankGroupM.style.display = 'none';
+            bankGroupV.style.display = 'none';
+        }
+    },
+
     setupEventListeners() {
         const payModal = document.getElementById('payment-modal');
         const payForm = document.getElementById('payment-form');
         const payMethodSelect = document.getElementById('payment-method-select');
-        const payAmountInput = document.getElementById('payment-amount-input');
 
-        if (payAmountInput) {
-            payAmountInput.oninput = (e) => {
-                let value = e.target.value.replace(/\D/g, "");
-                if (value) {
-                    e.target.value = parseInt(value).toLocaleString('de-DE');
-                }
-            };
-        }
-
-        if (payMethodSelect) {
-            payMethodSelect.onchange = (e) => {
-                const bankGroup = document.getElementById('payment-bank-group');
-                const coSelect = document.querySelector('#payment-form select[name="company"]');
-                const co = coSelect ? coSelect.value : 'millenio';
-
-                if (bankGroup) {
-                    if (e.target.value === 'transfer') {
-                        const banks = this.getCompanyBanks(co);
-                        let html = '<label>Banco / Cuenta Destino</label><select name="accountId" class="form-control" required>';
-                        html += banks.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-                        if (banks.length === 0) html += '<option value="" disabled selected>No hay cuentas registradas</option>';
-                        html += '</select>';
-                        bankGroup.innerHTML = html;
-                        bankGroup.style.display = 'block';
-                    } else {
-                        bankGroup.style.display = 'none';
+        // Formateador de moneda en tiempo real para abonos split y actualización de bancos
+        const setupAmountInput = (input) => {
+            if (input) {
+                input.oninput = (e) => {
+                    let value = e.target.value.replace(/\D/g, "");
+                    if (value) {
+                        e.target.value = parseInt(value).toLocaleString('de-DE');
                     }
-                }
-            };
-
-            // Link company change to bank update if method is transfer
-            const coSelect = document.querySelector('#payment-form select[name="company"]');
-            if (coSelect) {
-                coSelect.onchange = () => {
-                    if (payMethodSelect.value === 'transfer') payMethodSelect.onchange({ target: payMethodSelect });
+                    this.updateBankSelectorVisibility();
                 };
             }
+        };
+
+        setupAmountInput(document.getElementById('payment-amount-millenio'));
+        setupAmountInput(document.getElementById('payment-amount-vulcano'));
+
+        if (payMethodSelect) {
+            payMethodSelect.onchange = () => {
+                this.updateBankSelectorVisibility();
+            };
         }
         
         // Delegate inputs
@@ -333,11 +383,7 @@ window.CRM = {
 
                 const abonoBtn = tgt.closest('.abono-btn');
                 if (abonoBtn) {
-                    const modal = document.getElementById('payment-modal');
-                    if (modal) {
-                        document.getElementById('payment-client-id').value = abonoBtn.dataset.id;
-                        modal.classList.add('show');
-                    }
+                    this.openPaymentModal(abonoBtn.dataset.id);
                 }
             }
         });
@@ -390,17 +436,26 @@ window.CRM = {
         try {
             btn.disabled = true;
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
-            window.ERP_LOG('Iniciando registro de abono...');
+            window.ERP_LOG('Iniciando registro de abono split...');
 
-            const formData = new FormData(form);
-            const data = Object.fromEntries(formData.entries());
-            const amount = parseFloat(data.amount.replace(/\./g, '')) || 0;
-            const clientId = data.clientId;
+            const clientId = document.getElementById('payment-client-id').value;
+            const method = document.getElementById('payment-method-select').value;
+            const notes = document.getElementById('payment-notes').value;
+
+            const amountRawM = document.getElementById('payment-amount-millenio').value;
+            const amountRawV = document.getElementById('payment-amount-vulcano').value;
+
+            const amountM = parseFloat(amountRawM.replace(/\./g, '').replace(/,/g, '')) || 0;
+            const amountV = parseFloat(amountRawV.replace(/\./g, '').replace(/,/g, '')) || 0;
+
+            if (amountM <= 0 && amountV <= 0) {
+                throw new Error('Por favor ingrese un monto de abono para Millenio o Vulcano.');
+            }
 
             const client = Storage.getById(STORAGE_KEYS.CLIENTS, clientId);
             if (!client) throw new Error('Cliente no encontrado');
 
-            // Validación de abono duplicado en el mismo día para el mismo cliente con el mismo valor
+            // 1. Validaciones antiduplicados
             const today = new Date();
             const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
             const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
@@ -411,30 +466,79 @@ window.CRM = {
                 const d = new Date(dateVal);
                 return d >= startOfDay && d <= endOfDay;
             });
-            
-            const isDuplicatePayment = todayPayments.some(p => {
-                return p.clientId === clientId && Math.abs(parseFloat(p.amount) - amount) < 0.01;
-            });
-            
-            if (isDuplicatePayment) {
-                const confirmNew = confirm(`⚠️ ALERTA DE POSIBLE ABONO DUPLICADO\n\nYa existe hoy un abono para "${client.name}" por valor de $${amount.toLocaleString('es-CO')}.\n\n¿Este es un NUEVO ABONO o es un abono DUPLICADO?\n\n- Presiona ACEPTAR si es un NUEVO abono independiente.\n- Presiona CANCELAR si está DUPLICADO (no se registrará).`);
-                if (!confirmNew) {
-                    window.ERP_LOG('Abono cancelado: abono identificado como duplicado por el usuario.');
-                    return;
+
+            if (amountM > 0) {
+                const isDupM = todayPayments.some(p => p.clientId === clientId && p.company === 'millenio' && Math.abs(parseFloat(p.amount) - amountM) < 0.01);
+                if (isDupM) {
+                    const ok = confirm(`⚠️ ALERTA DE POSIBLE DUPLICADO MILLENIO\n\nYa existe hoy un abono de Millenio para "${client.name}" por $${amountM.toLocaleString('es-CO')}.\n\n¿Quieres registrarlo de todas formas como un nuevo abono?`);
+                    if (!ok) {
+                        window.ERP_LOG('Abono Millenio cancelado por posible duplicado.');
+                        return;
+                    }
                 }
             }
 
-            if (data.company === 'millenio') client.balanceMillenio = (client.balanceMillenio || 0) - amount;
-            else client.balanceVulcano = (client.balanceVulcano || 0) - amount;
+            if (amountV > 0) {
+                const isDupV = todayPayments.some(p => p.clientId === clientId && p.company === 'vulcano' && Math.abs(parseFloat(p.amount) - amountV) < 0.01);
+                if (isDupV) {
+                    const ok = confirm(`⚠️ ALERTA DE POSIBLE DUPLICADO VULCANO\n\nYa existe hoy un abono de Vulcano para "${client.name}" por $${amountV.toLocaleString('es-CO')}.\n\n¿Quieres registrarlo de todas formas como un nuevo abono?`);
+                    if (!ok) {
+                        window.ERP_LOG('Abono Vulcano cancelado por posible duplicado.');
+                        return;
+                    }
+                }
+            }
 
+            // 2. Aplicar deducción de saldos
+            if (amountM > 0) client.balanceMillenio = (client.balanceMillenio || 0) - amountM;
+            if (amountV > 0) client.balanceVulcano = (client.balanceVulcano || 0) - amountV;
+
+            // 3. Guardar cliente actualizado
             await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, client);
-            await Storage.addItem(STORAGE_KEYS.PAYMENTS, { ...data, amount, clientName: client.name });
 
-            window.ERP_LOG('Abono registrado localmente', 'success');
+            // 4. Registrar abonos en tabla de payments
+            if (amountM > 0) {
+                const bankSelectM = document.getElementById('payment-bank-select-millenio');
+                const accountIdM = method === 'transfer' ? (bankSelectM ? bankSelectM.value : null) : null;
+                
+                await Storage.addItem(STORAGE_KEYS.PAYMENTS, {
+                    clientId,
+                    clientName: client.name,
+                    company: 'millenio',
+                    amount: amountM,
+                    method,
+                    accountId: accountIdM,
+                    notes: notes || 'Abono Millenio',
+                    date: new Date().toISOString()
+                });
+            }
+
+            if (amountV > 0) {
+                const bankSelectV = document.getElementById('payment-bank-select-vulcano');
+                const accountIdV = method === 'transfer' ? (bankSelectV ? bankSelectV.value : null) : null;
+                
+                await Storage.addItem(STORAGE_KEYS.PAYMENTS, {
+                    clientId,
+                    clientName: client.name,
+                    company: 'vulcano',
+                    amount: amountV,
+                    method,
+                    accountId: accountIdV,
+                    notes: notes || 'Abono Vulcano',
+                    date: new Date().toISOString()
+                });
+            }
+
+            window.ERP_LOG('Abono(s) registrado(s) con éxito', 'success');
             form.reset();
             document.getElementById('payment-modal').classList.remove('show');
+            
+            // Actualizar vistas
             this.updateClientList();
-            alert(`✅ Abono de $${amount.toLocaleString()} registrado.`);
+            if (window.Finances && window.Finances.updateDebtUI) window.Finances.updateDebtUI();
+            if (window.Finances && window.Finances.updateBalancesUI) window.Finances.updateBalancesUI();
+            
+            alert(`✅ Abono(s) registrado(s) con éxito.`);
         } catch (err) {
             window.ERP_LOG('Error Abono: ' + err.message, 'error');
             alert('❌ Error: ' + err.message);
