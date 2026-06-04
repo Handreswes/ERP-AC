@@ -363,8 +363,12 @@ async function fetchProducts() {
         
         console.log('Raw products fetched:', data ? data.length : 0);
 
-        // Filter out ghost products (no price)
-        products = data.filter(p => (p.priceInternet || p.priceFinal || p.priceWholesale) > 0);
+        // Filter out ghost products (no price) and products without images
+        products = data.filter(p => {
+            const hasPrice = (p.priceInternet || p.priceFinal || p.priceWholesale) > 0;
+            const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
+            return hasPrice && hasImage;
+        });
         
         console.log('Filtered products:', products.length);
 
