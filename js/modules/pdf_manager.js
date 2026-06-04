@@ -16,12 +16,12 @@ window.PDFManager = {
         if (!document.getElementById('pdf-preview-modal')) {
             const modalHtml = `
             <div id="pdf-preview-modal" class="modal">
-                <div class="modal-content" style="max-width: 800px; background: #f8fafc;">
-                    <div class="modal-header">
-                        <h2 id="pdf-preview-title">Vista Previa de Documento</h2>
-                        <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
+                <div class="modal-content" style="max-width: 800px; background: #f8fafc; border: 1px solid #cbd5e1; box-shadow: var(--shadow-premium);">
+                    <div class="modal-header" style="background: #f1f5f9; border-bottom: 1px solid #cbd5e1; color: #0f172a; padding: 1.25rem 1.5rem;">
+                        <h2 id="pdf-preview-title" style="color: #0f172a; margin: 0; font-size: 1.25rem; font-weight: 700;">Vista Previa de Documento</h2>
+                        <span class="close-modal" style="color: #475569; cursor: pointer; font-size: 1.75rem; font-weight: bold;" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
                     </div>
-                    <div class="modal-body" style="padding: 1.5rem;">
+                    <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 160px);">
                         <!-- Toolbar for Actions -->
                         <div style="display: flex; gap: 10px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
                             <button id="pdf-btn-download" class="btn btn-primary" style="background: var(--accent); flex: 1; min-width: 150px;">
@@ -44,6 +44,8 @@ window.PDFManager = {
     },
 
     setupEventListeners() {
+        if (this.hasEventListeners) return;
+        this.hasEventListeners = true;
         document.addEventListener('click', (e) => {
             const tgt = e.target;
             
@@ -274,26 +276,20 @@ window.PDFManager = {
         const originalElement = document.getElementById('pdf-export-content');
         if (!originalElement) return;
 
-        const modal = originalElement.closest('.modal');
-        const modalBody = originalElement.closest('.modal-body');
-        const modalContent = originalElement.closest('.modal-content');
+        // Clonamos el elemento para evitar alterar la vista del modal en pantalla
+        const clone = originalElement.cloneNode(true);
         
-        let origOverflow = '';
-        let origBodyOverflow = '';
-        let origMaxHeight = '';
-        let origContentMaxHeight = '';
-
-        if (modal && modalBody) {
-            origOverflow = modal.style.overflow;
-            origBodyOverflow = modalBody.style.overflow;
-            origMaxHeight = modalBody.style.maxHeight;
-            if (modalContent) origContentMaxHeight = modalContent.style.maxHeight;
-            
-            modal.style.overflow = 'visible';
-            modalBody.style.overflow = 'visible';
-            modalBody.style.maxHeight = 'none';
-            if (modalContent) modalContent.style.maxHeight = 'none';
-        }
+        // Estilizamos el clon para que se expanda totalmente fuera de la pantalla visible
+        clone.style.position = 'absolute';
+        clone.style.left = '-9999px';
+        clone.style.top = '0';
+        clone.style.width = '800px'; // Mantenemos el ancho estándar para consistencia del PDF
+        clone.style.height = 'auto';
+        clone.style.maxHeight = 'none';
+        clone.style.overflow = 'visible';
+        clone.style.background = 'white';
+        
+        document.body.appendChild(clone);
 
         const opt = {
             margin:       10, // mm
@@ -314,12 +310,10 @@ window.PDFManager = {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
         btn.disabled = true;
 
-        html2pdf().set(opt).from(originalElement).save().then(() => {
-            if (modal && modalBody) {
-                modal.style.overflow = origOverflow;
-                modalBody.style.overflow = origBodyOverflow;
-                modalBody.style.maxHeight = origMaxHeight;
-                if (modalContent) modalContent.style.maxHeight = origContentMaxHeight;
+        html2pdf().set(opt).from(clone).save().then(() => {
+            // Removemos el clon del DOM tras guardar
+            if (clone.parentNode) {
+                document.body.removeChild(clone);
             }
             setTimeout(() => {
                 btn.innerHTML = originalText;
@@ -327,11 +321,9 @@ window.PDFManager = {
             }, 1000);
         }).catch(err => {
             console.error("Error generating PDF:", err);
-            if (modal && modalBody) {
-                modal.style.overflow = origOverflow;
-                modalBody.style.overflow = origBodyOverflow;
-                modalBody.style.maxHeight = origMaxHeight;
-                if (modalContent) modalContent.style.maxHeight = origContentMaxHeight;
+            // Aseguramos limpiar el clon en caso de error
+            if (clone.parentNode) {
+                document.body.removeChild(clone);
             }
             alert("Hubo un error al generar el PDF.");
             btn.innerHTML = originalText;
