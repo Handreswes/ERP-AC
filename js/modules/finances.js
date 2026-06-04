@@ -540,11 +540,8 @@ window.Finances = {
 
             const abonoBtn = e.target.closest('.abono-btn');
             if (abonoBtn) {
-                const modal = document.getElementById('payment-modal');
-                if (modal) {
-                    const clientIdInput = document.getElementById('payment-client-id');
-                    if (clientIdInput) clientIdInput.value = abonoBtn.dataset.id;
-                    modal.classList.add('show');
+                if (window.CRM && window.CRM.openPaymentModal) {
+                    window.CRM.openPaymentModal(abonoBtn.dataset.id);
                 }
                 return;
             }
