@@ -1,0 +1,16 @@
+{
+  "name": "ERP Multinegocio AC",
+  "short_name": "ERP AC",
+  "description": "Sistema de gestión para Millenio, Vulcano y TuCompras",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#2563eb",
+  "icons": [
+    {
+      "src": "logo_tucompras.png.jpg",
+      "sizes": "192x192 512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
