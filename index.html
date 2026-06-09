@@ -3,647 +3,521 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <!-- Script Anti-Error 431 (Clear Bloated Cookies) -->
-    <script>
-        (function () {
-            const cookies = document.cookie.split(";");
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i];
-                const eqPos = cookie.indexOf("=");
-                const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-                document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
-            }
-            console.log("Cookies cleared to prevent 431 error");
-        })();
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="meta-title-tag">TuCompras Col | Herramientas y Hogar con Envíos en Colombia</title>
+    <meta name="description" id="meta-description-tag" content="Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.">
+    <meta name="keywords" content="herramientas, ferretería colombia, millenio, vulcano, tucompras col, pago contra entrega, protección industrial">
+    <link rel="canonical" href="https://tucomprascol.com/">
+
+    <!-- Open Graph / Facebook / TikTok -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://tucomprascol.com/">
+    <meta property="og:title" content="TuCompras Col | Calidad y Rapidez en Herramientas">
+    <meta property="og:description" content="Compra herramientas profesionales y artículos para el hogar con pago contra entrega. Calidad garantizada.">
+    <meta property="og:image" content="https://tucomprascol.com/product_showcase_1.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://tucomprascol.com/">
+    <meta property="twitter:title" content="TuCompras Col | Herramientas y Hogar">
+    <meta property="twitter:description" content="Más de 1.300 productos entregados. Compra seguro en Colombia.">
+    <meta property="twitter:image" content="https://tucomprascol.com/product_showcase_1.png">
+
+    <!-- Google / Schema.org (Datos Estructurados) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Store",
+      "name": "TuCompras Col",
+      "description": "Tienda líder en herramientas y hogar en Colombia",
+      "url": "https://tucomprascol.com/",
+      "telephone": "+573167862554",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "CO"
+      }
+    }
     </script>
-    <title>ERP Multinegocio - Millenio / Vulcano / TuCompras</title>
-    <link rel="stylesheet" href="styles.css?v=111">
+
+    <!-- Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css?v=1.0.4">
+
+    <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/jpeg" href="logo_tucompras.png.jpg">
-    <link rel="apple-touch-icon" href="logo_tucompras.png.jpg">
-    <meta name="theme-color" content="#2563eb">
+
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', 'TU_PIXEL_ID_FB'); 
+    fbq('track', 'PageView');
+    </script>
+
+    <!-- TikTok Pixel Code -->
+    <script>
+    !function (w, d, t) {
+      w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"],ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e},ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{},ttq._i[e]=[],ttq._i[e]._u=i,ttq._t=ttq._t||{},ttq._t[e]=+new Date,ttq._o=ttq._o||{},ttq._o[e]=n;var o=d.createElement("script");o.type="text/javascript",o.async=!0,o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};
+      ttq.load('TU_PIXEL_ID_TIKTOK');
+      ttq.page();
+    }(window, document, 'ttq');
+    </script>
+
+    <!-- Google Tag (gtag.js) Base -->
+    <script async src="https://www.googletagmanager.com/gtag/js"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      // Configuration will be loaded dynamically from web.js
+    </script>
 </head>
 
-<body class="dark-theme">
+<body>
 
-    <!-- Login Overlay (Outside app-container to avoid display:none conflicts) -->
-    <div id="login-overlay" class="login-overlay hidden">
-        <div class="login-card">
-            <div class="login-header">
-                <h1>ERP <span style="color: white;">AC</span></h1>
-                <p>Inicia sesión para continuar</p>
+    <!-- Navbar -->
+    <nav class="navbar" id="navbar">
+        <div class="container nav-container">
+            <a href="#home" class="logo">
+                <img src="logo_tucompras.png.jpg" alt="TuCompras Logo" class="logo-img">
+                <span class="logo-text">
+                    TuCompras <span style="color: var(--primary);">Col</span>
+                </span>
+            </a>
+            <div class="nav-links">
+                <a href="#home">Inicio</a>
+                <a href="#productos">Productos</a>
+                <a href="#categorias">Categorías</a>
+                <a href="#mayoristas">Mayoristas</a>
+                <a href="#contacto">Contacto</a>
+                <a href="#account" class="btn btn-sm btn-outline" style="margin-left: 10px; padding: 8px 15px;">Mi Cuenta</a>
             </div>
-            <form id="login-form">
-                <div class="form-group" style="margin-bottom: 1rem;">
-                    <label>Email Corporativo</label>
-                    <input type="email" name="username" class="form-control" required placeholder="tu@email.com">
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <div class="cart-btn" onclick="window.location.hash = 'checkout'">
+                    <i class="fas fa-shopping-basket"></i>
+                    <span id="cart-count">0</span>
                 </div>
-                <div class="form-group" style="margin-bottom: 1.5rem;">
-                    <label>Contraseña</label>
-                    <div style="position: relative;">
-                        <input type="password" name="password" id="login-password" class="form-control" required
-                            placeholder="••••••••" style="padding-right: 40px;">
-                        <i id="toggle-password" class="fas fa-eye"
-                            style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); cursor: pointer; color: var(--text-secondary);"></i>
-                    </div>
+                <div class="menu-toggle" id="menu-toggle">
+                    <i class="fas fa-bars"></i>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block btn-lg">Iniciar Sesión</button>
-            </form>
-            <div class="login-footer">
-                ERP AC - v104 Production Ready
             </div>
         </div>
-    </div>
-
-    <!-- Bottom Navigation (Mobile Only) -->
-    <nav class="bottom-nav">
-        <a href="javascript:void(0)" class="bottom-nav-item active" data-panel="dashboard">
-            <i class="fas fa-th-large"></i>
-            <span>Inicio</span>
-        </a>
-        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="inventory">
-            <i class="fas fa-boxes"></i>
-            <span>Stock</span>
-        </a>
-        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="sales">
-            <i class="fas fa-cash-register"></i>
-            <span>Ventas</span>
-        </a>
-        <a href="javascript:void(0)" class="bottom-nav-item" data-panel="crm">
-            <i class="fas fa-users"></i>
-            <span>Clientes</span>
-        </a>
-        <a href="javascript:void(0)" id="mobile-menu-trigger" class="bottom-nav-item">
-            <i class="fas fa-bars"></i>
-            <span>Menú</span>
-        </a>
     </nav>
 
-    <!-- Bottom Sheet Menu (Mobile) -->
-    <div id="bottom-sheet-overlay" class="bottom-sheet-overlay"></div>
-    <div id="bottom-sheet" class="bottom-sheet">
-        <div class="bottom-sheet-handle"></div>
-        <div class="bottom-sheet-header">
-            <h3>Menú del Sistema</h3>
-            <button id="close-mobile-menu" class="icon-btn"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="bottom-sheet-grid">
-            <a href="#" class="menu-grid-item" data-panel="finances">
-                <i class="fas fa-chart-line" style="color: #6366f1;"></i>
-                <span>Finanzas</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="tucompras">
-                <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
-                <span>TuCompras</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="catalog">
-                <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
-                <span>Catálogo</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="vendedores">
-                <i class="fas fa-user-tie" style="color: #ec4899;"></i>
-                <span>Vendedores</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="categories">
-                <i class="fas fa-tags" style="color: #6366f1;"></i>
-                <span>Categorías</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="consultas">
-                <i class="fas fa-search-plus" style="color: #06b6d4;"></i>
-                <span>Consultas</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="logistics">
-                <i class="fas fa-truck" style="color: #8b5cf6;"></i>
-                <span>Logística</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="settings">
-                <i class="fas fa-cog" style="color: #94a3b8;"></i>
-                <span>Ajustes</span>
-            </a>
-            <a href="#" class="menu-grid-item" data-panel="website_admin">
-                <i class="fas fa-globe" style="color: #0ea5e9;"></i>
-                <span>Sitio Web</span>
-            </a>
-        </div>
-    </div>
-
-    <div id="sidebar-overlay"></div>
-
-    <div class="mobile-top-bar">
-        <div class="logo">
-            <img src="logo_tucompras.png.jpg" alt="Logo TuCompras" style="width: 32px; height: 32px; border-radius: 8px;">
-            <span class="logo-text" style="font-weight: 700; font-size: 1.1rem; color: #fff;">TuCompras <span style="color: var(--accent);">Col</span></span>
-        </div>
-        <button class="hamburger-btn" id="open-sidebar-btn">
-            <i class="fas fa-bars"></i>
-        </button>
-    </div>
-
-    <div id="app" class="app-container">
-
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="sidebar">
-            <div class="sidebar-header" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <div class="logo">
-                    <img src="logo_tucompras.png.jpg" alt="Logo TuCompras" style="width: 40px; height: 40px; border-radius: 8px;">
-                    <span class="logo-text">TuCompras <span style="color: var(--accent);">Col</span></span>
-                </div>
-                <button class="icon-btn close-sidebar" id="close-sidebar-btn" style="display: none; border: none; background: transparent;">
-                    <i class="fas fa-times" style="font-size: 1.25rem;"></i>
-                </button>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="#" class="nav-item active" data-panel="dashboard">
-                    <i class="fas fa-th-large"></i>
-                    <span>Dashboard</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="inventory">
-                    <i class="fas fa-boxes"></i>
-                    <span>Inventarios</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="categories">
-                    <i class="fas fa-tags"></i>
-                    <span>Categorías</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="sales">
-                    <i class="fas fa-cash-register"></i>
-                    <span>Ventas POS</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="crm">
-                    <i class="fas fa-users"></i>
-                    <span>Clientes / CRM</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="finances">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Finanzas</span>
-                </a>
-                <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
-                <a href="#" class="nav-item" data-panel="tucompras">
-                    <i class="fas fa-shopping-cart" style="color: #10b981;"></i>
-                    <span>TUCOMPRAS</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="vendedores">
-                    <i class="fas fa-user-tie" style="color: #f59e0b;"></i>
-                    <span>Vendedores</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="tucompras-crm">
-                    <i class="fas fa-address-book" style="color: #6366f1;"></i>
-                    <span>CRM Ecommerce</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="marketing">
-                    <i class="fas fa-bullhorn" style="color: #ec4899;"></i>
-                    <span>Marketing CRM</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="website_admin">
-                    <i class="fas fa-globe" style="color: #0ea5e9;"></i>
-                    <span>Admin. Website</span>
-                </a>
-                <div style="margin: 10px 0; border-top: 1px solid rgba(255,255,255,0.05);"></div>
-                <a href="#" class="nav-item" data-panel="logistics">
-                    <i class="fas fa-truck" style="color: #8b5cf6;"></i>
-                    <span>Logística</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="consultas">
-                    <i class="fas fa-search-dollar" style="color: #06b6d4;"></i>
-                    <span>Consultas</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="catalog">
-                    <i class="fas fa-file-invoice-dollar" style="color: #fbbf24;"></i>
-                    <span>Catálogo PDF</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="user-management">
-                    <i class="fas fa-shield-alt" style="color: #f87171;"></i>
-                    <span>Seguridad / Usuarios</span>
-                </a>
-                <a href="#" class="nav-item" data-panel="settings">
-                    <i class="fas fa-cog"></i>
-                    <span>Configuración</span>
-                </a>
-            </nav>
-            <div class="sidebar-footer">
-                <div class="company-badge"
-                    style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-                    <span id="active-company">Multinegocio</span>
-                    <i id="supabase-status" class="fas fa-circle" style="font-size: 0.6rem; color: #ef4444;"
-                        title="Sin conexión (Offline)"></i>
-                </div>
-                <button onclick="clearAllSystemData()" class="btn btn-outline btn-sm"
-                    style="margin-top: 10px; width: 100%; font-size: 0.7rem; border-color: rgba(255,0,0,0.3); color: #ff6b6b;">
-                    <i class="fas fa-trash-alt"></i> Limpiar Sistema
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content Area -->
-        <main class="main-content">
-            <header class="top-bar">
-
-                <div class="top-bar-actions">
-                    <button id="notif-btn" class="icon-btn"><i class="fas fa-bell"></i></button>
-                    <div class="user-profile">
-                        <img src="https://ui-avatars.com/api/?name=Admin&background=2563eb&color=fff" alt="User">
-                        <div style="display: flex; flex-direction: column; line-height: 1;">
-                            <span style="font-size: 0.85rem; font-weight: 600;">Cargando...</span>
-                            <a href="#" id="logout-btn"
-                                style="font-size: 0.7rem; color: #ef4444; text-decoration: none;">Cerrar Sesión</a>
+    <!-- Main Content -->
+    <main id="main-content">
+        <!-- Home View -->
+        <section id="home-view" class="view">
+            <!-- Hero Section -->
+            <section class="hero">
+                <div class="container hero-grid">
+                    <div class="hero-text animate">
+                        <h1 id="hero-title-text">En el 2025 vendimos más de 1.300 productos</h1>
+                        <p id="hero-subtitle-text">Más de 1.300 productos entregados y clientes 100% satisfechos en toda Colombia. Compra con
+                            seguridad y paga al recibir en tu puerta.</p>
+                        <div class="hero-btns">
+                            <a href="#productos" class="btn btn-primary">VER CATÁLOGO <i
+                                    class="fas fa-shopping-bag"></i></a>
+                            <a href="https://wa.me/573167862554" class="btn btn-outline wa-dynamic-link">HABLAR CON ASESOR</a>
+                        </div>
+                    </div>
+                    <div class="hero-visual animate">
+                        <div class="cylinder-wrap" id="hero-cylinder-wrap">
+                            <div class="cylinder-item"><img src="fotos clientes/cliente 1.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cliente 2.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cleinte 3.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cliente 4.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cliente 5.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cliente 1.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cliente 2.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
+                            <div class="cylinder-item"><img src="fotos clientes/cleinte 3.jpeg" alt="Cliente satisfecho" style="filter: blur(1px); object-fit: cover;"></div>
                         </div>
                     </div>
                 </div>
-            </header>
+            </section>
 
-            <section id="content-area" class="content-area">
-                <!-- Content will be dynamically loaded here -->
-                <div id="user-management-panel" class="panel"></div>
-                <div id="dashboard-panel" class="panel active">
-                    <div class="panel-header">
-                        <h1>Panel General</h1>
-                        <div class="dashboard-filters">
-                            <select id="dashboard-date-range" class="form-select">
-                                <option value="today">Hoy</option>
-                                <option value="week">Esta Semana</option>
-                                <option value="month">Este Mes</option>
-                                <option value="custom">Rango Personalizado</option>
-                            </select>
-                            <div id="custom-date-inputs" style="display: none; gap: 0.5rem; align-items: center;">
-                                <input type="date" id="date-start" class="form-control">
-                                <span>a</span>
-                                <input type="date" id="date-end" class="form-control">
-                            </div>
-                        </div>
+            <!-- Categories Section -->
+            <section class="section" id="categorias" style="padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Explora por Categoría</h2>
+                        <p>Todo lo que necesitas en un solo lugar</p>
                     </div>
-
-                    <div class="stats-grid" style="margin-top: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
-                        <!-- 1. Ingresos Brutos -->
-                        <div class="stat-card clickable" id="stat-revenue" style="cursor:pointer; background: linear-gradient(135deg, rgba(16,185,129,0.1), transparent); border-left: 4px solid var(--success);">
-                            <h3 id="stat-revenue-title">Ingresos (Ventas)</h3>
-                            <p class="stat-value text-success">$0.00</p>
-                            <span class="stat-label">Total bruto sin descontar costos</span>
-                        </div>
-                        <!-- 2. Utilidad Bruta -->
-                        <div class="stat-card clickable" id="stat-gross-profit" style="cursor:pointer; background: linear-gradient(135deg, rgba(59,130,246,0.1), transparent); border-left: 4px solid var(--accent);">
-                            <h3 id="stat-gross-profit-title">Utilidad Bruta</h3>
-                            <p class="stat-value text-blue">$0.00</p>
-                            <span class="stat-label">Ventas menos costo de producto (COGS)</span>
-                        </div>
-                        <!-- 3. Gastos (OPEX) -->
-                        <div class="stat-card clickable" id="stat-opex" style="cursor:pointer; background: linear-gradient(135deg, rgba(239,68,68,0.1), transparent); border-left: 4px solid var(--danger);">
-                            <h3 id="stat-opex-title">Gastos / Salidas</h3>
-                            <p class="stat-value text-danger">$0.00</p>
-                            <span class="stat-label">Gastos fijos, variables y retiros</span>
-                        </div>
-                        <!-- 4. Utilidad Neta -->
-                        <div class="stat-card clickable" id="stat-net-profit" style="cursor:pointer; background: linear-gradient(135deg, rgba(139,92,246,0.1), transparent); border-left: 4px solid #8b5cf6;">
-                            <h3 id="stat-net-profit-title">Utilidad Neta (Caja)</h3>
-                            <p class="stat-value" style="color: #8b5cf6;">$0.00</p>
-                            <span class="stat-label">Ganancia real (Bruta - Gastos)</span>
-                        </div>
-                        <!-- 5. Margen Neto -->
-                        <div class="stat-card clickable" id="stat-margin" style="cursor:pointer; background: linear-gradient(135deg, rgba(245,158,11,0.1), transparent); border-left: 4px solid var(--warning);">
-                            <h3 id="stat-margin-title">Margen Neto</h3>
-                            <p class="stat-value text-warning">0%</p>
-                            <span class="stat-label">Porcentaje de ganancia por venta</span>
-                        </div>
-                    </div>
-
-                    <!-- Charts Section -->
-                    <div class="charts-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-top: 2rem;">
-                        <div class="detail-section" style="margin-top: 0; padding: 1.5rem; display: flex; flex-direction: column;">
-                            <h2 class="section-title" style="margin-bottom: 1rem;">Tendencia: Ingresos vs Gastos vs Utilidad</h2>
-                            <div style="position: relative; height: 300px; width: 100%; flex: 1;">
-                                <canvas id="dashboard-trend-chart"></canvas>
-                            </div>
-                        </div>
-                        <div class="detail-section" style="margin-top: 0; padding: 1.5rem; display: flex; flex-direction: column; align-items: center;">
-                            <h2 class="section-title" style="margin-bottom: 1rem; width: 100%; text-align: left;">Distribución del Ingreso</h2>
-                            <div style="position: relative; height: 250px; width: 100%; display: flex; justify-content: center; align-items: center;">
-                                <canvas id="dashboard-distribution-chart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h2 class="section-title" style="margin-top: 2.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">Alertas y Métricas Operativas</h2>
-                    <div class="stats-grid" style="margin-top: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                        <div class="stat-card clickable" id="stat-stock" style="cursor:pointer;">
-                            <h3 id="stat-stock-title">Stock Crítico</h3>
-                            <p class="stat-value">0</p>
-                            <span class="stat-label">Productos por agotar</span>
-                        </div>
-                        <div class="stat-card clickable" id="stat-credits-millenio" style="cursor:pointer; border-color: rgba(59, 130, 246, 0.3);">
-                            <h3 id="stat-credits-millenio-title" style="color: #3b82f6;">Deuda Millenio</h3>
-                            <p class="stat-value text-danger" style="color: #ef4444;">$0.00</p>
-                            <span class="stat-label">Por cobrar</span>
-                        </div>
-                        <div class="stat-card clickable" id="stat-credits-vulcano" style="cursor:pointer; border-color: rgba(245, 158, 11, 0.3);">
-                            <h3 id="stat-credits-vulcano-title" style="color: #f59e0b;">Deuda Vulcano</h3>
-                            <p class="stat-value text-danger" style="color: #ef4444;">$0.00</p>
-                            <span class="stat-label">Por cobrar</span>
-                        </div>
-                        <div class="stat-card clickable" id="stat-commissions" style="cursor:pointer;">
-                            <h3 id="stat-commissions-title">Comisiones Pendientes</h3>
-                            <p class="stat-value" style="color: var(--warning);">$0.00</p>
-                            <span class="stat-label">Por pagar a vendedores</span>
-                        </div>
-                    </div>
-
-
-                    <div class="dashboard-details">
-                        <div class="detail-section">
-                            <h2 class="section-title millenio-title">Resumen Millenio</h2>
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <h4 id="millenio-sales-header">Ventas Hoy</h4>
-                                    <p id="millenio-sales-today-detail" class="detail-value text-success">$0.00</p>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>Gastos Hoy</h4>
-                                    <p id="millenio-expenses-today" class="detail-value text-danger">$0.00</p>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>Efectivo Hoy</h4>
-                                    <p id="millenio-cash-today" class="detail-value text-success">$0.00</p>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>Consignación Hoy</h4>
-                                    <p id="millenio-consignment-today" class="detail-value text-blue">$0.00</p>
-                                </div>
-                                <div class="detail-card" style="grid-column: span 2;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                        <h4 style="margin: 0;">Créditos Hoy</h4>
-                                        <h4 id="millenio-credit-total-today" class="text-danger" style="margin: 0;">$0</h4>
-                                    </div>
-                                    <div id="millenio-credits-today" class="credits-list">
-                                        <p class="text-secondary">Sin créditos hoy</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="detail-section">
-                            <h2 class="section-title vulcano-title">Resumen Vulcano</h2>
-                            <div class="detail-grid">
-                                <div class="detail-card">
-                                    <h4 id="vulcano-sales-header">Ventas Hoy</h4>
-                                    <p id="vulcano-sales-today-detail" class="detail-value text-success">$0.00</p>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>Gastos Hoy</h4>
-                                    <p id="vulcano-expenses-today" class="detail-value text-danger">$0.00</p>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>Efectivo Hoy</h4>
-                                    <p id="vulcano-cash-today" class="detail-value text-success">$0.00</p>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>Consignación Hoy</h4>
-                                    <p id="vulcano-consignment-today" class="detail-value text-blue">$0.00</p>
-                                </div>
-                                <div class="detail-card" style="grid-column: span 2;">
-                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                                        <h4 style="margin: 0;">Créditos Hoy</h4>
-                                        <h4 id="vulcano-credit-total-today" class="text-danger" style="margin: 0;">$0</h4>
-                                    </div>
-                                    <div id="vulcano-credits-today" class="credits-list">
-                                        <p class="text-secondary">Sin créditos hoy</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Product Rotation Section -->
-                        <div class="detail-section" style="grid-column: 1 / -1;">
-                            <h2 class="section-title" style="color: var(--accent);">Rotación de Productos</h2>
-                            <div class="detail-grid" style="grid-template-columns: 1fr 1fr;">
-                                <div class="detail-card">
-                                    <h4>🔥 Más Vendidos (Top 5)</h4>
-                                    <div id="top-products-rotation" class="credits-list">
-                                        <p class="text-secondary">Calculando...</p>
-                                    </div>
-                                </div>
-                                <div class="detail-card">
-                                    <h4>❄️ Menos Vendidos (Top 5)</h4>
-                                    <div id="bottom-products-rotation" class="credits-list">
-                                        <p class="text-secondary">Calculando...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- closes dashboard-panel -->
-
-                <!-- Categories Panel -->
-                <div id="categories-panel" class="panel">
-                    <div class="panel-header">
-                        <h1>Gestión de Categorías</h1>
-                        <button class="btn btn-primary" id="add-category-btn">
-                            <i class="fas fa-plus"></i> Nueva Categoría
-                        </button>
-                    </div>
-                    <div class="table-container" style="margin-top: 1.5rem;">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Nombre</th>
-                                    <th>ID</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="categories-list">
-                                <!-- Categorías cargadas dinámicamente -->
-                            </tbody>
-                        </table>
+                    <div class="products-grid" id="category-grid">
+                        <!-- Dynamic categories -->
                     </div>
                 </div>
-            </section> <!-- closes content-area -->
-        </main> <!-- closes main-content -->
-    </div> <!-- closes app-container -->
+            </section>
 
-    <!-- Dashboard Detail Modal -->
-    <div id="dashboard-detail-modal" class="modal">
-        <div class="modal-content" style="max-width: 1000px;">
-            <div class="modal-header">
-                <h2 id="dashboard-detail-title">Detalle de Información</h2>
-                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
-            </div>
-            <div class="modal-body" style="display: flex; gap: 1.5rem; padding: 1.5rem; overflow: hidden;">
-                <!-- Sidebar: Summary (5cm) -->
-                <div id="dashboard-detail-sidebar"
-                    style="width: 250px; flex-shrink: 0; background: rgba(0,0,0,0.1); padding: 1.25rem; border-radius: var(--radius); border: 1px solid var(--border); display: flex; flex-direction: column; gap: 1rem;">
-                    <div id="dashboard-detail-summary-content">
-                        <!-- Dynamic content -->
+            <!-- Products Section -->
+            <section class="section" id="productos" style="background: rgba(255,255,255,0.02); padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Nuestros Productos</h2>
+                        <p>Sincronizado en tiempo real con nuestro inventario</p>
                     </div>
-                </div>
-
-                <!-- Main Area: Content (15cm) -->
-                <div class="history-main"
-                    style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.05); border-radius: var(--radius); border: 1px solid var(--border);">
-                    <div id="dashboard-detail-list-container" class="table-container"
-                        style="flex: 1; margin: 0; border: none; border-radius: 0; overflow-y: auto;">
-                        <table class="data-table">
-                            <tbody id="dashboard-detail-list-body"></tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Global Payment Modal -->
-    <div id="payment-modal" class="modal">
-        <div class="modal-content" style="max-width: 500px;">
-            <div class="modal-header">
-                <h2>Registrar Abono / Pago</h2>
-                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
-            </div>
-            <div class="modal-body">
-                <form id="payment-form">
-                    <input type="hidden" name="clientId" id="payment-client-id">
                     
-                    <!-- Deudas actuales de Millenio y Vulcano -->
-                    <div style="display: flex; gap: 10px; margin-bottom: 1.5rem; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
-                        <div style="flex: 1; text-align: center; border-right: 1px solid var(--border); padding-right: 5px;">
-                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary);">Deuda Millenio</span>
-                            <h3 id="payment-debt-millenio" style="margin: 4px 0 0 0; color: var(--danger); font-size: 1.15rem;">$0</h3>
-                        </div>
-                        <div style="flex: 1; text-align: center; padding-left: 5px;">
-                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary);">Deuda Vulcano</span>
-                            <h3 id="payment-debt-vulcano" style="margin: 4px 0 0 0; color: var(--danger); font-size: 1.15rem;">$0</h3>
-                        </div>
+                    <div class="search-filter-container" style="max-width: 600px; margin: 0 auto 3rem auto; display: flex; gap: 10px;">
+                        <input type="text" id="search-input" class="form-control" placeholder="Buscar por palabra clave..." style="flex-grow: 1;" oninput="filterBySearch(this.value)">
+                        <button class="btn btn-primary" id="btn-clear-filter" onclick="clearFilters()" style="display: none; white-space: nowrap;">Ver Todos</button>
                     </div>
 
-                    <div class="crm-responsive-grid">
-                        <!-- Abono Millenio -->
-                        <div class="form-group">
-                            <label style="color: #3b82f6; font-weight: 700;">Abonar a Millenio</label>
-                            <input type="text" id="payment-amount-millenio" class="form-control" placeholder="0">
-                        </div>
-                        <!-- Abono Vulcano -->
-                        <div class="form-group">
-                            <label style="color: #f59e0b; font-weight: 700;">Abonar a Vulcano</label>
-                            <input type="text" id="payment-amount-vulcano" class="form-control" placeholder="0">
-                        </div>
+                    <div class="products-grid" id="product-grid">
+                        <!-- Dynamic products from Supabase -->
+                        <div class="loader" id="loader">Cargando productos...</div>
+                    </div>
+                </div>
+            </section>
 
-                        <!-- Método de Pago -->
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>Método de Pago</label>
-                            <select name="method" required id="payment-method-select">
-                                <option value="cash">Efectivo</option>
-                                <option value="transfer">Consignación / Transferencia</option>
-                            </select>
+            <!-- Testimonials Section -->
+            <section class="section" id="testimonios" style="padding: 100px 0;">
+                <div class="container">
+                    <div class="section-title">
+                        <h2>Lo que dicen nuestros clientes</h2>
+                        <p>Más de 1.300 familias ya confían en nosotros</p>
+                    </div>
+                    <div class="testimonials-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                        <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px; position: relative;">
+                            <div style="color: #ffc145; margin-bottom: 1rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"Excelente servicio. Pedí un taladro y me llegó al día siguiente a Medellín. Lo mejor es que pagué en la puerta de mi casa."</p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 45px; height: 45px; background: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">CH</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1rem;">Carlos H.</h4>
+                                    <small style="color: #94a3b8;">Cliente Verificado - Medellín</small>
+                                </div>
+                            </div>
                         </div>
-
-                        <!-- Bancos Millenio (Visible si ingresa abono a Millenio y es Transferencia) -->
-                        <div class="form-group" id="payment-bank-group-millenio" style="display: none; grid-column: span 2;">
-                            <!-- Dinámico -->
+                        <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px;">
+                            <div style="color: #ffc145; margin-bottom: 1rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"Muy cumplidos con la garantía. Tuve un pequeño detalle con un artículo y me lo cambiaron sin problemas. Recomendados 100%."</p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 45px; height: 45px; background: #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">MA</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1rem;">Martha A.</h4>
+                                    <small style="color: #94a3b8;">Cliente Verificado - Cali</small>
+                                </div>
+                            </div>
                         </div>
-                        <!-- Bancos Vulcano (Visible si ingresa abono a Vulcano y es Transferencia) -->
-                        <div class="form-group" id="payment-bank-group-vulcano" style="display: none; grid-column: span 2;">
-                            <!-- Dinámico -->
-                        </div>
-
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>Notas</label>
-                            <input type="text" name="notes" id="payment-notes" placeholder="Opcional...">
+                        <div class="glass testimonial-card" style="padding: 2.5rem; border-radius: 25px;">
+                            <div style="color: #ffc145; margin-bottom: 1rem;">
+                                <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            </div>
+                            <p style="font-style: italic; color: var(--text-secondary); margin-bottom: 1.5rem;">"Los precios son muy competitivos y la calidad de las herramientas es profesional. Ya he comprado varias veces para mi taller."</p>
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <div style="width: 45px; height: 45px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">JR</div>
+                                <div>
+                                    <h4 style="margin: 0; font-size: 1rem;">Jorge R.</h4>
+                                    <small style="color: #94a3b8;">Cliente Verificado - Bogotá</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <button type="button" id="save-payment-manual-btn" class="btn btn-primary btn-block"
-                        style="margin-top: 1.5rem; padding: 1rem;">Registrar Pago / Abono</button>
-                </form>
-            </div>
-        </div>
-    </div>
+                </div>
+            </section>
+        </section>
 
-    <!-- Movement Modal (Consignations / Outflows) -->
-    <div id="movement-modal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="movement-modal-title">Registrar Movimiento</h2>
-                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
+        <!-- Product Landing View -->
+        <section id="product-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" id="product-landing-content">
+                <!-- Loaded via JS -->
             </div>
-            <div class="modal-body">
-                <form id="movement-form">
-                    <div class="crm-responsive-grid">
+        </section>
+
+        <!-- Checkout View -->
+        <section id="checkout-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" style="max-width: 600px;">
+                <div style="margin-bottom: 1.5rem;">
+                    <a href="#home"
+                        style="text-decoration: none; color: var(--text-secondary); font-weight: 600; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-arrow-left"></i> Volver al Catálogo
+                    </a>
+                </div>
+                <div class="glass checkout-card" style="padding: 3rem; border-radius: 30px;">
+                    <h2 style="margin-bottom: 2rem; text-align: center;">Finalizar Pedido</h2>
+                    
+                    <!-- Removed Social Login for simplicity -->
+
+                    <form id="checkout-form">
                         <div class="form-group">
-                            <label>Tipo de Movimiento</label>
-                            <select name="type" id="movement-type" required>
-                                <option value="outflow">Salida de Dinero (Gasto/Pago)</option>
-                                <option value="transfer">Consignación (Efectivo -> Banco)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Empresa</label>
-                            <select name="company" id="movement-company" required>
-                                <option value="millenio">Millenio</option>
-                                <option value="vulcano">Vulcano</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="origin-account-group">
-                            <label>Cuenta Origen</label>
-                            <select name="originAccount" id="movement-origin" required>
-                                <option value="cash">Caja Efectivo</option>
-                            </select>
-                        </div>
-                        <div class="form-group" id="destination-account-group" style="display: none;">
-                            <label>Cuenta Destino</label>
-                            <select name="destinationAccount" id="movement-destination">
-                                <!-- Dynamic accounts -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Monto</label>
-                            <input type="text" name="amount" id="movement-amount-input" class="form-control" required
-                                placeholder="0">
-                        </div>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <label>Concepto / Notas</label>
-                            <input type="text" name="notes" placeholder="Ej: Pago arriendo, Consignación diaria..."
+                            <label>Nombre Completo *</label>
+                            <input type="text" id="cust-name" class="form-control" placeholder="Ej: Juan Perez"
                                 required>
                         </div>
-                        <div class="form-group" id="transit-group"
-                            style="grid-column: span 2; display: flex; align-items: center; gap: 8px; margin-top: 0.5rem; background: rgba(59,130,246,0.1); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(59,130,246,0.2);">
-                            <input type="checkbox" name="isTransit" id="is-transit-checkbox"
-                                style="width: 18px; height: 18px; cursor: pointer;">
-                            <label for="is-transit-checkbox"
-                                style="margin: 0; cursor: pointer; color: var(--accent); font-weight: 600; font-size: 0.85rem;">¿Es
-                                mercancía en tránsito? (Se registrará en Inventario)</label>
+                        <div class="form-group">
+                            <label>Teléfono de Contacto (WhatsApp) *</label>
+                            <input type="tel" id="cust-phone" class="form-control" placeholder="Ej: 300 000 0000"
+                                required>
                         </div>
-                    </div>
-                    <button type="button" id="save-movement-manual-btn" class="btn btn-primary btn-block"
-                        style="margin-top: 1.5rem; padding: 1rem;">Registrar Movimiento</button>
-                </form>
+                        <div class="form-group">
+                            <label>Correo Electrónico *</label>
+                            <input type="email" id="cust-email" class="form-control" placeholder="tu@email.com"
+                                required>
+                        </div>
+                        <div class="form-group" style="margin-top: 1.5rem;">
+                            <label>Método de Envío *</label>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px;">
+                                <label class="shipping-option" style="padding: 12px; border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: var(--transition);">
+                                    <input type="radio" name="shipping-type" value="domicilio" checked onchange="toggleShippingFields('domicilio')" style="accent-color: var(--primary);">
+                                    <span style="font-size: 0.85rem; font-weight: 600;">Domicilio</span>
+                                </label>
+                                <label class="shipping-option" style="padding: 12px; border: 1px solid var(--glass-border); border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: var(--transition);">
+                                    <input type="radio" name="shipping-type" value="oficina" onchange="toggleShippingFields('oficina')" style="accent-color: var(--primary);">
+                                    <span style="font-size: 0.85rem; font-weight: 600;">Oficina Principal Transportadora</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                            <div class="form-group">
+                                <label>Departamento *</label>
+                                <input type="text" id="cust-dept" class="form-control" placeholder="Antioquia" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Ciudad / Municipio *</label>
+                                <input type="text" id="cust-city" class="form-control" placeholder="Medellín" required>
+                            </div>
+                        </div>
+
+                        <div id="address-field" class="form-group" style="margin-top: 1rem;">
+                            <label>Dirección Exacta *</label>
+                            <input type="text" id="cust-address" class="form-control" placeholder="Calle ... #" required>
+                        </div>
+
+                        <div id="carrier-field" class="form-group" style="margin-top: 1rem; display: none;">
+                            <label>Transportadora de su elección *</label>
+                            <select id="cust-carrier" class="form-control">
+                                <option value="Interrapidísimo">Interrapidísimo</option>
+                                <option value="Servientrega">Servientrega</option>
+                                <option value="Envia">Envía</option>
+                                <option value="Coordinadora">Coordinadora</option>
+                                <option value="TCC">TCC</option>
+                            </select>
+                            <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 5px;">* El pedido se enviará a la oficina principal del municipio indicado.</p>
+                        </div>
+
+                        <div class="glass"
+                            style="padding: 1rem; margin: 1.5rem 0; border: 1px solid var(--accent); background: rgba(0,242,254,0.05);">
+                            <div style="display: flex; align-items: center; gap: 10px; color: var(--accent);">
+                                <i class="fas fa-truck-fast"></i>
+                                <strong>Pago Contra Entrega (COD)</strong>
+                            </div>
+                            <p style="font-size: 0.85rem; margin-top: 5px; color: var(--text-secondary);">Recuerda:
+                                Pagas en efectivo al recibir el producto en tu casa o trabajo.</p>
+                        </div>
+
+                        <div class="form-group" style="display: flex; align-items: flex-start; gap: 10px; margin: 1.5rem 0;">
+                            <input type="checkbox" id="accept-notifications" checked style="width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer;">
+                            <label for="accept-notifications" style="font-size: 0.85rem; color: var(--text-secondary); cursor: pointer; text-align: left;">
+                                Acepto recibir notificaciones sobre mi pedido y ofertas exclusivas de TuCompras Col por WhatsApp o correo.
+                            </label>
+                        </div>
+
+                        <div class="glass" style="margin: 1.5rem 0; padding: 1.5rem; border: 1px solid #e2e8f0; border-radius: 20px;">
+                            <p style="font-size: 0.8rem; font-weight: 700; color: var(--text-secondary); margin-bottom: 10px; text-align: center;">FINANCIACIÓN DISPONIBLE:</p>
+                            <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 20px; transition: var(--transition);" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <img src="logos%20addi%20y%20sistecredito/WhatsApp%20Image%202026-05-05%20at%2012.11.26%20PM.jpeg" alt="Addi y Sistecredito" style="height: 80px; width: auto; opacity: 1; background: white; padding: 5px; border-radius: 8px;">
+                            </a>
+                            <p style="font-size: 0.75rem; color: var(--primary); text-align: center; margin-top: 12px; font-weight: 700;">
+                                <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20pagar%20mi%20pedido%20con%20Addi%20o%20Sistecrédito" target="_blank" style="color: inherit; text-decoration: none;">
+                                    ¿Pagar con crédito? Habla con un asesor aquí <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </p>
+                        </div>
+
+                        <div id="checkout-summary" style="margin-bottom: 2rem;">
+                            <!-- Products summary -->
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block"
+                            style="width: 100%; height: 60px; font-weight: 700;">
+                            CONFIRMAR PEDIDO <i class="fas fa-check"></i>
+                        </button>
+                        <a href="#home"
+                            style="display: block; text-align: center; margin-top: 1.5rem; color: var(--text-secondary);">Seguir
+                            Comprando</a>
+                    </form>
+                </div>
             </div>
+        </section>
+
+        <!-- Account View -->
+        <section id="account-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container" id="account-content">
+                <!-- Loaded via JS (Login/Register or Profile) -->
+            </div>
+        </section>
+
+        <!-- Success View -->
+        <section id="success-view" class="view section animate"
+            style="display: none; padding: 15vh 0; text-align: center;">
+            <div class="container">
+                <div class="glass"
+                    style="max-width: 500px; margin: 0 auto; padding: 4rem; border-radius: 40px; border: 1px solid var(--success);">
+                    <i class="fas fa-check-circle"
+                        style="font-size: 6rem; color: var(--success); margin-bottom: 2rem;"></i>
+                    <h1 style="margin-bottom: 1rem;">¡Pedido Realizado en TuCompras!</h1>
+                    <p style="font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 3rem;">Hemos recibido tu
+                        solicitud. Nos pondremos en contacto contigo pronto para confirmar el
+                        envío.<br><br><strong>Pagas al recibir.</strong></p>
+                    <div id="guest-register-prompt" style="display: none; margin-top: 3rem; padding-top: 2rem; border-top: 1px solid var(--border);">
+                        <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 1.5rem;"><strong>¿Quieres ahorrar tiempo?</strong><br>Crea una contraseña para guardar tus datos y rastrear tus pedidos fácilmente.</p>
+                        <button class="btn btn-primary" onclick="showView('account')" style="width: 100%; height: 55px; font-weight: 700;">SÍ, CREAR MI CUENTA <i class="fas fa-magic"></i></button>
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="location.href='index.html'" style="margin-top: 2rem; width: 100%;">Volver a la Tienda</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Privacy Policy View -->
+        <section id="privacy-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container">
+                <div class="glass" style="padding: 3rem; border-radius: 30px; text-align: left; max-width: 900px; margin: 0 auto;">
+                    <h1 style="margin-bottom: 2rem;">Política de Privacidad</h1>
+                    <div id="privacy-policy-content" style="color: var(--text-secondary); line-height: 1.8;">
+                        <p>Cargando políticas...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Refund Policy View -->
+        <section id="refunds-view" class="view section animate" style="display: none; padding-top: 150px;">
+            <div class="container">
+                <div class="glass" style="padding: 3rem; border-radius: 30px; text-align: left; max-width: 900px; margin: 0 auto;">
+                    <h1 style="margin-bottom: 2rem;">Política de Reembolsos y Devoluciones</h1>
+                    <div id="refunds-policy-content" style="color: var(--text-secondary); line-height: 1.8;">
+                        <p>Cargando políticas...</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Wholesale Section -->
+        <section id="mayoristas" class="section animate" style="padding: 120px 0; background: linear-gradient(rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.9)), url('https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&q=80'); background-size: cover; background-position: center; color: white;">
+            <div class="container" style="text-align: center;">
+                <span class="badge" style="background: var(--primary); color: white; margin-bottom: 2rem;">B2B & DISTRIBUCIÓN</span>
+                <h2 id="wholesale-title-text" style="font-size: 3.5rem; margin-bottom: 1.5rem; color: white;">¿Eres Comerciante o Ferretero?</h2>
+                <p id="wholesale-desc-text" style="font-size: 1.25rem; max-width: 800px; margin: 0 auto 3rem; color: #94a3b8; line-height: 1.8;">
+                    En <strong>TuCompras Col</strong> somos importadores y distribuidores directos. Potencia tu negocio con nuestro catálogo mayorista, precios competitivos y envíos prioritarios a toda Colombia.
+                </p>
+                <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                    <a href="https://wa.me/573113979396?text=Hola,%20quisiera%20información%20sobre%20compras%20al%20por%20mayor" class="btn btn-primary btn-lg" style="min-width: 250px;">
+                        QUIERO SER MAYORISTA <i class="fas fa-handshake" style="margin-left: 10px;"></i>
+                    </a>
+                    <a href="#contacto" class="btn btn-outline btn-lg" style="border-color: white; color: white; min-width: 250px;">
+                        SOLICITAR CATÁLOGO B2B
+                    </a>
+                </div>
+                <div style="margin-top: 4rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 3rem;">
+                    <div>
+                        <i class="fas fa-tags" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h4 style="color: white;">Precios de Fábrica</h4>
+                        <p style="font-size: 0.9rem; color: #64748b;">Márgenes de ganancia superiores para tu negocio.</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-truck-ramp-box" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h4 style="color: white;">Logística Nacional</h4>
+                        <p style="font-size: 0.9rem; color: #64748b;">Despachos inmediatos a cualquier rincón de Colombia.</p>
+                    </div>
+                    <div>
+                        <i class="fas fa-user-tie" style="font-size: 2.5rem; color: var(--primary); margin-bottom: 15px;"></i>
+                        <h4 style="color: white;">Asesoría VIP</h4>
+                        <p style="font-size: 0.9rem; color: #64748b;">Atención personalizada para gestionar tus inventarios.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contacto" class="section animate" style="padding: 100px 0; text-align: center; background: rgba(255,140,0,0.02);">
+            <div class="container">
+                <div class="section-title">
+                    <h2>¿Necesitas asesoría personalizada?</h2>
+                    <p>Escríbenos directamente y un asesor te ayudará con tu compra.</p>
+                </div>
+                <a href="https://wa.me/573167862554" class="btn btn-primary btn-lg wa-dynamic-link" style="margin-top: 2rem;">
+                    HABLAR POR WHATSAPP <i class="fab fa-whatsapp"></i>
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobile-menu">
+        <div class="mobile-menu-header">
+            <span class="logo">TuCompras <span style="color:var(--primary)">Col</span></span>
+            <div class="close-menu" id="close-menu"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="mobile-links">
+            <a href="#home">Inicio</a>
+            <a href="#productos">Productos</a>
+            <a href="#categorias">Categorías</a>
+            <a href="#mayoristas">Mayoristas</a>
+            <a href="#contacto">Contacto</a>
+            <hr style="opacity: 0.1; margin: 1rem 0;">
+            <a href="#account" class="auth-link">Mi Cuenta</a>
         </div>
     </div>
 
-    <!-- 5. Core System (v101) - Loaded in Order -->
-    <script src="js/supabase.js?v=115"></script>
-    <script src="js/storage.js?v=115"></script>
-    <script src="js/modules/auth.js?v=115"></script>
-    <script src="js/modules/inventory.js?v=115"></script>
-    <script src="js/modules/catalog.js?v=115"></script>
-    <script src="js/modules/crm.js?v=115"></script>
-    <script src="js/modules/pdf_manager.js?v=115"></script>
-    <script src="js/modules/sales.js?v=115"></script>
-    <script src="js/modules/dashboard.js?v=115"></script>
-    <script src="js/modules/finances.js?v=115"></script>
-    <script src="js/modules/marketing.js?v=115"></script>
-    <script src="js/modules/user_management.js?v=115"></script>
-    <script src="js/modules/tucompras_crm.js?v=115"></script>
-    <script src="js/modules/tucompras.js?v=115"></script>
-    <script src="js/modules/logistics.js?v=115"></script>
-    <script src="js/modules/vendedores.js?v=115"></script>
-    <script src="js/modules/categories.js?v=115"></script>
-    <script src="js/modules/settings.js?v=115"></script>
-    <script src="js/modules/website_admin.js?v=115"></script>
-    <script src="js/modules/consultas.js?v=115"></script>
-    <script src="js/app.js?v=115"></script>
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <a href="#home" class="active"><i class="fas fa-home"></i><span>Inicio</span></a>
+        <a href="#productos"><i class="fas fa-th-large"></i><span>Tienda</span></a>
+        <a href="#checkout"><i class="fas fa-shopping-cart"></i><span>Carrito</span></a>
+        <a href="#account"><i class="fas fa-user-circle"></i><span>Perfil</span></a>
+    </nav>
+
+    <!-- WhatsApp Floating Button -->
+    <a href="https://wa.me/573167862554" class="wp-float wa-dynamic-link" target="_blank" id="wa-link">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+    <!-- Footer -->
+    <footer style="padding: 4rem 0; background: #0f172a; color: white; text-align: center;">
+        <div class="container">
+            <div style="margin-bottom: 2rem; display: flex; justify-content: center; gap: 2rem; flex-wrap: wrap;">
+                <a href="#account" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem; font-weight: 700;">Mi Cuenta / Registrarse</a>
+                <a href="#privacy" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Política de Privacidad</a>
+                <a href="#refunds" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Reembolsos y Devoluciones</a>
+                <a href="#contacto" style="color: #94a3b8; text-decoration: none; font-size: 0.85rem;">Contacto</a>
+            </div>
+            
+            <div class="payment-methods-premium" style="margin-bottom: 3.5rem; padding: 2.5rem; background: rgba(255,255,255,0.03); border-radius: 30px; border: 1px solid rgba(255,255,255,0.05);">
+                <p style="font-size: 0.8rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 2rem;">Financia tu compra con</p>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 4rem; flex-wrap: wrap;">
+                    <a href="https://wa.me/573167862554?text=Hola,%20quisiera%20comprar%20a%20cuotas" target="_blank" style="transition: transform 0.3s; background: white; padding: 10px 20px; border-radius: 12px; display: inline-block;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                        <img src="logos%20addi%20y%20sistecredito/WhatsApp%20Image%202026-05-05%20at%2012.11.26%20PM.jpeg" style="height: 100px; width: auto; object-fit: contain;" alt="Addi y Sistecredito">
+                    </a>
+                </div>
+                <p style="margin-top: 1.5rem; font-size: 0.85rem; color: #64748b;">¿Quieres pagar a cuotas? <a href="https://wa.me/573167862554?text=Hola,%20quiero%20pagar%20a%20cuotas" style="color: var(--primary); font-weight: 700; text-decoration: none;">Habla con un asesor aquí <i class="fab fa-whatsapp"></i></a></p>
+            </div>
+            <p style="color: #64748b; font-size: 0.9rem;">&copy; 2025 TuCompras Col. Todos los derechos reservados.</p>
+            <div style="margin-top: 1.5rem; display: flex; justify-content: center; gap: 2.5rem; color: #94a3b8; font-size: 1.5rem;">
+                <a href="https://www.facebook.com/share/1RpydiVLKN/" id="social-fb-link" target="_blank" style="color: inherit;"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://www.instagram.com/1tucompras?utm_source=qr&igsh=MWRybzZoNnF2ODZ6ZA==" id="social-ig-link" target="_blank" style="color: inherit;"><i class="fab fa-instagram"></i></a>
+                <a href="https://www.tiktok.com/@tucomprascol?_r=1&_t=ZS-95oEWPXGCIC" id="social-tk-link" target="_blank" style="color: inherit;"><i class="fab fa-tiktok"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="js/web.js?v=1.0.4"></script>
 </body>
 
 </html>
