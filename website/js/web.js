@@ -435,17 +435,17 @@ function renderProducts(items) {
                 <div class="product-overlay"><span>Ver Detalles</span></div>
             </div>
             <div class="product-info">
-                <div style="display: flex; flex-direction: column; flex: 1; justify-content: flex-start; margin-bottom: 1rem; width: 100%;">
+                <div class="product-details">
                     <h3>${p.name}</h3>
-                    <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.5rem;">${p.category || 'General'}</p>
-                    <div style="display:flex; justify-content:center; align-items:center; margin-top:0.25rem;">
+                    <p class="product-category">${p.category || 'General'}</p>
+                    <div class="product-price-container">
                         <span class="product-price">$${price}</span>
                     </div>
                 </div>
-                <div style="display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; margin-top: auto;">
-                    <button class="btn btn-primary btn-sm" onclick="quickBuy('${p.id}')" style="flex: 1; height: 40px; border-radius: 20px; white-space: nowrap; font-size: 0.85rem; padding: 0 10px;">Compra Rápida</button>
-                    <button class="btn btn-outline btn-sm" onclick="addToCart('${p.id}')" title="Añadir al carrito" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; border: 1.5px solid var(--primary); color: var(--primary);">
-                        <i class="fas fa-cart-plus" style="font-size: 0.9rem;"></i>
+                <div class="product-actions">
+                    <button class="btn btn-primary btn-quick-buy" onclick="quickBuy('${p.id}')">Compra Rápida</button>
+                    <button class="btn btn-outline btn-add-cart" onclick="addToCart('${p.id}')" title="Añadir al carrito">
+                        <i class="fas fa-cart-plus"></i>
                     </button>
                 </div>
             </div>
@@ -544,13 +544,13 @@ function renderProductLanding(id) {
         const rpImg = (Array.isArray(rp.image) ? rp.image[0] : (rp.image || rp.imageUrl)) || 'https://via.placeholder.com/300';
         const rpPrice = (rp.priceFinal || rp.priceInternet || 0).toLocaleString();
         return `
-            <div class="glass product-card animate" style="padding: 1.5rem; border-radius: 20px; text-align: left; display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
-                <div onclick="window.location.hash = '#product?id=${rp.id}'" style="cursor: pointer;">
+            <div class="glass product-card animate" style="padding: 1.5rem; border-radius: 20px; text-align: left; display: flex; flex-direction: column;">
+                <div onclick="window.location.hash = '#product?id=${rp.id}'" style="cursor: pointer; flex: 1 0 auto; display: flex; flex-direction: column;">
                     <img src="${rpImg}" alt="${rp.name}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 15px; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.1rem; line-height: 1.3; margin-bottom: 0.5rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${rp.name}</h3>
                     <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.75rem;">${rp.category || 'General'}</p>
                 </div>
-                <div>
+                <div style="margin-top: auto;">
                     <div style="font-size: 1.25rem; font-weight: 800; color: var(--accent); margin-bottom: 1rem;">$${rpPrice}</div>
                     <button class="btn btn-primary btn-sm btn-block" onclick="window.location.hash = '#product?id=${rp.id}'" style="width: 100%; border-radius: 20px; font-weight: 700; height: 40px;">
                         Ver Detalles
@@ -578,7 +578,7 @@ function renderProductLanding(id) {
                         <i class="fas fa-fire"></i> ${viewers} personas viendo ahora
                     </span>
                 </div>
-                <h1 style="font-size: 3.5rem; line-height: 1.1; margin-bottom: 1.5rem;">${p.name}</h1>
+                <h1 class="product-title">${p.name}</h1>
                 
                 <div style="font-size: 1.1rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.6;">
                     ${(() => {
@@ -591,7 +591,7 @@ function renderProductLanding(id) {
                 <div class="glass" style="padding: 2.5rem; border-radius: 25px; margin-bottom: 3rem; border: 2px solid var(--accent);">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                         <span style="font-size: 1.1rem; color: var(--text-secondary);">Precio para Ti:</span>
-                        <span style="font-size: 3rem; font-weight: 800; color: var(--accent);">$${price}</span>
+                        <span class="product-detail-price">$${price}</span>
                     </div>
                     
                     <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 700; margin-bottom: 1.5rem;">
@@ -618,16 +618,16 @@ function renderProductLanding(id) {
                     </div>
                 </div>
 
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; text-align: center;">
-                    <div class="glass" style="padding: 1rem; border-radius: 15px; border-bottom: 4px solid var(--accent);">
+                <div class="warranty-badge-grid">
+                    <div class="glass warranty-badge" style="border-bottom-color: var(--accent);">
                         <i class="fas fa-shield-alt" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i>
                         <small style="font-weight: 700;">Garantía 3 Meses<br><span style="font-size: 0.65rem; opacity: 0.8;">(Motor / Fábrica)</span></small>
                     </div>
-                    <div class="glass" style="padding: 1rem; border-radius: 15px; border-bottom: 4px solid var(--success);">
+                    <div class="glass warranty-badge" style="border-bottom-color: var(--success);">
                         <i class="fas fa-certificate" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--success);"></i>
                         <small style="font-weight: 700;">100% Original</small>
                     </div>
-                    <div class="glass" style="padding: 1rem; border-radius: 15px; border-bottom: 4px solid #6366f1;">
+                    <div class="glass warranty-badge" style="border-bottom-color: #6366f1;">
                         <i class="fas fa-lock" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: #6366f1;"></i>
                         <small style="font-weight: 700;">Compra Segura</small>
                     </div>
@@ -638,7 +638,7 @@ function renderProductLanding(id) {
         <!-- Related Products Section -->
         <div style="margin-top: 6rem; border-top: 1px solid var(--glass-border); padding-top: 4rem;">
             <h2 style="font-size: 2.2rem; margin-bottom: 2rem; text-align: left;">Productos Relacionados</h2>
-            <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 2rem; margin-top: 1.5rem;">
+            <div class="products-grid" style="margin-top: 1.5rem;">
                 ${relatedHtml}
             </div>
         </div>
@@ -672,8 +672,7 @@ async function renderCategories() {
         categoryGrid.innerHTML = '';
         data.forEach(cat => {
             const card = document.createElement('div');
-            card.className = 'glass product-card animate';
-            card.style = 'cursor: pointer; padding: 2.5rem; text-align: center;';
+            card.className = 'glass category-card animate';
             card.onclick = () => { 
                 activeCategory = cat.name; 
                 renderProducts(products); 
@@ -681,7 +680,7 @@ async function renderCategories() {
                 const prodSec = document.getElementById('productos');
                 if (prodSec) prodSec.scrollIntoView({ behavior: 'smooth' });
             };
-            card.innerHTML = `<i class="fas ${icons[cat.name] || 'fa-tag'}" style="font-size: 3rem; color: var(--accent); margin-bottom: 1.2rem;"></i><h3>${cat.name}</h3>`;
+            card.innerHTML = `<i class="fas ${icons[cat.name] || 'fa-tag'}"></i><h3>${cat.name}</h3>`;
             categoryGrid.appendChild(card);
         });
     } catch (err) { console.error('Error categories:', err.message); }
