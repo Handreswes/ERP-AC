@@ -2,11 +2,10 @@
 .env
 .env.local
 
-# Project Specific
-sync_github.ps1.bak
+# Assets
+assets/temp/
 
-# Common excludes
+# Common
 node_modules/
 dist/
 .DS_Store
-Thumbs.db
