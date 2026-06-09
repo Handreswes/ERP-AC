@@ -16,14 +16,14 @@ window.PDFManager = {
         if (!document.getElementById('pdf-preview-modal')) {
             const modalHtml = `
             <div id="pdf-preview-modal" class="modal">
-                <div class="modal-content" style="max-width: 800px; background: #f8fafc; border: 1px solid #cbd5e1; box-shadow: var(--shadow-premium);">
-                    <div class="modal-header" style="background: #f1f5f9; border-bottom: 1px solid #cbd5e1; color: #0f172a; padding: 1.25rem 1.5rem;">
+                <div class="modal-content" style="max-width: 800px; max-height: 90vh; display: flex; flex-direction: column; background: #f8fafc; border: 1px solid #cbd5e1; box-shadow: var(--shadow-premium);">
+                    <div class="modal-header" style="background: #f1f5f9; border-bottom: 1px solid #cbd5e1; color: #0f172a; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
                         <h2 id="pdf-preview-title" style="color: #0f172a; margin: 0; font-size: 1.25rem; font-weight: 700;">Vista Previa de Documento</h2>
                         <span class="close-modal" style="color: #475569; cursor: pointer; font-size: 1.75rem; font-weight: bold;" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
                     </div>
-                    <div class="modal-body" style="padding: 1.5rem; overflow-y: auto; max-height: calc(100vh - 160px);">
+                    <div class="modal-body" style="padding: 1.5rem; overflow: hidden; flex: 1; display: flex; flex-direction: column; background: #f8fafc;">
                         <!-- Toolbar for Actions -->
-                        <div style="display: flex; gap: 10px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border); flex-wrap: wrap; flex-shrink: 0;">
                             <button id="pdf-btn-download" class="btn btn-primary" style="background: var(--accent); flex: 1; min-width: 150px;">
                                 <i class="fas fa-file-pdf"></i> Descargar PDF
                             </button>
@@ -32,9 +32,11 @@ window.PDFManager = {
                             </button>
                         </div>
 
-                        <!-- The actual element to be converted to PDF -->
-                        <div id="pdf-export-content" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color: #1e293b; font-family: 'Inter', sans-serif;">
-                            <!-- Content injected dynamically -->
+                        <!-- The actual element to be converted to PDF (Scrollable) -->
+                        <div style="flex: 1; overflow-y: auto; padding-right: 5px;">
+                            <div id="pdf-export-content" style="background: white; padding: 40px; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); color: #1e293b; font-family: 'Inter', sans-serif;">
+                                <!-- Content injected dynamically -->
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -44,21 +46,18 @@ window.PDFManager = {
     },
 
     setupEventListeners() {
-        if (this.hasEventListeners) return;
-        this.hasEventListeners = true;
-        document.addEventListener('click', (e) => {
-            const tgt = e.target;
-            
-            // Download PDF
-            const downloadBtn = tgt.closest('#pdf-btn-download');
-            if (downloadBtn) {
+        const downloadBtn = document.getElementById('pdf-btn-download');
+        if (downloadBtn) {
+            downloadBtn.onclick = (e) => {
+                e.preventDefault();
                 this.generatePDF();
-                return;
-            }
+            };
+        }
 
-            // WhatsApp Share
-            const waBtn = tgt.closest('#pdf-btn-whatsapp');
-            if (waBtn) {
+        const waBtn = document.getElementById('pdf-btn-whatsapp');
+        if (waBtn) {
+            waBtn.onclick = (e) => {
+                e.preventDefault();
                 const phone = this.currentWaPhone;
                 const text = this.currentWaText;
                 if (!phone || !text) {
@@ -70,9 +69,8 @@ window.PDFManager = {
                     // Add instructions
                     setTimeout(() => alert("El PDF debe enviarse manualmente descargándolo primero. El link de WhatsApp ya incluye el mensaje resumen."), 500);
                 }
-                return;
-            }
-        });
+            };
+        }
     },
 
     /**
