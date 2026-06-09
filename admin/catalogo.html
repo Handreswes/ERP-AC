@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Catálogo Oficial | TuCompras Col</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #3b82f6;
+            --success: #10b981;
+            --bg: #f8fafc;
+            --border: #e2e8f0;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+        }
+
+        body {
+            font-family: "Outfit", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        /* Top Bar Controls */
+        .controls-bar {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+        }
+
+        .controls-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 800;
+            font-size: 1.25rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .controls-logo span {
+            color: #ff8c00;
+        }
+
+        .filters-group {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text);
+            background: white;
+            cursor: pointer;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .filter-select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .btn-print {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .btn-print:hover {
+            background: #2563eb;
+            transform: scale(1.02);
+        }
+
+        /* Catalog Layout */
+        .header {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: white;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0;
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto 5rem;
+            padding: 0 1.5rem;
+        }
+
+        .catalog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.03);
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+        }
+
+        .product-gallery {
+            width: 100%;
+            height: 250px;
+            position: relative;
+            background: #f1f5f9;
+            overflow: hidden;
+        }
+
+        .product-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1.25rem;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            gap: 0.5rem;
+        }
+
+        .category {
+            font-size: 0.65rem;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.2rem;
+        }
+
+        .name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #1e293b;
+            line-height: 1.3;
+            margin-bottom: 0.5rem;
+            min-height: 2.6rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .desc {
+            font-size: 0.82rem !important;
+            color: #64748b;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+            text-align: left;
+            background: rgba(0,0,0,0.01);
+            padding: 8px 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--accent);
+        }
+
+        .price-tag {
+            background: var(--primary);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            display: inline-block;
+            align-self: center;
+        }
+
+        /* Specs table with dot leaders */
+        .specs-table {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 5px;
+            width: 100%;
+        }
+
+        .spec-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .spec-prop {
+            font-weight: 600;
+            color: #1e293b;
+            padding-right: 4px;
+            white-space: nowrap;
+        }
+
+        .spec-dots {
+            flex-grow: 1;
+            border-bottom: 1px dotted #cbd5e1;
+            margin: 0 4px;
+            position: relative;
+            top: -3px;
+        }
+
+        .spec-val {
+            color: #475569;
+            text-align: right;
+            padding-left: 4px;
+            font-weight: 500;
+        }
+
+        .spec-text {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+            font-style: italic;
+            text-align: left;
+        }
+
+        .standard-desc {
+            font-size: 0.8rem;
+            color: #475569;
+            line-height: 1.45;
+            text-align: left;
+        }
+
+        /* Floating WhatsApp Button */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #25d366;
+            color: white;
+            padding: 0.85rem 1.8rem;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            box-shadow: 0 10px 25px rgba(37,211,102,0.4);
+            z-index: 10000;
+            transition: 0.3s ease;
+            animation: pulse-whatsapp 2s infinite;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.05);
+            background: #128c7e;
+        }
+
+        .whatsapp-float i {
+            font-size: 1.4rem;
+        }
+
+        @keyframes pulse-whatsapp {
+            0% { box-shadow: 0 0 0 0 rgba(37,211,102,0.7); }
+            70% { box-shadow: 0 0 0 15px rgba(37,211,102,0); }
+            100% { box-shadow: 0 0 0 0 rgba(37,211,102,0); }
+        }
+
+        /* Cover Page Styling (Print only) */
+        .print-cover {
+            display: none;
+        }
+
+        /* Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #0f172a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            transition: 0.5s ease;
+        }
+
+        .loading-spinner {
+            border: 4px solid rgba(255,255,255,0.1);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border-left-color: var(--accent);
+            animation: spin 1s linear infinite;
+            margin-bottom: 1.5rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Print Media Styles */
+        @media print {
+            @page {
+                size: portrait;
+                margin: 20mm 15mm 20mm 15mm;
+            }
+
+            body {
+                background: white !important;
+                color: #0f172a !important;
+            }
+
+            .controls-bar, .whatsapp-float {
+                display: none !important;
+            }
+
+            .header {
+                display: none !important;
+            }
+
+            .container {
+                margin-top: 0 !important;
+                padding: 0 !important;
+            }
+
+            .catalog-grid {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 15mm !important;
+            }
+
+            .product-card {
+                box-shadow: none !important;
+                border: 1px solid #cbd5e1 !important;
+                background: white !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                border-radius: 12px !important;
+            }
+
+            .product-gallery, .product-img {
+                height: 220px !important;
+            }
+
+            .product-info {
+                padding: 14px !important;
+                gap: 5px !important;
+            }
+
+            .name {
+                font-size: 1.1rem !important;
+                margin-bottom: 4px !important;
+                color: #0f172a !important;
+                font-weight: 700 !important;
+            }
+
+            .category {
+                font-size: 0.7rem !important;
+                margin-bottom: 2px !important;
+                color: #2563eb !important;
+                font-weight: 700 !important;
+            }
+
+            .desc {
+                font-size: 0.78rem !important;
+                background: transparent !important;
+                border-left: 2px solid #2563eb !important;
+                padding: 4px 10px !important;
+                margin-bottom: 8px !important;
+            }
+
+            .price-tag {
+                font-size: 1.1rem !important;
+                background: #0f172a !important;
+                color: white !important;
+                padding: 5px 15px !important;
+                border-radius: 25px !important;
+                align-self: center !important;
+            }
+
+            .spec-row {
+                font-size: 0.78rem !important;
+                line-height: 1.4 !important;
+            }
+
+            .spec-prop { color: #0f172a !important; }
+            .spec-val { color: #334155 !important; }
+            .spec-text { font-size: 0.78rem !important; }
+            .standard-desc { font-size: 0.78rem !important; }
+
+            /* Printed Cover Page Layout */
+            .print-cover {
+                display: flex !important;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                height: 94vh;
+                box-sizing: border-box;
+                padding: 15mm;
+                page-break-after: always !important;
+                break-after: page !important;
+                background: #ffffff !important;
+                color: #0f172a !important;
+                position: relative;
+                border: 8px double #1e293b;
+            }
+
+            .cover-border {
+                border: 1px solid #2563eb;
+                border-radius: 12px;
+                padding: 15mm;
+                width: 100%;
+                height: 100%;
+                box-sizing: border-box;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .cover-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 5px;
+            }
+
+            .cover-company-logo {
+                font-size: 2.6rem;
+                font-weight: 800;
+                letter-spacing: 8px;
+                color: #0f172a !important;
+                text-align: center;
+            }
+
+            .cover-company-slogan {
+                font-size: 0.75rem;
+                letter-spacing: 4px;
+                color: #475569 !important;
+                font-weight: 700;
+                text-transform: uppercase;
+                margin-top: 5px;
+                text-align: center;
+            }
+
+            .cover-body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                max-width: 85%;
+            }
+
+            .cover-catalog-label {
+                font-size: 0.85rem;
+                letter-spacing: 6px;
+                color: #2563eb !important;
+                font-weight: 800;
+                text-transform: uppercase;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #2563eb;
+                padding-bottom: 5px;
+            }
+
+            .cover-title {
+                font-size: 3.2rem !important;
+                font-weight: 800;
+                color: #0f172a !important;
+                margin: 0 0 15px 0 !important;
+                letter-spacing: 1px;
+                line-height: 1.15;
+            }
+
+            .cover-description {
+                font-size: 0.95rem;
+                color: #475569 !important;
+                line-height: 1.6;
+                margin: 0;
+            }
+
+            .cover-footer {
+                display: flex;
+                flex-direction: column;
+                gap: 8px;
+                align-items: center;
+                width: 100%;
+                border-top: 1px solid #e2e8f0;
+                padding-top: 20px;
+            }
+
+            .footer-meta-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 0.8rem;
+                color: #475569 !important;
+            }
+
+            .footer-meta-item i {
+                color: #2563eb !important;
+                font-size: 0.9rem;
+            }
+
+            .footer-meta-item strong {
+                color: #0f172a !important;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .controls-bar {
+                flex-direction: column;
+                gap: 12px;
+                align-items: stretch;
+                padding: 1rem;
+            }
+            .filters-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .filter-select, .btn-print {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loading-screen">
+        <div class="loading-spinner"></div>
+        <div style="font-weight: 600; font-size: 1.1rem; letter-spacing: 1px;">CARGANDO CATÁLOGO...</div>
+    </div>
+
+    <!-- Controls Bar (Visible only on web view, hidden during printing) -->
+    <div class="controls-bar">
+        <a href="#" class="controls-logo">
+            TuCompras<span>Col</span>
+        </a>
+        <div class="filters-group">
+            <!-- Dynamic Search input -->
+            <div style="position: relative;">
+                <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.85rem;"></i>
+                <input type="text" id="search-input" placeholder="Buscar productos..." class="filter-select" oninput="applyFilters()" style="padding-left: 35px; width: 180px; box-sizing: border-box;">
+            </div>
+            <!-- Dynamic Categories loaded dynamically -->
+            <select id="select-category" class="filter-select" onchange="applyFilters()">
+                <option value="all">Todas las Categorías</option>
+            </select>
+            <!-- Print PDF Button -->
+            <button class="btn-print" onclick="window.print()">
+                <i class="fas fa-print"></i> Guardar PDF
+            </button>
+        </div>
+    </div>
+
+    <!-- Cover Page Layout (Print only) -->
+    <div class="print-cover">
+        <div class="cover-border">
+            <div class="cover-header">
+                <span class="cover-company-logo">TUCOMPRAS</span>
+                <span class="cover-company-slogan">SOLUCIONES PARA EL HOGAR Y LA FERRETERÍA</span>
+            </div>
+            <div class="cover-body">
+                <span class="cover-catalog-label">CATÁLOGO OFICIAL</span>
+                <h1 class="cover-title" id="cover-catalog-title">CATÁLOGO GENERAL</h1>
+                <p class="cover-description">
+                    Presentamos nuestra selección exclusiva de herramientas profesionales y artículos seleccionados de la más alta calidad, con precios competitivos y garantía respaldada por motor y defectos de fábrica.
+                </p>
+            </div>
+            <div class="cover-footer">
+                <div class="footer-meta-item">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span><strong>FECHA DE EMISIÓN:</strong> <span id="cover-date">-</span></span>
+                </div>
+                <div class="footer-meta-item" id="cover-shipping-item">
+                    <i class="fas fa-truck-fast"></i>
+                    <span><strong>COBERTURA:</strong> <span id="cover-shipping-text">ENVÍOS NACIONALES</span></span>
+                </div>
+                <div class="footer-meta-item">
+                    <i class="fas fa-globe"></i>
+                    <span><strong>SITIO WEB:</strong> www.tucomprascol.com</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web Header -->
+    <div class="header">
+        <h1 id="web-title">Catálogo Oficial</h1>
+        <p id="web-subtitle">Catálogo Premium - Edición Digital</p>
+    </div>
+
+    <!-- Catalog Container -->
+    <div class="container">
+        <div class="catalog-grid" id="catalog-grid">
+            <!-- Rendered dynamically -->
+        </div>
+    </div>
+
+    <!-- Floating WhatsApp Button -->
+    <a href="#" target="_blank" class="whatsapp-float" id="whatsapp-float-btn">
+        <i class="fab fa-whatsapp"></i>
+        <span id="whatsapp-btn-text">Ventas al por Mayor</span>
+    </a>
+
+    <script>
+        // Supabase initialization
+        const SUPABASE_URL = 'https://zuondbguopirimvfuehu.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1b25kYmd1b3BpcmltdmZ1ZWh1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjAzMjk2NiwiZXhwIjoyMDg3NjA4OTY2fQ.9Zja0di6OMtWwFyigiZiWnXo0burILHTVAuBOf6EhUE';
+        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let allProducts = [];
+        let defaultRetailPhone = '573167862554';
+
+        // Load query parameters on startup
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlCompany = urlParams.get('company') || 'all';
+        const urlPrice = urlParams.get('price') || 'wholesale'; // default is wholesale
+
+        // Date population
+        document.getElementById('cover-date').innerText = new Date().toLocaleDateString('es-CO', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+
+        // Initialize App
+        async function init() {
+            try {
+                // Fetch Website Settings to get default WhatsApp retail number
+                const { data: settings, error: sErr } = await _supabase
+                    .from('website_settings')
+                    .select('whatsapp')
+                    .eq('id', 'default')
+                    .single();
+                if (!sErr && settings && settings.whatsapp) {
+                    defaultRetailPhone = settings.whatsapp;
+                }
+
+                // Fetch Products
+                const { data: products, error: pErr } = await _supabase
+                    .from('products')
+                    .select('*')
+                    .eq('active', true)
+                    .order('name', { ascending: true });
+
+                if (pErr) throw pErr;
+
+                // Filter out ghost products (no price) and products without images
+                allProducts = products.filter(p => {
+                    const hasPrice = (p.priceInternet || p.priceFinal || p.priceWholesale) > 0;
+                    const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
+                    return hasPrice && hasImage;
+                });
+
+                // Populate Category Filter dropdown dynamically from actual products
+                const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
+                const catSelect = document.getElementById('select-category');
+                categories.forEach(cat => {
+                    const opt = document.createElement('option');
+                    opt.value = cat;
+                    opt.innerText = cat;
+                    catSelect.appendChild(opt);
+                });
+
+                applyFilters();
+
+                // Hide loading screen
+                const loader = document.getElementById('loading-screen');
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+
+            } catch (err) {
+                console.error("Error loading catalog:", err);
+                document.getElementById('catalog-grid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: 16px; border: 1px solid var(--border);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h3>Error al cargar los productos</h3>
+                        <p style="color: var(--text-secondary);">Por favor revisa tu conexión e intenta refrescar la página.</p>
+                    </div>
+                `;
+                document.getElementById('loading-screen').style.display = 'none';
+            }
+        }
+
+        // Filter and Render Logic
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
+            const activeCategory = document.getElementById('select-category').value;
+
+            // 1. Base filter based on URL query parameters (Locked for the customer)
+            let filtered = allProducts;
+            if (urlCompany !== 'all') {
+                filtered = allProducts.filter(p => p.company === 'both' || p.company === urlCompany);
+            }
+
+            // 2. Customer interactive filters (Categories and Search)
+            if (activeCategory !== 'all') {
+                filtered = filtered.filter(p => p.category === activeCategory);
+            }
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    (p.name || '').toLowerCase().includes(searchTerm) ||
+                    (p.category || '').toLowerCase().includes(searchTerm) ||
+                    (p.ref || '').toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // 3. Update cover page & headings titles
+            const catalogTitle = urlPrice === 'wholesale' ? 'Catálogo Mayorista' : 'Catálogo de Productos';
+            document.title = catalogTitle + " | TuCompras Col";
+            document.getElementById('web-title').innerText = catalogTitle;
+            document.getElementById('cover-catalog-title').innerText = catalogTitle.toUpperCase();
+
+            // 4. Update cover page shipping (NO Contraentrega for B2B Wholesale)
+            const shippingText = document.getElementById('cover-shipping-text');
+            if (urlPrice === 'wholesale') {
+                shippingText.innerText = 'ENVÍOS NACIONALES';
+            } else {
+                shippingText.innerText = 'ENVÍOS NACIONALES + CONTRAENTREGA';
+            }
+
+            // 5. Update WhatsApp floating button link & text
+            const waFloat = document.getElementById('whatsapp-float-btn');
+            const waText = document.getElementById('whatsapp-btn-text');
+            if (urlPrice === 'wholesale') {
+                waFloat.href = `https://wa.me/573113979396?text=Hola,%20quisiera%20consultar%20sobre%20ventas%20al%20por%20mayor%20del%20catálogo`;
+                waText.innerText = "Ventas al por Mayor";
+            } else {
+                const formattedPhone = defaultRetailPhone.replace(/[^0-9]/g, '');
+                const finalPhone = formattedPhone.startsWith('57') ? formattedPhone : (formattedPhone.length === 10 ? '57' + formattedPhone : '573167862554');
+                waFloat.href = `https://wa.me/${finalPhone}?text=Hola,%20quisiera%20consultar%20sobre%20un%20producto%20del%20catálogo`;
+                waText.innerText = "Consultar por WhatsApp";
+            }
+
+            // 6. Render products
+            const grid = document.getElementById('catalog-grid');
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 4rem;">
+                        <i class="fas fa-search" style="font-size: 3.5rem; color: var(--text-secondary); margin-bottom: 1rem; display:block;"></i>
+                        <p style="color: var(--text-secondary); font-size: 1.1rem;">No hay productos disponibles para este filtro.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => {
+                const price = urlPrice === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
+                const displayDesc = getDisplayDescription(p);
+                const img = (Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/300?text=Premium+Product';
+
+                return `
+                    <div class="product-card">
+                        <div class="product-gallery">
+                            <img src="${img}" class="product-img" alt="${p.name}">
+                        </div>
+                        <div class="product-info">
+                            <div class="category">${p.category || 'General'}</div>
+                            <div class="name">${p.name}</div>
+                            ${displayDesc ? `<div class="desc">${formatCatalogDescription(displayDesc)}</div>` : ''}
+                            <div class="price-tag">$${parseFloat(price || 0).toLocaleString()}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Specifications Parser
+        function formatCatalogDescription(descText) {
+            if (!descText) return '';
+            const lines = descText.split(/\r?\n/);
+            const hasProperties = lines.some(line => line.includes(':'));
+            
+            if (hasProperties) {
+                let html = '<div class="specs-table">';
+                lines.forEach(line => {
+                    line = line.trim();
+                    if (!line) return;
+                    
+                    if (line.includes(':')) {
+                        const colonIdx = line.indexOf(':');
+                        const prop = line.substring(0, colonIdx).trim();
+                        const val = line.substring(colonIdx + 1).trim();
+                        
+                        const cleanProp = prop.replace(/\*\*/g, '').replace(/^[\*\-\u2022]\s*/, '');
+                        const cleanVal = val.replace(/\*\*/g, '');
+                        
+                        html += `
+                            <div class="spec-row">
+                                <span class="spec-prop">${cleanProp}</span>
+                                <span class="spec-dots"></span>
+                                <span class="spec-val">${cleanVal}</span>
+                            </div>
+                        `;
+                    } else {
+                        const cleanLine = line.replace(/^[\*\-\u2022]\s*/, '').replace(/\*\*/g, '');
+                        html += `<div class="spec-text">${cleanLine}</div>`;
+                    }
+                });
+                html += '</div>';
+                return html;
+            }
+            
+            return `<div class="standard-desc" style="white-space: pre-line;">${descText}</div>`;
+        }
+
+        // Fallback checks and block splitting
+        function getDisplayDescription(p) {
+            const parts = (p.description || '').split('[CATALOGO]');
+            if (parts[1] && parts[1].trim()) {
+                return parts[1].trim();
+            }
+            
+            const descText = parts[0].trim();
+            if (!descText) return '';
+            
+            const lines = descText.split(/\r?\n/);
+            const hasColons = lines.some(line => line.includes(':'));
+            
+            if (hasColons || descText.length < 120) {
+                return descText;
+            }
+            
+            return '';
+        }
+
+        // Run on start
+        init();
+    </script>
+</body>
+</html>
