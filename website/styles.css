@@ -482,6 +482,9 @@ body {
     transition: var(--transition);
     box-shadow: var(--shadow);
     border: 1px solid var(--glass-border);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 
 .product-card:hover {
@@ -535,6 +538,10 @@ body {
 .product-info {
     padding: 1.5rem;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    justify-content: space-between;
 }
 
 .product-info h3 {
