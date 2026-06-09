@@ -435,15 +435,17 @@ function renderProducts(items) {
                 <div class="product-overlay"><span>Ver Detalles</span></div>
             </div>
             <div class="product-info">
-                <h3>${p.name}</h3>
-                <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:1rem;">${p.category || 'General'}</p>
-                <div style="display:flex; justify-content:space-between; align-items:center;">
-                    <span class="product-price">$${price}</span>
+                <div style="display: flex; flex-direction: column; flex: 1; justify-content: flex-start; margin-bottom: 1rem; width: 100%;">
+                    <h3>${p.name}</h3>
+                    <p style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.5rem;">${p.category || 'General'}</p>
+                    <div style="display:flex; justify-content:center; align-items:center; margin-top:0.25rem;">
+                        <span class="product-price">$${price}</span>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 10px; margin-top: 1rem; align-items: center; justify-content: center;">
-                    <button class="btn btn-primary btn-sm" onclick="quickBuy('${p.id}')" style="flex: 1; height: 45px; border-radius: 25px; white-space: nowrap;">Compra Rápida</button>
-                    <button class="btn btn-outline btn-sm" onclick="addToCart('${p.id}')" title="Añadir al carrito" style="width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0;">
-                        <i class="fas fa-cart-plus"></i>
+                <div style="display: flex; gap: 8px; align-items: center; justify-content: center; width: 100%; margin-top: auto;">
+                    <button class="btn btn-primary btn-sm" onclick="quickBuy('${p.id}')" style="flex: 1; height: 40px; border-radius: 20px; white-space: nowrap; font-size: 0.85rem; padding: 0 10px;">Compra Rápida</button>
+                    <button class="btn btn-outline btn-sm" onclick="addToCart('${p.id}')" title="Añadir al carrito" style="width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; padding: 0; flex-shrink: 0; border: 1.5px solid var(--primary); color: var(--primary);">
+                        <i class="fas fa-cart-plus" style="font-size: 0.9rem;"></i>
                     </button>
                 </div>
             </div>
