@@ -42,6 +42,9 @@ window.Consultas = {
                     <button class="tab-btn ${this.activeTab === 'local_sales' ? 'active' : ''}" data-tab="local_sales">
                         <i class="fas fa-store"></i> Ventas Locales (POS)
                     </button>
+                    <button class="tab-btn ${this.activeTab === 'abonos_recibidos' ? 'active' : ''}" data-tab="abonos_recibidos">
+                        <i class="fas fa-hand-holding-usd"></i> Abonos de Clientes
+                    </button>
                 </div>
             </div>
 
@@ -64,6 +67,7 @@ window.Consultas = {
             case 'commissions': this.renderCommissionHistory(content); break;
             case 'sales': this.renderSalesHistory(content); break;
             case 'local_sales': this.renderLocalSalesHistory(content); break;
+            case 'abonos_recibidos': this.renderAbonosRecibidosHistory(content); break;
         }
     },
 
@@ -458,10 +462,15 @@ window.Consultas = {
                     <td>${methodLabel}</td>
                     <td>${s.sellerName || 'Caja'}</td>
                     <td class="text-right"><strong>$${total.toLocaleString()}</strong></td>
-                    <td class="text-center">
+                    <td class="text-center" style="white-space: nowrap;">
                         <button class="btn btn-sm btn-primary btn-reprint-pdf" data-sale="${safeSale}" data-rem="${remNumber}">
-                            <i class="fas fa-file-pdf"></i> Ver Remisión
+                            <i class="fas fa-file-pdf"></i> Ver
                         </button>
+                        ${Auth.isAdmin() ? `
+                        <button class="btn btn-sm btn-danger btn-delete-sale" data-id="${s.id}" style="background:var(--danger); border-color:var(--danger); color:white; margin-left:5px;">
+                            <i class="fas fa-trash"></i> Anular
+                        </button>
+                        ` : ''}
                     </td>
                 </tr>
             `;
@@ -494,7 +503,7 @@ window.Consultas = {
                 return;
             }
             
-            const pdfBtn = e.target.closest('.btn-reprint-pdf');
+            const pdfBtn = tgt.closest('.btn-reprint-pdf');
             if (pdfBtn && window.PDFManager) {
                 try {
                     const saleData = JSON.parse(decodeURIComponent(pdfBtn.dataset.sale));
@@ -506,6 +515,236 @@ window.Consultas = {
                 }
                 return;
             }
+
+            const deleteSaleBtn = tgt.closest('.btn-delete-sale');
+            if (deleteSaleBtn) {
+                const id = deleteSaleBtn.dataset.id;
+                await this.deleteSale(id);
+                return;
+            }
+
+            const deletePaymentBtn = tgt.closest('.btn-delete-payment');
+            if (deletePaymentBtn) {
+                const id = deletePaymentBtn.dataset.id;
+                await this.deletePayment(id);
+                return;
+            }
         };
+    },
+
+    renderAbonosRecibidosHistory(container) {
+        const payments = Storage.get(STORAGE_KEYS.PAYMENTS) || [];
+        payments.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+
+        container.innerHTML = `
+            <!-- Filters -->
+            <div class="search-filter-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+                <input type="text" id="q-abonos-search" class="form-control" placeholder="Buscar por cliente o notas..." style="max-width: 280px;">
+                <input type="month" id="q-abonos-month" class="form-control" style="max-width: 160px;">
+                <select id="q-abonos-company" class="form-control" style="max-width: 170px;">
+                    <option value="all">Millenio y Vulcano</option>
+                    <option value="millenio">Sólo Millenio</option>
+                    <option value="vulcano">Sólo Vulcano</option>
+                </select>
+            </div>
+
+            <div id="q-abonos-summary" style="margin-bottom: 1rem; font-size: 0.85rem; color: var(--text-secondary);"></div>
+
+            <div class="table-container">
+                <table class="data-table" style="font-size: 0.85rem;">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Empresa</th>
+                            <th>Método Pago</th>
+                            <th>Notas</th>
+                            <th class="text-right">Monto</th>
+                            <th class="text-center">Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="abonos-history-list">
+                        ${this.buildAbonosRows(payments)}
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        this.updateAbonosSummary(payments);
+
+        const search = document.getElementById('q-abonos-search');
+        const monthF = document.getElementById('q-abonos-month');
+        const companyF = document.getElementById('q-abonos-company');
+
+        const refilter = () => {
+            const q = (search?.value || '').toLowerCase();
+            const m = monthF?.value || '';
+            const comp = companyF?.value || 'all';
+            let rows = payments;
+
+            if (q) rows = rows.filter(p => {
+                const client = (p.clientName || '').toLowerCase();
+                const notes = (p.notes || '').toLowerCase();
+                return client.includes(q) || notes.includes(q);
+            });
+            if (m) rows = rows.filter(p => {
+                const dateField = p.date || p.createdAt;
+                return dateField && dateField.startsWith(m);
+            });
+            if (comp !== 'all') rows = rows.filter(p => p.company === comp);
+
+            document.getElementById('abonos-history-list').innerHTML = this.buildAbonosRows(rows);
+            this.updateAbonosSummary(rows);
+        };
+
+        search?.addEventListener('input', refilter);
+        monthF?.addEventListener('change', refilter);
+        companyF?.addEventListener('change', refilter);
+    },
+
+    updateAbonosSummary(rows) {
+        const el = document.getElementById('q-abonos-summary');
+        if (!el) return;
+        const total = rows.reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+        el.innerHTML = `<strong>${rows.length}</strong> abonos encontrados · Valor total: <strong style="color:var(--success);">$${total.toLocaleString()}</strong>`;
+    },
+
+    buildAbonosRows(rows) {
+        if (rows.length === 0) return `<tr><td colspan="7" class="text-center text-secondary" style="padding:2rem;">Sin resultados para los filtros aplicados.</td></tr>`;
+        
+        const methods = { cash: '💵 Efectivo', transfer: '🏦 Transf.', credit: '💳 Crédito' };
+        
+        return rows.map(p => {
+            const dateStr = (p.date || p.createdAt) ? new Date(p.date || p.createdAt).toLocaleString('es-CO', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
+            const amt = parseFloat(p.amount) || 0;
+            const methodLabel = methods[p.method] || p.method;
+            
+            return `
+                <tr>
+                    <td>${dateStr}</td>
+                    <td><strong>${p.clientName || '—'}</strong></td>
+                    <td><span class="badge ${p.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${p.company.toUpperCase()}</span></td>
+                    <td>${methodLabel}</td>
+                    <td><span style="font-size: 0.8rem; color: var(--text-secondary);">${p.notes || '—'}</span></td>
+                    <td class="text-right" style="color: var(--success);"><strong>$${amt.toLocaleString()}</strong></td>
+                    <td class="text-center">
+                        ${Auth.isAdmin() ? `
+                        <button class="btn btn-sm btn-danger btn-delete-payment" data-id="${p.id}" style="background:var(--danger); border-color:var(--danger); color:white;">
+                            <i class="fas fa-trash"></i> Anular
+                        </button>
+                        ` : '<small class="text-secondary">—</small>'}
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+
+    async deleteSale(saleId) {
+        if (!Auth.isAdmin()) {
+            alert("No tienes permisos para anular ventas.");
+            return;
+        }
+        if (!confirm("⚠️ ¿Estás seguro de ANULAR esta venta permanentemente?\n\nEsto eliminará la remisión, reintegrará los productos al stock y descontará el saldo al cliente si fue a crédito.")) {
+            return;
+        }
+
+        try {
+            const sale = Storage.getById(STORAGE_KEYS.SALES, saleId);
+            if (!sale) throw new Error("Venta no encontrada en memoria.");
+
+            // 1. Reintegrar stock
+            if (sale.items && Array.isArray(sale.items)) {
+                for (const item of sale.items) {
+                    const p = Storage.getById(STORAGE_KEYS.PRODUCTS, item.id);
+                    if (p) {
+                        if (sale.company === 'millenio') {
+                            p.stockMillenio = (p.stockMillenio || 0) + (item.quantity || 1);
+                        } else {
+                            p.stockVulcano = (p.stockVulcano || 0) + (item.quantity || 1);
+                        }
+                        await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, {
+                            stockMillenio: p.stockMillenio,
+                            stockVulcano: p.stockVulcano
+                        });
+                    }
+                }
+            }
+
+            // 2. Restar saldo al cliente
+            if (sale.method === 'credit' && sale.clientId) {
+                const c = Storage.getById(STORAGE_KEYS.CLIENTS, sale.clientId);
+                if (c) {
+                    c.balanceMillenio = Math.max(0, (c.balanceMillenio || 0) - (sale.totalM || 0));
+                    c.balanceVulcano = Math.max(0, (c.balanceVulcano || 0) - (sale.totalV || 0));
+                    await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
+                        balanceMillenio: c.balanceMillenio,
+                        balanceVulcano: c.balanceVulcano
+                    });
+                }
+            }
+
+            // 3. Eliminar venta
+            await Storage.deleteItem(STORAGE_KEYS.SALES, saleId);
+            alert("✅ Venta anulada exitosamente.");
+            
+            // Actualizar Vistas
+            this.renderTab();
+            if (window.Inventory && window.Inventory.updateInventoryList) window.Inventory.updateInventoryList();
+            if (window.CRM && window.CRM.updateClientList) window.CRM.updateClientList();
+            if (window.Finances && window.Finances.updateDebtUI) {
+                window.Finances.updateDebtUI();
+                window.Finances.updateBalancesUI();
+            }
+        } catch(err) {
+            console.error(err);
+            alert("❌ Error al anular la venta: " + err.message);
+        }
+    },
+
+    async deletePayment(paymentId) {
+        if (!Auth.isAdmin()) {
+            alert("No tienes permisos para anular abonos.");
+            return;
+        }
+        if (!confirm("⚠️ ¿Estás seguro de ANULAR este abono permanentemente?\n\nEsto eliminará el registro de abono de la base de datos y aumentará la deuda del cliente correspondiente para restablecer su saldo anterior.")) {
+            return;
+        }
+
+        try {
+            const p = Storage.getById(STORAGE_KEYS.PAYMENTS, paymentId);
+            if (!p) throw new Error("Abono no encontrado en memoria.");
+
+            // 1. Restablecer saldo al cliente
+            if (p.clientId) {
+                const c = Storage.getById(STORAGE_KEYS.CLIENTS, p.clientId);
+                if (c) {
+                    const amt = parseFloat(p.amount) || 0;
+                    if (p.company === 'millenio') {
+                        c.balanceMillenio = (c.balanceMillenio || 0) + amt;
+                    } else {
+                        c.balanceVulcano = (c.balanceVulcano || 0) + amt;
+                    }
+                    await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
+                        balanceMillenio: c.balanceMillenio,
+                        balanceVulcano: c.balanceVulcano
+                    });
+                }
+            }
+
+            // 2. Eliminar abono
+            await Storage.deleteItem(STORAGE_KEYS.PAYMENTS, paymentId);
+            alert("✅ Abono anulado exitosamente.");
+            
+            // Actualizar Vistas
+            this.renderTab();
+            if (window.CRM && window.CRM.updateClientList) window.CRM.updateClientList();
+            if (window.Finances && window.Finances.updateDebtUI) {
+                window.Finances.updateDebtUI();
+                window.Finances.updateBalancesUI();
+            }
+        } catch(err) {
+            console.error(err);
+            alert("❌ Error al anular el abono: " + err.message);
+        }
     }
 };
