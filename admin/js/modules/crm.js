@@ -586,7 +586,7 @@ window.CRM = {
                 movimientos.push({
                     date: s.date,
                     type: `Compra (Remisión POS)`,
-                    description: `${s.items?.length || 0} producto(s) | Facturado: ${s.company === 'vulcano' ? 'Vulcano' : 'Millenio'}`,
+                    description: `${s.items ? s.items.map(i => `${i.qty || i.quantity || 1}x ${i.name}`).join(', ') : 'Sin productos'} | Facturado: ${s.company === 'vulcano' ? 'Vulcano' : 'Millenio'}`,
                     amount: amt,
                     isCharge: true
                 });
