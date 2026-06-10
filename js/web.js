@@ -407,7 +407,9 @@ function populateCylinder() {
 // Render Products
 function renderProducts(items) {
     productGrid.innerHTML = '';
-    let filtered = activeCategory === 'all' ? items : items.filter(p => p.category === activeCategory);
+    let filtered = activeCategory === 'all' 
+        ? items.filter(p => (p.category || '').toLowerCase() !== 'cuadros') 
+        : items.filter(p => p.category === activeCategory);
 
     if (currentSearchQuery) {
         filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(currentSearchQuery));
