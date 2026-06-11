@@ -3,7 +3,7 @@
   <channel>
     <title>TuCompras Col</title>
     <link>https://tucomprascol.com</link>
-    <description>Distribuidora lÃ­der en herramientas y hogar en Colombia</description>
+    <description>Distribuidora lider en herramientas y hogar en Colombia</description>
     <item>
       <g:id>be05522b-d3bd-445f-aa6b-bdf93d22a76b</g:id>
       <title>Sierra Circular 7&quot;</title>
@@ -204,18 +204,6 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>4d4c258f-3cc9-43ed-accd-8e2ba13bd344</g:id>
-      <title>SOLDADOR 2 FUNCIONES </title>
-      <description>S</description>
-      <link>https://tucomprascol.com/?p=4d4c258f-3cc9-43ed-accd-8e2ba13bd344</link>
-      <g:image_link>https://tucomprascol.com/images/products/4d4c258f-3cc9-43ed-accd-8e2ba13bd344.jpg</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in_stock</g:availability>
-      <g:price>349000.00 COP</g:price>
-      <g:brand>ANDRES </g:brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
       <g:id>b33e7a1d-fa86-47be-96cb-60108e0c6e88</g:id>
       <title>ROTOMARTILLO INALAMBRICO</title>
       <description>El Rotomartillo Inalámbrico de 98V ofrece la potencia y la libertad de movimiento necesarias para realizar perforaciones precisas en concreto, metal o madera. Su diseño sin cables optimiza el tiempo de trabajo, permitiendo ejecutar tanto obras exigentes como remodelaciones en el hogar con total comodidad y rendimiento profesional.
@@ -228,18 +216,6 @@
       <g:condition>new</g:condition>
       <g:availability>in_stock</g:availability>
       <g:price>369000.00 COP</g:price>
-      <g:brand>TuCompras</g:brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>643f94a6-658a-41cf-9e11-f698ccbb5926</g:id>
-      <title>Arcangel Acrilico</title>
-      <description>72cm* 52cm</description>
-      <link>https://tucomprascol.com/?p=643f94a6-658a-41cf-9e11-f698ccbb5926</link>
-      <g:image_link>https://tucomprascol.com/images/products/643f94a6-658a-41cf-9e11-f698ccbb5926.jpg</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in_stock</g:availability>
-      <g:price>199000.00 COP</g:price>
       <g:brand>TuCompras</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
@@ -277,6 +253,18 @@
       <g:availability>in_stock</g:availability>
       <g:price>99000.00 COP</g:price>
       <g:brand>BRITO</g:brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>4d4c258f-3cc9-43ed-accd-8e2ba13bd344</g:id>
+      <title>SOLDADOR 2 FUNCIONES </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=4d4c258f-3cc9-43ed-accd-8e2ba13bd344</link>
+      <g:image_link>https://tucomprascol.com/images/products/4d4c258f-3cc9-43ed-accd-8e2ba13bd344.jpg</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>349000.00 COP</g:price>
+      <g:brand>ANDRES </g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -1223,6 +1211,18 @@
       <g:condition>new</g:condition>
       <g:availability>in_stock</g:availability>
       <g:price>189000.00 COP</g:price>
+      <g:brand>TuCompras</g:brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>643f94a6-658a-41cf-9e11-f698ccbb5926</g:id>
+      <title>Arcangel Acrilico</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=643f94a6-658a-41cf-9e11-f698ccbb5926</link>
+      <g:image_link>https://tucomprascol.com/images/products/643f94a6-658a-41cf-9e11-f698ccbb5926.jpg</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>199000.00 COP</g:price>
       <g:brand>TuCompras</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
