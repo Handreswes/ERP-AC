@@ -15,7 +15,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
+      <availability>out of stock</availability>
       <g:price>289000.00 COP</g:price>
       <price>289000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -33,7 +33,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>389000.00 COP</g:price>
       <price>389000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -51,7 +51,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>499000.00 COP</g:price>
       <price>499000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -72,7 +72,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>349000.00 COP</g:price>
       <price>349000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -90,7 +90,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
+      <availability>out of stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -108,7 +108,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>269000.00 COP</g:price>
       <price>269000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -126,7 +126,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>349000.00 COP</g:price>
       <price>349000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -144,7 +144,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>209000.00 COP</g:price>
       <price>209000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -162,7 +162,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
+      <availability>out of stock</availability>
       <g:price>209000.00 COP</g:price>
       <price>209000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -184,7 +184,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>369000.00 COP</g:price>
       <price>369000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -207,7 +207,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>279000.00 COP</g:price>
       <price>279000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -230,47 +230,11 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>169000.00 COP</g:price>
       <price>169000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>ce16436f-9239-4d62-bc4a-044e5f5d554f</g:id>
-      <sku_id>ce16436f-9239-4d62-bc4a-044e5f5d554f</sku_id>
-      <title>ARCANGEL GOV  </title>
-      <description>77cm*60cm</description>
-      <link>https://tucomprascol.com/?p=ce16436f-9239-4d62-bc4a-044e5f5d554f</link>
-      <g:image_link>https://tucomprascol.com/images/products/ce16436f-9239-4d62-bc4a-044e5f5d554f.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/ce16436f-9239-4d62-bc4a-044e5f5d554f.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>189000.00 COP</g:price>
-      <price>189000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>4cec1898-2d6e-415f-8019-059b61d0f093</g:id>
-      <sku_id>4cec1898-2d6e-415f-8019-059b61d0f093</sku_id>
-      <title>TALADRO 24V MANDRIL METALICO DE MEDIA</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=4cec1898-2d6e-415f-8019-059b61d0f093</link>
-      <g:image_link>https://tucomprascol.com/images/products/4cec1898-2d6e-415f-8019-059b61d0f093.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/4cec1898-2d6e-415f-8019-059b61d0f093.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>199000.00 COP</g:price>
-      <price>199000.00 COP</price>
-      <g:brand>GORDO</g:brand>
-      <brand>GORDO</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -284,11 +248,29 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>650000.00 COP</g:price>
       <price>650000.00 COP</price>
       <g:brand>GORDO</g:brand>
       <brand>GORDO</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>ce16436f-9239-4d62-bc4a-044e5f5d554f</g:id>
+      <sku_id>ce16436f-9239-4d62-bc4a-044e5f5d554f</sku_id>
+      <title>ARCANGEL GOV  </title>
+      <description>77cm*60cm</description>
+      <link>https://tucomprascol.com/?p=ce16436f-9239-4d62-bc4a-044e5f5d554f</link>
+      <g:image_link>https://tucomprascol.com/images/products/ce16436f-9239-4d62-bc4a-044e5f5d554f.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/ce16436f-9239-4d62-bc4a-044e5f5d554f.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>189000.00 COP</g:price>
+      <price>189000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -302,7 +284,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>99000.00 COP</g:price>
       <price>99000.00 COP</price>
       <g:brand>BRITO</g:brand>
@@ -310,39 +292,21 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>4d4c258f-3cc9-43ed-accd-8e2ba13bd344</g:id>
-      <sku_id>4d4c258f-3cc9-43ed-accd-8e2ba13bd344</sku_id>
-      <title>SOLDADOR 2 FUNCIONES </title>
+      <g:id>4cec1898-2d6e-415f-8019-059b61d0f093</g:id>
+      <sku_id>4cec1898-2d6e-415f-8019-059b61d0f093</sku_id>
+      <title>TALADRO 24V MANDRIL METALICO DE MEDIA</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=4d4c258f-3cc9-43ed-accd-8e2ba13bd344</link>
-      <g:image_link>https://tucomprascol.com/images/products/4d4c258f-3cc9-43ed-accd-8e2ba13bd344.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/4d4c258f-3cc9-43ed-accd-8e2ba13bd344.jpg</image_link>
+      <link>https://tucomprascol.com/?p=4cec1898-2d6e-415f-8019-059b61d0f093</link>
+      <g:image_link>https://tucomprascol.com/images/products/4cec1898-2d6e-415f-8019-059b61d0f093.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/4cec1898-2d6e-415f-8019-059b61d0f093.jpg</image_link>
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>349000.00 COP</g:price>
-      <price>349000.00 COP</price>
-      <g:brand>ANDRES </g:brand>
-      <brand>ANDRES </brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>0f10da9b-fee2-4982-89de-f8a13dc4c037</g:id>
-      <sku_id>0f10da9b-fee2-4982-89de-f8a13dc4c037</sku_id>
-      <title>Taladro azul</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=0f10da9b-fee2-4982-89de-f8a13dc4c037</link>
-      <g:image_link>https://tucomprascol.com/images/products/0f10da9b-fee2-4982-89de-f8a13dc4c037.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/0f10da9b-fee2-4982-89de-f8a13dc4c037.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>169000.00 COP</g:price>
-      <price>169000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
+      <availability>in stock</availability>
+      <g:price>199000.00 COP</g:price>
+      <price>199000.00 COP</price>
+      <g:brand>GORDO</g:brand>
+      <brand>GORDO</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -356,7 +320,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>419000.00 COP</g:price>
       <price>419000.00 COP</price>
       <g:brand>GORDO</g:brand>
@@ -374,7 +338,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>75000.00 COP</g:price>
       <price>75000.00 COP</price>
       <g:brand>BRITO</g:brand>
@@ -382,21 +346,39 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>9426e144-7783-4d8f-970a-5fb7bd8cb04c</g:id>
-      <sku_id>9426e144-7783-4d8f-970a-5fb7bd8cb04c</sku_id>
-      <title>ARCANGEL GOV </title>
-      <description>97cm *58cm</description>
-      <link>https://tucomprascol.com/?p=9426e144-7783-4d8f-970a-5fb7bd8cb04c</link>
-      <g:image_link>https://tucomprascol.com/images/products/9426e144-7783-4d8f-970a-5fb7bd8cb04c.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/9426e144-7783-4d8f-970a-5fb7bd8cb04c.jpg</image_link>
+      <g:id>6d4c88aa-35ad-4bbc-8362-a68e5ca62935</g:id>
+      <sku_id>6d4c88aa-35ad-4bbc-8362-a68e5ca62935</sku_id>
+      <title>MULTIMETRO TRADICIONAL </title>
+      <description>MU</description>
+      <link>https://tucomprascol.com/?p=6d4c88aa-35ad-4bbc-8362-a68e5ca62935</link>
+      <g:image_link>https://tucomprascol.com/images/products/6d4c88aa-35ad-4bbc-8362-a68e5ca62935.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/6d4c88aa-35ad-4bbc-8362-a68e5ca62935.jpg</image_link>
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>209000.00 COP</g:price>
-      <price>209000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
+      <availability>in stock</availability>
+      <g:price>25000.00 COP</g:price>
+      <price>25000.00 COP</price>
+      <g:brand>ANDRES</g:brand>
+      <brand>ANDRES</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>4d4c258f-3cc9-43ed-accd-8e2ba13bd344</g:id>
+      <sku_id>4d4c258f-3cc9-43ed-accd-8e2ba13bd344</sku_id>
+      <title>SOLDADOR 2 FUNCIONES </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=4d4c258f-3cc9-43ed-accd-8e2ba13bd344</link>
+      <g:image_link>https://tucomprascol.com/images/products/4d4c258f-3cc9-43ed-accd-8e2ba13bd344.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/4d4c258f-3cc9-43ed-accd-8e2ba13bd344.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>349000.00 COP</g:price>
+      <price>349000.00 COP</price>
+      <g:brand>ANDRES </g:brand>
+      <brand>ANDRES </brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -410,63 +392,9 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6</g:id>
-      <sku_id>4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6</sku_id>
-      <title>MOTOTOOL</title>
-      <description>Mototool 150W: 10000-32000 RPM, incluye guaya expansiva y accesorios.</description>
-      <link>https://tucomprascol.com/?p=4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6</link>
-      <g:image_link>https://tucomprascol.com/images/products/4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>189000.00 COP</g:price>
-      <price>189000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>b038593b-c352-4c7e-8dff-f32b1cdc0784</g:id>
-      <sku_id>b038593b-c352-4c7e-8dff-f32b1cdc0784</sku_id>
-      <title>Motosierra 5801</title>
-      <description>Motosierra  con espada de 60cm motor 58cc</description>
-      <link>https://tucomprascol.com/?p=b038593b-c352-4c7e-8dff-f32b1cdc0784</link>
-      <g:image_link>https://tucomprascol.com/images/products/b038593b-c352-4c7e-8dff-f32b1cdc0784.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/b038593b-c352-4c7e-8dff-f32b1cdc0784.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
-      <g:price>399000.00 COP</g:price>
-      <price>399000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>886a14e1-15f6-4224-bc26-1a0bf379d15e</g:id>
-      <sku_id>886a14e1-15f6-4224-bc26-1a0bf379d15e</sku_id>
-      <title>Pistola Anclaje</title>
-      <description>pistola de anclaje para chazo fulmínante</description>
-      <link>https://tucomprascol.com/?p=886a14e1-15f6-4224-bc26-1a0bf379d15e</link>
-      <g:image_link>https://tucomprascol.com/images/products/886a14e1-15f6-4224-bc26-1a0bf379d15e.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/886a14e1-15f6-4224-bc26-1a0bf379d15e.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
-      <g:price>99000.00 COP</g:price>
-      <price>99000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -475,36 +403,18 @@
       <g:id>182d1019-bb4d-4d26-8064-f4d5c23b2cc9</g:id>
       <sku_id>182d1019-bb4d-4d26-8064-f4d5c23b2cc9</sku_id>
       <title>Sierra Sable </title>
-      <description>Sierra Sable</description>
+      <description>Realice cortes precisos, limpios y rápidos en madera, metal e incluso hueso con total libertad de movimiento. Esta sierra sable inalámbrica optimiza sus jornadas de trabajo gracias a su potencia constante y un rendimiento superior libre de cables.
+
+*</description>
       <link>https://tucomprascol.com/?p=182d1019-bb4d-4d26-8064-f4d5c23b2cc9</link>
       <g:image_link>https://tucomprascol.com/images/products/182d1019-bb4d-4d26-8064-f4d5c23b2cc9.jpg</g:image_link>
       <image_link>https://tucomprascol.com/images/products/182d1019-bb4d-4d26-8064-f4d5c23b2cc9.jpg</image_link>
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>259000.00 COP</g:price>
-      <price>259000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>f832963e-83fe-441e-82f4-b4bdaa03deb4</g:id>
-      <sku_id>f832963e-83fe-441e-82f4-b4bdaa03deb4</sku_id>
-      <title>Fumigadora Varilla Roja</title>
-      <description>Proteja la salud de sus cultivos y optimice el control de plagas con la Fumigadora Varilla Roja de 20 litros, desarrollada para ofrecer una cobertura uniforme en grandes extensiones. Su ingeniería le permite trabajar con total fluidez, asegurando que cada aplicación sea precisa, rápida y libre de interrupciones innecesarias.
-
-*</description>
-      <link>https://tucomprascol.com/?p=f832963e-83fe-441e-82f4-b4bdaa03deb4</link>
-      <g:image_link>https://tucomprascol.com/images/products/f832963e-83fe-441e-82f4-b4bdaa03deb4.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/f832963e-83fe-441e-82f4-b4bdaa03deb4.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>689000.00 COP</g:price>
-      <price>689000.00 COP</price>
+      <availability>in stock</availability>
+      <g:price>289000.00 COP</g:price>
+      <price>289000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -520,7 +430,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -531,14 +441,14 @@
       <g:id>83ec3cd6-5b1b-4953-968a-b90af5afb5eb</g:id>
       <sku_id>83ec3cd6-5b1b-4953-968a-b90af5afb5eb</sku_id>
       <title>Combo llave Impacto y Taladro  amarillo</title>
-      <description>combo llave impacto y taladro amarillos</description>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
       <link>https://tucomprascol.com/?p=83ec3cd6-5b1b-4953-968a-b90af5afb5eb</link>
       <g:image_link>https://tucomprascol.com/images/products/83ec3cd6-5b1b-4953-968a-b90af5afb5eb.jpg</g:image_link>
       <image_link>https://tucomprascol.com/images/products/83ec3cd6-5b1b-4953-968a-b90af5afb5eb.jpg</image_link>
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>349000.00 COP</g:price>
       <price>349000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -546,39 +456,19 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>fb625f73-79c0-4347-b50e-b41fa6375315</g:id>
-      <sku_id>fb625f73-79c0-4347-b50e-b41fa6375315</sku_id>
-      <title>CARETA FOTOSENSIBLE</title>
-      <description>Proteja su visión con la tecnología de oscurecimiento automático de alta precisión. Esta careta fotosensible aerografiada combina una seguridad superior contra la radiación con la practicidad de la carga solar continua para optimizar sus jornadas de trabajo.
-
-*</description>
-      <link>https://tucomprascol.com/?p=fb625f73-79c0-4347-b50e-b41fa6375315</link>
-      <g:image_link>https://tucomprascol.com/images/products/fb625f73-79c0-4347-b50e-b41fa6375315.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/fb625f73-79c0-4347-b50e-b41fa6375315.jpg</image_link>
+      <g:id>886a14e1-15f6-4224-bc26-1a0bf379d15e</g:id>
+      <sku_id>886a14e1-15f6-4224-bc26-1a0bf379d15e</sku_id>
+      <title>Pistola Anclaje</title>
+      <description>pistola de anclaje para chazo fulmínante</description>
+      <link>https://tucomprascol.com/?p=886a14e1-15f6-4224-bc26-1a0bf379d15e</link>
+      <g:image_link>https://tucomprascol.com/images/products/886a14e1-15f6-4224-bc26-1a0bf379d15e.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/886a14e1-15f6-4224-bc26-1a0bf379d15e.jpg</image_link>
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>115000.00 COP</g:price>
-      <price>115000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>466ea2c2-4f61-4da2-818d-e0afc7242b09</g:id>
-      <sku_id>466ea2c2-4f61-4da2-818d-e0afc7242b09</sku_id>
-      <title>Ahoyadora</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=466ea2c2-4f61-4da2-818d-e0afc7242b09</link>
-      <g:image_link>https://tucomprascol.com/images/products/466ea2c2-4f61-4da2-818d-e0afc7242b09.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/466ea2c2-4f61-4da2-818d-e0afc7242b09.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>599000.00 COP</g:price>
-      <price>599000.00 COP</price>
+      <availability>in stock</availability>
+      <g:price>99000.00 COP</g:price>
+      <price>99000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -594,9 +484,27 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>259000.00 COP</g:price>
       <price>259000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>b038593b-c352-4c7e-8dff-f32b1cdc0784</g:id>
+      <sku_id>b038593b-c352-4c7e-8dff-f32b1cdc0784</sku_id>
+      <title>Motosierra 5801</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=b038593b-c352-4c7e-8dff-f32b1cdc0784</link>
+      <g:image_link>https://tucomprascol.com/images/products/b038593b-c352-4c7e-8dff-f32b1cdc0784.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/b038593b-c352-4c7e-8dff-f32b1cdc0784.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>449000.00 COP</g:price>
+      <price>449000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -612,7 +520,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -630,7 +538,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>499000.00 COP</g:price>
       <price>499000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -648,7 +556,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>409000.00 COP</g:price>
       <price>409000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -666,7 +574,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -684,7 +592,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>199000.00 COP</g:price>
       <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -702,7 +610,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>199000.00 COP</g:price>
       <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -720,7 +628,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>249000.00 COP</g:price>
       <price>249000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -738,7 +646,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>199000.00 COP</g:price>
       <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -756,7 +664,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>199000.00 COP</g:price>
       <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -774,7 +682,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -792,7 +700,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -810,7 +718,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>159000.00 COP</g:price>
       <price>159000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -828,7 +736,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>289000.00 COP</g:price>
       <price>289000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -846,7 +754,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>209000.00 COP</g:price>
       <price>209000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -864,7 +772,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>209000.00 COP</g:price>
       <price>209000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -882,7 +790,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>149000.00 COP</g:price>
       <price>149000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -900,7 +808,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>259000.00 COP</g:price>
       <price>259000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -918,7 +826,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>169000.00 COP</g:price>
       <price>169000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -936,7 +844,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -954,7 +862,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>169000.00 COP</g:price>
       <price>169000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -972,7 +880,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>169000.00 COP</g:price>
       <price>169000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -990,7 +898,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>149000.00 COP</g:price>
       <price>149000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1008,7 +916,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1026,7 +934,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>279000.00 COP</g:price>
       <price>279000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1044,7 +952,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
+      <availability>out of stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1062,7 +970,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>409000.00 COP</g:price>
       <price>409000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1080,7 +988,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1098,7 +1006,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>199000.00 COP</g:price>
       <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1116,7 +1024,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1134,7 +1042,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>289000.00 COP</g:price>
       <price>289000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1152,7 +1060,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>199000.00 COP</g:price>
       <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1170,7 +1078,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
+      <availability>out of stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1188,7 +1096,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>259000.00 COP</g:price>
       <price>259000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1206,7 +1114,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>out_of_stock</g:availability>
-      <availability>out_of_stock</availability>
+      <availability>out of stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1224,7 +1132,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>249000.00 COP</g:price>
       <price>249000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1242,7 +1150,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1260,7 +1168,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>259000.00 COP</g:price>
       <price>259000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1281,9 +1189,27 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>f3f1c2bd-833e-400a-a919-93f5534742e6</g:id>
+      <sku_id>f3f1c2bd-833e-400a-a919-93f5534742e6</sku_id>
+      <title>Chazos con tuerca </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=f3f1c2bd-833e-400a-a919-93f5534742e6</link>
+      <g:image_link>https://tucomprascol.com/images/products/f3f1c2bd-833e-400a-a919-93f5534742e6.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/f3f1c2bd-833e-400a-a919-93f5534742e6.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>120000.00 COP</g:price>
+      <price>120000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -1299,7 +1225,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>389000.00 COP</g:price>
       <price>389000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1317,27 +1243,9 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>219000.00 COP</g:price>
       <price>219000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>f3f1c2bd-833e-400a-a919-93f5534742e6</g:id>
-      <sku_id>f3f1c2bd-833e-400a-a919-93f5534742e6</sku_id>
-      <title>Chazos con tuerca </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=f3f1c2bd-833e-400a-a919-93f5534742e6</link>
-      <g:image_link>https://tucomprascol.com/images/products/f3f1c2bd-833e-400a-a919-93f5534742e6.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/f3f1c2bd-833e-400a-a919-93f5534742e6.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>120000.00 COP</g:price>
-      <price>120000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -1357,7 +1265,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>379000.00 COP</g:price>
       <price>379000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1375,7 +1283,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>169000.00 COP</g:price>
       <price>169000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1393,7 +1301,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1411,7 +1319,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>339000.00 COP</g:price>
       <price>339000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1429,7 +1337,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1447,7 +1355,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>169000.00 COP</g:price>
       <price>169000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1465,7 +1373,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>289000.00 COP</g:price>
       <price>289000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1488,7 +1396,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1506,7 +1414,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>320000.00 COP</g:price>
       <price>320000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1524,30 +1432,9 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>729000.00 COP</g:price>
       <price>729000.00 COP</price>
-      <g:brand>TuCompras</g:brand>
-      <brand>TuCompras</brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>e7ce74b9-71db-4952-a33a-09b7f844efe9</g:id>
-      <sku_id>e7ce74b9-71db-4952-a33a-09b7f844efe9</sku_id>
-      <title>Taladro Brushless mandril metalico</title>
-      <description>Realice sus proyectos de remodelación y montaje con la precisión y eficiencia que exigen los trabajos de alta calidad. Este taladro inalámbrico optimiza el consumo de energía y proporciona una fuerza constante para perforar o atornillar con el mínimo esfuerzo y la máxima seguridad.
-
-* Mandril metálico de 3/8 de pulgada con sistema de bloqueo integrado que impide que la broca se afloje o se caiga durante el uso exigente.
-*</description>
-      <link>https://tucomprascol.com/?p=e7ce74b9-71db-4952-a33a-09b7f844efe9</link>
-      <g:image_link>https://tucomprascol.com/images/products/e7ce74b9-71db-4952-a33a-09b7f844efe9.jpg</g:image_link>
-      <image_link>https://tucomprascol.com/images/products/e7ce74b9-71db-4952-a33a-09b7f844efe9.jpg</image_link>
-      <g:condition>new</g:condition>
-      <condition>new</condition>
-      <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
-      <g:price>199000.00 COP</g:price>
-      <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
@@ -1565,7 +1452,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>389000.00 COP</g:price>
       <price>389000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1583,7 +1470,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>599000.00 COP</g:price>
       <price>599000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1605,7 +1492,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>359000.00 COP</g:price>
       <price>359000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1628,7 +1515,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1646,7 +1533,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1669,7 +1556,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>189000.00 COP</g:price>
       <price>189000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1687,7 +1574,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>449000.00 COP</g:price>
       <price>449000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1709,7 +1596,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>1199000.00 COP</g:price>
       <price>1199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1730,7 +1617,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>399000.00 COP</g:price>
       <price>399000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1748,7 +1635,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>249000.00 COP</g:price>
       <price>249000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1766,7 +1653,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>249000.00 COP</g:price>
       <price>249000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1784,7 +1671,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>389000.00 COP</g:price>
       <price>389000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1802,7 +1689,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>299000.00 COP</g:price>
       <price>299000.00 COP</price>
       <g:brand>TuCompras</g:brand>
@@ -1820,7 +1707,7 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>390000.00 COP</g:price>
       <price>390000.00 COP</price>
       <g:brand>GORDO</g:brand>
@@ -1838,9 +1725,126 @@
       <g:condition>new</g:condition>
       <condition>new</condition>
       <g:availability>in_stock</g:availability>
-      <availability>in_stock</availability>
+      <availability>in stock</availability>
       <g:price>389000.00 COP</g:price>
       <price>389000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>0f10da9b-fee2-4982-89de-f8a13dc4c037</g:id>
+      <sku_id>0f10da9b-fee2-4982-89de-f8a13dc4c037</sku_id>
+      <title>Taladro azul 780w</title>
+      <description>Realice sus proyectos de perforación y construcción con total precisión y eficiencia gracias a la potencia constante que ofrece este equipo de alto rendimiento. Su fuerza controlada le permite trabajar sobre diversos materiales con un acabado limpio y profesional desde el primer uso.
+
+*</description>
+      <link>https://tucomprascol.com/?p=0f10da9b-fee2-4982-89de-f8a13dc4c037</link>
+      <g:image_link>https://tucomprascol.com/images/products/0f10da9b-fee2-4982-89de-f8a13dc4c037.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/0f10da9b-fee2-4982-89de-f8a13dc4c037.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>169000.00 COP</g:price>
+      <price>169000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6</g:id>
+      <sku_id>4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6</sku_id>
+      <title>MOTOTOOL</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6</link>
+      <g:image_link>https://tucomprascol.com/images/products/4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/4a8a08c3-1257-46c4-9e25-65cc9b1fe0d6.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>189000.00 COP</g:price>
+      <price>189000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>f832963e-83fe-441e-82f4-b4bdaa03deb4</g:id>
+      <sku_id>f832963e-83fe-441e-82f4-b4bdaa03deb4</sku_id>
+      <title>Fumigadora Varilla Roja</title>
+      <description>Proteja la salud de sus cultivos y optimice el control de plagas con la Fumigadora Varilla Roja de 20 litros, desarrollada para ofrecer una cobertura uniforme en grandes extensiones. Su ingeniería le permite trabajar con total fluidez, asegurando que cada aplicación sea precisa, rápida y libre de interrupciones innecesarias.
+
+*</description>
+      <link>https://tucomprascol.com/?p=f832963e-83fe-441e-82f4-b4bdaa03deb4</link>
+      <g:image_link>https://tucomprascol.com/images/products/f832963e-83fe-441e-82f4-b4bdaa03deb4.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/f832963e-83fe-441e-82f4-b4bdaa03deb4.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>689000.00 COP</g:price>
+      <price>689000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>466ea2c2-4f61-4da2-818d-e0afc7242b09</g:id>
+      <sku_id>466ea2c2-4f61-4da2-818d-e0afc7242b09</sku_id>
+      <title>Ahoyadora de 10cm </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=466ea2c2-4f61-4da2-818d-e0afc7242b09</link>
+      <g:image_link>https://tucomprascol.com/images/products/466ea2c2-4f61-4da2-818d-e0afc7242b09.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/466ea2c2-4f61-4da2-818d-e0afc7242b09.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>599000.00 COP</g:price>
+      <price>599000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>fb625f73-79c0-4347-b50e-b41fa6375315</g:id>
+      <sku_id>fb625f73-79c0-4347-b50e-b41fa6375315</sku_id>
+      <title>CARETA FOTOSENSIBLE</title>
+      <description>Proteja su visión con la tecnología de oscurecimiento automático de alta precisión. Esta careta fotosensible aerografiada combina una seguridad superior contra la radiación con la practicidad de la carga solar continua para optimizar sus jornadas de trabajo.
+
+*</description>
+      <link>https://tucomprascol.com/?p=fb625f73-79c0-4347-b50e-b41fa6375315</link>
+      <g:image_link>https://tucomprascol.com/images/products/fb625f73-79c0-4347-b50e-b41fa6375315.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/fb625f73-79c0-4347-b50e-b41fa6375315.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>115000.00 COP</g:price>
+      <price>115000.00 COP</price>
+      <g:brand>TuCompras</g:brand>
+      <brand>TuCompras</brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>e7ce74b9-71db-4952-a33a-09b7f844efe9</g:id>
+      <sku_id>e7ce74b9-71db-4952-a33a-09b7f844efe9</sku_id>
+      <title>Taladro Brushless mandril metalico</title>
+      <description>Realice sus proyectos de remodelación y montaje con la precisión y eficiencia que exigen los trabajos de alta calidad. Este taladro inalámbrico optimiza el consumo de energía y proporciona una fuerza constante para perforar o atornillar con el mínimo esfuerzo y la máxima seguridad.
+
+* Mandril metálico de 3/8 de pulgada con sistema de bloqueo integrado que impide que la broca se afloje o se caiga durante el uso exigente.
+*</description>
+      <link>https://tucomprascol.com/?p=e7ce74b9-71db-4952-a33a-09b7f844efe9</link>
+      <g:image_link>https://tucomprascol.com/images/products/e7ce74b9-71db-4952-a33a-09b7f844efe9.jpg</g:image_link>
+      <image_link>https://tucomprascol.com/images/products/e7ce74b9-71db-4952-a33a-09b7f844efe9.jpg</image_link>
+      <g:condition>new</g:condition>
+      <condition>new</condition>
+      <g:availability>in_stock</g:availability>
+      <availability>in stock</availability>
+      <g:price>199000.00 COP</g:price>
+      <price>199000.00 COP</price>
       <g:brand>TuCompras</g:brand>
       <brand>TuCompras</brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
