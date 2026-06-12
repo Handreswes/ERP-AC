@@ -563,7 +563,7 @@ window.Inventory = {
             }
             
             const cost = parseFloat(p.cost) || 0;
-            const price = parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0;
+            const price = parseFloat(p.priceWholesale) || 0;
             
             totalQty += qty;
             totalCostValue += qty * cost;
@@ -582,7 +582,7 @@ window.Inventory = {
                     <p style="font-size: 1.5rem; font-weight: 700; margin: 0.25rem 0 0 0; color: var(--success);">$${totalCostValue.toLocaleString('es-CO')}</p>
                 </div>
                 <div class="stat-card" style="padding: 1rem; border-radius: 12px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.1); text-align: left;">
-                    <h3 style="font-size: 0.75rem; margin: 0; color: var(--text-secondary); text-transform: uppercase;">Valor Proyectado (Venta)</h3>
+                    <h3 style="font-size: 0.75rem; margin: 0; color: var(--text-secondary); text-transform: uppercase;">Valor Proyectado (Mayorista)</h3>
                     <p style="font-size: 1.5rem; font-weight: 700; margin: 0.25rem 0 0 0; color: var(--warning);">$${totalSaleValue.toLocaleString('es-CO')}</p>
                 </div>
             `;
