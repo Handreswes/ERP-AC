@@ -714,10 +714,12 @@ function renderProductLanding(id) {
                 </div>
 
                 <div class="warranty-badge-grid">
+                    ${p.warranty ? `
                     <div class="glass warranty-badge" style="border-bottom-color: var(--accent);">
                         <i class="fas fa-shield-alt" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--accent);"></i>
-                        <small style="font-weight: 700;">Garantía 3 Meses<br><span style="font-size: 0.65rem; opacity: 0.8;">(Motor / Fábrica)</span></small>
+                        <small style="font-weight: 700;">Garantía ${p.warranty}</small>
                     </div>
+                    ` : ''}
                     <div class="glass warranty-badge" style="border-bottom-color: var(--success);">
                         <i class="fas fa-certificate" style="display: block; font-size: 1.5rem; margin-bottom: 8px; color: var(--success);"></i>
                         <small style="font-weight: 700;">100% Original</small>
@@ -862,6 +864,8 @@ function renderCheckoutSummary() {
         `;
     });
 
+    const hasWarrantyItems = items.some(i => i.warranty);
+
     summary.innerHTML = `
         <div class="glass" style="padding: 1.5rem; border-radius: 20px; border: 1px solid var(--accent); background: rgba(0, 242, 254, 0.02); text-align: left;">
             <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: var(--accent); font-weight: 700; border-bottom: 1px solid rgba(0, 242, 254, 0.1); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
@@ -874,9 +878,11 @@ function renderCheckoutSummary() {
                 <strong>TOTAL A PAGAR:</strong>
                 <strong style="color: var(--accent);">$${total.toLocaleString('es-CO')} COP</strong>
             </div>
+            ${hasWarrantyItems ? `
             <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--success); font-weight: 700; text-align: center; background: rgba(16, 185, 129, 0.08); padding: 8px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15);">
-                <i class="fas fa-shield-alt"></i> Tu compra incluye 3 meses de garantía por motor o defectos de fábrica.
+                <i class="fas fa-shield-alt"></i> Tu compra incluye garantía de fábrica en los productos que aplique.
             </div>
+            ` : ''}
         </div>
     `;
 
