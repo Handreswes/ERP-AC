@@ -242,6 +242,10 @@ window.Inventory = {
                                         <option value="false">Inactivo</option>
                                     </select>
                                 </div>
+                                <div class="form-group">
+                                    <label>Garantía (Meses/Años)</label>
+                                    <input type="text" name="warranty" placeholder="Ej: 3 Meses, o vacío si no tiene">
+                                </div>
                             </div>
                              <div class="form-group" style="grid-column: span 2; margin-top: 1rem;">
                                  <button type="button" id="save-product-manual-btn" class="btn btn-primary btn-block" style="padding: 1rem; border-radius: 16px; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);">
@@ -1097,7 +1101,8 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                 image: Array.from(document.querySelectorAll('.image-base64'))
                     .map(input => input.value)
                     .filter(val => val && val.startsWith('data:image')),
-                ref: formData.get('ref') || ''
+                ref: formData.get('ref') || '',
+                warranty: formData.get('warranty') || ''
             };
 
             console.log('DEBUG: Product object to save:', product);
