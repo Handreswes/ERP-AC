@@ -66,13 +66,7 @@ window.Logistics = {
                                     <label>Vendedor Responsable *</label>
                                     <select id="logistic-seller" class="form-control"></select>
                                 </div>
-                                <div class="form-group">
-                                    <label>Bodega de Salida *</label>
-                                    <select id="logistic-source" class="form-control">
-                                        <option value="millenio">Bodega Millenio</option>
-                                        <option value="vulcano">Bodega Vulcano</option>
-                                    </select>
-                                </div>
+
                             </div>
                             <div class="form-group">
                                 <label>Transportadora</label>
@@ -221,7 +215,6 @@ window.Logistics = {
                     if (sale) {
                         if (isWeb) {
                             const sellerId = document.getElementById('logistic-seller').value;
-                            const invSource = document.getElementById('logistic-source').value;
                             
                             if (!sellerId) { alert('Debes asignar un vendedor para pedidos web.'); return; }
 
@@ -234,7 +227,7 @@ window.Logistics = {
                                 seller_id: sellerId,
                                 carrier: carrier,
                                 tracking_number: tracking,
-                                inventory_source: invSource,
+                                inventory_source: 'auto',
                                 status: 'despachado',
                                 shipping_cost: 0,
                                 commission_paid: 0, // Will be calculated on confirm money or manual
@@ -243,20 +236,38 @@ window.Logistics = {
                                     name: i.name,
                                     qty: i.qty || i.quantity,
                                     sale_price: i.price,
-                                    cost_price: 0 // Will need manual sync later or check inventory
+                                    cost_price: 0, // Will need manual sync later or check inventory
+                                    warehouse_used: 'auto'
                                 })),
                                 money_confirmed: false,
                                 is_paid_to_inventory: false
                             };
                             
-                            // Try to get costs from inventory for better stats
+                            // Try to get costs from inventory for better stats and auto-detect warehouse
                             for (const item of tcSale.items) {
                                 const p = Inventory.getProducts().find(prod => prod.id === item.product_id);
                                 if (p) {
                                     item.cost_price = p.priceWholesale || p.cost || 0;
                                     tcSale.commission_paid += (p.commissionBase || 0) * item.qty;
+                                    
+                                    // Auto-detect warehouse based on product company or stock availability
+                                    let itemSource = p.company || 'both';
+                                    if (itemSource === 'both') {
+                                        if ((p.stockMillenio || 0) >= item.qty) {
+                                            itemSource = 'millenio';
+                                        } else if ((p.stockVulcano || 0) >= item.qty) {
+                                            itemSource = 'vulcano';
+                                        } else {
+                                            itemSource = (p.stockMillenio || 0) >= (p.stockVulcano || 0) ? 'millenio' : 'vulcano';
+                                        }
+                                    }
+                                    item.warehouse_used = itemSource;
                                 }
                             }
+
+                            // Summarize inventory sources used
+                            const sourcesUsed = [...new Set(tcSale.items.map(i => i.warehouse_used).filter(Boolean))];
+                            tcSale.inventory_source = sourcesUsed.join(', ') || 'auto';
 
                             await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, tcSale);
 
@@ -264,8 +275,11 @@ window.Logistics = {
                             for (const item of tcSale.items) {
                                 const p = Inventory.getProducts().find(prod => prod.id === item.product_id);
                                 if (p) {
-                                    if (invSource === 'millenio') p.stockMillenio -= item.qty;
-                                    else p.stockVulcano -= item.qty;
+                                    if (item.warehouse_used === 'millenio') {
+                                        p.stockMillenio = Math.max(0, (p.stockMillenio || 0) - item.qty);
+                                    } else {
+                                        p.stockVulcano = Math.max(0, (p.stockVulcano || 0) - item.qty);
+                                    }
                                     await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, p);
                                 }
                             }
