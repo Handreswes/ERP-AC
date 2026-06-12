@@ -60,6 +60,8 @@ window.Inventory = {
                     <button class="tab-btn ${this.activeCompanyFilter === 'vulcano' ? 'active' : ''}" data-company="vulcano" style="font-size: 0.8rem; padding: 4px 15px;">Vulcano</button>
                 </div>
 
+                <div id="inventory-summary-cards" class="stats-grid" style="margin-bottom: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
+
                 <div class="search-filter-row" style="margin-bottom: 1.5rem; display: flex; gap: 10px; align-items: center;">
                     <div class="search-input-wrapper" style="flex: 1; position: relative;">
                         <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
@@ -538,12 +540,52 @@ window.Inventory = {
                 return company === 'both' || company === this.activeCompanyFilter;
             });
         }
-
         // FILTER BY DISPONIBLE VS LIMBO
         if (this.activeTab === 'stock') {
             filtered = filtered.filter(p => (parseFloat(p.stockMillenio) || 0) + (parseFloat(p.stockVulcano) || 0) > 0);
         } else if (this.activeTab === 'limbo') {
             filtered = filtered.filter(p => (parseFloat(p.stockMillenio) || 0) + (parseFloat(p.stockVulcano) || 0) <= 0);
+        }
+
+        // Calculate Totals based on current filters
+        let totalQty = 0;
+        let totalCostValue = 0;
+        let totalSaleValue = 0;
+
+        filtered.forEach(p => {
+            let qty = 0;
+            if (this.activeCompanyFilter === 'all') {
+                qty = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
+            } else if (this.activeCompanyFilter === 'millenio') {
+                qty = parseInt(p.stockMillenio) || 0;
+            } else if (this.activeCompanyFilter === 'vulcano') {
+                qty = parseInt(p.stockVulcano) || 0;
+            }
+            
+            const cost = parseFloat(p.cost) || 0;
+            const price = parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0;
+            
+            totalQty += qty;
+            totalCostValue += qty * cost;
+            totalSaleValue += qty * price;
+        });
+
+        const summaryContainer = document.getElementById('inventory-summary-cards');
+        if (summaryContainer) {
+            summaryContainer.innerHTML = `
+                <div class="stat-card" style="padding: 1rem; border-radius: 12px; background: rgba(59, 130, 246, 0.05); border: 1px solid rgba(59, 130, 246, 0.1); text-align: left;">
+                    <h3 style="font-size: 0.75rem; margin: 0; color: var(--text-secondary); text-transform: uppercase;">Total Unidades</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; margin: 0.25rem 0 0 0; color: var(--accent);">${totalQty.toLocaleString('es-CO')}</p>
+                </div>
+                <div class="stat-card" style="padding: 1rem; border-radius: 12px; background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.1); text-align: left;">
+                    <h3 style="font-size: 0.75rem; margin: 0; color: var(--text-secondary); text-transform: uppercase;">Valor a Costo</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; margin: 0.25rem 0 0 0; color: var(--success);">$${totalCostValue.toLocaleString('es-CO')}</p>
+                </div>
+                <div class="stat-card" style="padding: 1rem; border-radius: 12px; background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.1); text-align: left;">
+                    <h3 style="font-size: 0.75rem; margin: 0; color: var(--text-secondary); text-transform: uppercase;">Valor Proyectado (Venta)</h3>
+                    <p style="font-size: 1.5rem; font-weight: 700; margin: 0.25rem 0 0 0; color: var(--warning);">$${totalSaleValue.toLocaleString('es-CO')}</p>
+                </div>
+            `;
         }
 
         if (filtered.length === 0) {
