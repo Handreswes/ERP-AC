@@ -3,6 +3,63 @@ const SUPABASE_URL = 'https://zuondbguopirimvfuehu.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1b25kYmd1b3BpcmltdmZ1ZWh1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjAzMjk2NiwiZXhwIjoyMDg3NjA4OTY2fQ.9Zja0di6OMtWwFyigiZiWnXo0burILHTVAuBOf6EhUE';
 const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+const Locations = {
+    departments: {
+        "Amazonas": ["Leticia", "Puerto Nariño"],
+        "Antioquia": ["Medellín", "Bello", "Itagüí", "Envigado", "Rionegro", "Apartadó"],
+        "Arauca": ["Arauca", "Tame", "Saravena"],
+        "Atlántico": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga"],
+        "Bolívar": ["Cartagena", "Magangué", "Turbaco"],
+        "Boyacá": ["Tunja", "Duitama", "Sogamoso", "Chiquinquirá"],
+        "Caldas": ["Manizales", "La Dorada", "Riosucio"],
+        "Caquetá": ["Florencia", "San Vicente del Caguán"],
+        "Casanare": ["Yopal", "Aguazul", "Paz de Ariporo"],
+        "Cauca": ["Popayán", "Santander de Quilichao"],
+        "Cesar": ["Valledupar", "Aguachica", "Codazzi"],
+        "Chocó": ["Quibdó", "Istmina"],
+        "Córdoba": ["Montería", "Cereté", "Sahagún", "Lorica"],
+        "Cundinamarca": ["Bogotá", "Soacha", "Facatativá", "Chía", "Zipaquirá", "Fusagasugá"],
+        "Guainía": ["Inírida"],
+        "Guaviare": ["San José del Guaviare"],
+        "Huila": ["Neiva", "Pitalito", "Garzón"],
+        "La Guajira": ["Riohacha", "Maicao", "Uribia"],
+        "Magdalena": ["Santa Marta", "Ciénaga", "Fundación"],
+        "Meta": ["Villavicencio", "Acacías", "Granada"],
+        "Nariño": ["Pasto", "Ipiales", "Tumaco"],
+        "Nariño": ["Pasto", "Ipiales", "Tumaco"],
+        "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona"],
+        "Putumayo": ["Mocoa", "Puerto Asís"],
+        "Quindío": ["Armenia", "Calarcá"],
+        "Risaralda": ["Pereira", "Dosquebradas"],
+        "San Andrés y Providencia": ["San Andrés"],
+        "Santander": ["Bucaramanga", "Floridablanca", "Girón", "Piedecuesta", "Barrancabermeja"],
+        "Sucre": ["Sincelejo", "Corozal"],
+        "Tolima": ["Ibagué", "Espinal", "Melgar"],
+        "Valle del Cauca": ["Cali", "Buenaventura", "Palmira", "Tuluá", "Buga", "Cartago"],
+        "Vaupés": ["Mitú"],
+        "Vichada": ["Puerto Carreño"]
+    },
+
+    populateDepartments(selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        select.innerHTML = '<option value="">Seleccione Departamento...</option>' +
+            Object.keys(this.departments).sort().map(d => `<option value="${d}">${d}</option>`).join('');
+    },
+
+    populateCities(deptName, selectId) {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+        if (!deptName || !this.departments[deptName]) {
+            select.innerHTML = '<option value="">Primero seleccione depto...</option>';
+            return;
+        }
+        const cities = [...this.departments[deptName].sort(), "OTRO (Escribir manualmente)"];
+        select.innerHTML = '<option value="">Seleccione Ciudad...</option>' +
+            cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    }
+};
+
 // State
 let products = [];
 let cart = JSON.parse(localStorage.getItem('tc-cart')) || [];
@@ -306,6 +363,16 @@ function showView(viewId, productId = null) {
         renderProductLanding(productId);
     }
     if (viewId === 'checkout') {
+        Locations.populateDepartments('cust-dept');
+        const citySelect = document.getElementById('cust-city');
+        if (citySelect) citySelect.innerHTML = '<option value="">Primero seleccione depto...</option>';
+        const customField = document.getElementById('custom-city-field');
+        if (customField) customField.style.display = 'none';
+        const customInput = document.getElementById('cust-city-custom');
+        if (customInput) {
+            customInput.required = false;
+            customInput.value = '';
+        }
         renderCheckoutSummary();
         const prompt = document.getElementById('checkout-login-prompt');
         if (prompt) prompt.style.display = currentUser ? 'none' : 'block';
@@ -797,8 +864,27 @@ function renderCheckoutSummary() {
         if (document.getElementById('cust-name')) document.getElementById('cust-name').value = currentUser.name || '';
         if (document.getElementById('cust-phone')) document.getElementById('cust-phone').value = currentUser.phone || '';
         if (document.getElementById('cust-address')) document.getElementById('cust-address').value = currentUser.address || '';
-        if (document.getElementById('cust-city')) document.getElementById('cust-city').value = currentUser.city || '';
-        if (document.getElementById('cust-dept')) document.getElementById('cust-dept').value = currentUser.dept || '';
+        
+        const deptEl = document.getElementById('cust-dept');
+        if (deptEl && currentUser.dept) {
+            deptEl.value = currentUser.dept;
+            Locations.populateCities(currentUser.dept, 'cust-city');
+            
+            const cityEl = document.getElementById('cust-city');
+            if (cityEl && currentUser.city) {
+                const optionExists = Array.from(cityEl.options).some(opt => opt.value === currentUser.city);
+                if (optionExists) {
+                    cityEl.value = currentUser.city;
+                    document.getElementById('custom-city-field').style.display = 'none';
+                    document.getElementById('cust-city-custom').required = false;
+                } else {
+                    cityEl.value = 'OTRO (Escribir manualmente)';
+                    document.getElementById('custom-city-field').style.display = 'block';
+                    document.getElementById('cust-city-custom').value = currentUser.city;
+                    document.getElementById('cust-city-custom').required = true;
+                }
+            }
+        }
     }
 }
 
@@ -944,7 +1030,9 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         customerPhone: phone, 
         customerEmail: document.getElementById('cust-email').value,
         customerAddress: shippingType === 'domicilio' ? document.getElementById('cust-address').value : ('Oficina Principal ' + carrier),
-        customerCity: document.getElementById('cust-city').value, 
+        customerCity: document.getElementById('cust-city').value === 'OTRO (Escribir manualmente)' 
+            ? document.getElementById('cust-city-custom').value.trim() 
+            : document.getElementById('cust-city').value, 
         customerDept: document.getElementById('cust-dept').value, 
         shippingType,
         carrier,
@@ -1031,6 +1119,42 @@ function setupEventListeners() {
     document.querySelectorAll('.mobile-links a').forEach(a => {
         a.onclick = () => document.getElementById('mobile-menu').classList.remove('active');
     });
+
+    // Location Select Dropdowns Listeners
+    const deptSelect = document.getElementById('cust-dept');
+    if (deptSelect) {
+        deptSelect.onchange = (e) => {
+            Locations.populateCities(e.target.value, 'cust-city');
+            const customField = document.getElementById('custom-city-field');
+            if (customField) customField.style.display = 'none';
+            const customInput = document.getElementById('cust-city-custom');
+            if (customInput) {
+                customInput.required = false;
+                customInput.value = '';
+            }
+        };
+    }
+
+    const citySelect = document.getElementById('cust-city');
+    if (citySelect) {
+        citySelect.onchange = (e) => {
+            const customField = document.getElementById('custom-city-field');
+            const customInput = document.getElementById('cust-city-custom');
+            if (e.target.value === 'OTRO (Escribir manualmente)') {
+                if (customField) customField.style.display = 'block';
+                if (customInput) {
+                    customInput.required = true;
+                    customInput.focus();
+                }
+            } else {
+                if (customField) customField.style.display = 'none';
+                if (customInput) {
+                    customInput.required = false;
+                    customInput.value = '';
+                }
+            }
+        };
+    }
 
     handleRouting(); // Call once on start
 }
