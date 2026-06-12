@@ -271,6 +271,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
     "customerDept" TEXT NOT NULL,
     "shippingType" TEXT,
     "carrier" TEXT,
+    "tracking_number" TEXT,
     "items" JSONB NOT NULL,
     "total" DECIMAL(12, 2) NOT NULL,
     "status" TEXT DEFAULT 'Pendiente por Confirmar',
