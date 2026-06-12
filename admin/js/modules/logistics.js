@@ -92,7 +92,17 @@ window.Logistics = {
         try {
             // 1. Fetch POS Sales from Storage/DB
             const sales = Storage.get(STORAGE_KEYS.SALES) || [];
-            const pendingPOS = sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending');
+            const pendingPOS = sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending').map(s => {
+                const client = Storage.getById(STORAGE_KEYS.CLIENTS, s.clientId);
+                return {
+                    ...s,
+                    phone: s.clientPhone || client?.phone || '',
+                    address: s.address || client?.address || 'Sin dirección',
+                    city: s.city || client?.city || '--',
+                    source: 'pos',
+                    shippingType: s.shippingType || 'domicilio'
+                };
+            });
 
             // 2. Fetch Website Orders from Supabase
             const { data: webOrders, error } = await window.supabaseClient
@@ -107,6 +117,7 @@ window.Logistics = {
                 id: o.id,
                 date: o.createdAt,
                 clientName: o.customerName,
+                phone: o.customerPhone || '',
                 address: o.customerAddress,
                 city: `${o.customerCity}, ${o.customerDept}`,
                 items: o.items,
@@ -132,7 +143,10 @@ window.Logistics = {
         list.innerHTML = sales.map(s => `
             <tr>
                 <td>${new Date(s.date).toLocaleDateString()}</td>
-                <td><strong>${s.clientName || 'Cliente Genérico'}</strong></td>
+                <td>
+                    <strong>${s.clientName || 'Cliente Genérico'}</strong><br>
+                    <small style="color: var(--accent); font-weight: 600;"><i class="fas fa-phone"></i> ${s.phone || s.clientPhone || 'Sin teléfono'}</small>
+                </td>
                 <td>${s.city || '--'}</td>
                 <td>
                     <span class="badge ${s.shippingType === 'oficina' ? 'bg-orange' : 'bg-blue'}" style="font-size: 0.65rem; margin-bottom: 4px;">
