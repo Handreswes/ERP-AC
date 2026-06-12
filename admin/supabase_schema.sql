@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     "active" BOOLEAN DEFAULT true,
     "image" JSONB DEFAULT '[]'::jsonb,
     "ref" TEXT,
+    "warranty" TEXT DEFAULT '',
     "createdAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     "updatedAt" TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
