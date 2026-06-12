@@ -645,9 +645,10 @@ function renderProductLanding(id) {
             </div>
         </div>
     `;
-    if (window.fbq) fbq('track', 'ViewContent', { content_ids: [id], content_type: 'product', content_name: p.name, value: p.priceFinal, currency: 'COP' });
-    if (window.ttq) ttq.track('ViewContent', { content_id: id, content_name: p.name, value: p.priceFinal, currency: 'COP' });
-    if (typeof gtag === 'function') gtag('event', 'view_item', { currency: 'COP', value: p.priceFinal, items: [{ item_id: id, item_name: p.name, item_category: p.category, price: p.priceFinal }] });
+    const priceNum = parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0;
+    if (window.fbq) fbq('track', 'ViewContent', { content_ids: [id], content_type: 'product', content_name: p.name, value: priceNum, currency: 'COP' });
+    if (window.ttq) ttq.track('ViewContent', { content_id: id, content_name: p.name, value: priceNum, currency: 'COP' });
+    if (typeof gtag === 'function') gtag('event', 'view_item', { currency: 'COP', value: priceNum, items: [{ item_id: id, item_name: p.name, item_category: p.category, price: priceNum }] });
 }
 
 // Render Categories
@@ -702,9 +703,10 @@ window.addToCart = (id) => {
     updateCartUI();
     showToast(`¡${p.name} añadido!`);
     
-    if (window.fbq) fbq('track', 'AddToCart', { content_ids: [p.id], content_type: 'product', content_name: p.name, value: p.priceFinal, currency: 'COP' });
-    if (window.ttq) ttq.track('AddToCart', { content_id: p.id, content_name: p.name, value: p.priceFinal, currency: 'COP' });
-    if (typeof gtag === 'function') gtag('event', 'add_to_cart', { currency: 'COP', value: p.priceFinal, items: [{ item_id: p.id, item_name: p.name, price: p.priceFinal, quantity: 1 }] });
+    const priceNum = parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0;
+    if (window.fbq) fbq('track', 'AddToCart', { content_ids: [p.id], content_type: 'product', content_name: p.name, value: priceNum, currency: 'COP' });
+    if (window.ttq) ttq.track('AddToCart', { content_id: p.id, content_name: p.name, value: priceNum, currency: 'COP' });
+    if (typeof gtag === 'function') gtag('event', 'add_to_cart', { currency: 'COP', value: priceNum, items: [{ item_id: p.id, item_name: p.name, price: priceNum, quantity: 1 }] });
 };
 
 function updateCartUI() {
@@ -846,7 +848,9 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
     const phone = document.getElementById('cust-phone').value.replace(/\s/g, '');
     if (!/^3[0-9]{9}$/.test(phone)) { alert('Ingresa un teléfono válido de Colombia (10 dígitos).'); btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>'; return; }
 
-    const items = checkoutSource === 'landing' ? [{ product_id: checkoutItem.id, name: checkoutItem.name, qty: 1, price: checkoutItem.priceFinal }] : cart.map(i => ({ product_id: i.id, name: i.name, qty: i.qty, price: i.priceFinal }));
+    const items = checkoutSource === 'landing' 
+        ? [{ product_id: checkoutItem.id, name: checkoutItem.name, qty: 1, price: (parseFloat(checkoutItem.priceFinal) || parseFloat(checkoutItem.priceInternet) || 0) }] 
+        : cart.map(i => ({ product_id: i.id, name: i.name, qty: i.qty, price: (parseFloat(i.priceFinal) || parseFloat(i.priceInternet) || 0) }));
     
     const shippingType = document.querySelector('input[name="shipping-type"]:checked').value;
     const carrier = shippingType === 'oficina' ? document.getElementById('cust-carrier').value : null;
