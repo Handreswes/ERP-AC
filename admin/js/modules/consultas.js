@@ -495,7 +495,7 @@ window.Consultas = {
         const panel = document.getElementById('consultas-panel');
         if (!panel) return;
 
-        panel.onclick = (e) => {
+        panel.onclick = async (e) => {
             const tabBtn = e.target.closest('.tab-btn');
             if (tabBtn && tabBtn.dataset.tab) {
                 this.activeTab = tabBtn.dataset.tab;
@@ -503,7 +503,7 @@ window.Consultas = {
                 return;
             }
             
-            const pdfBtn = tgt.closest('.btn-reprint-pdf');
+            const pdfBtn = e.target.closest('.btn-reprint-pdf');
             if (pdfBtn && window.PDFManager) {
                 try {
                     const saleData = JSON.parse(decodeURIComponent(pdfBtn.dataset.sale));
@@ -516,14 +516,14 @@ window.Consultas = {
                 return;
             }
 
-            const deleteSaleBtn = tgt.closest('.btn-delete-sale');
+            const deleteSaleBtn = e.target.closest('.btn-delete-sale');
             if (deleteSaleBtn) {
                 const id = deleteSaleBtn.dataset.id;
                 await this.deleteSale(id);
                 return;
             }
 
-            const deletePaymentBtn = tgt.closest('.btn-delete-payment');
+            const deletePaymentBtn = e.target.closest('.btn-delete-payment');
             if (deletePaymentBtn) {
                 const id = deletePaymentBtn.dataset.id;
                 await this.deletePayment(id);
