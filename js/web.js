@@ -11,6 +11,7 @@ let currentSearchQuery = '';
 let checkoutSource = 'cart';
 let checkoutItem = null;
 let currentUser = null;
+let isQuickBuyTriggered = false;
 
 window.filterBySearch = function(keyword) {
     currentSearchQuery = keyword.toLowerCase().trim();
@@ -331,6 +332,10 @@ function handleRouting() {
         const id = urlParams.get('id') || urlParams.get('p');
         showView('product', id);
     } else if (view === 'checkout') {
+        if (!isQuickBuyTriggered) {
+            checkoutSource = 'cart';
+        }
+        isQuickBuyTriggered = false;
         showView('checkout');
     } else if (view === 'account') {
         showView('account');
@@ -693,6 +698,7 @@ async function renderCategories() {
 window.quickBuy = (id) => { 
     checkoutSource = 'landing'; 
     checkoutItem = products.find(p => p.id === id); 
+    isQuickBuyTriggered = true;
     window.location.hash = 'checkout'; 
 };
 window.addToCart = (id) => {
@@ -716,23 +722,73 @@ function updateCartUI() {
 
 function renderCheckoutSummary() {
     const summary = document.getElementById('checkout-summary');
-    let html = ''; let total = 0;
+    if (!summary) return;
+
+    let html = '';
+    let total = 0;
     const items = checkoutSource === 'landing' ? [{ ...checkoutItem, qty: 1 }] : cart;
 
+    if (items.length === 0) {
+        summary.innerHTML = `
+            <div style="text-align: center; padding: 2rem; border: 1px dashed rgba(255,255,255,0.15); border-radius: 20px; background: rgba(255,255,255,0.02); margin-bottom: 2rem;">
+                <i class="fas fa-shopping-cart" style="font-size: 3rem; color: var(--text-secondary); margin-bottom: 1rem; display: block;"></i>
+                <p style="color: var(--text-secondary); font-weight: 600; margin-bottom: 1rem;">Tu carrito está vacío</p>
+                <a href="#productos" class="btn btn-primary btn-sm" style="display: inline-block; padding: 8px 20px; border-radius: 20px; font-weight: 700; text-decoration: none;">Ver Productos</a>
+            </div>
+        `;
+        const submitBtn = document.querySelector('#checkout-form button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = true;
+        return;
+    } else {
+        const submitBtn = document.querySelector('#checkout-form button[type="submit"]');
+        if (submitBtn) submitBtn.disabled = false;
+    }
+
     items.forEach(i => {
-        const p = i.priceFinal || i.priceInternet || 0;
+        const p = parseFloat(i.priceFinal) || parseFloat(i.priceInternet) || 0;
         total += p * i.qty;
-        html += `<div style="display: flex; justify-content: space-between; margin-bottom: 8px;"><span>${i.qty}x ${i.name}</span><span>$${(p * i.qty).toLocaleString()}</span></div>`;
+        const imgUrl = (Array.isArray(i.image) ? i.image[0] : i.image) || 'https://via.placeholder.com/80?text=NP';
+        
+        html += `
+            <div class="checkout-item" style="display: flex; gap: 15px; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <img src="${imgUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <div style="flex: 1; min-width: 0;">
+                    <h4 style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${i.name}</h4>
+                    <span style="font-size: 0.85rem; color: var(--accent); font-weight: 700;">$${p.toLocaleString('es-CO')} COP</span>
+                </div>
+                ${checkoutSource === 'landing' ? `
+                    <div style="font-size: 0.85rem; font-weight: 700; color: white; padding: 5px 12px; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                        Cant: 1
+                    </div>
+                ` : `
+                    <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); border-radius: 10px; padding: 4px 8px; border: 1px solid rgba(255,255,255,0.08);">
+                        <button type="button" onclick="decrementCartItem('${i.id}')" style="background: none; border: none; color: white; font-weight: 700; cursor: pointer; padding: 0 5px; font-size: 1.1rem; line-height: 1;">-</button>
+                        <span style="font-weight: 700; font-size: 0.85rem; min-width: 15px; text-align: center; color: white;">${i.qty}</span>
+                        <button type="button" onclick="incrementCartItem('${i.id}')" style="background: none; border: none; color: white; font-weight: 700; cursor: pointer; padding: 0 5px; font-size: 1.1rem; line-height: 1;">+</button>
+                    </div>
+                    <button type="button" onclick="removeCartItem('${i.id}')" style="background: none; border: none; color: #ef4444; cursor: pointer; padding: 8px; font-size: 1rem; transition: transform 0.2s;">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                `}
+            </div>
+        `;
     });
 
     summary.innerHTML = `
-        <h4 style="margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 10px;">Resumen del Pedido</h4>
-        ${html}
-        <div style="display: flex; justify-content: space-between; font-size: 1.5rem; margin-top: 15px; border-top: 2px solid var(--accent); padding-top: 10px;">
-            <strong>TOTAL:</strong><strong style="color: var(--accent);">$${total.toLocaleString()}</strong>
-        </div>
-        <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--success); font-weight: 700; text-align: center; background: rgba(16, 185, 129, 0.1); padding: 8px; border-radius: 8px;">
-            <i class="fas fa-shield-alt"></i> Tu compra incluye 3 meses de garantía por motor o defectos de fábrica.
+        <div class="glass" style="padding: 1.5rem; border-radius: 20px; border: 1px solid var(--accent); background: rgba(0, 242, 254, 0.02); text-align: left;">
+            <h3 style="margin: 0 0 1rem 0; font-size: 1.1rem; color: var(--accent); font-weight: 700; border-bottom: 1px solid rgba(0, 242, 254, 0.1); padding-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-shopping-basket"></i> Resumen de tu Compra
+            </h3>
+            <div style="max-height: 250px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;">
+                ${html}
+            </div>
+            <div style="display: flex; justify-content: space-between; font-size: 1.35rem; margin-top: 15px; border-top: 2px solid var(--accent); padding-top: 15px; color: white;">
+                <strong>TOTAL A PAGAR:</strong>
+                <strong style="color: var(--accent);">$${total.toLocaleString('es-CO')} COP</strong>
+            </div>
+            <div style="margin-top: 1rem; font-size: 0.8rem; color: var(--success); font-weight: 700; text-align: center; background: rgba(16, 185, 129, 0.08); padding: 8px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.15);">
+                <i class="fas fa-shield-alt"></i> Tu compra incluye 3 meses de garantía por motor o defectos de fábrica.
+            </div>
         </div>
     `;
 
@@ -745,6 +801,33 @@ function renderCheckoutSummary() {
         if (document.getElementById('cust-dept')) document.getElementById('cust-dept').value = currentUser.dept || '';
     }
 }
+
+window.incrementCartItem = (id) => {
+    const item = cart.find(i => i.id === id);
+    if (item) {
+        item.qty++;
+        updateCartUI();
+        renderCheckoutSummary();
+    }
+};
+
+window.decrementCartItem = (id) => {
+    const item = cart.find(i => i.id === id);
+    if (item) {
+        item.qty--;
+        if (item.qty <= 0) {
+            cart = cart.filter(i => i.id !== id);
+        }
+        updateCartUI();
+        renderCheckoutSummary();
+    }
+};
+
+window.removeCartItem = (id) => {
+    cart = cart.filter(i => i.id !== id);
+    updateCartUI();
+    renderCheckoutSummary();
+};
 
 // Account View Rendering
 async function renderAccountView() {
