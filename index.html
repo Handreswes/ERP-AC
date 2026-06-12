@@ -286,12 +286,21 @@
                         <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                             <div class="form-group">
                                 <label>Departamento *</label>
-                                <input type="text" id="cust-dept" class="form-control" placeholder="Antioquia" required>
+                                <select id="cust-dept" class="form-control" required>
+                                    <option value="">Seleccione Depto...</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label>Ciudad / Municipio *</label>
-                                <input type="text" id="cust-city" class="form-control" placeholder="Medellín" required>
+                                <select id="cust-city" class="form-control" required>
+                                    <option value="">Primero seleccione depto...</option>
+                                </select>
                             </div>
+                        </div>
+
+                        <div id="custom-city-field" class="form-group" style="margin-top: 1rem; display: none;">
+                            <label>Escribe tu Ciudad / Municipio *</label>
+                            <input type="text" id="cust-city-custom" class="form-control" placeholder="Ej: Sabaneta">
                         </div>
 
                         <div id="address-field" class="form-group" style="margin-top: 1rem;">
