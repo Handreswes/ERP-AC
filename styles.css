@@ -1006,3 +1006,15 @@ body {
         grid-template-columns: 1fr !important;
     }
 }
+
+.account-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .account-grid-layout {
+        grid-template-columns: 1fr 2fr;
+    }
+}
