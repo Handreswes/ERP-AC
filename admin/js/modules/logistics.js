@@ -296,6 +296,8 @@ window.Logistics = {
                         const modal = document.getElementById('logistic-modal');
                         if (modal) modal.classList.remove('show');
 
+                        if (window.updateLogisticsBadge) window.updateLogisticsBadge();
+
                         setTimeout(() => this.renderPanel(), 100);
                     }
                 } catch (err) {
