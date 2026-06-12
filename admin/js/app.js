@@ -100,6 +100,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             for (let r of regs) r.unregister();
         }).catch(() => {});
     }
+
+    // Initialize logistics badge and start interval polling
+    setTimeout(() => {
+        if (window.updateLogisticsBadge) {
+            window.updateLogisticsBadge();
+            setInterval(window.updateLogisticsBadge, 30000); // Poll every 30 seconds
+        }
+    }, 1000);
 });
 
 // ========================================================
@@ -223,4 +231,55 @@ window.clearAllSystemData = async function () {
     if (!confirm('¿Limpiar todo el sistema?')) return;
     localStorage.clear();
     location.reload(true);
+};
+
+// Logistics Badge Update Logic
+window.updateLogisticsBadge = async function() {
+    try {
+        if (!window.supabaseClient || !window.Storage) return;
+
+        // 1. POS sales pending shipment
+        const sales = window.Storage.get('sales') || [];
+        const pendingPOS = sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending').length;
+
+        // 2. Web orders pending confirmation
+        const { data: webOrders, error } = await window.supabaseClient
+            .from('orders')
+            .select('id')
+            .eq('status', 'Pendiente por Confirmar');
+        
+        const pendingWeb = error ? 0 : (webOrders || []).length;
+        const totalPending = pendingPOS + pendingWeb;
+
+        // 3. Update the UI badges
+        const navItems = document.querySelectorAll('[data-panel="logistics"]');
+        navItems.forEach(item => {
+            let badge = item.querySelector('.logistics-badge');
+            if (totalPending > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'logistics-badge';
+                    badge.style.background = '#10b981'; // Green dot
+                    badge.style.color = 'white';
+                    badge.style.fontSize = '10px';
+                    badge.style.fontWeight = 'bold';
+                    badge.style.borderRadius = '50%';
+                    badge.style.padding = '2px 6px';
+                    badge.style.marginLeft = '8px';
+                    badge.style.display = 'inline-flex';
+                    badge.style.alignItems = 'center';
+                    badge.style.justifyContent = 'center';
+                    badge.style.minWidth = '16px';
+                    badge.style.height = '16px';
+                    badge.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.5)';
+                    item.appendChild(badge);
+                }
+                badge.textContent = totalPending;
+            } else {
+                if (badge) badge.remove();
+            }
+        });
+    } catch (e) {
+        console.error('Error updating logistics badge:', e);
+    }
 };
