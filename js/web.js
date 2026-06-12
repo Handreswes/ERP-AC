@@ -57,6 +57,19 @@ const Locations = {
         const cities = [...this.departments[deptName].sort(), "OTRO (Escribir manualmente)"];
         select.innerHTML = '<option value="">Seleccione Ciudad...</option>' +
             cities.map(c => `<option value="${c}">${c}</option>`).join('');
+    },
+
+    getTrackingUrl(carrier, trackingNumber) {
+        if (!trackingNumber) return "#";
+        const urls = {
+            "Interrapidisimo": `https://servicios.interrapidisimo.com/SrvRastreoGuias/RastreoGuia.aspx?guia=${trackingNumber}`,
+            "Servientrega": `https://www.servientrega.com/wps/portal/Colombia/transaccional/rastreo-envios?id=${trackingNumber}`,
+            "Envía": `https://envia.co/seguimiento-de-envio?guia=${trackingNumber}`,
+            "Coordinadora": `https://www.coordinadora.com/rastreo/rastreo-de-guia/detalle-de-rastreo/?guia=${trackingNumber}`,
+            "TCC": `https://www.tcc.com.co/logistica/rastreo-de-envios/?guia=${trackingNumber}`
+        };
+        const key = Object.keys(urls).find(k => k.toLowerCase().includes(carrier.toLowerCase())) || carrier;
+        return urls[key] || `https://www.google.com/search?q=rastreo+${carrier}+${trackingNumber}`;
     }
 };
 
@@ -184,14 +197,22 @@ async function fetchOrderHistory() {
         <div class="glass" style="padding:1.5rem; margin-bottom:1rem; border-left: 4px solid var(--primary);">
             <div style="display:flex; justify-content:space-between; margin-bottom:0.5rem;">
                 <strong>${o.id}</strong>
-                <span class="badge" style="background:var(--primary); color:white; padding:2px 10px; border-radius:10px; font-size:0.8rem;">${o.status}</span>
+                <span class="badge" style="background:${o.status === 'Despachado' ? 'var(--success)' : 'var(--primary)'}; color:white; padding:2px 10px; border-radius:10px; font-size:0.8rem;">${o.status}</span>
             </div>
             <div style="font-size:0.9rem; color:var(--text-secondary);">
                 ${new Date(o.createdAt).toLocaleDateString()} - $${o.total.toLocaleString()}
             </div>
-            <div style="margin-top:0.5rem; font-size:0.85rem;">
+            <div style="margin-top:0.5rem; font-size:0.85rem; color: white;">
                 ${o.items.map(i => `${i.qty}x ${i.name}`).join(', ')}
             </div>
+            ${o.status === 'Despachado' && o.tracking_number ? `
+                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px dashed rgba(255,255,255,0.1); font-size: 0.85rem; color: var(--text-secondary);">
+                    <strong>Envío:</strong> ${o.carrier || 'Transportadora'} - Guía: 
+                    <a href="${Locations.getTrackingUrl(o.carrier || '', o.tracking_number)}" target="_blank" style="color: var(--accent); font-weight: 700; text-decoration: none;">
+                        ${o.tracking_number} <i class="fas fa-external-link-alt" style="font-size: 0.75rem; margin-left: 3px;"></i>
+                    </a>
+                </div>
+            ` : ''}
         </div>
     `).join('');
 }
@@ -979,7 +1000,7 @@ async function renderAccountView() {
         }
     } else {
         container.innerHTML = `
-            <div style="display: grid; grid-template-columns: 1fr 2fr; gap: 2rem;">
+            <div class="account-grid-layout">
                 <div class="glass" style="padding: 2rem; border-radius: 30px; height: fit-content;">
                     <div style="text-align: center; margin-bottom: 2rem;">
                         <div style="width: 80px; height: 80px; background: var(--primary); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 1rem;">
