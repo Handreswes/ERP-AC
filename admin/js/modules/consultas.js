@@ -612,7 +612,7 @@ window.Consultas = {
     buildAbonosRows(rows) {
         if (rows.length === 0) return `<tr><td colspan="7" class="text-center text-secondary" style="padding:2rem;">Sin resultados para los filtros aplicados.</td></tr>`;
         
-        const methods = { cash: '💵 Efectivo', transfer: '🏦 Transf.', credit: '💳 Crédito' };
+        const methods = { cash: '💵 Efectivo', transfer: '🏦 Transf.', credit: '💳 Crédito', devolucion: '↩️ Devolución' };
         
         return rows.map(p => {
             const dateStr = (p.date || p.createdAt) ? new Date(p.date || p.createdAt).toLocaleString('es-CO', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—';
@@ -728,6 +728,33 @@ window.Consultas = {
                         balanceMillenio: c.balanceMillenio,
                         balanceVulcano: c.balanceVulcano
                     });
+                }
+            }
+
+            // 1.5. Si es devolución, revertir stock del producto
+            if (p.method === 'devolucion' && p.paymentDetails) {
+                try {
+                    const details = JSON.parse(p.paymentDetails);
+                    if (details && details.productId && details.quantity) {
+                        const prod = Storage.getById(STORAGE_KEYS.PRODUCTS, details.productId);
+                        if (prod) {
+                            const qty = parseInt(details.quantity) || 0;
+                            if (p.company === 'millenio') {
+                                prod.stockMillenio = Math.max(0, (parseInt(prod.stockMillenio) || 0) - qty);
+                            } else {
+                                prod.stockVulcano = Math.max(0, (parseInt(prod.stockVulcano) || 0) - qty);
+                            }
+                            await Storage.updateItem(STORAGE_KEYS.PRODUCTS, prod.id, {
+                                stockMillenio: prod.stockMillenio,
+                                stockVulcano: prod.stockVulcano
+                            });
+                            if (window.Inventory && window.Inventory.updateInventoryList) {
+                                window.Inventory.updateInventoryList();
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Error al revertir stock de devolución:", e);
                 }
             }
 
