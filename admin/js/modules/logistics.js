@@ -283,18 +283,26 @@ window.Logistics = {
                             const sourcesUsed = [...new Set(tcSale.items.map(i => i.warehouse_used).filter(Boolean))];
                             tcSale.inventory_source = sourcesUsed.join(', ') || 'auto';
 
-                            await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, tcSale);
+                            // 1. Save TuCompras Sale record (Idempotent: update if already exists)
+                            const existingSale = Storage.getById(STORAGE_KEYS.TUCOMPRAS_SALES, tcSale.id);
+                            if (existingSale) {
+                                await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, tcSale.id, tcSale);
+                            } else {
+                                await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, tcSale);
+                            }
 
-                            // 2. Discount Inventory
-                            for (const item of tcSale.items) {
-                                const p = Inventory.getProducts().find(prod => prod.id === item.product_id);
-                                if (p) {
-                                    if (item.warehouse_used === 'millenio') {
-                                        p.stockMillenio = Math.max(0, (p.stockMillenio || 0) - item.qty);
-                                    } else {
-                                        p.stockVulcano = Math.max(0, (p.stockVulcano || 0) - item.qty);
+                            // 2. Discount Inventory (only if not already dispatched previously)
+                            if (!existingSale) {
+                                for (const item of tcSale.items) {
+                                    const p = Inventory.getProducts().find(prod => prod.id === item.product_id);
+                                    if (p) {
+                                        if (item.warehouse_used === 'millenio') {
+                                            p.stockMillenio = Math.max(0, (p.stockMillenio || 0) - item.qty);
+                                        } else {
+                                            p.stockVulcano = Math.max(0, (p.stockVulcano || 0) - item.qty);
+                                        }
+                                        await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, p);
                                     }
-                                    await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, p);
                                 }
                             }
 
