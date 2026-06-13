@@ -560,6 +560,73 @@
         </div>
     </div>
 
+    <!-- Global Return Modal -->
+    <div id="return-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h2>Registrar Devolución de Producto</h2>
+                <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="return-form">
+                    <input type="hidden" name="clientId" id="return-client-id">
+                    
+                    <!-- Deudas actuales de Millenio y Vulcano -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 1.5rem; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 12px; border: 1px solid var(--border);">
+                        <div style="flex: 1; text-align: center; border-right: 1px solid var(--border); padding-right: 5px;">
+                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary);">Deuda Millenio</span>
+                            <h3 id="return-debt-millenio" style="margin: 4px 0 0 0; color: var(--danger); font-size: 1.15rem;">$0</h3>
+                        </div>
+                        <div style="flex: 1; text-align: center; padding-left: 5px;">
+                            <span style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-secondary);">Deuda Vulcano</span>
+                            <h3 id="return-debt-vulcano" style="margin: 4px 0 0 0; color: var(--danger); font-size: 1.15rem;">$0</h3>
+                        </div>
+                    </div>
+
+                    <div class="crm-responsive-grid">
+                        <!-- Producto -->
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Seleccionar Producto Devuelto</label>
+                            <select id="return-product-select" class="form-control" required style="width: 100%;">
+                                <option value="">Cargando productos...</option>
+                            </select>
+                        </div>
+
+                        <!-- Cantidad -->
+                        <div class="form-group">
+                            <label>Cantidad Devuelta</label>
+                            <input type="number" id="return-quantity" class="form-control" min="1" required value="1">
+                        </div>
+
+                        <!-- Empresa Destino Stock -->
+                        <div class="form-group">
+                            <label>Bodega Destino</label>
+                            <select id="return-company-select" class="form-control" required>
+                                <option value="millenio">Millenio</option>
+                                <option value="vulcano">Vulcano</option>
+                            </select>
+                        </div>
+
+                        <!-- Valor de Devolución por Unidad -->
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Valor Unitario de Crédito (COP)</label>
+                            <input type="text" id="return-unit-value" class="form-control" required placeholder="0">
+                            <small class="text-secondary" style="margin-top: 4px; display: block;">Este valor se multiplicará por la cantidad y se restará de la deuda del cliente.</small>
+                        </div>
+
+                        <!-- Notas -->
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label>Notas / Motivo</label>
+                            <input type="text" id="return-notes" class="form-control" placeholder="Ej: Defecto de fábrica, cambio de referencia...">
+                        </div>
+                    </div>
+                    <button type="button" id="save-return-btn" class="btn btn-primary btn-block"
+                        style="margin-top: 1.5rem; padding: 1rem; background: #dc2626; border-color: #dc2626;">Registrar Devolución</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Movement Modal (Consignations / Outflows) -->
     <div id="movement-modal" class="modal">
         <div class="modal-content">
