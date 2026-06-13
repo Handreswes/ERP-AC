@@ -166,6 +166,7 @@ window.CRM = {
                 <td data-label="Total Deuda"><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
                 <td class="table-actions">
                     <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono" onclick="window.CRM.openPaymentModal(this.dataset.id);"><i class="fas fa-hand-holding-usd"></i></button>
+                    <button class="icon-btn refund-btn" data-id="${c.id}" title="Registrar Devolución" onclick="window.CRM.openReturnModal(this.dataset.id);" style="color: #f87171;"><i class="fas fa-undo"></i></button>
                     <button class="icon-btn state-btn" data-id="${c.id}" title="Estado de Cuenta"><i class="fas fa-file-invoice-dollar"></i></button>
                     <button class="icon-btn edit-btn" data-id="${c.id}" title="Editar Cliente"><i class="fas fa-edit"></i></button>
                     <button class="icon-btn delete-btn" data-id="${c.id}" title="Eliminar Cliente" style="color: var(--danger);"><i class="fas fa-trash"></i></button>
@@ -299,6 +300,12 @@ window.CRM = {
                 return;
             }
 
+            // Manual Save: Return
+            if (tgt.id === 'save-return-btn') {
+                this.handleSaveReturn();
+                return;
+            }
+
             // Safe check for closest to avoid errors on Document/Window clicks
             if (tgt && typeof tgt.closest === 'function') {
                 const editBtn = tgt.closest('.edit-btn');
@@ -384,6 +391,13 @@ window.CRM = {
                 const abonoBtn = tgt.closest('.abono-btn');
                 if (abonoBtn) {
                     this.openPaymentModal(abonoBtn.dataset.id);
+                    return;
+                }
+
+                const refundBtn = tgt.closest('.refund-btn');
+                if (refundBtn) {
+                    this.openReturnModal(refundBtn.dataset.id);
+                    return;
                 }
             }
         });
@@ -623,6 +637,153 @@ window.CRM = {
             window.PDFManager.showStatement(client, saldoAnterior, saldoActual, movimientos, dateRangeStr);
         } else {
             alert("Error: PDFManager no está cargado. Actualice la página e intente nuevamente.");
+        }
+    },
+
+    openReturnModal(clientId) {
+        const client = this.getClients().find(c => c.id === clientId);
+        if (!client) return;
+
+        document.getElementById('return-client-id').value = clientId;
+
+        // Mostrar deudas actuales
+        const mDebt = parseFloat(client.balanceMillenio) || 0;
+        const vDebt = parseFloat(client.balanceVulcano) || 0;
+        document.getElementById('return-debt-millenio').textContent = `$${mDebt.toLocaleString('es-CO')}`;
+        document.getElementById('return-debt-vulcano').textContent = `$${vDebt.toLocaleString('es-CO')}`;
+
+        // Resetear inputs
+        document.getElementById('return-quantity').value = '1';
+        document.getElementById('return-unit-value').value = '';
+        document.getElementById('return-notes').value = '';
+        document.getElementById('return-company-select').value = 'millenio';
+
+        // Cargar productos
+        const productSelect = document.getElementById('return-product-select');
+        const unitValueInput = document.getElementById('return-unit-value');
+        const companySelect = document.getElementById('return-company-select');
+
+        const products = (window.Inventory && window.Inventory.getProducts ? window.Inventory.getProducts() : [])
+            .filter(p => p.active !== false)
+            .sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+        productSelect.innerHTML = '<option value="">Seleccione un producto...</option>' +
+            products.map(p => `<option value="${p.id}">${p.name} (${p.ref || 'Sin Ref'})</option>`).join('');
+
+        // Listener cambio producto
+        productSelect.onchange = () => {
+            const prod = products.find(p => p.id === productSelect.value);
+            if (prod) {
+                const defaultPrice = client.type === 'wholesale' ? (prod.priceWholesale || 0) : (prod.priceFinal || prod.priceInternet || 0);
+                unitValueInput.value = parseInt(defaultPrice).toLocaleString('de-DE');
+                if (prod.company && prod.company !== 'both') {
+                    companySelect.value = prod.company;
+                }
+            } else {
+                unitValueInput.value = '';
+            }
+        };
+
+        // Formateador moneda unitario
+        unitValueInput.oninput = (e) => {
+            let val = e.target.value.replace(/\D/g, "");
+            if (val) {
+                e.target.value = parseInt(val).toLocaleString('de-DE');
+            }
+        };
+
+        document.getElementById('return-modal').classList.add('show');
+    },
+
+    async handleSaveReturn() {
+        const btn = document.getElementById('save-return-btn');
+        if (!btn) return;
+
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+            window.ERP_LOG('Iniciando registro de devolución...');
+
+            const clientId = document.getElementById('return-client-id').value;
+            const productId = document.getElementById('return-product-select').value;
+            const quantity = parseInt(document.getElementById('return-quantity').value) || 0;
+            const company = document.getElementById('return-company-select').value;
+            const unitValueRaw = document.getElementById('return-unit-value').value;
+            const unitValue = parseFloat(unitValueRaw.replace(/\./g, '').replace(/,/g, '')) || 0;
+            const notes = document.getElementById('return-notes').value;
+
+            if (!clientId) throw new Error('Cliente inválido');
+            if (!productId) throw new Error('Debe seleccionar un producto');
+            if (quantity <= 0) throw new Error('La cantidad debe ser mayor a 0');
+            if (unitValue < 0) throw new Error('El valor unitario no puede ser negativo');
+
+            const client = Storage.getById(STORAGE_KEYS.CLIENTS, clientId);
+            if (!client) throw new Error('Cliente no encontrado');
+
+            const product = Storage.getById(STORAGE_KEYS.PRODUCTS, productId);
+            if (!product) throw new Error('Producto no encontrado');
+
+            const totalRefund = quantity * unitValue;
+
+            // 1. Aplicar descuento de deuda
+            if (company === 'millenio') {
+                client.balanceMillenio = (client.balanceMillenio || 0) - totalRefund;
+            } else {
+                client.balanceVulcano = (client.balanceVulcano || 0) - totalRefund;
+            }
+
+            // 2. Incrementar stock del producto
+            if (company === 'millenio') {
+                product.stockMillenio = (parseInt(product.stockMillenio) || 0) + quantity;
+            } else {
+                product.stockVulcano = (parseInt(product.stockVulcano) || 0) + quantity;
+            }
+
+            // 3. Guardar en Base de Datos (Cloud + Cache)
+            await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, client);
+            await Storage.updateItem(STORAGE_KEYS.PRODUCTS, productId, product);
+
+            // 4. Crear registro en payments (Abonos)
+            await Storage.addItem(STORAGE_KEYS.PAYMENTS, {
+                clientId,
+                clientName: client.name,
+                company: company,
+                amount: totalRefund,
+                method: 'devolucion',
+                accountId: null,
+                paymentDetails: JSON.stringify({ productId: product.id, quantity: quantity }),
+                notes: notes ? `Devolución: ${quantity}x ${product.name}. Motivo: ${notes}` : `Devolución: ${quantity}x ${product.name}`,
+                date: new Date().toISOString()
+            });
+
+            // 5. Crear registro de entrada de stock
+            await Storage.addItem(STORAGE_KEYS.STOCK_ENTRIES, {
+                date: new Date().toISOString(),
+                productId: product.id,
+                productName: product.name,
+                quantity: quantity,
+                company: company,
+                source: 'Devolución Cliente',
+                notes: `Cruce saldo cliente: ${client.name}. ${notes || ''}`
+            });
+
+            window.ERP_LOG('Devolución registrada con éxito', 'success');
+            document.getElementById('return-form').reset();
+            document.getElementById('return-modal').classList.remove('show');
+
+            // Actualizar vistas
+            this.updateClientList();
+            if (window.Inventory && window.Inventory.updateInventoryList) window.Inventory.updateInventoryList();
+            if (window.Finances && window.Finances.updateDebtUI) window.Finances.updateDebtUI();
+            if (window.Finances && window.Finances.updateBalancesUI) window.Finances.updateBalancesUI();
+
+            alert('✅ Devolución registrada con éxito.');
+        } catch (err) {
+            window.ERP_LOG('Error Devolución: ' + err.message, 'error');
+            alert('❌ Error: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Registrar Devolución';
         }
     }
 };
