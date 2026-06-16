@@ -3,7 +3,7 @@
  */
 
 window.Catalog = {
-    currentCompany: 'all',
+    currentCompany: 'millenio',
     currentPriceType: 'wholesale', // 'wholesale' or 'internet'
 
     init() {
@@ -94,25 +94,18 @@ window.Catalog = {
             </div>
 
             <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
-                <div class="form-grid">
+                <div class="form-grid" style="grid-template-columns: 1fr;">
                     <div class="form-group">
-                        <label><i class="fas fa-building"></i> Filtrar por Empresa</label>
-                        <select id="catalog-company-filter" class="form-control">
-                            <option value="all" ${this.currentCompany === 'all' ? 'selected' : ''}>Todas las Empresas (Ambas)</option>
-                            <option value="millenio" ${this.currentCompany === 'millenio' ? 'selected' : ''}>Millenio</option>
-                            <option value="vulcano" ${this.currentCompany === 'vulcano' ? 'selected' : ''}>Vulcano</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label><i class="fas fa-tags"></i> Tipo de Precio a Mostrar</label>
-                        <select id="catalog-price-type" class="form-control">
-                            <option value="wholesale" ${this.currentPriceType === 'wholesale' ? 'selected' : ''}>Precios al POR MAYOR</option>
-                            <option value="internet" ${this.currentPriceType === 'internet' ? 'selected' : ''}>Precios Venta INTERNET / FINAL</option>
+                        <label><i class="fas fa-file-invoice-dollar"></i> Seleccionar Catálogo Mayorista a Generar</label>
+                        <select id="catalog-select-type" class="form-control">
+                            <option value="millenio" ${this.currentCompany === 'millenio' ? 'selected' : ''}>Catálogo MILLENIO (Al por Mayor)</option>
+                            <option value="all" ${this.currentCompany === 'all' ? 'selected' : ''}>Catálogo MULTINEGOCIO - Millenio & Vulcano (Al por Mayor)</option>
+                            <option value="vulcano" ${this.currentCompany === 'vulcano' ? 'selected' : ''}>Catálogo VULCANO (Al por Mayor)</option>
                         </select>
                     </div>
                 </div>
                 <div class="alert alert-info" style="margin-top: 1.5rem; background: rgba(59,130,246,0.1); border: 1px solid var(--accent); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
-                    <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos. El diseño es responsive y elegante.
+                    <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos de la empresa seleccionada utilizando sus precios al por mayor.
                 </div>
                 <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px;">
                     <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);"><i class="fas fa-link"></i> Enlace de Catálogo Compartible (Tiempo Real):</label>
@@ -226,13 +219,9 @@ window.Catalog = {
         if (!panel) return;
 
         panel.onchange = (e) => {
-            if (e.target.id === 'catalog-company-filter') {
+            if (e.target.id === 'catalog-select-type') {
                 this.currentCompany = e.target.value;
-                this.updatePreview();
-                this.updateShareableLink();
-            }
-            if (e.target.id === 'catalog-price-type') {
-                this.currentPriceType = e.target.value;
+                this.currentPriceType = 'wholesale';
                 this.updatePreview();
                 this.updateShareableLink();
             }
@@ -318,7 +307,7 @@ window.Catalog = {
         .name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1e293b; }
         .desc { font-size: 0.82rem !important; color: #64748b; margin-bottom: 0.75rem; line-height: 1.4; text-align: left; background: rgba(0,0,0,0.01); padding: 8px 12px; border-radius: 8px; border-left: 3px solid var(--accent); }
         .price-tag { background: var(--primary); color: white; padding: 0.4rem 1.2rem; border-radius: 50px; font-weight: 700; display: inline-block; align-self: center; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-        .print-btn { position: fixed; bottom: 1.5rem; right: 1.5rem; background: var(--accent); color: white; border: none; padding: 1rem 1.5rem; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 20px rgba(59,130,246,0.3); z-index: 100; font-weight: 600; font-family: 'Outfit', sans-serif; transition: 0.2s; }
+        .print-btn { background: var(--accent); color: white; border: none; padding: 1rem 1.5rem; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 20px rgba(59,130,246,0.3); font-weight: 600; font-family: 'Outfit', sans-serif; transition: 0.2s; }
         .print-btn:hover { background: #2563eb; transform: scale(1.05); }
 
         /* Floating WhatsApp Button for Wholesale Sales */
@@ -379,23 +368,35 @@ window.Catalog = {
                 margin: 20mm 15mm 20mm 15mm;
             }
             body { background: white !important; color: #0f172a !important; }
-            .header, .print-btn, .whatsapp-float { display: none !important; }
-            .container { margin-top: 0 !important; padding: 0 !important; }
-            .catalog-grid {
-                grid-template-columns: repeat(2, 1fr) !important;
-                gap: 15mm !important;
-            }
-            .product-card {
-                box-shadow: none !important;
-                border: 1px solid #cbd5e1 !important;
-                background: white !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-                border-radius: 12px !important;
-            }
-            .product-gallery, .product-img {
-                height: 220px !important;
-            }
+             .header, .print-btn-container, .whatsapp-float { display: none !important; }
+             .container { margin-top: 0 !important; padding: 0 !important; }
+             .catalog-grid {
+                 grid-template-columns: repeat(2, 1fr) !important;
+                 gap: 15mm !important;
+             }
+             .product-card {
+                 box-shadow: none !important;
+                 border: 1px solid #cbd5e1 !important;
+                 background: white !important;
+                 page-break-inside: avoid !important;
+                 break-inside: avoid !important;
+                 border-radius: 12px !important;
+             }
+             .product-gallery {
+                 display: block !important;
+                 height: 220px !important;
+                 width: 100% !important;
+                 overflow: hidden !important;
+             }
+             .product-img {
+                 display: none !important;
+             }
+             .product-img:first-child {
+                 display: block !important;
+                 width: 100% !important;
+                 height: 220px !important;
+                 object-fit: cover !important;
+             }
             .product-info {
                 padding: 14px !important;
                 gap: 5px !important;
@@ -587,9 +588,14 @@ window.Catalog = {
     <div class="container">
         <div class="catalog-grid">${htmlProducts}</div>
     </div>
-    <button class="print-btn" onclick="window.print()">
-        <i class="fas fa-print"></i> Guardar PDF / Imprimir
-    </button>
+    <div style="position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; z-index: 10000;" class="print-btn-container">
+        <button class="print-btn" onclick="window.print()" style="position: static; margin: 0;">
+            <i class="fas fa-file-pdf"></i> Guardar como PDF
+        </button>
+        <span style="background: rgba(15, 23, 42, 0.9); color: #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.15); font-weight: 500; text-align: right; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" class="print-hint">
+            💡 Consejo: En la ventana que se abre, selecciona <strong>"Guardar como PDF"</strong> en la opción <em>Destino</em>.
+        </span>
+    </div>
 </body>
 </html>`;
         const blob = new Blob([html], { type: 'text/html' });
