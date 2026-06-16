@@ -94,6 +94,20 @@ window.Dashboard = {
         const salesHeader = document.getElementById('stat-sales-title');
         if (salesHeader) salesHeader.textContent = `Ventas ${rangeText}`;
 
+        // Dynamic Millenio Headers
+        this.updateElText('millenio-sales-header', `Ventas ${rangeText}`);
+        this.updateElText('millenio-expenses-header', `Gastos ${rangeText}`);
+        this.updateElText('millenio-cash-header', `Efectivo ${rangeText}`);
+        this.updateElText('millenio-consignment-header', `Consignación ${rangeText}`);
+        this.updateElText('millenio-credits-header', `Créditos ${rangeText}`);
+
+        // Dynamic Vulcano Headers
+        this.updateElText('vulcano-sales-header', `Ventas ${rangeText}`);
+        this.updateElText('vulcano-expenses-header', `Gastos ${rangeText}`);
+        this.updateElText('vulcano-cash-header', `Efectivo ${rangeText}`);
+        this.updateElText('vulcano-consignment-header', `Consignación ${rangeText}`);
+        this.updateElText('vulcano-credits-header', `Créditos ${rangeText}`);
+
         this.lastFilteredSales = filteredSales; // Store for modal
         this.renderFilteredStats(filteredSales, products, clients, expenses, movements, startDate, endDate);
     },
