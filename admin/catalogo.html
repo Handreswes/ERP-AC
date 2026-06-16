@@ -389,8 +389,17 @@
                 border-radius: 12px !important;
             }
 
-            .product-gallery, .product-img {
+            .product-gallery {
+                display: block !important;
                 height: 220px !important;
+                width: 100% !important;
+                overflow: hidden !important;
+            }
+
+            .product-img {
+                width: 100% !important;
+                height: 220px !important;
+                object-fit: cover !important;
             }
 
             .product-info {
@@ -600,9 +609,12 @@
                 <option value="all">Todas las Categorías</option>
             </select>
             <!-- Print PDF Button -->
-            <button class="btn-print" onclick="window.print()">
-                <i class="fas fa-print"></i> Guardar PDF
-            </button>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;" class="print-control-container">
+                <button class="btn-print" onclick="window.print()" style="margin: 0;">
+                    <i class="fas fa-file-pdf"></i> Guardar como PDF
+                </button>
+                <small style="font-size: 0.65rem; color: #64748b; font-weight: 500; white-space: nowrap;" class="print-control-hint">💡 En Destino, elige "Guardar como PDF".</small>
+            </div>
         </div>
     </div>
 
