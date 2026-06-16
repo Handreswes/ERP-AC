@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const modulesToInit = [
         'Inventory', 'CRM', 'Sales', 'Dashboard', 'Finances', 'Marketing', 
         'TuCompras', 'Vendedores', 'CategoriesModule', 'Settings', 'Consultas', 
-        'Catalog', 'PDFManager', 'TuComprasCRM', 'Logistics', 'UserManagement', 'WebsiteAdmin'
+        'Catalog', 'PDFManager', 'TuComprasCRM', 'Logistics', 'UserManagement', 'WebsiteAdmin', 'Agent'
     ];
 
     ERP_LOG('Registrando módulos...', 'info');
