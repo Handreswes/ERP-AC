@@ -1544,6 +1544,120 @@ window.TuCompras = {
         const cleanText = rawText.trim();
         let orders = [];
 
+        // 0. Detect if it's direct copy-paste from Dropi screen
+        if (cleanText.includes('Estatus de la Orden') || cleanText.includes('GUIA_GENERADA') || cleanText.includes('RECHAZADO') || (/\b\d{8}\b/.test(cleanText) && cleanText.includes('Tel:'))) {
+            console.log('[TUCOMPRAS] Detectado copiado directo de pantalla de Dropi. Procesando...');
+            const lines = cleanText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+            
+            const orderBlocks = [];
+            let currentBlock = null;
+
+            for (let i = 0; i < lines.length; i++) {
+                const line = lines[i];
+                if (/^\d{8,10}\b/.test(line)) {
+                    if (currentBlock) orderBlocks.push(currentBlock);
+                    currentBlock = { header: line, contentLines: [] };
+                } else if (currentBlock) {
+                    currentBlock.contentLines.push(line);
+                }
+            }
+            if (currentBlock) orderBlocks.push(currentBlock);
+
+            orderBlocks.forEach(block => {
+                const parts = block.header.split('\t');
+                const orderId = parts[0];
+                const productName = parts[1] || 'Producto Dropi';
+                const orderDate = parts[2] || new Date().toISOString();
+                let customerName = parts[3] || '';
+
+                let address = '';
+                let phone = '';
+                let status = 'despachado';
+                let carrier = '';
+                let trackingNumber = '';
+
+                block.contentLines.forEach(line => {
+                    if (line.toLowerCase().includes('tel:') || /^\d{7,10}$/.test(line.replace(/\D/g, ''))) {
+                        const match = line.match(/Tel:\s*(\d+)/i) || line.match(/(\d{7,10})/);
+                        if (match) phone = match[1];
+                        
+                        if (line.includes('\t')) {
+                            const p = line.split('\t');
+                            const possibleStatus = p[1]?.trim()?.toLowerCase();
+                            if (possibleStatus) {
+                                if (possibleStatus.includes('generada')) status = 'despachado';
+                                else if (possibleStatus.includes('rechazado')) status = 'devuelto';
+                                else if (possibleStatus.includes('entregado')) status = 'recibido';
+                            }
+                        }
+                    }
+                    else if (line.includes('#') || line.includes('CL') || line.includes('Calle') || line.includes('Carrera') || line.includes('Av') || line.includes('Avenida')) {
+                        address = line;
+                    }
+                    else if (/^\d{10,15}$/.test(line.split('\t')[0])) {
+                        const p = line.split('\t');
+                        trackingNumber = p[0];
+                        if (p[1]) carrier = p[1].trim();
+                    }
+                    else {
+                        const p = line.split('\t');
+                        p.forEach(term => {
+                            term = term.trim();
+                            if (/^(envia|interrapidisimo|coordinadora|servientrega|tcc)$/i.test(term)) {
+                                carrier = term;
+                            } else if (/^(guia_generada|rechazado|devuelto|entregado)$/i.test(term)) {
+                                if (term.toLowerCase().includes('generada')) status = 'despachado';
+                                else if (term.toLowerCase().includes('rechazado')) status = 'devuelto';
+                                else if (term.toLowerCase().includes('entregado')) status = 'recibido';
+                            }
+                        });
+                    }
+                });
+
+                let city = '';
+                let dept = '';
+                if (address) {
+                    const lastCommaIdx = address.lastIndexOf(',');
+                    let locationStr = lastCommaIdx !== -1 ? address.substring(lastCommaIdx + 1).trim() : address;
+                    if (locationStr.includes('-')) {
+                        const p = locationStr.split('-');
+                        city = p[0].trim();
+                        dept = p[1].trim();
+                    } else {
+                        city = locationStr;
+                    }
+                }
+
+                if (orderId && (customerName || phone)) {
+                    orders.push({
+                        id: orderId,
+                        date: orderDate,
+                        customer_name: customerName || 'Cliente Dropi',
+                        customer_phone: phone,
+                        customer_address: address,
+                        customer_city: city,
+                        customer_dept: dept,
+                        carrier: carrier || 'ENVIA',
+                        tracking_number: trackingNumber,
+                        shipping_cost: 0,
+                        sale_price: 0,
+                        items: [{
+                            name: productName,
+                            qty: 1,
+                            mapped_product_id: '',
+                            inventory_source: 'millenio'
+                        }],
+                        seller_id: '',
+                        status: status
+                    });
+                }
+            });
+
+            if (orders.length > 0) {
+                return orders;
+            }
+        }
+
         // 1. Check if it's JSON
         if (cleanText.startsWith('[') || cleanText.startsWith('{')) {
             try {
@@ -1780,7 +1894,7 @@ window.TuCompras = {
                     name: prod.name,
                     qty: item.qty,
                     cost_price: prod.priceWholesale || prod.cost || 0,
-                    sale_price: order.sale_price / order.items.length, // Distribute total price evenly
+                    sale_price: order.sale_price ? (order.sale_price / order.items.length) : (prod.priceFinal || 0), // Fallback if price is not in screen copy-paste
                     commission_paid: prod.commissionBase || 0,
                     inventory_source: item.inventory_source
                 };
