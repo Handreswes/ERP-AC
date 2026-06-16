@@ -5,6 +5,7 @@ window.TuCompras = {
     selectedLiquidations: new Set(),
     activeStep: 1,
     activeCompanyFilter: 'all',
+    pendingImportOrders: [],
 
     init() {
         this.renderPanel();
