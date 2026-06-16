@@ -45,6 +45,8 @@ window.TuCompras = {
                 <button class="tab-btn ${this.activeStatus === 'proceso_devolucion' ? 'active' : ''}" data-status="proceso_devolucion">En Proceso Dev.</button>
                 <button class="tab-btn ${this.activeStatus === 'devolucion_recibida' ? 'active' : ''}" data-status="devolucion_recibida">Devueltos</button>
                 <button class="tab-btn ${this.activeStatus === 'liquidacion' ? 'active' : ''}" data-status="liquidacion" style="border: 1px solid var(--accent);">Liquidación Bodegas</button>
+                <button class="tab-btn ${this.activeStatus === 'importar_dropi' ? 'active' : ''}" data-status="importar_dropi" style="border: 1px solid var(--success);"><i class="fas fa-cloud-download-alt"></i> Importar Dropi</button>
+                <button class="tab-btn ${this.activeStatus === 'gastos' ? 'active' : ''}" data-status="gastos" style="border: 1px solid var(--warning);"><i class="fas fa-wallet"></i> Gastos TuCompras</button>
             </div>
 
             <div id="tucompras-main-content">
@@ -190,6 +192,10 @@ window.TuCompras = {
 
         if (this.activeStatus === 'liquidacion') {
             this.renderLiquidationView();
+        } else if (this.activeStatus === 'importar_dropi') {
+            this.renderImportDropiView();
+        } else if (this.activeStatus === 'gastos') {
+            this.renderExpensesView();
         } else {
             this.renderSalesView();
         }
@@ -204,7 +210,7 @@ window.TuCompras = {
         if (!container) return;
 
         // Financial Stats
-        const totalUtility = sales.reduce((sum, s) => {
+        const totalUtilitySales = sales.reduce((sum, s) => {
             if (s.status === 'recibido') {
                 const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price) * i.qty), 0) : s.sale_price;
                 const totalCost = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.cost_price) * i.qty), 0) : s.cost_price;
@@ -215,6 +221,10 @@ window.TuCompras = {
             }
             return sum;
         }, 0);
+
+        const tcExpenses = Storage.get(STORAGE_KEYS.EXPENSES).filter(e => e.company === 'tucompras');
+        const totalExpenses = tcExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
+        const netUtility = totalUtilitySales - totalExpenses;
 
         const debtMillenio = sales
             .filter(s => s.status === 'recibido' && s.money_confirmed && !s.is_paid_to_inventory && s.inventory_source === 'millenio')
@@ -236,17 +246,25 @@ window.TuCompras = {
         });
 
         container.innerHTML = `
-            <div class="stat-card">
+            <div class="stat-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.1), transparent); border-left: 4px solid var(--success);">
                 <h3>Utilidad Neta Total</h3>
-                <p class="stat-value">$${totalUtility.toLocaleString()}</p>
+                <p class="stat-value" style="color:var(--success); font-size: 1.8rem;">$${netUtility.toLocaleString()}</p>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">Cindy (50%): $${Math.max(0, netUtility / 2).toLocaleString()} | Andrés (50%): $${Math.max(0, netUtility / 2).toLocaleString()}</span>
+            </div>
+            <div class="stat-card" style="border-left: 4px solid var(--warning);">
+                <h3>Gastos TuCompras</h3>
+                <p class="stat-value text-warning" style="font-size: 1.8rem;">$${totalExpenses.toLocaleString()}</p>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">Publicidad y varios</span>
             </div>
             <div class="stat-card">
                 <h3>Deuda MILLENIO</h3>
-                <p class="stat-value text-danger">$${debtMillenio.toLocaleString()}</p>
+                <p class="stat-value text-danger" style="font-size: 1.8rem;">$${debtMillenio.toLocaleString()}</p>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">Pendiente liquidar</span>
             </div>
             <div class="stat-card">
                 <h3>Deuda VULCANO</h3>
-                <p class="stat-value text-danger">$${debtVulcano.toLocaleString()}</p>
+                <p class="stat-value text-danger" style="font-size: 1.8rem;">$${debtVulcano.toLocaleString()}</p>
+                <span style="font-size:0.75rem; color:var(--text-secondary);">Pendiente liquidar</span>
             </div>
             <div class="stat-card" style="grid-column: span 1.5; background: rgba(16,185,129,0.05);">
                 <h3>Rendimiento Logística (${shippingStats.length} trans.)</h3>
@@ -485,10 +503,108 @@ window.TuCompras = {
                 return;
             }
 
-            if (e.target.classList.contains('close-modal')) {
+            if (e.target.id === 'tc-add-expense-btn') {
+                const modal = document.getElementById('tc-expense-modal');
+                if (modal) modal.classList.add('show');
+                return;
+            }
+
+            const delExpenseBtn = e.target.closest('.tc-delete-expense-btn');
+            if (delExpenseBtn) {
+                if (confirm('¿Seguro que deseas eliminar este gasto?')) {
+                    await Storage.deleteItem(STORAGE_KEYS.EXPENSES, delExpenseBtn.dataset.id);
+                    this.renderPanel();
+                }
+                return;
+            }
+
+            if (e.target.classList.contains('close-modal') || e.target.classList.contains('tc-close-modal')) {
                 document.querySelectorAll('.modal').forEach(m => m.classList.remove('show'));
                 return;
             }
+
+            // --- Dropi Import click handlers ---
+            if (e.target.id === 'tc-save-dropi-key-btn') {
+                const keyInput = document.getElementById('tc-dropi-key');
+                if (keyInput) {
+                    localStorage.setItem('erp_dropi_integration_key', keyInput.value.trim());
+                    alert('Token de Dropi guardado.');
+                    this.renderPanel();
+                }
+                return;
+            }
+
+            if (e.target.id === 'tc-process-dropi-btn') {
+                const text = document.getElementById('tc-dropi-raw')?.value;
+                if (!text) {
+                    alert('Por favor pega el texto de Dropi primero.');
+                    return;
+                }
+                const parsed = this.parseDropiData(text);
+                if (parsed.length > 0) {
+                    this.pendingImportOrders = parsed;
+                    this.renderPanel();
+                    alert(`Se procesaron ${parsed.length} pedidos. Por favor verifícalos abajo.`);
+                } else {
+                    alert('No se encontraron pedidos válidos. Verifica el formato pegado.');
+                }
+                return;
+            }
+
+            if (e.target.id === 'tc-clear-pending-import-btn') {
+                if (confirm('¿Deseas vaciar la lista de pedidos pendientes de importación?')) {
+                    this.pendingImportOrders = [];
+                    this.renderPanel();
+                }
+                return;
+            }
+
+            if (e.target.id === 'tc-batch-assign-seller-btn') {
+                const sellerId = document.getElementById('tc-batch-seller-select')?.value;
+                if (!sellerId) {
+                    alert('Por favor selecciona un vendedor.');
+                    return;
+                }
+                const checked = document.querySelectorAll('.tc-import-check:checked');
+                if (checked.length === 0) {
+                    alert('Selecciona al menos un pedido marcando la casilla a la izquierda.');
+                    return;
+                }
+                checked.forEach(cb => {
+                    const idx = parseInt(cb.dataset.index);
+                    this.pendingImportOrders[idx].seller_id = sellerId;
+                    const row = document.getElementById(`tc-pending-row-${idx}`);
+                    if (row) {
+                        row.classList.remove('highlight-warning');
+                        const sel = row.querySelector('.tc-order-seller-select');
+                        if (sel) {
+                            sel.value = sellerId;
+                            sel.style.borderColor = 'var(--border)';
+                        }
+                    }
+                });
+                alert(`Vendedor asignado a ${checked.length} pedidos.`);
+                return;
+            }
+
+            const importSingleBtn = e.target.closest('.tc-import-single-btn');
+            if (importSingleBtn) {
+                const idx = parseInt(importSingleBtn.dataset.index);
+                this.handleImportOrders([idx]);
+                return;
+            }
+
+            if (e.target.id === 'tc-batch-import-submit-btn') {
+                const checked = document.querySelectorAll('.tc-import-check:checked');
+                if (checked.length === 0) {
+                    alert('Selecciona al menos un pedido para importar.');
+                    return;
+                }
+                const indices = Array.from(checked).map(cb => parseInt(cb.dataset.index));
+                this.handleImportOrders(indices);
+                return;
+            }
+            // --- End Dropi Import click handlers ---
         };
 
         panel.onchange = (e) => {
@@ -517,6 +633,45 @@ window.TuCompras = {
                 else this.selectedLiquidations.delete(e.target.dataset.id);
                 this.updateBatchButton();
             }
+
+            // --- Dropi Import change handlers ---
+            if (e.target.id === 'tc-import-select-all') {
+                const checked = e.target.checked;
+                document.querySelectorAll('.tc-import-check').forEach(cb => cb.checked = checked);
+                return;
+            }
+
+            if (e.target.classList.contains('tc-item-product-select')) {
+                const orderIdx = parseInt(e.target.dataset.orderIdx);
+                const itemIdx = parseInt(e.target.dataset.itemIdx);
+                const prodId = e.target.value;
+                this.pendingImportOrders[orderIdx].items[itemIdx].mapped_product_id = prodId;
+                e.target.style.borderColor = prodId ? 'var(--border)' : '#ef4444';
+                const icon = e.target.nextElementSibling;
+                if (icon) {
+                    icon.className = prodId ? 'fas fa-check-circle text-success' : 'fas fa-exclamation-circle text-danger';
+                }
+                return;
+            }
+
+            if (e.target.classList.contains('tc-item-warehouse-select')) {
+                const orderIdx = parseInt(e.target.dataset.orderIdx);
+                const itemIdx = parseInt(e.target.dataset.itemIdx);
+                this.pendingImportOrders[orderIdx].items[itemIdx].inventory_source = e.target.value;
+                return;
+            }
+
+            if (e.target.classList.contains('tc-order-seller-select')) {
+                const orderIdx = parseInt(e.target.dataset.orderIdx);
+                const sellerId = e.target.value;
+                this.pendingImportOrders[orderIdx].seller_id = sellerId;
+                e.target.style.borderColor = sellerId ? 'var(--border)' : '#f59e0b';
+                
+                const row = document.getElementById(`tc-pending-row-${orderIdx}`);
+                if (row) row.classList.toggle('highlight-warning', !sellerId);
+                return;
+            }
+            // --- End Dropi Import change handlers ---
         };
 
         const prodSearch = document.getElementById('tc-product-search');
@@ -527,6 +682,89 @@ window.TuCompras = {
             form.onsubmit = async (e) => {
                 e.preventDefault();
                 await this.handleNewSale(new FormData(form));
+            };
+        }
+
+        const expForm = document.getElementById('tc-expense-form');
+        if (expForm) {
+            expForm.onsubmit = async (e) => {
+                e.preventDefault();
+                const formData = new FormData(expForm);
+                const data = {
+                    company: 'tucompras',
+                    category: formData.get('category'),
+                    concept: formData.get('concept'),
+                    amount: parseFloat(formData.get('amount')) || 0,
+                    date: new Date().toISOString(),
+                    notes: formData.get('notes') || '',
+                    originAccount: 'cash'
+                };
+                await Storage.addItem(STORAGE_KEYS.EXPENSES, data);
+                alert('Gasto registrado con éxito.');
+                this.renderPanel();
+            };
+        }
+
+        // --- File input & API Sync button listeners ---
+        const fileInput = document.getElementById('tc-dropi-file');
+        if (fileInput) {
+            fileInput.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        const textarea = document.getElementById('tc-dropi-raw');
+                        if (textarea) textarea.value = evt.target.result;
+                    };
+                    reader.readAsText(file);
+                }
+            };
+        }
+
+        const syncApiBtn = document.getElementById('tc-sync-dropi-api-btn');
+        if (syncApiBtn) {
+            syncApiBtn.onclick = async () => {
+                const key = localStorage.getItem('erp_dropi_integration_key');
+                if (!key) { alert('No hay token de Dropi guardado.'); return; }
+                
+                try {
+                    syncApiBtn.disabled = true;
+                    syncApiBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sincronizando...';
+                    
+                    const response = await fetch('https://api.dropi.co/orders/myorders', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'dropi-integration-key': key
+                        },
+                        body: JSON.stringify({
+                            limit: 50,
+                            offset: 0
+                        })
+                    });
+                    
+                    if (!response.ok) throw new Error(`Status: ${response.status}`);
+                    const json = await response.json();
+                    
+                    if (json && json.data) {
+                        const parsed = this.parseDropiData(JSON.stringify(json.data));
+                        if (parsed.length > 0) {
+                            this.pendingImportOrders = parsed;
+                            this.renderPanel();
+                            alert(`Sincronización exitosa: ${parsed.length} pedidos cargados.`);
+                        } else {
+                            alert('No se encontraron pedidos nuevos en la respuesta de Dropi.');
+                        }
+                    } else {
+                        alert('Respuesta inesperada de Dropi: ' + JSON.stringify(json));
+                    }
+                } catch (err) {
+                    console.error('[TUCOMPRAS] Dropi API Sync Error:', err);
+                    alert(`❌ Error de Sincronización: ${err.message}\n\nNota: Esto puede deberse a restricciones de CORS en tu navegador local. Te recomendamos exportar el reporte CSV de Dropi y pegarlo en el cuadro de texto para una importación directa y segura sin dependencias.`);
+                } finally {
+                    syncApiBtn.disabled = false;
+                    syncApiBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Sincronizar API Dropi';
+                }
             };
         }
     },
@@ -549,19 +787,118 @@ window.TuCompras = {
     },
 
     async processBatchPayment() {
-        if (!confirm(`¿Confirmas el pago a bodega de ${this.selectedLiquidations.size} ventas seleccionadas?`)) return;
-
         const sales = this.getSales();
-        for (const id of this.selectedLiquidations) {
-            const sale = sales.find(s => s.id === id);
-            if (sale) {
-                sale.is_paid_to_inventory = true;
-                sale.inventory_paid_at = new Date().toISOString();
-                await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
+        const millenioSales = [];
+        const vulcanoSales = [];
+        let millenioAmount = 0;
+        let vulcanoAmount = 0;
+
+        this.selectedLiquidations.forEach(id => {
+            const s = sales.find(x => x.id === id);
+            if (s) {
+                const cost = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.cost_price) * i.qty), 0) : parseFloat(s.cost_price || 0);
+                if (s.inventory_source === 'millenio') {
+                    millenioSales.push(s);
+                    millenioAmount += cost;
+                } else if (s.inventory_source === 'vulcano') {
+                    vulcanoSales.push(s);
+                    vulcanoAmount += cost;
+                }
+            }
+        });
+
+        if (millenioSales.length === 0 && vulcanoSales.length === 0) {
+            alert('No se encontraron ventas seleccionadas válidas.');
+            return;
+        }
+
+        let confirmMsg = '¿Confirmas el pago de las siguientes liquidaciones?\n';
+        if (millenioAmount > 0) confirmMsg += `- Millenio: $${millenioAmount.toLocaleString()} (${millenioSales.length} ventas)\n`;
+        if (vulcanoAmount > 0) confirmMsg += `- Vulcano: $${vulcanoAmount.toLocaleString()} (${vulcanoSales.length} ventas)\n`;
+        if (!confirm(confirmMsg)) return;
+
+        // Process Millenio Destination Account
+        let millenioDestAccount = 'cash';
+        if (millenioAmount > 0) {
+            const millenioAccounts = Storage.get(STORAGE_KEYS.ACCOUNTS).filter(a => a.company === 'millenio');
+            let optionsText = "Selecciona la cuenta de destino para MILLENIO (escribe el número correspondiente):\n\n0: Caja Efectivo\n";
+            millenioAccounts.forEach((acc, index) => {
+                optionsText += `${index + 1}: ${acc.bankName} - ${acc.name} ($${parseFloat(acc.balance || 0).toLocaleString()})\n`;
+            });
+            
+            const selection = prompt(optionsText, "0");
+            if (selection === null) return; // cancelled
+            
+            if (selection !== "0") {
+                const idx = parseInt(selection) - 1;
+                if (millenioAccounts[idx]) {
+                    millenioDestAccount = millenioAccounts[idx].id;
+                } else {
+                    alert('Selección de cuenta Millenio inválida. Proceso cancelado.');
+                    return;
+                }
             }
         }
 
-        alert('Pagos registrados con éxito.');
+        // Process Vulcano Destination Account
+        let vulcanoDestAccount = 'cash';
+        if (vulcanoAmount > 0) {
+            const vulcanoAccounts = Storage.get(STORAGE_KEYS.ACCOUNTS).filter(a => a.company === 'vulcano');
+            let optionsText = "Selecciona la cuenta de destino para VULCANO (escribe el número correspondiente):\n\n0: Caja Efectivo\n";
+            vulcanoAccounts.forEach((acc, index) => {
+                optionsText += `${index + 1}: ${acc.bankName} - ${acc.name} ($${parseFloat(acc.balance || 0).toLocaleString()})\n`;
+            });
+            
+            const selection = prompt(optionsText, "0");
+            if (selection === null) return; // cancelled
+            
+            if (selection !== "0") {
+                const idx = parseInt(selection) - 1;
+                if (vulcanoAccounts[idx]) {
+                    vulcanoDestAccount = vulcanoAccounts[idx].id;
+                } else {
+                    alert('Selección de cuenta Vulcano inválida. Proceso cancelado.');
+                    return;
+                }
+            }
+        }
+
+        // Save Inflow Movements
+        if (millenioAmount > 0) {
+            await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+                company: 'millenio',
+                type: 'inflow',
+                originAccount: 'tucompras',
+                destinationAccount: millenioDestAccount,
+                amount: millenioAmount,
+                concept: `Liquidación Bodega TuCompras (${millenioSales.length} ventas)`,
+                date: new Date().toISOString(),
+                notes: `Guías: ${millenioSales.map(s => s.tracking_number || s.id).join(', ')}`
+            });
+        }
+
+        if (vulcanoAmount > 0) {
+            await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+                company: 'vulcano',
+                type: 'inflow',
+                originAccount: 'tucompras',
+                destinationAccount: vulcanoDestAccount,
+                amount: vulcanoAmount,
+                concept: `Liquidación Bodega TuCompras (${vulcanoSales.length} ventas)`,
+                date: new Date().toISOString(),
+                notes: `Guías: ${vulcanoSales.map(s => s.tracking_number || s.id).join(', ')}`
+            });
+        }
+
+        // Update Sales status in Storage
+        for (const sale of [...millenioSales, ...vulcanoSales]) {
+            sale.is_paid_to_inventory = true;
+            sale.inventory_paid_at = new Date().toISOString();
+            await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale.id, sale);
+        }
+
+        alert('Liquidación a bodegas procesada y registrada en Finanzas con éxito.');
+        this.selectedLiquidations.clear();
         this.renderPanel();
     },
 
@@ -904,6 +1241,589 @@ window.TuCompras = {
         sale.money_confirmed_at = new Date().toISOString();
         await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
         document.getElementById('tc-status-modal').classList.remove('show');
+        this.renderPanel();
+    },
+
+    renderExpensesView() {
+        const container = document.getElementById('tucompras-main-content');
+        const expenses = Storage.get(STORAGE_KEYS.EXPENSES).filter(e => e.company === 'tucompras');
+
+        container.innerHTML = `
+            <div class="actions-row" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <h2 style="margin:0;"><i class="fas fa-wallet" style="color:var(--warning);"></i> Listado de Gastos TuCompras</h2>
+                <button id="tc-add-expense-btn" class="btn btn-warning" style="border-radius: 12px;">
+                    <i class="fas fa-plus"></i> Registrar Gasto
+                </button>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Categoría</th>
+                            <th>Concepto</th>
+                            <th class="text-right">Monto</th>
+                            <th>Notas</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tc-expenses-list-body">
+                        ${expenses.map(e => `
+                            <tr>
+                                <td>${new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                                <td><span class="badge" style="background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); font-size: 0.75rem;">${e.category || 'General'}</span></td>
+                                <td><strong>${e.concept}</strong></td>
+                                <td class="text-right text-danger"><strong>$${parseFloat(e.amount).toLocaleString()}</strong></td>
+                                <td style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis;">${e.notes || '-'}</td>
+                                <td class="table-actions">
+                                    <button class="icon-btn tc-delete-expense-btn" data-id="${e.id}" style="color:var(--danger);" title="Eliminar Gasto">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                        ${expenses.length === 0 ? '<tr><td colspan="6" class="text-center text-secondary" style="padding: 2rem;">No hay gastos registrados</td></tr>' : ''}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Expense Modal -->
+            <div id="tc-expense-modal" class="modal">
+                <div class="modal-content" style="max-width: 450px; border-radius: 20px;">
+                    <div class="modal-header">
+                        <h2>Registrar Gasto TuCompras</h2>
+                        <span class="close-modal tc-close-modal">&times;</span>
+                    </div>
+                    <div class="modal-body" style="padding: 1.5rem 2rem;">
+                        <form id="tc-expense-form">
+                            <div class="form-grid" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                <div class="form-group">
+                                    <label>Categoría</label>
+                                    <select name="category" class="form-control" required>
+                                        <option value="Publicidad">Publicidad / Marketing</option>
+                                        <option value="Fletes">Fletes</option>
+                                        <option value="Devoluciones">Devoluciones (Cargos)</option>
+                                        <option value="Operativo">Gasto Operativo</option>
+                                        <option value="General">Otro / General</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Concepto / Detalle *</label>
+                                    <input type="text" name="concept" class="form-control" placeholder="Ej: Publicidad Facebook Junio" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Monto ($) *</label>
+                                    <input type="number" name="amount" class="form-control" placeholder="Monto del gasto" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Notas Adicionales</label>
+                                    <textarea name="notes" class="form-control" placeholder="Detalles extra..." rows="3"></textarea>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top: 1.5rem; height: 50px; border-radius: 12px;">
+                                GUARDAR GASTO
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderImportDropiView() {
+        const container = document.getElementById('tucompras-main-content');
+        const key = localStorage.getItem('erp_dropi_integration_key') || '';
+        const sellers = Vendedores.getSellers().filter(s => s.status === 'active' || s.active !== false);
+
+        container.innerHTML = `
+            <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-sidebar); border-radius: 16px; border: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="document.getElementById('tc-dropi-settings').classList.toggle('hidden')">
+                    <h3 style="margin:0; font-size:1.1rem; display:flex; align-items:center; gap:8px;"><i class="fas fa-cog text-blue"></i> Configuración de Integración Dropi (API)</h3>
+                    <span style="font-size: 0.8rem; color: var(--text-secondary);"><i class="fas fa-chevron-down"></i></span>
+                </div>
+                <div id="tc-dropi-settings" class="hidden" style="margin-top: 1rem; border-top: 1px solid var(--border); padding-top: 1rem;">
+                    <div style="display: flex; gap: 1rem; align-items: flex-end;">
+                        <div class="form-group" style="margin:0; flex: 1;">
+                            <label style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Token de Integración (Dropi Integration Key)</label>
+                            <input type="password" id="tc-dropi-key" class="form-control" value="${key}" placeholder="Pegar token de integraciones de Dropi">
+                        </div>
+                        <button id="tc-save-dropi-key-btn" class="btn btn-primary" style="height: 42px; border-radius:10px;">Guardar Token</button>
+                    </div>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 5px; margin-bottom: 0;">
+                        * Puedes obtener este token en tu cuenta de Dropi -> Configuración -> Integraciones -> Token de Integración.
+                    </p>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.5rem 2rem; border-radius: 16px; margin-bottom: 1.5rem; border: 1px solid var(--border);">
+                <h3 style="margin:0 0 1rem 0; font-size:1.2rem; display:flex; align-items:center; gap:8px;"><i class="fas fa-file-import text-success"></i> Cargar Ventas de Dropi</h3>
+                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <strong>Método Recomendado (CORS-Safe):</strong> Copia la tabla de pedidos o el reporte CSV de Dropi y pégalo abajo, o arrastra el archivo CSV.
+                </p>
+
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    <textarea id="tc-dropi-raw" class="form-control" style="height: 120px; font-family: monospace; font-size: 0.8rem; border-radius:12px; background: rgba(0,0,0,0.15);" placeholder="Pega el texto CSV o JSON de tu reporte de pedidos de Dropi aquí..."></textarea>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div style="display:flex; gap:10px;">
+                            <input type="file" id="tc-dropi-file" accept=".csv,.txt" style="display: none;">
+                            <button class="btn btn-outline" onclick="document.getElementById('tc-dropi-file').click()" style="border-radius:10px;">
+                                <i class="fas fa-file-upload"></i> Subir Archivo CSV
+                            </button>
+                            <button id="tc-process-dropi-btn" class="btn btn-success" style="min-width: 140px; border-radius:10px;">Procesar Datos</button>
+                        </div>
+                        
+                        <div style="display:flex; gap:10px;">
+                            <button id="tc-sync-dropi-api-btn" class="btn btn-primary" ${key ? '' : 'disabled'} title="Sincronizar directamente vía API de Dropi" style="border-radius:10px;">
+                                <i class="fas fa-sync-alt"></i> Sincronizar API Dropi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tc-pending-import-area" class="${this.pendingImportOrders.length === 0 ? 'hidden' : ''}">
+                <div class="card" style="padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; border: 1px solid var(--border);">
+                    <div class="panel-header" style="padding:0; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <h2 style="margin:0; font-size:1.2rem;"><i class="fas fa-tasks text-blue"></i> Pedidos Pendientes de Confirmar (${this.pendingImportOrders.length})</h2>
+                        
+                        <div style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 12px; border:1px solid var(--border);">
+                            <label style="font-size:0.8rem; white-space:nowrap; color: var(--text-secondary); margin:0;">Asignar Vendedor Masivo:</label>
+                            <select id="tc-batch-seller-select" class="form-control" style="width: 150px; height: 30px; padding: 2px 5px; font-size:0.8rem; border-radius:6px; background:var(--bg-dark);">
+                                <option value="">Seleccione...</option>
+                                ${sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                            </select>
+                            <button id="tc-batch-assign-seller-btn" class="btn btn-primary btn-sm" style="border-radius:6px; height:30px; padding: 0 10px; font-size:0.8rem;">Asignar</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: space-between; align-items:center;">
+                        <div class="alert alert-info" style="margin: 0; padding: 8px 12px; font-size:0.8rem; border-radius:8px;">
+                            <i class="fas fa-info-circle"></i> Selecciona los pedidos, asigna el vendedor e impórtalos al ERP.
+                        </div>
+                        <button id="tc-clear-pending-import-btn" class="btn btn-outline-danger btn-sm" style="border-radius:8px;">Limpiar Lista</button>
+                    </div>
+
+                    <div class="table-container" style="overflow-x: auto; margin:0;">
+                        <table class="data-table" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="tc-import-select-all"></th>
+                                    <th>Pedido / Cliente</th>
+                                    <th>Logística / Flete</th>
+                                    <th>Artículos de Dropi</th>
+                                    <th>Mapear Producto ERP</th>
+                                    <th>Bodega</th>
+                                    <th>Vendedor</th>
+                                    <th>Precio Venta</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tc-pending-import-list">
+                                ${this.renderPendingImportListRows()}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; text-align: right;">
+                        <button id="tc-batch-import-submit-btn" class="btn btn-success btn-lg" style="border-radius: 12px; height: 50px; font-size:1rem; padding: 0 2rem;">
+                            <i class="fas fa-check-circle"></i> CONFIRMAR E IMPORTAR SELECCIONADOS
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    renderPendingImportListRows() {
+        const erpProducts = Inventory.getProducts().filter(p => p.active !== false);
+        const sellers = Vendedores.getSellers().filter(s => s.status === 'active' || s.active !== false);
+
+        return this.pendingImportOrders.map((order, orderIdx) => {
+            const customerStr = `
+                <div>
+                    <strong>${order.customer_name || 'N/A'}</strong><br>
+                    <span class="text-secondary" style="font-size:0.75rem;">Tel: ${order.customer_phone || '-'}<br>
+                    ${order.customer_city || ''} (${order.customer_dept || ''})</span>
+                </div>
+            `;
+            const logisticsStr = `
+                <div>
+                    <span class="badge bg-blue" style="font-size: 0.65rem; padding: 2px 6px;">${order.carrier || 'N/A'}</span><br>
+                    <span style="font-size:0.75rem; display:block; margin-top:2px;">Guía: <strong>${order.tracking_number || '-'}</strong><br>
+                    Flete: <span class="text-orange">$${(order.shipping_cost || 0).toLocaleString()}</span></span>
+                </div>
+            `;
+
+            // Render mapping cells
+            let itemsHtml = "";
+            let mapHtml = "";
+            let warehouseHtml = "";
+
+            order.items.forEach((item, itemIdx) => {
+                // Auto-match
+                let matchedId = item.mapped_product_id || "";
+                if (!matchedId) {
+                    // Try exact or substring match in ERP products
+                    const match = erpProducts.find(p => 
+                        p.name.toLowerCase() === item.name.toLowerCase() || 
+                        p.ref && item.name.toLowerCase().includes(p.ref.toLowerCase()) ||
+                        p.name.toLowerCase().includes(item.name.toLowerCase()) ||
+                        item.name.toLowerCase().includes(p.name.toLowerCase())
+                    );
+                    if (match) {
+                        matchedId = match.id;
+                        item.mapped_product_id = match.id; // Save in object
+                    }
+                }
+
+                // Default warehouse source based on stock
+                let matchedProd = erpProducts.find(p => p.id === matchedId);
+                let defaultSource = item.inventory_source || "millenio";
+                if (matchedProd) {
+                    if (matchedProd.stockVulcano > 0 && matchedProd.stockMillenio <= 0) defaultSource = "vulcano";
+                }
+                item.inventory_source = item.inventory_source || defaultSource;
+
+                itemsHtml += `<div style="margin-bottom: 5px; font-size:0.8rem; font-weight:600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">
+                    ${item.qty}x ${item.name}
+                </div>`;
+
+                mapHtml += `
+                    <div style="margin-bottom: 5px; display:flex; gap: 4px; align-items:center;">
+                        <select class="form-control tc-item-product-select" data-order-idx="${orderIdx}" data-item-idx="${itemIdx}" style="height:26px; padding: 2px; font-size: 0.75rem; width: 140px; border-color: ${matchedId ? 'var(--border)' : '#ef4444'};">
+                            <option value="">-- Mapear... --</option>
+                            ${erpProducts.map(p => `<option value="${p.id}" ${p.id === matchedId ? 'selected' : ''}>${p.name}</option>`).join('')}
+                        </select>
+                        ${matchedId ? '<i class="fas fa-check-circle text-success" title="Mapeado"></i>' : '<i class="fas fa-exclamation-circle text-danger" title="Falta mapear"></i>'}
+                    </div>
+                `;
+
+                warehouseHtml += `
+                    <div style="margin-bottom: 5px;">
+                        <select class="form-control tc-item-warehouse-select" data-order-idx="${orderIdx}" data-item-idx="${itemIdx}" style="height:26px; padding: 2px; font-size: 0.75rem; width: 85px;">
+                            <option value="millenio" ${item.inventory_source === 'millenio' ? 'selected' : ''}>Millenio</option>
+                            <option value="vulcano" ${item.inventory_source === 'vulcano' ? 'selected' : ''}>Vulcano</option>
+                        </select>
+                    </div>
+                `;
+            });
+
+            // Seller selection
+            const selectedSellerId = order.seller_id || "";
+            const sellerDropdown = `
+                <select class="form-control tc-order-seller-select" data-order-idx="${orderIdx}" style="height:30px; padding: 2px 5px; font-size: 0.75rem; width: 120px; border-color: ${selectedSellerId ? 'var(--border)' : '#f59e0b'};">
+                    <option value="">-- Seleccione... --</option>
+                    ${sellers.map(s => `<option value="${s.id}" ${s.id === selectedSellerId ? 'selected' : ''}>${s.name}</option>`).join('')}
+                </select>
+            `;
+
+            return `
+                <tr id="tc-pending-row-${orderIdx}" class="${!order.seller_id ? 'highlight-warning' : ''}">
+                    <td><input type="checkbox" class="tc-import-check" data-index="${orderIdx}"></td>
+                    <td>${customerStr}</td>
+                    <td>${logisticsStr}</td>
+                    <td style="vertical-align: top;">${itemsHtml}</td>
+                    <td style="vertical-align: top;">${mapHtml}</td>
+                    <td style="vertical-align: top;">${warehouseHtml}</td>
+                    <td style="vertical-align: middle;">${sellerDropdown}</td>
+                    <td style="vertical-align: middle;"><strong>$${(order.sale_price || 0).toLocaleString()}</strong></td>
+                    <td class="table-actions" style="vertical-align: middle;">
+                        <button class="btn btn-sm btn-outline tc-import-single-btn" data-index="${orderIdx}" style="border-radius:6px; font-size:0.75rem; padding: 4px 8px;">Importar</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+
+    parseDropiData(rawText) {
+        if (!rawText || !rawText.trim()) return [];
+
+        const cleanText = rawText.trim();
+        let orders = [];
+
+        // 1. Check if it's JSON
+        if (cleanText.startsWith('[') || cleanText.startsWith('{')) {
+            try {
+                let parsed = JSON.parse(cleanText);
+                if (!Array.isArray(parsed)) parsed = [parsed];
+                
+                // Map JSON properties to our standard pending orders
+                parsed.forEach(o => {
+                    const name = o.customer_name || o.nombreRecibe || (o.cliente && o.cliente.nombre) || o.nombre_recibe || '';
+                    const phone = o.customer_phone || o.celularRecibe || (o.cliente && o.cliente.telefono) || o.telefono_recibe || '';
+                    const address = o.customer_address || o.direccionRecibe || (o.cliente && o.cliente.direccion) || o.direccion_recibe || '';
+                    const city = o.customer_city || o.ciudadRecibe || (o.cliente && o.cliente.ciudad) || o.ciudad_recibe || '';
+                    const dept = o.customer_dept || o.departamentoRecibe || (o.cliente && o.cliente.departamento) || o.departamento_recibe || '';
+                    const carrier = o.carrier || o.nombreTransportadora || o.transportadora || '';
+                    const tracking = o.tracking_number || o.guia || o.tracking || o.numero_guia || '';
+                    const shipping = parseFloat(o.shipping_cost || o.costo_envio || o.valorFlete || o.flete_recaudo || 0);
+                    const totalVal = parseFloat(o.sale_price || o.total || o.valorTotal || o.recaudo || 0);
+                    
+                    let items = [];
+                    const jsonItems = o.items || o.productos || o.detalles || [];
+                    if (Array.isArray(jsonItems)) {
+                        jsonItems.forEach(item => {
+                            items.push({
+                                name: item.name || item.nombre || item.producto || 'Producto Dropi',
+                                qty: parseInt(item.qty || item.cantidad || item.cantidad_producto || 1),
+                                mapped_product_id: item.mapped_product_id || item.product_id || '',
+                                inventory_source: item.inventory_source || 'millenio'
+                            });
+                        });
+                    } else if (typeof jsonItems === 'string') {
+                        items.push({ name: jsonItems, qty: 1, mapped_product_id: '', inventory_source: 'millenio' });
+                    }
+
+                    if (name && phone && items.length > 0) {
+                        orders.push({
+                            id: o.id || o.id_orden || o.idPedido || 'DR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                            date: o.date || o.fecha || new Date().toISOString(),
+                            customer_name: name,
+                            customer_phone: phone,
+                            customer_address: address,
+                            customer_city: city,
+                            customer_dept: dept,
+                            carrier: carrier,
+                            tracking_number: tracking,
+                            shipping_cost: shipping,
+                            sale_price: totalVal,
+                            items: items,
+                            seller_id: o.seller_id || ''
+                        });
+                    }
+                });
+            } catch (e) {
+                console.warn('[TUCOMPRAS] Failed to parse Dropi data as JSON, falling back to CSV parser.', e.message);
+            }
+        }
+
+        // 2. CSV Parser (either fallback or primary)
+        if (orders.length === 0) {
+            const lines = cleanText.split(/\r?\n/).filter(l => l.trim().length > 0);
+            if (lines.length > 1) {
+                // Detect delimiter
+                const headerLine = lines[0];
+                let delim = ',';
+                const commaCount = (headerLine.match(/,/g) || []).length;
+                const semiCount = (headerLine.match(/;/g) || []).length;
+                const tabCount = (headerLine.match(/\t/g) || []).length;
+                
+                if (semiCount > commaCount && semiCount > tabCount) delim = ';';
+                else if (tabCount > commaCount && tabCount > semiCount) delim = '\t';
+
+                const parseCsvRow = (rowText) => {
+                    let fields = [];
+                    let insideQuote = false;
+                    let current = '';
+                    for (let i = 0; i < rowText.length; i++) {
+                        const char = rowText[i];
+                        if (char === '"') {
+                            insideQuote = !insideQuote;
+                        } else if (char === delim && !insideQuote) {
+                            fields.push(current.trim());
+                            current = '';
+                        } else {
+                            current += char;
+                        }
+                    }
+                    fields.push(current.trim());
+                    return fields;
+                };
+
+                const headers = parseCsvRow(headerLine).map(h => h.toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/[^a-z0-9_]/g, '_')
+                    .replace(/_+/g, '_')
+                    .replace(/(^_|_$)/g, '')
+                );
+
+                console.log('[TUCOMPRAS] Normalized CSV headers:', headers);
+
+                const getHeaderIdx = (synonyms) => {
+                    return headers.findIndex(h => synonyms.some(syn => h === syn || h.includes(syn)));
+                };
+
+                const idxId = getHeaderIdx(['id', 'pedido', 'orden', 'consecutivo', 'numero']);
+                const idxName = getHeaderIdx(['cliente', 'recibe', 'nombre', 'destinatario', 'nombre_recibe']);
+                const idxPhone = getHeaderIdx(['telefono', 'celular', 'movil', 'contacto', 'celular_recibe']);
+                const idxAddress = getHeaderIdx(['direccion', 'nomenclatura', 'direccion_recibe']);
+                const idxCity = getHeaderIdx(['ciudad', 'municipio', 'ciudad_recibe']);
+                const idxDept = getHeaderIdx(['departamento', 'estado', 'departamento_recibe']);
+                const idxCarrier = getHeaderIdx(['transportadora', 'courier', 'carrier', 'nombre_transportadora']);
+                const idxTracking = getHeaderIdx(['guia', 'rastrear', 'tracking', 'codigo_rastreo', 'numero_guia']);
+                const idxShipping = getHeaderIdx(['flete', 'costo_envio', 'valor_envio', 'flete_recaudo']);
+                const idxTotal = getHeaderIdx(['total', 'recaudo', 'valor_cobrar', 'cobro', 'valor_total']);
+                const idxProductName = getHeaderIdx(['producto', 'item', 'descripcion', 'articulo', 'detalle']);
+                const idxProductQty = getHeaderIdx(['cantidad', 'unidades', 'qty', 'cantidad_producto']);
+
+                const groupedOrders = {};
+
+                for (let i = 1; i < lines.length; i++) {
+                    const cols = parseCsvRow(lines[i]);
+                    if (cols.length < 2) continue;
+
+                    const id = idxId !== -1 ? cols[idxId] : '';
+                    const name = idxName !== -1 ? cols[idxName] : '';
+                    const phone = idxPhone !== -1 ? cols[idxPhone] : '';
+                    
+                    if (!name && !phone) continue;
+
+                    const groupKey = id || `${name}_${phone}`;
+
+                    const address = idxAddress !== -1 ? cols[idxAddress] : '';
+                    const city = idxCity !== -1 ? cols[idxCity] : '';
+                    const dept = idxDept !== -1 ? cols[idxDept] : '';
+                    const carrier = idxCarrier !== -1 ? cols[idxCarrier] : '';
+                    const tracking = idxTracking !== -1 ? cols[idxTracking] : '';
+                    const shipping = idxShipping !== -1 ? parseFloat(cols[idxShipping].replace(/[^\d.-]/g, '')) || 0 : 0;
+                    const totalVal = idxTotal !== -1 ? parseFloat(cols[idxTotal].replace(/[^\d.-]/g, '')) || 0 : 0;
+                    
+                    const prodName = idxProductName !== -1 ? cols[idxProductName] : 'Producto Dropi';
+                    const prodQty = idxProductQty !== -1 ? parseInt(cols[idxProductQty].replace(/[^\d]/g, '')) || 1 : 1;
+
+                    if (!groupedOrders[groupKey]) {
+                        groupedOrders[groupKey] = {
+                            id: id || 'DR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                            date: new Date().toISOString(),
+                            customer_name: name,
+                            customer_phone: phone,
+                            customer_address: address,
+                            customer_city: city,
+                            customer_dept: dept,
+                            carrier: carrier,
+                            tracking_number: tracking,
+                            shipping_cost: shipping,
+                            sale_price: totalVal,
+                            items: [],
+                            seller_id: ''
+                        };
+                    }
+
+                    groupedOrders[groupKey].items.push({
+                        name: prodName,
+                        qty: prodQty,
+                        mapped_product_id: '',
+                        inventory_source: 'millenio'
+                    });
+                }
+
+                orders = Object.values(groupedOrders);
+            }
+        }
+
+        return orders;
+    },
+
+    async handleImportOrders(indices) {
+        if (!indices || indices.length === 0) {
+            alert('Por favor seleccione al menos un pedido para importar.');
+            return;
+        }
+
+        const erpProducts = Inventory.getProducts().filter(p => p.active !== false);
+        let successCount = 0;
+
+        for (const idx of indices) {
+            const order = this.pendingImportOrders[idx];
+            if (!order) continue;
+
+            // 1. Validation
+            if (!order.seller_id) {
+                alert(`⚠️ El pedido de "${order.customer_name}" no tiene Vendedor asignado.`);
+                return;
+            }
+
+            const missingMap = order.items.some(item => !item.mapped_product_id);
+            if (missingMap) {
+                alert(`⚠️ El pedido de "${order.customer_name}" tiene artículos sin mapear a productos del ERP.`);
+                return;
+            }
+
+            // Validate stock availability
+            const stockErrors = [];
+            for (const item of order.items) {
+                const product = erpProducts.find(p => p.id === item.mapped_product_id);
+                if (!product) {
+                    stockErrors.push(`El producto mapeado para "${item.name}" no existe.`);
+                    continue;
+                }
+                const source = item.inventory_source || 'millenio';
+                const available = source === 'millenio' ? (product.stockMillenio || 0) : (product.stockVulcano || 0);
+                if (item.qty > available) {
+                    stockErrors.push(`"${product.name}": solicitados ${item.qty}, disponibles ${available} en ${source}.`);
+                }
+            }
+            if (stockErrors.length > 0) {
+                alert(`❌ Stock insuficiente para el pedido de "${order.customer_name}":\n\n` + stockErrors.join('\n'));
+                return;
+            }
+
+            // 2. Process stock discount
+            for (const item of order.items) {
+                const product = erpProducts.find(p => p.id === item.mapped_product_id);
+                if (product) {
+                    const source = item.inventory_source || 'millenio';
+                    if (source === 'millenio') product.stockMillenio -= item.qty;
+                    else product.stockVulcano -= item.qty;
+                    await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+                }
+            }
+
+            // 3. Create items list for ERP TuCompras sale
+            const finalSaleItems = order.items.map(item => {
+                const prod = erpProducts.find(p => p.id === item.mapped_product_id);
+                return {
+                    product_id: item.mapped_product_id,
+                    name: prod.name,
+                    qty: item.qty,
+                    cost_price: prod.priceWholesale || prod.cost || 0,
+                    sale_price: order.sale_price / order.items.length, // Distribute total price evenly
+                    commission_paid: prod.commissionBase || 0,
+                    inventory_source: item.inventory_source
+                };
+            });
+
+            const totalCommission = finalSaleItems.reduce((sum, i) => sum + (parseFloat(i.commission_paid) * i.qty), 0);
+
+            // Construct sale object
+            const sale = {
+                id: 'TC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                date: order.date || new Date().toISOString(),
+                customer_name: order.customer_name,
+                customer_phone: order.customer_phone,
+                seller_id: order.seller_id,
+                carrier: order.carrier,
+                tracking_number: order.tracking_number,
+                inventory_source: order.items[0].inventory_source,
+                status: 'despachado',
+                shipping_cost: order.shipping_cost,
+                commission_paid: totalCommission,
+                items: finalSaleItems,
+                money_confirmed: false,
+                is_paid_to_inventory: false
+            };
+
+            // Save sale
+            await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale);
+
+            // CRM Sync
+            await TuComprasCRM.addCustomer({
+                name: order.customer_name,
+                phone: order.customer_phone,
+                dept: order.customer_dept || '',
+                city: order.customer_city || '',
+                address: order.customer_address || ''
+            });
+
+            successCount++;
+        }
+
+        // Clean imported items from list
+        this.pendingImportOrders = this.pendingImportOrders.filter((_, idx) => !indices.includes(idx));
+
+        alert(`¡Se importaron ${successCount} pedidos al ERP exitosamente!`);
         this.renderPanel();
     }
 };
