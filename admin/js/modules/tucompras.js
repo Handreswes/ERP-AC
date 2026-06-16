@@ -448,7 +448,7 @@ window.TuCompras = {
         const panel = document.getElementById('tucompras-panel');
         if (!panel) return;
 
-        panel.onclick = (e) => {
+        panel.onclick = async (e) => {
             const tabBtn = e.target.closest('.tab-btn');
             if (tabBtn) {
                 this.activeStatus = tabBtn.dataset.status;
