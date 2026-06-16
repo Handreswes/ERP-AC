@@ -324,7 +324,7 @@ window.Finances = {
             }
         });
 
-        // 3. Movements (Transfers & Outflows)
+        // 3. Movements (Transfers, Outflows & Inflows)
         movements.forEach(m => {
             const amount = parseFloat(m.amount);
             if (m.type === 'transfer') {
@@ -338,6 +338,12 @@ window.Finances = {
                     balances[m.company].cash -= amount;
                 } else if (balances[m.company].banks[m.originAccount]) {
                     balances[m.company].banks[m.originAccount].balance -= amount;
+                }
+            } else if (m.type === 'inflow') {
+                if (m.destinationAccount === 'cash') {
+                    balances[m.company].cash += amount;
+                } else if (balances[m.company].banks[m.destinationAccount]) {
+                    balances[m.company].banks[m.destinationAccount].balance += amount;
                 }
             }
         });
@@ -810,7 +816,7 @@ window.Finances = {
             }
         });
 
-        // 3. Movements (Transfers & Outflows)
+        // 3. Movements (Transfers, Outflows & Inflows)
         movements.forEach(m => {
             if (isCash) {
                 if (m.company === targetCo) {
@@ -819,13 +825,19 @@ window.Finances = {
                         logs.push({ date: m.date || new Date().toISOString(), type: 'Consignación', concept: 'Salida a Banco', notes: m.notes || '', amount: -parseFloat(m.amount) });
                     } else if (m.type === 'outflow' && m.originAccount === 'cash') {
                         logs.push({ date: m.date || new Date().toISOString(), type: 'Salida', concept: m.concept || 'Gasto Efectivo', notes: m.notes || '', amount: -parseFloat(m.amount) });
+                    } else if (m.type === 'inflow' && m.destinationAccount === 'cash') {
+                        logs.push({ date: m.date || new Date().toISOString(), type: 'Ingreso', concept: m.concept || 'Ingreso Efectivo', notes: m.notes || '', amount: parseFloat(m.amount) });
                     }
                 }
             } else {
                 if (m.destinationAccount === accountId) {
-                    logs.push({ date: m.date || new Date().toISOString(), type: 'Consignación', concept: 'Entrada desde Efectivo', notes: m.notes || '', amount: parseFloat(m.amount) });
+                    if (m.type === 'transfer') {
+                        logs.push({ date: m.date || new Date().toISOString(), type: 'Consignación', concept: 'Entrada desde Efectivo', notes: m.notes || '', amount: parseFloat(m.amount) });
+                    } else if (m.type === 'inflow') {
+                        logs.push({ date: m.date || new Date().toISOString(), type: 'Ingreso', concept: m.concept || 'Ingreso Cuenta', notes: m.notes || '', amount: parseFloat(m.amount) });
+                    }
                 }
-                if (m.originAccount === accountId) {
+                if (m.originAccount === accountId && m.type === 'outflow') {
                     logs.push({ date: m.date || new Date().toISOString(), type: 'Salida', concept: m.concept || 'Movimiento de Salida', notes: m.notes || '', amount: -parseFloat(m.amount) });
                 }
             }
