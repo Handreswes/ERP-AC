@@ -187,22 +187,41 @@ window.Dashboard = {
             return d >= startDate && d <= endDate;
         });
 
-        const tcRevenue = tcFiltered.reduce((sum, s) => s.status === 'recibido' ? sum + parseFloat(s.sale_price || 0) : sum, 0);
-        const tcCogsAndExpenses = tcFiltered.reduce((sum, s) => {
+        const tcRevenue = tcFiltered.reduce((sum, s) => {
             if (s.status === 'recibido') {
-                return sum + parseFloat(s.cost_price || 0) + parseFloat(s.commission_paid || 0) + parseFloat(s.shipping_cost || 0);
-            }
-            if (s.status === 'devuelto') {
-                return sum + parseFloat(s.shipping_loss || 0);
+                const totalSale = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.sale_price || 0) * i.qty), 0) : parseFloat(s.sale_price || 0);
+                return sum + totalSale;
             }
             return sum;
         }, 0);
+
+        const tcCogsAndExpenses = tcFiltered.reduce((sum, s) => {
+            if (s.status === 'recibido') {
+                const totalCost = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.cost_price || 0) * i.qty), 0) : parseFloat(s.cost_price || 0);
+                const totalComm = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.commission_paid || 0) * i.qty), 0) : parseFloat(s.commission_paid || 0);
+                return sum + totalCost + totalComm + parseFloat(s.shipping_cost || 0);
+            }
+            if (s.status === 'devuelto' || s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida') {
+                return sum + (parseFloat(s.shipping_loss || 0));
+            }
+            return sum;
+        }, 0);
+
+        let tcExpenses = expenses.filter(e => {
+            const d = new Date(e.createdAt);
+            return d >= startDate && d <= endDate && e.company === 'tucompras';
+        }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+        tcExpenses += movements.filter(m => {
+            const d = new Date(m.date);
+            return d >= startDate && d <= endDate && m.company === 'tucompras' && m.type === 'outflow';
+        }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
 
         // MASTER FINANCIAL CALCULATIONS
         const totalRevenue = totalFilteredPOS + tcRevenue;
         const totalCOGS = posCOGS + tcCogsAndExpenses;
         const grossProfit = totalRevenue - totalCOGS;
-        const totalOPEX = mExpenses + vExpenses;
+        const totalOPEX = mExpenses + vExpenses + tcExpenses;
         const netProfit = grossProfit - totalOPEX;
         const netMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : 0;
 
@@ -298,7 +317,10 @@ window.Dashboard = {
             });
             tcFiltered.forEach(s => {
                 const d = new Date(s.date).toISOString().split('T')[0];
-                if (grouped[d] && s.status === 'recibido') grouped[d].rev += (parseFloat(s.sale_price) || 0);
+                if (grouped[d] && s.status === 'recibido') {
+                    const totalSale = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.sale_price || 0) * i.qty), 0) : parseFloat(s.sale_price || 0);
+                    grouped[d].rev += totalSale;
+                }
             });
             
             // OPEX (Generic expenses from STORAGE_KEYS.EXPENSES and MOVEMENTS)
@@ -361,7 +383,13 @@ window.Dashboard = {
         // Data preparation for Distribution Chart (Doughnut)
         const mSalesTot = filteredSales.reduce((sum, s) => sum + (s.totalM || 0), 0);
         const vSalesTot = filteredSales.reduce((sum, s) => sum + (s.totalV || 0), 0);
-        const tcSalesTot = tcFiltered.reduce((sum, s) => s.status === 'recibido' ? sum + parseFloat(s.sale_price || 0) : sum, 0);
+        const tcSalesTot = tcFiltered.reduce((sum, s) => {
+            if (s.status === 'recibido') {
+                const totalSale = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.sale_price || 0) * i.qty), 0) : parseFloat(s.sale_price || 0);
+                return sum + totalSale;
+            }
+            return sum;
+        }, 0);
 
         this.distChart = new Chart(distCtx, {
             type: 'doughnut',
