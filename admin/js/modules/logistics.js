@@ -159,10 +159,15 @@ window.Logistics = {
                 <td><span class="badge ${s.source === 'web' ? 'bg-blue' : 'bg-success'}">${s.source === 'web' ? 'WEB' : 'POS'}</span></td>
                 <td>${s.carrier || '<span class="text-secondary">--</span>'}</td>
                 <td>${s.tracking_number || '<span class="text-secondary">--</span>'}</td>
-                <td class="table-actions">
+                <td class="table-actions" style="display: flex; gap: 5px;">
                     <button class="btn btn-sm btn-primary edit-logistic-btn" data-id="${s.id}">
                         <i class="fas fa-truck"></i> Despachar
                     </button>
+                    ${s.source === 'web' ? `
+                    <button class="btn btn-sm btn-danger cancel-web-order-btn" data-id="${s.id}" title="Cancelar Pedido" style="background-color: var(--danger); border-color: var(--danger);">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                    ` : ''}
                 </td>
             </tr>
         `).join('');
@@ -201,6 +206,41 @@ window.Logistics = {
                     }
                     
                     document.getElementById('logistic-modal').classList.add('show');
+                }
+                return;
+            }
+
+            const cancelBtn = e.target.closest('.cancel-web-order-btn');
+            if (cancelBtn) {
+                const saleId = cancelBtn.dataset.id;
+                if (!confirm(`¿Estás seguro de cancelar el pedido ${saleId}? Se eliminará de la lista.`)) return;
+
+                try {
+                    // 1. Update order status to 'Cancelado' in Supabase
+                    const { error } = await window.supabaseClient
+                        .from('orders')
+                        .update({ status: 'Cancelado' })
+                        .eq('id', saleId);
+                    
+                    if (error) throw error;
+
+                    // 2. If it was partially created in tucompras_sales, delete it to clean stats
+                    if (Storage.getById(STORAGE_KEYS.TUCOMPRAS_SALES, saleId)) {
+                        await Storage.deleteItem(STORAGE_KEYS.TUCOMPRAS_SALES, saleId);
+                    }
+
+                    alert('Pedido cancelado exitosamente.');
+                    
+                    // 3. Re-render panel
+                    const pending = await this.getPendingShipments();
+                    this.updateListUI(pending);
+                    
+                    // Update main badge if function exists
+                    if (window.updateLogisticsBadge) window.updateLogisticsBadge();
+
+                } catch(err) {
+                    console.error(err);
+                    alert('Error al cancelar pedido: ' + err.message);
                 }
                 return;
             }
