@@ -241,6 +241,27 @@ async function loadWebsiteSettings() {
         const { data, error } = await _supabase.from('website_settings').select('*').eq('id', 'default').single();
         if (error || !data) return; // Fallback to hardcoded HTML if not found
 
+        // 6. Pixels (Dynamic Injection - Executed first to ensure tracking works even if other DOM elements fail)
+        if (data.google_analytics_id) {
+            gtag('js', new Date());
+            gtag('config', data.google_analytics_id);
+        }
+        if (data.google_ads_id) {
+            gtag('config', data.google_ads_id);
+        }
+        if (data.meta_pixel_id && window.fbq) {
+            if (data.meta_pixel_id !== '533214856186331') {
+                fbq('init', data.meta_pixel_id);
+                fbq('track', 'PageView');
+            }
+        }
+        if (data.tiktok_pixel_id && window.ttq) {
+            if (data.tiktok_pixel_id !== 'D8KO4LBC77U7JESGNN8G') {
+                ttq.load(data.tiktok_pixel_id);
+                ttq.page();
+            }
+        }
+
         // 1. Meta Tags (SEO)
         if (data.meta_title) {
             document.title = data.meta_title;
@@ -341,22 +362,7 @@ async function loadWebsiteSettings() {
             }
         }
 
-        // 6. Pixels (Dynamic Injection)
-        if (data.google_analytics_id) {
-            gtag('js', new Date());
-            gtag('config', data.google_analytics_id);
-        }
-        if (data.google_ads_id) {
-            gtag('config', data.google_ads_id);
-        }
-        if (data.meta_pixel_id && window.fbq) {
-            fbq('init', data.meta_pixel_id);
-            fbq('track', 'PageView');
-        }
-        if (data.tiktok_pixel_id && window.ttq) {
-            ttq.load(data.tiktok_pixel_id);
-            ttq.page();
-        }
+        // Testimonials and other DOM configurations follow...
     } catch (e) {
         console.error('Error loading website settings:', e);
     }
