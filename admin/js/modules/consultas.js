@@ -466,11 +466,12 @@ window.Consultas = {
                         <button class="btn btn-sm btn-primary btn-reprint-pdf" data-sale="${safeSale}" data-rem="${remNumber}">
                             <i class="fas fa-file-pdf"></i> Ver
                         </button>
-                        ${Auth.isAdmin() ? `
+                        <button class="btn btn-sm btn-warning btn-edit-sale" data-id="${s.id}" style="background:var(--warning); border-color:var(--warning); color:black; margin-left:5px;">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
                         <button class="btn btn-sm btn-danger btn-delete-sale" data-id="${s.id}" style="background:var(--danger); border-color:var(--danger); color:white; margin-left:5px;">
                             <i class="fas fa-trash"></i> Anular
                         </button>
-                        ` : ''}
                     </td>
                 </tr>
             `;
@@ -513,6 +514,13 @@ window.Consultas = {
                     console.error("Error parsing sale data for PDF", err);
                     alert("Error al intentar reconstruir la remisión.");
                 }
+                return;
+            }
+
+            const editSaleBtn = e.target.closest('.btn-edit-sale');
+            if (editSaleBtn) {
+                const id = editSaleBtn.dataset.id;
+                await this.editSale(id);
                 return;
             }
 
@@ -640,10 +648,6 @@ window.Consultas = {
     },
 
     async deleteSale(saleId) {
-        if (!Auth.isAdmin()) {
-            alert("No tienes permisos para anular ventas.");
-            return;
-        }
         if (!confirm("⚠️ ¿Estás seguro de ANULAR esta venta permanentemente?\n\nEsto eliminará la remisión, reintegrará los productos al stock y descontará el saldo al cliente si fue a crédito.")) {
             return;
         }
@@ -698,6 +702,85 @@ window.Consultas = {
         } catch(err) {
             console.error(err);
             alert("❌ Error al anular la venta: " + err.message);
+        }
+    },
+
+    async editSale(saleId) {
+        try {
+            const sale = Storage.getById(STORAGE_KEYS.SALES, saleId);
+            if (!sale) throw new Error("Venta no encontrada en memoria.");
+
+            if (!confirm(`¿Deseas cargar la venta "${sale.remissionNumber || 'sin número'}" de "${sale.clientName}" en el POS para editarla?\n\nEsto te permitirá modificar las cantidades o productos en el carrito actual.`)) {
+                return;
+            }
+
+            // Cargar datos en el módulo de ventas
+            if (!window.Sales) {
+                throw new Error("El módulo de Ventas no está cargado.");
+            }
+
+            // Mapear los ítems de la venta al formato del carrito del POS
+            window.Sales.cart = sale.items.map(item => {
+                const prod = Storage.getById(STORAGE_KEYS.PRODUCTS, item.id);
+                return {
+                    id: item.id,
+                    name: item.name,
+                    price: parseFloat(item.price) || 0,
+                    quantity: parseInt(item.quantity) || 1,
+                    manualPrice: true,
+                    ...(prod || {})
+                };
+            });
+
+            // Cargar el cliente de la venta
+            const client = Storage.getById(STORAGE_KEYS.CLIENTS, sale.clientId);
+            window.Sales.selectedClient = client || {
+                id: sale.clientId,
+                name: sale.clientName,
+                phone: sale.clientPhone
+            };
+
+            // Configurar método de pago y otras propiedades del POS
+            window.Sales.editingSaleId = sale.id;
+            window.Sales.editingSale = sale;
+            window.Sales.activeCompany = sale.company || 'all';
+
+            // Cambiar al panel POS
+            window.handleNavClick('sales');
+
+            // Actualizar la interfaz del POS
+            window.Sales.renderPanel();
+            
+            // Establecer el método de pago en el select del DOM
+            const pmSelect = document.getElementById('payment-method');
+            if (pmSelect) {
+                pmSelect.value = sale.method || 'cash';
+                // Disparar evento de cambio para que cargue la cuenta si es transferencia
+                pmSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                
+                // Esperar un momento a que se renderice el select de banco e intentar asignarlo
+                setTimeout(() => {
+                    const bankSelect = document.getElementById('pos-bank-account');
+                    if (bankSelect && sale.accountId) {
+                        bankSelect.value = sale.accountId;
+                    }
+                }, 100);
+            }
+
+            const delSelect = document.getElementById('pos-delivery-type');
+            if (delSelect) {
+                delSelect.value = sale.delivery_type || 'pickup';
+            }
+
+            const remInput = document.getElementById('remision-number-input');
+            if (remInput) {
+                remInput.value = sale.remissionNumber || '';
+            }
+
+            window.ERP_LOG(`Venta ${sale.remissionNumber} cargada en POS para edición.`);
+        } catch(err) {
+            console.error(err);
+            alert("❌ Error al cargar la venta para edición: " + err.message);
         }
     },
 
