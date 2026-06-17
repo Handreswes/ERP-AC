@@ -16,7 +16,8 @@ window.Auth = {
             try {
                 this.currentUser = JSON.parse(session);
                 document.body.classList.remove('logged-out');
-                document.getElementById('login-overlay')?.classList.add('hidden');
+                const overlay = document.getElementById('login-overlay');
+                if (overlay) overlay.remove();
                 this.updateProfileUI();
             } catch (e) {
                 console.warn('Invalid session format, clearing...');
