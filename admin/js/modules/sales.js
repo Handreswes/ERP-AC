@@ -234,6 +234,31 @@ window.Sales = {
         if (totalEl) totalEl.textContent = `$${total.toLocaleString('es-CO')}`;
     },
 
+    updateBankAccountsSelect() {
+        const container = document.getElementById('payment-details-container');
+        const pm = document.getElementById('payment-method');
+        if (container && pm && pm.value === 'transfer') {
+            const allAccounts = Storage.get(STORAGE_KEYS.ACCOUNTS) || [];
+            const accounts = this.activeCompany === 'all'
+                ? allAccounts
+                : allAccounts.filter(a => a.company === this.activeCompany);
+            
+            let html = '<label>Banco / Cuenta Destino</label><select id="pos-bank-account" class="form-control" required>';
+            html += accounts.map(a => {
+                const suffix = this.activeCompany === 'all' ? ` (${a.company.toUpperCase()})` : '';
+                return `<option value="${a.id}">${a.name}${suffix}</option>`;
+            }).join('');
+            if (accounts.length === 0) {
+                html += '<option value="" disabled selected>No hay cuentas bancarias</option>';
+            }
+            html += '</select>';
+            container.innerHTML = html;
+            container.style.display = 'block';
+        } else if (container) {
+            container.style.display = 'none';
+        }
+    },
+
     addToCart(product) {
         const existing = this.cart.find(item => item.id === product.id);
         // Default to wholesale price as requested
@@ -276,6 +301,9 @@ window.Sales = {
                 });
                 const searchEl = document.getElementById('pos-product-search');
                 this.renderProductGrid(searchEl ? searchEl.value : '');
+                
+                // Update bank accounts dropdown if visible
+                this.updateBankAccountsSelect();
                 return;
             }
 
@@ -427,21 +455,7 @@ window.Sales = {
 
             // Show/Hide Bank Details
             if (e.target.id === 'payment-method') {
-                const container = document.getElementById('payment-details-container');
-                if (container) {
-                    if (e.target.value === 'transfer') {
-                        const co = this.activeCompany === 'all' ? 'millenio' : this.activeCompany;
-                        const accounts = Storage.get(STORAGE_KEYS.ACCOUNTS).filter(a => a.company === co);
-                        let html = '<label>Banco / Cuenta Destino</label><select id="pos-bank-account" class="form-control" required>';
-                        html += accounts.map(a => `<option value="${a.id}">${a.name}</option>`).join('');
-                        if (accounts.length === 0) html += '<option value="" disabled selected>No hay cuentas bancarias</option>';
-                        html += '</select>';
-                        container.innerHTML = html;
-                        container.style.display = 'block';
-                    } else {
-                        container.style.display = 'none';
-                    }
-                }
+                this.updateBankAccountsSelect();
             }
         };
     },
