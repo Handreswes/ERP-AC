@@ -187,6 +187,18 @@ window.Storage = {
             createdAt: new Date().toISOString()
         };
 
+        // Auto-Limbo Trigger
+        if (key === STORAGE_KEYS.PRODUCTS) {
+            const stockM = parseInt(newItem.stockMillenio) || 0;
+            const stockV = parseInt(newItem.stockVulcano) || 0;
+            const totalStock = stockM + stockV;
+            if (totalStock <= 0) {
+                newItem.active = false;
+            } else if (newItem.active === undefined) {
+                newItem.active = true;
+            }
+        }
+
         // 1. CLOUD SYNC STRICT AWAIT (Fails if network/API errors occur)
         if (table && supabase) {
             console.log(`Syncing ${table} to Cloud...`);
@@ -228,6 +240,21 @@ window.Storage = {
         const index = items.findIndex(item => item.id === id);
 
         if (index !== -1) {
+            // Auto-Limbo Trigger
+            if (key === STORAGE_KEYS.PRODUCTS) {
+                const existing = items[index];
+                const oldStock = (parseInt(existing.stockMillenio) || 0) + (parseInt(existing.stockVulcano) || 0);
+                const newStockM = updatedData.stockMillenio !== undefined ? (parseInt(updatedData.stockMillenio) || 0) : (parseInt(existing.stockMillenio) || 0);
+                const newStockV = updatedData.stockVulcano !== undefined ? (parseInt(updatedData.stockVulcano) || 0) : (parseInt(existing.stockVulcano) || 0);
+                const newStock = newStockM + newStockV;
+
+                if (newStock <= 0 && oldStock > 0) {
+                    updatedData.active = false;
+                } else if (newStock > 0 && oldStock <= 0) {
+                    updatedData.active = true;
+                }
+            }
+
             const finalItem = { ...items[index], ...updatedData, updatedAt: new Date().toISOString() };
 
             // Cloud Sync Await
