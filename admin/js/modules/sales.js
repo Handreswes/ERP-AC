@@ -20,9 +20,27 @@ window.Sales = {
         }
 
         const panel = document.getElementById('sales-panel');
+        
+        let editingHeaderHTML = '';
+        if (this.editingSaleId) {
+            const remNum = this.editingSale?.remissionNumber || 'Venta';
+            editingHeaderHTML = `
+                <div style="background: rgba(245, 158, 11, 0.1); border: 2px dashed #f59e0b; border-radius: 12px; padding: 12px 20px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                    <div>
+                        <span style="font-weight: 700; color: #f59e0b; font-size: 1rem;"><i class="fas fa-edit"></i> MODO EDICIÓN ACTIVO</span>
+                        <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 4px;">Modificando venta: <strong>${remNum}</strong> (${this.editingSale?.clientName})</div>
+                    </div>
+                    <button id="cancel-edit-sale-btn" class="btn btn-sm btn-danger" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid #ef4444; border-radius: 8px;">
+                        Cancelar
+                    </button>
+                </div>
+            `;
+        }
+
         panel.innerHTML = `
+            ${editingHeaderHTML}
             <div class="panel-header">
-                <h1>Ventas POS</h1>
+                <h1>Ventas POS ${this.editingSaleId ? '(Editando)' : ''}</h1>
                 <div class="company-selector">
                     <button class="btn ${this.activeCompany === 'all' ? 'btn-primary' : 'btn-outline'}" data-company="all">Todos</button>
                     <button class="btn ${this.activeCompany === 'millenio' ? 'btn-primary' : 'btn-outline'}" data-company="millenio">Millenio</button>
@@ -360,6 +378,18 @@ window.Sales = {
             if (btn) {
                 const index = parseInt(btn.dataset.index);
 
+                if (btn.id === 'cancel-edit-sale-btn') {
+                    if (confirm('¿Desea cancelar la edición de la venta? Se perderán los cambios del carrito actual.')) {
+                        this.cart = [];
+                        this.selectedClient = null;
+                        this.editingSaleId = null;
+                        this.editingSale = null;
+                        this.renderPanel();
+                        this.setupEventListeners();
+                    }
+                    return;
+                }
+
                 if (btn.classList.contains('qty-btn')) {
                     if (btn.dataset.action === 'inc') this.cart[index].quantity++;
                     else if (this.cart[index].quantity > 1) this.cart[index].quantity--;
@@ -507,6 +537,7 @@ window.Sales = {
             const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
             
             const todaySales = (Storage.get(STORAGE_KEYS.SALES) || []).filter(s => {
+                if (this.editingSaleId && s.id === this.editingSaleId) return false; // Excluir la venta que se está editando
                 if (!s.date) return false;
                 const d = new Date(s.date);
                 return d >= startOfDay && d <= endOfDay;
@@ -537,37 +568,76 @@ window.Sales = {
                 }
             }
 
+            // 1. Simulación y Validación de Stock (Previene saldo negativo)
+            const productClones = {};
+            const getClone = (id) => {
+                if (!productClones[id]) {
+                    const original = Inventory.getProducts().find(p => p.id === id);
+                    if (!original) return null;
+                    productClones[id] = { ...original };
+                }
+                return productClones[id];
+            };
+
+            // Si es edición, devolvemos temporalmente el stock de la venta anterior para simular
+            if (this.editingSaleId && this.editingSale) {
+                const oldSale = this.editingSale;
+                const oldCompany = oldSale.company || 'millenio';
+                for (const oldItem of oldSale.items) {
+                    const pClone = getClone(oldItem.id);
+                    if (pClone) {
+                        let targetCompany = pClone.company || 'millenio';
+                        if (targetCompany === 'both') {
+                            targetCompany = oldCompany;
+                        }
+                        if (targetCompany === 'millenio') {
+                            pClone.stockMillenio = (parseInt(pClone.stockMillenio) || 0) + oldItem.quantity;
+                        } else {
+                            pClone.stockVulcano = (parseInt(pClone.stockVulcano) || 0) + oldItem.quantity;
+                        }
+                    }
+                }
+            }
+
             let totalM = 0;
             let totalV = 0;
 
-            // 1. Process items
+            // Procesar ítems del carrito contra el clon de inventario
             for (const item of this.cart) {
-                const p = Inventory.getProducts().find(prod => prod.id === item.id);
-                if (!p) continue;
+                const pClone = getClone(item.id);
+                if (!pClone) {
+                    throw new Error(`Producto "${item.name}" no encontrado en el inventario.`);
+                }
 
                 const itemTotal = item.price * item.quantity;
-                let targetCompany = p.company || 'millenio';
+                let targetCompany = pClone.company || 'millenio';
 
                 if (targetCompany === 'both') {
                     if (this.activeCompany !== 'all') {
                         targetCompany = this.activeCompany;
                     } else {
-                        targetCompany = (p.stockMillenio >= item.quantity) ? 'millenio' : 'vulcano';
+                        targetCompany = (pClone.stockMillenio >= item.quantity) ? 'millenio' : 'vulcano';
                     }
                 }
 
                 if (targetCompany === 'millenio') {
-                    p.stockMillenio = (p.stockMillenio || 0) - item.quantity;
+                    pClone.stockMillenio = (parseInt(pClone.stockMillenio) || 0) - item.quantity;
                     totalM += itemTotal;
                 } else {
-                    p.stockVulcano = (p.stockVulcano || 0) - item.quantity;
+                    pClone.stockVulcano = (parseInt(pClone.stockVulcano) || 0) - item.quantity;
                     totalV += itemTotal;
                 }
-                // Update deferred to after sale is securely saved
+
+                // Validación de stock negativo
+                if (pClone.stockMillenio < 0 || pClone.stockVulcano < 0) {
+                    const available = targetCompany === 'millenio' ? (pClone.stockMillenio + item.quantity) : (pClone.stockVulcano + item.quantity);
+                    throw new Error(`Stock insuficiente para "${pClone.name}". Stock disponible en bodega ${targetCompany.toUpperCase()}: ${available}, solicitado: ${item.quantity}.`);
+                }
             }
 
             const deliveryType = document.getElementById('pos-delivery-type')?.value || 'pickup';
-            const remNumber = document.getElementById('remision-number-input')?.value || `REM-${Date.now()}`;
+            const remissionNumberInput = document.getElementById('remision-number-input');
+            const remNumber = remissionNumberInput?.value || `REM-${Date.now()}`;
             const generateRemision = document.getElementById('generate-remision-chk')?.checked;
             
             const sale = {
@@ -588,31 +658,79 @@ window.Sales = {
                 accountId: accountId,
                 delivery_type: deliveryType,
                 delivery_status: deliveryType === 'shipping' ? 'pending' : 'completed',
-                date: new Date().toISOString(),
                 company: totalM >= totalV ? 'millenio' : 'vulcano',
-                remissionNumber: remNumber
+                remissionNumber: remNumber,
+                date: this.editingSaleId && this.editingSale ? this.editingSale.date : new Date().toISOString()
             };
 
-            // 1. SAVE SALE FIRST (Primary Data)
-            await Storage.addItem(STORAGE_KEYS.SALES, sale);
-            window.ERP_LOG('Venta registrada en la nube', 'success');
+            // 1. SAVE SALE (Add or Update)
+            if (this.editingSaleId) {
+                await Storage.updateItem(STORAGE_KEYS.SALES, this.editingSaleId, sale);
+                window.ERP_LOG('Venta modificada exitosamente en la nube', 'success');
+            } else {
+                await Storage.addItem(STORAGE_KEYS.SALES, sale);
+                window.ERP_LOG('Venta registrada en la nube', 'success');
+            }
 
             // 2. COMMIT INVENTORY (Dependent Data)
-            for (const item of this.cart) {
-                const p = Inventory.getProducts().find(prod => prod.id === item.id);
-                if (p) await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, p);
+            for (const id in productClones) {
+                const clone = productClones[id];
+                await Storage.updateItem(STORAGE_KEYS.PRODUCTS, id, {
+                    stockMillenio: clone.stockMillenio,
+                    stockVulcano: clone.stockVulcano
+                });
             }
 
             // 3. COMMIT CREDIT DEBT IF APPLICABLE
-            if (method === 'credit') {
-                const c = this.selectedClient;
-                c.balanceMillenio = (c.balanceMillenio || 0) + totalM;
-                c.balanceVulcano = (c.balanceVulcano || 0) + totalV;
-                await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, c);
+            if (this.editingSaleId && this.editingSale) {
+                const oldSale = this.editingSale;
+                
+                // Revertir deuda del cliente original si fue a crédito
+                if (oldSale.method === 'credit' && oldSale.clientId) {
+                    const oldClient = Storage.getById(STORAGE_KEYS.CLIENTS, oldSale.clientId);
+                    if (oldClient) {
+                        const newBalM = Math.max(0, (oldClient.balanceMillenio || 0) - (oldSale.totalM || 0));
+                        const newBalV = Math.max(0, (oldClient.balanceVulcano || 0) - (oldSale.totalV || 0));
+                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, oldClient.id, {
+                            balanceMillenio: newBalM,
+                            balanceVulcano: newBalV
+                        });
+                    }
+                }
+
+                // Sumar deuda al cliente nuevo si el nuevo método es crédito
+                if (method === 'credit') {
+                    const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
+                    if (c) {
+                        const newBalM = (c.balanceMillenio || 0) + totalM;
+                        const newBalV = (c.balanceVulcano || 0) + totalV;
+                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
+                            balanceMillenio: newBalM,
+                            balanceVulcano: newBalV
+                        });
+                    }
+                }
+            } else {
+                // Venta Nueva
+                if (method === 'credit') {
+                    const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
+                    if (c) {
+                        c.balanceMillenio = (c.balanceMillenio || 0) + totalM;
+                        c.balanceVulcano = (c.balanceVulcano || 0) + totalV;
+                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
+                            balanceMillenio: c.balanceMillenio,
+                            balanceVulcano: c.balanceVulcano
+                        });
+                    }
+                }
             }
+
+            const isEditing = !!this.editingSaleId;
 
             this.cart = [];
             this.selectedClient = null;
+            this.editingSaleId = null;
+            this.editingSale = null;
             this.renderPanel();
             this.setupEventListeners();
             Inventory.updateInventoryList();
@@ -620,7 +738,11 @@ window.Sales = {
             if (generateRemision && window.PDFManager) {
                 window.PDFManager.showRemission(sale, remNumber);
             } else {
-                alert(`✅ Venta realizada. Millenio: $${totalM.toLocaleString()} | Vulcano: $${totalV.toLocaleString()}`);
+                alert(isEditing ? `✅ Venta modificada exitosamente.` : `✅ Venta realizada. Millenio: $${totalM.toLocaleString()} | Vulcano: $${totalV.toLocaleString()}`);
+            }
+
+            if (isEditing) {
+                window.handleNavClick('consultas');
             }
         } catch (err) {
             window.ERP_LOG('Error Checkout: ' + err.message, 'error');
