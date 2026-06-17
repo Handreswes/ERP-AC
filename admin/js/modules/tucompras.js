@@ -6,6 +6,9 @@ window.TuCompras = {
     activeStep: 1,
     activeCompanyFilter: 'all',
     pendingImportOrders: [],
+    hideImported: true,
+    hideCancelled: true,
+    statusFilter: 'active',
 
     init() {
         this.renderPanel();
@@ -13,6 +16,47 @@ window.TuCompras = {
 
     getSales() {
         return Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES);
+    },
+
+    isOrderImported(order) {
+        const sales = this.getSales();
+        return sales.find(s => 
+            (s.id === 'TC-DR-' + order.id) || 
+            (order.tracking_number && s.tracking_number === order.tracking_number)
+        );
+    },
+
+    parseDropiDateStr(dateStr, timeStr = '') {
+        if (!dateStr) return new Date().toISOString();
+        const dateParts = dateStr.split(/[-/]/);
+        if (dateParts.length === 3) {
+            let day, month, year;
+            if (dateParts[2].length === 4) {
+                day = parseInt(dateParts[0]);
+                month = parseInt(dateParts[1]) - 1;
+                year = parseInt(dateParts[2]);
+            } else if (dateParts[0].length === 4) {
+                year = parseInt(dateParts[0]);
+                month = parseInt(dateParts[1]) - 1;
+                day = parseInt(dateParts[2]);
+            } else {
+                return new Date().toISOString();
+            }
+            let hours = 12, minutes = 0;
+            if (timeStr) {
+                const timeParts = timeStr.split(':');
+                if (timeParts.length >= 2) {
+                    hours = parseInt(timeParts[0]) || 12;
+                    minutes = parseInt(timeParts[1]) || 0;
+                }
+            }
+            try {
+                return new Date(year, month, day, hours, minutes).toISOString();
+            } catch (e) {
+                return new Date().toISOString();
+            }
+        }
+        return new Date().toISOString();
     },
 
     renderPanel() {
@@ -609,6 +653,24 @@ window.TuCompras = {
         };
 
         panel.onchange = (e) => {
+            if (e.target.id === 'tc-filter-hide-imported') {
+                this.hideImported = e.target.checked;
+                this.renderPanel();
+                return;
+            }
+
+            if (e.target.id === 'tc-filter-hide-cancelled') {
+                this.hideCancelled = e.target.checked;
+                this.renderPanel();
+                return;
+            }
+
+            if (e.target.id === 'tc-filter-dropi-status') {
+                this.statusFilter = e.target.value;
+                this.renderPanel();
+                return;
+            }
+
             if (e.target.id === 'tc-cust-dept') {
                 Locations.populateCities(e.target.value, 'tc-cust-city');
                 document.getElementById('tc-cust-city-other-group').style.display = 'none';
@@ -1337,6 +1399,34 @@ window.TuCompras = {
         const key = localStorage.getItem('erp_dropi_integration_key') || '';
         const sellers = Vendedores.getSellers().filter(s => s.status === 'active' || s.active !== false);
 
+        // Filter pending orders
+        const totalCount = this.pendingImportOrders.length;
+        const filtered = this.pendingImportOrders.map((order, idx) => ({ order, idx })).filter(({ order }) => {
+            const isImported = !!this.isOrderImported(order);
+            const dropiStatus = (order.status || '').toUpperCase();
+            
+            if (this.hideImported && isImported) return false;
+            
+            const isCancelledStatus = dropiStatus === 'RECHAZADO' || dropiStatus === 'CANCELADO';
+            if (this.hideCancelled && isCancelledStatus) return false;
+            
+            if (this.statusFilter === 'active') {
+                const activeStatuses = ['GUIA_GENERADA', 'EN BODEGA ORIGEN', 'EN PROCESAMIENTO', 'EN REPARTO', 'NOVEDAD', 'INTENTO DE ENTREGA', 'EN BODEGA TRANSPORTADORA', 'DESPACHADA'];
+                if (!activeStatuses.includes(dropiStatus) && dropiStatus !== 'DESPACHADO' && dropiStatus !== '') {
+                    return false;
+                }
+            } else if (this.statusFilter === 'delivered') {
+                if (dropiStatus !== 'ENTREGADO' && dropiStatus !== 'RECIBIDO') return false;
+            } else if (this.statusFilter === 'returned') {
+                if (dropiStatus !== 'DEVOLUCION' && dropiStatus !== 'DEVUELTO') return false;
+            } else if (this.statusFilter === 'cancelled') {
+                if (dropiStatus !== 'RECHAZADO' && dropiStatus !== 'CANCELADO') return false;
+            }
+            
+            return true;
+        });
+        const filteredCount = filtered.length;
+
         container.innerHTML = `
             <div class="card" style="padding: 1.5rem; margin-bottom: 1.5rem; background: var(--bg-sidebar); border-radius: 16px; border: 1px solid var(--border);">
                 <div style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;" onclick="document.getElementById('tc-dropi-settings').classList.toggle('hidden')">
@@ -1347,7 +1437,7 @@ window.TuCompras = {
                     <div style="display: flex; gap: 1rem; align-items: flex-end;">
                         <div class="form-group" style="margin:0; flex: 1;">
                             <label style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:4px;">Token de Integración (Dropi Integration Key)</label>
-                            <input type="password" id="tc-dropi-key" class="form-control" value="${key}" placeholder="Pegar token de integraciones de Dropi">
+                            <input type="text" id="tc-dropi-key" class="form-control" value="${key}" placeholder="Pegar token de integraciones de Dropi" autocomplete="off" style="-webkit-text-security: disc; background: var(--bg-dark); color: var(--text);">
                         </div>
                         <button id="tc-save-dropi-key-btn" class="btn btn-primary" style="height: 42px; border-radius:10px;">Guardar Token</button>
                     </div>
@@ -1387,7 +1477,7 @@ window.TuCompras = {
             <div id="tc-pending-import-area" class="${this.pendingImportOrders.length === 0 ? 'hidden' : ''}">
                 <div class="card" style="padding: 1.5rem; border-radius: 16px; margin-bottom: 2rem; border: 1px solid var(--border);">
                     <div class="panel-header" style="padding:0; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-                        <h2 style="margin:0; font-size:1.2rem;"><i class="fas fa-tasks text-blue"></i> Pedidos Pendientes de Confirmar (${this.pendingImportOrders.length})</h2>
+                        <h2 style="margin:0; font-size:1.2rem;"><i class="fas fa-tasks text-blue"></i> Pedidos Pendientes de Confirmar (${filteredCount} de ${totalCount})</h2>
                         
                         <div style="display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,0.03); padding: 5px 12px; border-radius: 12px; border:1px solid var(--border);">
                             <label style="font-size:0.8rem; white-space:nowrap; color: var(--text-secondary); margin:0;">Asignar Vendedor Masivo:</label>
@@ -1396,6 +1486,29 @@ window.TuCompras = {
                                 ${sellers.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
                             </select>
                             <button id="tc-batch-assign-seller-btn" class="btn btn-primary btn-sm" style="border-radius:6px; height:30px; padding: 0 10px; font-size:0.8rem;">Asignar</button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros Inteligentes -->
+                    <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 1.25rem; background: rgba(255,255,255,0.02); padding: 10px 15px; border-radius: 12px; border: 1px solid var(--border);">
+                        <span style="font-size: 0.8rem; font-weight: bold; color: var(--text-secondary);"><i class="fas fa-filter text-blue"></i> Filtros de Vista:</span>
+                        <label style="font-size:0.8rem; display: flex; align-items: center; gap: 6px; cursor: pointer; margin:0;">
+                            <input type="checkbox" id="tc-filter-hide-imported" ${this.hideImported ? 'checked' : ''}>
+                            Ocultar Ya Importados
+                        </label>
+                        <label style="font-size:0.8rem; display: flex; align-items: center; gap: 6px; cursor: pointer; margin:0;">
+                            <input type="checkbox" id="tc-filter-hide-cancelled" ${this.hideCancelled ? 'checked' : ''}>
+                            Ocultar Cancelados/Rechazados
+                        </label>
+                        <div style="display: flex; align-items: center; gap: 6px; margin-left: auto;">
+                            <label style="font-size:0.8rem; margin:0; color: var(--text-secondary);">Estado Dropi:</label>
+                            <select id="tc-filter-dropi-status" class="form-control" style="width: 160px; height: 28px; padding: 2px 5px; font-size: 0.75rem; border-radius: 6px; background: var(--bg-dark); color: var(--text);">
+                                <option value="active" ${this.statusFilter === 'active' ? 'selected' : ''}>Activos / Pendientes</option>
+                                <option value="delivered" ${this.statusFilter === 'delivered' ? 'selected' : ''}>Entregados</option>
+                                <option value="returned" ${this.statusFilter === 'returned' ? 'selected' : ''}>Devoluciones</option>
+                                <option value="cancelled" ${this.statusFilter === 'cancelled' ? 'selected' : ''}>Cancelados / Rechazados</option>
+                                <option value="all" ${this.statusFilter === 'all' ? 'selected' : ''}>Todos los Estados</option>
+                            </select>
                         </div>
                     </div>
 
@@ -1422,7 +1535,7 @@ window.TuCompras = {
                                 </tr>
                             </thead>
                             <tbody id="tc-pending-import-list">
-                                ${this.renderPendingImportListRows()}
+                                ${this.renderPendingImportListRows(filtered)}
                             </tbody>
                         </table>
                     </div>
@@ -1437,18 +1550,38 @@ window.TuCompras = {
         `;
     },
 
-    renderPendingImportListRows() {
+    renderPendingImportListRows(filtered) {
         const erpProducts = Inventory.getProducts().filter(p => p.active !== false);
         const sellers = Vendedores.getSellers().filter(s => s.status === 'active' || s.active !== false);
 
-        return this.pendingImportOrders.map((order, orderIdx) => {
+        return filtered.map(({ order, idx: orderIdx }) => {
+            const isImported = this.isOrderImported(order);
+            const dropiStatus = (order.status || 'despachado').toUpperCase();
+
+            let statusBadge = '';
+            if (dropiStatus === 'ENTREGADO' || dropiStatus === 'RECIBIDO') {
+                statusBadge = `<span class="badge bg-success" style="font-size:0.6rem; padding: 2px 4px; margin-left: 5px;">${dropiStatus}</span>`;
+            } else if (dropiStatus === 'RECHAZADO' || dropiStatus === 'CANCELADO' || dropiStatus === 'DEVOLUCION' || dropiStatus === 'DEVUELTO') {
+                statusBadge = `<span class="badge bg-danger" style="font-size:0.6rem; padding: 2px 4px; margin-left: 5px;">${dropiStatus}</span>`;
+            } else {
+                statusBadge = `<span class="badge bg-warning" style="font-size:0.6rem; padding: 2px 4px; margin-left: 5px; color: black;">${dropiStatus}</span>`;
+            }
+
+            let importBadge = '';
+            if (isImported) {
+                importBadge = `<div style="margin-top: 4px;"><span class="badge bg-secondary" style="font-size:0.65rem; padding: 2px 6px;"><i class="fas fa-check-double"></i> Importado (ID: ${isImported.id})</span></div>`;
+            }
+
             const customerStr = `
                 <div>
+                    <span style="font-size: 0.75rem; color: var(--text-secondary); font-weight: bold;">ID: ${order.id}</span> ${statusBadge}<br>
                     <strong>${order.customer_name || 'N/A'}</strong><br>
                     <span class="text-secondary" style="font-size:0.75rem;">Tel: ${order.customer_phone || '-'}<br>
                     ${order.customer_city || ''} (${order.customer_dept || ''})</span>
+                    ${importBadge}
                 </div>
             `;
+
             const logisticsStr = `
                 <div>
                     <span class="badge bg-blue" style="font-size: 0.65rem; padding: 2px 6px;">${order.carrier || 'N/A'}</span><br>
@@ -1491,9 +1624,11 @@ window.TuCompras = {
                     ${item.qty}x ${item.name}
                 </div>`;
 
+                const disabledMapAttr = isImported ? 'disabled' : '';
+
                 mapHtml += `
                     <div style="margin-bottom: 5px; display:flex; gap: 4px; align-items:center;">
-                        <select class="form-control tc-item-product-select" data-order-idx="${orderIdx}" data-item-idx="${itemIdx}" style="height:26px; padding: 2px; font-size: 0.75rem; width: 140px; border-color: ${matchedId ? 'var(--border)' : '#ef4444'};">
+                        <select class="form-control tc-item-product-select" data-order-idx="${orderIdx}" data-item-idx="${itemIdx}" ${disabledMapAttr} style="height:26px; padding: 2px; font-size: 0.75rem; width: 140px; border-color: ${matchedId ? 'var(--border)' : '#ef4444'};">
                             <option value="">-- Mapear... --</option>
                             ${erpProducts.map(p => `<option value="${p.id}" ${p.id === matchedId ? 'selected' : ''}>${p.name}</option>`).join('')}
                         </select>
@@ -1503,7 +1638,7 @@ window.TuCompras = {
 
                 warehouseHtml += `
                     <div style="margin-bottom: 5px;">
-                        <select class="form-control tc-item-warehouse-select" data-order-idx="${orderIdx}" data-item-idx="${itemIdx}" style="height:26px; padding: 2px; font-size: 0.75rem; width: 85px;">
+                        <select class="form-control tc-item-warehouse-select" data-order-idx="${orderIdx}" data-item-idx="${itemIdx}" ${disabledMapAttr} style="height:26px; padding: 2px; font-size: 0.75rem; width: 85px;">
                             <option value="millenio" ${item.inventory_source === 'millenio' ? 'selected' : ''}>Millenio</option>
                             <option value="vulcano" ${item.inventory_source === 'vulcano' ? 'selected' : ''}>Vulcano</option>
                         </select>
@@ -1513,16 +1648,26 @@ window.TuCompras = {
 
             // Seller selection
             const selectedSellerId = order.seller_id || "";
+            const disabledSellerAttr = isImported ? 'disabled' : '';
             const sellerDropdown = `
-                <select class="form-control tc-order-seller-select" data-order-idx="${orderIdx}" style="height:30px; padding: 2px 5px; font-size: 0.75rem; width: 120px; border-color: ${selectedSellerId ? 'var(--border)' : '#f59e0b'};">
+                <select class="form-control tc-order-seller-select" data-order-idx="${orderIdx}" ${disabledSellerAttr} style="height:30px; padding: 2px 5px; font-size: 0.75rem; width: 120px; border-color: ${selectedSellerId ? 'var(--border)' : '#f59e0b'};">
                     <option value="">-- Seleccione... --</option>
                     ${sellers.map(s => `<option value="${s.id}" ${s.id === selectedSellerId ? 'selected' : ''}>${s.name}</option>`).join('')}
                 </select>
             `;
 
+            const disabledRowStyle = isImported ? 'style="opacity: 0.6; background: rgba(255,255,255,0.015);"' : '';
+            const checkboxHtml = isImported ? 
+                `<input type="checkbox" class="tc-import-check" data-index="${orderIdx}" disabled>` : 
+                `<input type="checkbox" class="tc-import-check" data-index="${orderIdx}">`;
+
+            const actionBtnHtml = isImported ? 
+                `<button class="btn btn-sm btn-outline tc-import-single-btn" data-index="${orderIdx}" disabled style="opacity: 0.5; border-color: var(--border);">Listo</button>` : 
+                `<button class="btn btn-sm btn-outline tc-import-single-btn" data-index="${orderIdx}" style="border-radius:6px; font-size:0.75rem; padding: 4px 8px;">Importar</button>`;
+
             return `
-                <tr id="tc-pending-row-${orderIdx}" class="${!order.seller_id ? 'highlight-warning' : ''}">
-                    <td><input type="checkbox" class="tc-import-check" data-index="${orderIdx}"></td>
+                <tr id="tc-pending-row-${orderIdx}" class="${!order.seller_id && !isImported ? 'highlight-warning' : ''}" ${disabledRowStyle}>
+                    <td>${checkboxHtml}</td>
                     <td>${customerStr}</td>
                     <td>${logisticsStr}</td>
                     <td style="vertical-align: top;">${itemsHtml}</td>
@@ -1531,7 +1676,7 @@ window.TuCompras = {
                     <td style="vertical-align: middle;">${sellerDropdown}</td>
                     <td style="vertical-align: middle;"><strong>$${(order.sale_price || 0).toLocaleString()}</strong></td>
                     <td class="table-actions" style="vertical-align: middle;">
-                        <button class="btn btn-sm btn-outline tc-import-single-btn" data-index="${orderIdx}" style="border-radius:6px; font-size:0.75rem; padding: 4px 8px;">Importar</button>
+                        ${actionBtnHtml}
                     </td>
                 </tr>
             `;
@@ -1567,7 +1712,7 @@ window.TuCompras = {
                 const parts = block.header.split('\t');
                 const orderId = parts[0];
                 const productName = parts[1] || 'Producto Dropi';
-                const orderDate = parts[2] || new Date().toISOString();
+                const orderDate = this.parseDropiDateStr(parts[2] || '', '');
                 let customerName = parts[3] || '';
 
                 let address = '';
@@ -1705,7 +1850,8 @@ window.TuCompras = {
                             shipping_cost: shipping,
                             sale_price: totalVal,
                             items: items,
-                            seller_id: o.seller_id || ''
+                            seller_id: o.seller_id || '',
+                            status: o.status || o.estado || o.estatus || 'despachado'
                         });
                     }
                 });
@@ -1757,7 +1903,9 @@ window.TuCompras = {
                 console.log('[TUCOMPRAS] Normalized CSV headers:', headers);
 
                 const getHeaderIdx = (synonyms) => {
-                    return headers.findIndex(h => synonyms.some(syn => h === syn || h.includes(syn)));
+                    const exactIdx = headers.findIndex(h => synonyms.some(syn => h === syn));
+                    if (exactIdx !== -1) return exactIdx;
+                    return headers.findIndex(h => synonyms.some(syn => h.includes(syn)));
                 };
 
                 const idxId = getHeaderIdx(['id', 'pedido', 'orden', 'consecutivo', 'numero']);
@@ -1772,6 +1920,9 @@ window.TuCompras = {
                 const idxTotal = getHeaderIdx(['total', 'recaudo', 'valor_cobrar', 'cobro', 'valor_total']);
                 const idxProductName = getHeaderIdx(['producto', 'item', 'descripcion', 'articulo', 'detalle']);
                 const idxProductQty = getHeaderIdx(['cantidad', 'unidades', 'qty', 'cantidad_producto']);
+                const idxDate = getHeaderIdx(['fecha', 'date']);
+                const idxTime = getHeaderIdx(['hora', 'time']);
+                const idxStatus = getHeaderIdx(['estatus', 'estado', 'status']);
 
                 const groupedOrders = {};
 
@@ -1797,11 +1948,15 @@ window.TuCompras = {
                     
                     const prodName = idxProductName !== -1 ? cols[idxProductName] : 'Producto Dropi';
                     const prodQty = idxProductQty !== -1 ? parseInt(cols[idxProductQty].replace(/[^\d]/g, '')) || 1 : 1;
+                    const rawDate = idxDate !== -1 ? cols[idxDate] : '';
+                    const rawTime = idxTime !== -1 ? cols[idxTime] : '';
+                    const parsedDate = this.parseDropiDateStr(rawDate, rawTime);
+                    const status = idxStatus !== -1 ? cols[idxStatus] : 'despachado';
 
                     if (!groupedOrders[groupKey]) {
                         groupedOrders[groupKey] = {
                             id: id || 'DR-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
-                            date: new Date().toISOString(),
+                            date: parsedDate,
                             customer_name: name,
                             customer_phone: phone,
                             customer_address: address,
@@ -1812,7 +1967,8 @@ window.TuCompras = {
                             shipping_cost: shipping,
                             sale_price: totalVal,
                             items: [],
-                            seller_id: ''
+                            seller_id: '',
+                            status: status
                         };
                     }
 
@@ -1904,7 +2060,7 @@ window.TuCompras = {
 
             // Construct sale object
             const sale = {
-                id: 'TC-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5),
+                id: 'TC-DR-' + order.id,
                 date: order.date || new Date().toISOString(),
                 customer_name: order.customer_name,
                 customer_phone: order.customer_phone,
