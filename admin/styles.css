@@ -2324,3 +2324,88 @@ textarea:focus {
         right: 0;
     }
 }
+
+/* --- ADDITIONAL PREMIUM MOBILE OVERRIDES & OVERFLOW FIXES --- */
+@media (max-width: 768px) {
+    /* 1. Chatbot Overlap Fix: Position above the bottom nav bar */
+    #ai-chat-container {
+        bottom: calc(var(--bottom-nav-height) + 15px) !important;
+        right: 15px !important;
+    }
+    
+    .chat-window {
+        bottom: 75px !important; /* Renders 75px above the bubble's bottom edge */
+    }
+
+    /* 2. Global Input Font Size Fix: Force 16px to prevent iOS auto-zoom */
+    input, 
+    select, 
+    textarea, 
+    .form-control {
+        font-size: 16px !important;
+    }
+
+    /* 3. Table Column and Width Constraints: Prevent horizontal stretch */
+    .data-table th, 
+    .data-table td {
+        width: auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    /* 4. Filter Rows and Unwrapped Flex Stacks: Force vertical stacking */
+    .search-filter-row,
+    .search-filter-row > div,
+    .actions-row,
+    .panel-header {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 12px !important;
+    }
+    
+    /* Ensure child wrapper divs in search/filters wrap as columns */
+    .search-filter-row > div {
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+    }
+
+    /* Make all inputs/selects inside search rows fill the screen width */
+    .search-filter-row select, 
+    .search-filter-row input,
+    .search-filter-row .form-control,
+    #comm-seller-filter,
+    #comm-month-filter {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    /* 5. Dropi Mass Assignment Header: Prevent horizontal stretching */
+    #tc-pending-import-area .panel-header > div,
+    .panel-header > div {
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
+    #tc-pending-import-area .panel-header select,
+    #tc-pending-import-area .panel-header button,
+    #tc-batch-seller-select,
+    #tc-batch-assign-seller-btn {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 44px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    /* Optimize chat window dimensions on very narrow mobile screens */
+    .chat-window {
+        width: calc(100vw - 30px) !important;
+        height: 380px !important;
+        right: -5px !important;
+    }
+}
