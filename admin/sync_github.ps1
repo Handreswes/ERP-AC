@@ -26,6 +26,7 @@ $files = Get-ChildItem -Path $baseDir -File -Recurse | Where-Object {
     $_.Name -ne ".env.example" -and
     $_.FullName -notmatch "\\\.git\\" -and
     $_.FullName -notmatch "\\scratch\\" -and
+    $_.FullName -notmatch "\\node_modules\\" -and
     $_.FullName -notmatch "\\BACKUP"
 }
 
