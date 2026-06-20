@@ -1845,6 +1845,8 @@ textarea:focus {
     /* Table to Cards Transformation */
     .data-table, .data-table thead, .data-table tbody, .data-table th, .data-table td, .data-table tr {
         display: block !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .data-table thead {
@@ -1859,6 +1861,8 @@ textarea:focus {
         border-radius: 12px !important;
         background: rgba(255,255,255,0.02) !important;
         padding: 0.5rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .data-table td {
@@ -1870,6 +1874,8 @@ textarea:focus {
         display: flex !important;
         align-items: center !important;
         justify-content: flex-end !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .data-table td:before {
