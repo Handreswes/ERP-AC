@@ -390,8 +390,8 @@ window.TuCompras = {
 
             return `
                 <tr class="${s.status === 'proceso_devolucion' ? 'highlight-return' : ''}">
-                    <td>${new Date(s.date).toLocaleDateString()}</td>
-                    <td>
+                    <td data-label="Fecha">${new Date(s.date).toLocaleDateString()}</td>
+                    <td data-label="Cliente">
                         <div style="font-size: 0.85rem;">
                             <strong>${customer}</strong><br>
                             <span class="text-secondary">
@@ -402,17 +402,17 @@ window.TuCompras = {
                             </span>
                         </div>
                     </td>
-                    <td style="font-size: 0.8rem;">${productNames}</td>
-                    <td>${seller}</td>
-                    <td>$${parseFloat(totalSaleValue).toLocaleString()}</td>
-                    <td class="text-orange">$${parseFloat(totalCommValue).toLocaleString()}</td>
-                    <td class="${utility >= 0 ? 'text-success' : 'text-danger'}"><strong>$${utility.toLocaleString()}</strong></td>
-                    <td>
+                    <td data-label="Productos" style="font-size: 0.8rem;">${productNames}</td>
+                    <td data-label="Vendedor">${seller}</td>
+                    <td data-label="Precio Venta">$${parseFloat(totalSaleValue).toLocaleString()}</td>
+                    <td data-label="Comisión" class="text-orange">$${parseFloat(totalCommValue).toLocaleString()}</td>
+                    <td data-label="Utilidad" class="${utility >= 0 ? 'text-success' : 'text-danger'}"><strong>$${utility.toLocaleString()}</strong></td>
+                    <td data-label="Estado Pago">
                         <span class="badge ${s.money_confirmed ? 'bg-success' : 'bg-secondary'}">
                             ${s.money_confirmed ? 'PAGADA' : 'PENDIENTE'}
                         </span>
                     </td>
-                    <td>
+                    <td data-label="Acciones">
                         <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}">Actualizar</button>
                     </td>
                 </tr>
@@ -475,15 +475,15 @@ window.TuCompras = {
 
             return `
                 <tr>
-                    <td><input type="checkbox" class="tc-liq-checkbox" data-id="${s.id}" data-amount="${totalCostValue}" ${this.selectedLiquidations.has(s.id) ? 'checked' : ''}></td>
-                    <td>${new Date(s.date).toLocaleDateString()}</td>
-                    <td><span class="badge ${s.inventory_source === 'millenio' ? 'bg-blue' : 'bg-orange'}">${s.inventory_source}</span></td>
-                    <td style="font-size: 0.8rem;">
+                    <td data-label="Seleccionar"><input type="checkbox" class="tc-liq-checkbox" data-id="${s.id}" data-amount="${totalCostValue}" ${this.selectedLiquidations.has(s.id) ? 'checked' : ''}></td>
+                    <td data-label="Fecha">${new Date(s.date).toLocaleDateString()}</td>
+                    <td data-label="Bodega"><span class="badge ${s.inventory_source === 'millenio' ? 'bg-blue' : 'bg-orange'}">${s.inventory_source}</span></td>
+                    <td data-label="Productos / Cliente" style="font-size: 0.8rem;">
                         <strong>${productSummary}</strong><br>
                         <span class="text-secondary">Cli: ${s.customer_name || 'N/A'}</span>
                     </td>
-                    <td><strong>$${totalCostValue.toLocaleString()}</strong></td>
-                    <td>${s.tracking_number || '-'}</td>
+                    <td data-label="Valor a Pagar"><strong>$${totalCostValue.toLocaleString()}</strong></td>
+                    <td data-label="Guía">${s.tracking_number || '-'}</td>
                 </tr>
             `;
         }).join('');
@@ -1334,12 +1334,12 @@ window.TuCompras = {
                     <tbody id="tc-expenses-list-body">
                         ${expenses.map(e => `
                             <tr>
-                                <td>${new Date(e.date || e.createdAt).toLocaleDateString()}</td>
-                                <td><span class="badge" style="background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); font-size: 0.75rem;">${e.category || 'General'}</span></td>
-                                <td><strong>${e.concept}</strong></td>
-                                <td class="text-right text-danger"><strong>$${parseFloat(e.amount).toLocaleString()}</strong></td>
-                                <td style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis;">${e.notes || '-'}</td>
-                                <td class="table-actions">
+                                <td data-label="Fecha">${new Date(e.date || e.createdAt).toLocaleDateString()}</td>
+                                <td data-label="Categoría"><span class="badge" style="background: rgba(245,158,11,0.15); color: var(--warning); border: 1px solid rgba(245,158,11,0.3); font-size: 0.75rem;">${e.category || 'General'}</span></td>
+                                <td data-label="Concepto"><strong>${e.concept}</strong></td>
+                                <td data-label="Monto" class="text-right text-danger"><strong>$${parseFloat(e.amount).toLocaleString()}</strong></td>
+                                <td data-label="Notas" style="font-size: 0.8rem; color: var(--text-secondary); max-width: 250px; overflow: hidden; text-overflow: ellipsis;">${e.notes || '-'}</td>
+                                <td data-label="Acciones" class="table-actions">
                                     <button class="icon-btn tc-delete-expense-btn" data-id="${e.id}" style="color:var(--danger);" title="Eliminar Gasto">
                                         <i class="fas fa-trash"></i>
                                     </button>
