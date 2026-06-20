@@ -243,7 +243,7 @@ window.updateLogisticsBadge = async function() {
         const pendingPOS = sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending').length;
 
         // 2. Web orders pending confirmation
-        const { data: webOrders, error } = await window.supabaseClient
+        const { data: webOrders, error } = await (window.supabaseAdminClient || window.supabaseClient)
             .from('orders')
             .select('id')
             .eq('status', 'Pendiente por Confirmar');
