@@ -437,7 +437,7 @@ function handleRouting() {
         showView('privacy');
     } else if (view === 'refunds') {
         showView('refunds');
-    } else if (view === 'success') {
+    } else if (view === 'success' || urlParams.get('status') === 'success') {
         showView('success');
     } else {
         showView('home');
@@ -1110,7 +1110,21 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         document.getElementById('guest-register-prompt').style.display = currentUser ? 'none' : 'block';
         window.lastOrderData = orderData; 
         
+        // Update browser URL in address bar to match Page URL conversion tracking without reloading the page
+        if (typeof history !== 'undefined' && history.pushState) {
+            history.pushState(null, '', 'index.html?status=success');
+        }
+
         showView('success');
+
+        // Trigger manual page_view event to Google Tag to ensure Google Tag Assistant registers the success URL change
+        if (typeof gtag === 'function') {
+            gtag('event', 'page_view', {
+                page_title: 'Compra Exitosa',
+                page_location: window.location.href,
+                page_path: window.location.pathname + window.location.search
+            });
+        }
 
         if (window.fbq) fbq('track', 'Purchase', { value: orderData.total, currency: 'COP', content_ids: orderData.items.map(i => i.product_id), content_type: 'product' });
         if (window.ttq) ttq.track('CompletePayment', { value: orderData.total, currency: 'COP', content_id: orderData.items.map(i => i.product_id) });
