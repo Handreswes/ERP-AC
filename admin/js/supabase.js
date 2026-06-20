@@ -7,7 +7,17 @@ window.initSupabase = () => {
 
     if (window.supabase && typeof window.supabase.createClient === 'function') {
         window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        console.log('Supabase: Client initialized successfully');
+        
+        // Admin client that ignores active auth session to always bypass RLS in ERP operations
+        window.supabaseAdminClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+            }
+        });
+        
+        console.log('Supabase: Clients initialized successfully');
         return window.supabaseClient;
     } else {
         console.error('Supabase: Global library not found');
