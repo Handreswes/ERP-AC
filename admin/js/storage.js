@@ -51,7 +51,7 @@ window.Storage = {
     async init() {
         console.log('--- STORAGE: INITIALIZING (V105) ---');
         const keys = Object.values(STORAGE_KEYS);
-        const supabase = window.supabaseClient;
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
 
         // Reset connection status
         this.updateStatus(!!supabase);
@@ -114,7 +114,7 @@ window.Storage = {
     },
 
     async migrateLocalToCloud() {
-        const supabase = window.supabaseClient;
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
         if (!supabase) return;
 
         window.ERP_LOG('Verificando datos para migración a la nube...');
@@ -179,7 +179,7 @@ window.Storage = {
      */
     async addItem(key, item) {
         const table = TABLE_MAP[key];
-        const supabase = window.supabaseClient;
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
 
         const newItem = {
             ...item,
@@ -235,7 +235,7 @@ window.Storage = {
      */
     async updateItem(key, id, updatedData) {
         const table = TABLE_MAP[key];
-        const supabase = window.supabaseClient;
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
         const items = this.get(key);
         const index = items.findIndex(item => item.id === id);
 
@@ -287,7 +287,7 @@ window.Storage = {
      */
     async deleteItem(key, id) {
         const table = TABLE_MAP[key];
-        const supabase = window.supabaseClient;
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
         const items = this.get(key);
         
         // Cloud Sync Await
