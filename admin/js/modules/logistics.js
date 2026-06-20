@@ -105,7 +105,7 @@ window.Logistics = {
             });
 
             // 2. Fetch Website Orders from Supabase
-            const { data: webOrders, error } = await window.supabaseClient
+            const { data: webOrders, error } = await (window.supabaseAdminClient || window.supabaseClient)
                 .from('orders')
                 .select('*')
                 .eq('status', 'Pendiente por Confirmar');
@@ -217,7 +217,7 @@ window.Logistics = {
 
                 try {
                     // 1. Update order status to 'Cancelado' in Supabase
-                    const { error } = await window.supabaseClient
+                    const { error } = await (window.supabaseAdminClient || window.supabaseClient)
                         .from('orders')
                         .update({ status: 'Cancelado' })
                         .eq('id', saleId);
@@ -347,7 +347,7 @@ window.Logistics = {
                             }
 
                             // 3. Update Web Order in Supabase
-                            const { error } = await window.supabaseClient
+                            const { error } = await (window.supabaseAdminClient || window.supabaseClient)
                                 .from('orders')
                                 .update({
                                     status: 'Despachado',
