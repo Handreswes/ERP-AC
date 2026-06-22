@@ -276,16 +276,21 @@ window.PDFManager = {
 
         // Clonamos el elemento para evitar alterar la vista del modal en pantalla
         const clone = originalElement.cloneNode(true);
+        clone.id = 'pdf-clone-temp'; // ID temporal para localizarlo en el onclone
         
-        // Estilizamos el clon para que se expanda totalmente fuera de la pantalla visible
-        clone.style.position = 'absolute';
-        clone.style.left = '-9999px';
+        // Estilizamos el clon para que esté en el viewport pero detrás de todo y casi transparente
+        clone.style.position = 'fixed';
+        clone.style.left = '0';
         clone.style.top = '0';
         clone.style.width = '800px'; // Mantenemos el ancho estándar para consistencia del PDF
         clone.style.height = 'auto';
         clone.style.maxHeight = 'none';
         clone.style.overflow = 'visible';
         clone.style.background = 'white';
+        clone.style.color = '#1e293b';
+        clone.style.colorScheme = 'light';
+        clone.style.zIndex = '-9999';
+        clone.style.opacity = '0.01';
         
         document.body.appendChild(clone);
 
@@ -298,7 +303,30 @@ window.PDFManager = {
                 useCORS: true, 
                 letterRendering: true, 
                 logging: false,
-                scrollY: 0
+                scrollY: 0,
+                onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById('pdf-clone-temp');
+                    if (clonedElement) {
+                        // En el documento de renderizado de html2canvas, lo hacemos totalmente visible y en flujo normal
+                        clonedElement.style.position = 'relative';
+                        clonedElement.style.left = '0';
+                        clonedElement.style.top = '0';
+                        clonedElement.style.zIndex = '9999';
+                        clonedElement.style.opacity = '1';
+                        clonedElement.style.background = 'white';
+                        clonedElement.style.color = '#1e293b';
+                        clonedElement.style.colorScheme = 'light';
+                        
+                        // Aseguramos que los textos hereden el color oscuro si no tienen color explícito
+                        const allTexts = clonedElement.querySelectorAll('*');
+                        allTexts.forEach(el => {
+                            const styleAttr = el.getAttribute('style') || '';
+                            if (!styleAttr.includes('color:')) {
+                                el.style.color = '#1e293b';
+                            }
+                        });
+                    }
+                }
             },
             jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
         };
