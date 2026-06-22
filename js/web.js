@@ -422,8 +422,8 @@ function handleRouting() {
     const [view, params] = hash.substring(1).split('?');
     const urlParams = new URLSearchParams(params || window.location.search);
 
-    if (view === 'product' || urlParams.has('p')) {
-        const id = urlParams.get('id') || urlParams.get('p');
+    if (view === 'product' || urlParams.has('p') || urlParams.has('id')) {
+        const id = urlParams.get('p') || urlParams.get('id');
         showView('product', id);
     } else if (view === 'checkout') {
         if (!isQuickBuyTriggered) {
