@@ -793,8 +793,39 @@ async function renderCategories() {
 // Purchase Functions
 window.quickBuy = (id) => { 
     checkoutSource = 'landing'; 
-    checkoutItem = products.find(p => p.id === id); 
+    const item = products.find(p => p.id === id);
+    checkoutItem = item; 
     isQuickBuyTriggered = true;
+    
+    // TRACKING: Fire AddToCart and BeginCheckout events on Comprar Ahora click
+    if (item) {
+        const priceNum = parseFloat(item.priceFinal) || parseFloat(item.priceInternet) || 0;
+        
+        // Facebook Pixel AddToCart
+        if (window.fbq) {
+            fbq('track', 'AddToCart', { content_ids: [id], content_type: 'product', content_name: item.name, value: priceNum, currency: 'COP' });
+        }
+        
+        // TikTok Pixel AddToCart
+        if (window.ttq) {
+            ttq.track('AddToCart', { content_id: id, content_name: item.name, value: priceNum, currency: 'COP' });
+        }
+        
+        // Google Analytics add_to_cart & begin_checkout
+        if (typeof gtag === 'function') {
+            gtag('event', 'add_to_cart', { 
+                currency: 'COP', 
+                value: priceNum, 
+                items: [{ item_id: id, item_name: item.name, price: priceNum, quantity: 1 }] 
+            });
+            gtag('event', 'begin_checkout', { 
+                currency: 'COP', 
+                value: priceNum, 
+                items: [{ item_id: id, item_name: item.name, price: priceNum, quantity: 1 }] 
+            });
+        }
+    }
+    
     window.location.hash = 'checkout'; 
 };
 window.addToCart = (id) => {
