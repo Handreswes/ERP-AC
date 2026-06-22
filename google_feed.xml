@@ -164,18 +164,6 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>e71be1e1-92c6-4f56-87f7-d8d13a2a581f</g:id>
-      <title>CHAZOS, FULMINATES </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=e71be1e1-92c6-4f56-87f7-d8d13a2a581f</link>
-      <g:image_link>https://tucomprascol.com/images/products/e71be1e1-92c6-4f56-87f7-d8d13a2a581f.jpg</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in_stock</g:availability>
-      <g:price>99000.00 COP</g:price>
-      <g:brand>BRITO</g:brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
       <g:id>b33e7a1d-fa86-47be-96cb-60108e0c6e88</g:id>
       <title>ROTOMARTILLO INALAMBRICO</title>
       <description>El Rotomartillo Inalámbrico de 98V ofrece la potencia y la libertad de movimiento necesarias para realizar perforaciones precisas en concreto, metal o madera. Su diseño sin cables optimiza el tiempo de trabajo, permitiendo ejecutar tanto obras exigentes como remodelaciones en el hogar con total comodidad y rendimiento profesional.
@@ -201,6 +189,18 @@
       <g:availability>in_stock</g:availability>
       <g:price>89000.00 COP</g:price>
       <g:brand>TuCompras</g:brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>e71be1e1-92c6-4f56-87f7-d8d13a2a581f</g:id>
+      <title>CHAZOS, FULMINATES </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=e71be1e1-92c6-4f56-87f7-d8d13a2a581f</link>
+      <g:image_link>https://tucomprascol.com/images/products/e71be1e1-92c6-4f56-87f7-d8d13a2a581f.jpg</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>99000.00 COP</g:price>
+      <g:brand>BRITO</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -358,20 +358,6 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>182d1019-bb4d-4d26-8064-f4d5c23b2cc9</g:id>
-      <title>Sierra Sable </title>
-      <description>Realice cortes precisos, limpios y rápidos en madera, metal e incluso hueso con total libertad de movimiento. Esta sierra sable inalámbrica optimiza sus jornadas de trabajo gracias a su potencia constante y un rendimiento superior libre de cables.
-
-*</description>
-      <link>https://tucomprascol.com/?p=182d1019-bb4d-4d26-8064-f4d5c23b2cc9</link>
-      <g:image_link>https://tucomprascol.com/images/products/182d1019-bb4d-4d26-8064-f4d5c23b2cc9.jpg</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in_stock</g:availability>
-      <g:price>289000.00 COP</g:price>
-      <g:brand>TuCompras</g:brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
       <g:id>c5c274c5-9686-48b5-9313-32aa2059805b</g:id>
       <title>ARMASX3</title>
       <description>95cm *44cm</description>
@@ -416,6 +402,20 @@
       <g:condition>new</g:condition>
       <g:availability>in_stock</g:availability>
       <g:price>299000.00 COP</g:price>
+      <g:brand>TuCompras</g:brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
+      <g:id>182d1019-bb4d-4d26-8064-f4d5c23b2cc9</g:id>
+      <title>Sierra Sable </title>
+      <description>Realice cortes precisos, limpios y rápidos en madera, metal e incluso hueso con total libertad de movimiento. Esta sierra sable inalámbrica optimiza sus jornadas de trabajo gracias a su potencia constante y un rendimiento superior libre de cables.
+
+*</description>
+      <link>https://tucomprascol.com/?p=182d1019-bb4d-4d26-8064-f4d5c23b2cc9</link>
+      <g:image_link>https://tucomprascol.com/images/products/182d1019-bb4d-4d26-8064-f4d5c23b2cc9.jpg</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>289000.00 COP</g:price>
       <g:brand>TuCompras</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
@@ -906,18 +906,15 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>ec4fc931-0abf-4097-9de5-9e971b57770d</g:id>
-      <title>Caladora Guia laser</title>
-      <description>Realice cortes exactos y limpios en sus proyectos con la precisión milimétrica que ofrece la guía láser integrada. Esta caladora combina la potencia necesaria para trabajar diversos materiales con un control absoluto en cada trazo, garantizando acabados de taller profesional en su propio espacio.
-
-* Motor de alto rendimiento de 980W con velocidad de hasta 3000 RPM, que asegura cortes rápidos y fluidos incluso en jornadas de trabajo exigentes.
-*</description>
-      <link>https://tucomprascol.com/?p=ec4fc931-0abf-4097-9de5-9e971b57770d</link>
-      <g:image_link>https://tucomprascol.com/images/products/ec4fc931-0abf-4097-9de5-9e971b57770d.jpg</g:image_link>
+      <g:id>14106cf7-9dae-4673-b425-f0a55d3b9b36</g:id>
+      <title>SOLDADOR  3 FUNCIONES </title>
+      <description>Realice trabajos de soldadura con precisión profesional y máxima versatilidad gracias a un equipo de ingeniería avanzada que asegura acabados impecables en diversos materiales.</description>
+      <link>https://tucomprascol.com/?p=14106cf7-9dae-4673-b425-f0a55d3b9b36</link>
+      <g:image_link>https://tucomprascol.com/images/products/14106cf7-9dae-4673-b425-f0a55d3b9b36.jpg</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in_stock</g:availability>
-      <g:price>189000.00 COP</g:price>
-      <g:brand>TuCompras</g:brand>
+      <g:price>650000.00 COP</g:price>
+      <g:brand>GORDO</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -978,18 +975,6 @@
       <g:availability>in_stock</g:availability>
       <g:price>320000.00 COP</g:price>
       <g:brand>TuCompras</g:brand>
-      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
-    </item>
-    <item>
-      <g:id>14106cf7-9dae-4673-b425-f0a55d3b9b36</g:id>
-      <title>SOLDADOR  3 FUNCIONES </title>
-      <description>Realice trabajos de soldadura con precisión profesional y máxima versatilidad gracias a un equipo de ingeniería avanzada que asegura acabados impecables en diversos materiales.</description>
-      <link>https://tucomprascol.com/?p=14106cf7-9dae-4673-b425-f0a55d3b9b36</link>
-      <g:image_link>https://tucomprascol.com/images/products/14106cf7-9dae-4673-b425-f0a55d3b9b36.jpg</g:image_link>
-      <g:condition>new</g:condition>
-      <g:availability>in_stock</g:availability>
-      <g:price>650000.00 COP</g:price>
-      <g:brand>GORDO</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
@@ -1097,6 +1082,18 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
+      <g:id>7452cb1b-5eae-4d5e-b89d-eb2d236c09ad</g:id>
+      <title>Guadaña Rigida </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=7452cb1b-5eae-4d5e-b89d-eb2d236c09ad</link>
+      <g:image_link>https://tucomprascol.com/images/products/7452cb1b-5eae-4d5e-b89d-eb2d236c09ad.jpg</g:image_link>
+      <g:condition>new</g:condition>
+      <g:availability>in_stock</g:availability>
+      <g:price>449000.00 COP</g:price>
+      <g:brand>TuCompras</g:brand>
+      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
+    </item>
+    <item>
       <g:id>7c3ed364-1a16-4aee-9d4b-b36032d7bc83</g:id>
       <title>Taladro Amarillo</title>
       <description>Realice sus proyectos de construcción y reparación con la potencia y precisión que exigen los trabajos de alta calidad. Este taladro percutor de 710W le permite perforar concreto, metal y madera con total facilidad, garantizando acabados limpios y un rendimiento constante en cada uso.
@@ -1165,14 +1162,17 @@
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
     <item>
-      <g:id>7452cb1b-5eae-4d5e-b89d-eb2d236c09ad</g:id>
-      <title>Guadaña Rigida </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=7452cb1b-5eae-4d5e-b89d-eb2d236c09ad</link>
-      <g:image_link>https://tucomprascol.com/images/products/7452cb1b-5eae-4d5e-b89d-eb2d236c09ad.jpg</g:image_link>
+      <g:id>ec4fc931-0abf-4097-9de5-9e971b57770d</g:id>
+      <title>Caladora Guia laser</title>
+      <description>Realice cortes exactos y limpios en sus proyectos con la precisión milimétrica que ofrece la guía láser integrada. Esta caladora combina la potencia necesaria para trabajar diversos materiales con un control absoluto en cada trazo, garantizando acabados de taller profesional en su propio espacio.
+
+* Motor de alto rendimiento de 980W con velocidad de hasta 3000 RPM, que asegura cortes rápidos y fluidos incluso en jornadas de trabajo exigentes.
+*</description>
+      <link>https://tucomprascol.com/?p=ec4fc931-0abf-4097-9de5-9e971b57770d</link>
+      <g:image_link>https://tucomprascol.com/images/products/ec4fc931-0abf-4097-9de5-9e971b57770d.jpg</g:image_link>
       <g:condition>new</g:condition>
       <g:availability>in_stock</g:availability>
-      <g:price>449000.00 COP</g:price>
+      <g:price>189000.00 COP</g:price>
       <g:brand>TuCompras</g:brand>
       <g:google_product_category>Hardware &gt; Tools</g:google_product_category>
     </item>
