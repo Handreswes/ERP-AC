@@ -17,8 +17,10 @@ $repo = $GITHUB_REPO
 $baseDir = $PSScriptRoot
 $remotePathPrefix = "admin"
 $headers = @{
-    Authorization = "token $token"
-    Accept        = "application/vnd.github.v3+json"
+    Authorization   = "token $token"
+    Accept          = "application/vnd.github.v3+json"
+    "Cache-Control" = "no-cache, no-store, must-revalidate"
+    "Pragma"        = "no-cache"
 }
 
 $files = Get-ChildItem -Path $baseDir -File -Recurse | Where-Object {
@@ -37,10 +39,12 @@ foreach ($file in $files) {
     
     $url = "https://api.github.com/repos/$owner/$repo/contents/$githubPath"
     
-    # 1. Get SHA if exists
+    # 1. Get SHA if exists (using cache-busting timestamp parameter)
     $sha = $null
     try {
-        $existing = Invoke-RestMethod -Uri $url -Headers $headers -Method Get -ErrorAction Stop
+        $ts = (Get-Date).Ticks
+        $urlGet = "${url}?t=${ts}"
+        $existing = Invoke-RestMethod -Uri $urlGet -Headers $headers -Method Get -ErrorAction Stop
         $sha = $existing.sha
     }
     catch {
