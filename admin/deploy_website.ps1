@@ -17,8 +17,10 @@ $sourceDir = "c:\Users\ANDRES\OneDrive\Desktop\PROYECTOS ANTIGRAVITY\ERP AC Webs
 $remotePathPrefix = "" # Empty for root directory
 
 $headers = @{
-    Authorization = "token $token"
-    Accept        = "application/vnd.github.v3+json"
+    Authorization   = "token $token"
+    Accept          = "application/vnd.github.v3+json"
+    "Cache-Control" = "no-cache, no-store, must-revalidate"
+    "Pragma"        = "no-cache"
 }
 # ==========================================
 # GENERATE GOOGLE MERCHANT PRODUCT FEED (XML)
@@ -182,10 +184,12 @@ foreach ($file in $files) {
     
     $url = "https://api.github.com/repos/$owner/$repo/contents/$githubPath"
     
-    # 1. Get SHA if exists to update
+    # 1. Get SHA if exists to update (using cache-busting timestamp parameter)
     $sha = $null
     try {
-        $existing = Invoke-RestMethod -Uri $url -Headers $headers -Method Get -ErrorAction Stop
+        $ts = (Get-Date).Ticks
+        $urlGet = "${url}?t=${ts}"
+        $existing = Invoke-RestMethod -Uri $urlGet -Headers $headers -Method Get -ErrorAction Stop
         $sha = $existing.sha
     }
     catch {}
