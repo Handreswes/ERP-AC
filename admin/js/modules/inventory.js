@@ -7,6 +7,27 @@ window.Inventory = {
     async init() {
         await this.renderPanel();
         this.setupEventListeners();
+
+        // Lazy Load: Sincronizar en segundo plano las tablas de inventario
+        const inventoryKeys = [
+            STORAGE_KEYS.STOCK_ENTRIES,
+            STORAGE_KEYS.TRANSIT_ORDERS,
+            STORAGE_KEYS.CONFIG // for categories/other settings
+        ];
+
+        inventoryKeys.forEach(key => {
+            Storage.syncTable(key).then(() => {
+                if (document.getElementById('inventory-panel')) {
+                    if (this.activeTab === 'stock' || this.activeTab === 'limbo') {
+                        this.updateInventoryList();
+                    } else if (this.activeTab === 'transit') {
+                        this.updateTransitList();
+                    } else if (this.activeTab === 'history') {
+                        this.updateHistoryList();
+                    }
+                }
+            }).catch(e => console.warn(`Error al sincronizar ${key} en segundo plano:`, e.message));
+        });
     },
 
 
