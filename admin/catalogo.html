@@ -692,24 +692,44 @@
         // Initialize App
         async function init() {
             try {
+                const basePath = window.location.pathname.includes('/admin/') ? '../' : './';
+
                 // Fetch Website Settings to get default WhatsApp retail number
-                const { data: settings, error: sErr } = await _supabase
-                    .from('website_settings')
-                    .select('whatsapp')
-                    .eq('id', 'default')
-                    .single();
-                if (!sErr && settings && settings.whatsapp) {
+                let settings;
+                try {
+                    const response = await fetch(basePath + 'settings.json');
+                    if (!response.ok) throw new Error('Network response not ok');
+                    settings = await response.json();
+                } catch (sErr) {
+                    console.warn("Could not load settings.json, falling back to Supabase:", sErr);
+                    const { data: dbSettings, error: dbSErr } = await _supabase
+                        .from('website_settings')
+                        .select('whatsapp')
+                        .eq('id', 'default')
+                        .single();
+                    if (!dbSErr) settings = dbSettings;
+                }
+
+                if (settings && settings.whatsapp) {
                     defaultRetailPhone = settings.whatsapp;
                 }
 
                 // Fetch Products
-                const { data: products, error: pErr } = await _supabase
-                    .from('products')
-                    .select('*')
-                    .eq('active', true)
-                    .order('name', { ascending: true });
-
-                if (pErr) throw pErr;
+                let products;
+                try {
+                    const response = await fetch(basePath + 'products.json');
+                    if (!response.ok) throw new Error('Network response not ok');
+                    products = await response.json();
+                } catch (pErr) {
+                    console.warn("Could not load products.json, falling back to Supabase:", pErr);
+                    const { data: dbProducts, error: dbPErr } = await _supabase
+                        .from('products')
+                        .select('*')
+                        .eq('active', true)
+                        .order('name', { ascending: true });
+                    if (dbPErr) throw dbPErr;
+                    products = dbProducts;
+                }
 
                 // Filter out ghost products (no price) and products without images
                 allProducts = products.filter(p => {
