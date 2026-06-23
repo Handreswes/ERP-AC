@@ -238,8 +238,18 @@ async function init() {
 
 async function loadWebsiteSettings() {
     try {
-        const { data, error } = await _supabase.from('website_settings').select('*').eq('id', 'default').single();
-        if (error || !data) return; // Fallback to hardcoded HTML if not found
+        console.log('Loading website settings from static settings.json...');
+        let data;
+        try {
+            const response = await fetch('./settings.json');
+            if (!response.ok) throw new Error('Network response was not ok');
+            data = await response.json();
+        } catch (jsonErr) {
+            console.warn('Could not load settings.json, falling back to Supabase:', jsonErr.message);
+            const { data: dbData, error } = await _supabase.from('website_settings').select('*').eq('id', 'default').single();
+            if (error || !dbData) return;
+            data = dbData;
+        }
 
         // 6. Pixels (Dynamic Injection - Executed first to ensure tracking works even if other DOM elements fail)
         if (data.google_analytics_id) {
@@ -445,19 +455,25 @@ function handleRouting() {
     updateBottomNav();
 }
 
-// Fetch Products from Supabase
+// Fetch Products from static JSON (Optimized to bypass Supabase Egress)
 async function fetchProducts() {
     try {
-        console.log('Fetching products from Supabase...');
-        const { data, error } = await _supabase
-            .from('products')
-            .select('*')
-            .eq('active', true)
-            .order('name', { ascending: true });
+        console.log('Fetching products from static products.json...');
+        let data;
+        try {
+            const response = await fetch('./products.json');
+            if (!response.ok) throw new Error('Network response was not ok');
+            data = await response.json();
+        } catch (jsonErr) {
+            console.error('Error fetching products from JSON, falling back to Supabase:', jsonErr.message);
+            const { data: dbData, error } = await _supabase
+                .from('products')
+                .select('*')
+                .eq('active', true)
+                .order('name', { ascending: true });
 
-        if (error) {
-            console.error('Supabase query error:', error);
-            throw error;
+            if (error) throw error;
+            data = dbData;
         }
         
         console.log('Raw products fetched:', data ? data.length : 0);
@@ -1108,6 +1124,35 @@ document.getElementById('checkout-form').onsubmit = async (e) => {
         acceptNotifications: document.getElementById('accept-notifications').checked,
         createdAt: new Date().toISOString()
     };
+
+    // Verify real-time stock for all items in the order
+    try {
+        const productIds = items.map(item => item.product_id);
+        const { data: dbProducts, error: stockError } = await _supabase
+            .from('products')
+            .select('id, name, stockMillenio, stockVulcano')
+            .in('id', productIds);
+
+        if (stockError) throw stockError;
+
+        for (const item of items) {
+            const dbProd = dbProducts.find(p => p.id === item.product_id);
+            if (!dbProd) {
+                alert(`El producto "${item.name}" ya no está disponible.`);
+                btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>';
+                return;
+            }
+            const currentStock = (parseInt(dbProd.stockMillenio) || 0) + (parseInt(dbProd.stockVulcano) || 0);
+            if (currentStock < item.qty) {
+                alert(`Lo sentimos, el producto "${item.name}" solo tiene ${currentStock} unidades disponibles en stock.`);
+                btn.disabled = false; btn.innerHTML = 'CONFIRMAR PEDIDO <i class="fas fa-check"></i>';
+                return;
+            }
+        }
+    } catch (err) {
+        console.error('Error verifying stock:', err.message);
+        // Continue checkout anyway as a fallback to avoid blocking sales if Supabase has a minor glitch
+    }
 
     try {
         const { error } = await _supabase.from('orders').insert([orderData]);
