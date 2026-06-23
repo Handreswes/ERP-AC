@@ -48,19 +48,19 @@ window.Storage = {
     /**
      * Initial Load: Fetches all data from Supabase into memory
      */
+    /**
+     * Initial Load: Loads local cache first (instant) and syncs critical tables in background
+     */
     async init() {
-        console.log('--- STORAGE: INITIALIZING (V105) ---');
+        console.log('--- STORAGE: INITIALIZING (V106) ---');
         const keys = Object.values(STORAGE_KEYS);
         const supabase = window.supabaseAdminClient || window.supabaseClient;
 
         // Reset connection status
         this.updateStatus(!!supabase);
 
-        // Parallelize loading and syncing for speed
-        const syncPromises = keys.map(async (key) => {
-            const table = TABLE_MAP[key];
-
-            // 1. Always load local first for speed
+        // 1. Immediately load local cache into memory (instant load)
+        for (const key of keys) {
             const storageKey = `erp_${key}`;
             const localData = localStorage.getItem(storageKey);
             this.cache[key] = [];
@@ -73,51 +73,116 @@ window.Storage = {
                     localStorage.removeItem(storageKey);
                 }
             }
-
-            // 2. Try to sync with cloud if available
-            if (table && supabase) {
-                try {
-                    const { data, error } = await supabase.from(table).select('*').limit(1000);
-                    if (!error && data) {
-                        // Only overwrite local if cloud has data
-                        if (data.length > 0) {
-                            this.cache[key] = data;
-                            try {
-                                localStorage.setItem(storageKey, JSON.stringify(data));
-                            } catch (e) {
-                                console.warn(`Could not persist ${key} to LocalStorage:`, e.message);
-                            }
-                            console.log(`Cloud Sync: ${table} (${data.length} items loaded)`);
-                        } else {
-                            console.log(`Cloud Table ${table} is empty. Preserving local data.`);
-                        }
-                        this.updateStatus(true);
-                    } else if (error) {
-                        console.warn(`Cloud Sync Error (${table}):`, error.message);
-                    }
-                } catch (err) {
-                    console.warn(`Sync failed for ${table}:`, err.message);
-                }
-            }
-        });
-
-        await Promise.all(syncPromises);
-
-        // 3. Auto-Migration check
-        if (supabase) {
-            this.migrateLocalToCloud();
         }
 
-        // Notify that sync is complete
+        // Notify that local cache is loaded and ERP UI can render immediately!
         window.dispatchEvent(new CustomEvent('erp_storage_ready'));
+
+        // 2. Sync critical tables in the background (asynchronous, does not block page load)
+        const criticalKeys = [
+            STORAGE_KEYS.PRODUCTS,
+            STORAGE_KEYS.SALES,
+            STORAGE_KEYS.CLIENTS,
+            STORAGE_KEYS.ACCOUNTS
+        ];
+
+        if (supabase) {
+            setTimeout(async () => {
+                for (const key of criticalKeys) {
+                    try {
+                        await this.syncTable(key);
+                    } catch (err) {
+                        console.warn(`Background delta sync failed for ${key}:`, err.message);
+                    }
+                }
+                // Check migration once in background
+                this.migrateLocalToCloud();
+            }, 500); // 500ms delay to prioritize UI load
+        }
+
         return true;
+    },
+
+    /**
+     * Delta Sync: Fetches only new/modified records from Supabase since the last local update
+     */
+    async syncTable(key) {
+        const table = TABLE_MAP[key];
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
+        if (!table || !supabase) return;
+
+        const storageKey = `erp_${key}`;
+        const localItems = this.cache[key] || [];
+
+        // Find the latest timestamp from local data
+        let latestTimestamp = null;
+        for (const item of localItems) {
+            const ts = item.updatedAt || item.createdAt || item.date;
+            if (ts) {
+                if (!latestTimestamp || new Date(ts) > new Date(latestTimestamp)) {
+                    latestTimestamp = ts;
+                }
+            }
+        }
+
+        try {
+            let query = supabase.from(table).select('*').limit(1000);
+
+            // If we have a local latest timestamp, perform a delta sync query
+            if (latestTimestamp) {
+                // Determine whether to filter by updatedAt or createdAt based on schema
+                const hasUpdatedAt = localItems.some(i => 'updatedAt' in i);
+                const filterCol = hasUpdatedAt ? 'updatedAt' : (localItems.some(i => 'createdAt' in i) ? 'createdAt' : 'date');
+                
+                // Fetch items modified/created strictly after our latest local timestamp
+                query = query.gt(filterCol, latestTimestamp);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+
+            if (data && data.length > 0) {
+                console.log(`Cloud Delta Sync: ${table} (Downloaded ${data.length} new/modified items)`);
+
+                // Merge data: replace existing items by ID, and insert new ones
+                const merged = [...localItems];
+                for (const newItem of data) {
+                    const idx = merged.findIndex(item => item.id === newItem.id);
+                    if (idx !== -1) {
+                        merged[idx] = newItem; // Update existing
+                    } else {
+                        merged.unshift(newItem); // Insert new
+                    }
+                }
+
+                // Update cache and localStorage
+                this.cache[key] = merged;
+                localStorage.setItem(storageKey, JSON.stringify(merged));
+
+                // Dispatch event indicating this specific table has updated
+                window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: data }));
+            } else {
+                console.log(`Cloud Delta Sync: ${table} (Already up to date)`);
+            }
+            this.updateStatus(true);
+        } catch (err) {
+            console.warn(`Delta sync failed for ${table}:`, err.message);
+            this.updateStatus(false);
+            throw err;
+        }
     },
 
     async migrateLocalToCloud() {
         const supabase = window.supabaseAdminClient || window.supabaseClient;
         if (!supabase) return;
 
+        // Check if migration already completed to avoid redundant checks
+        if (localStorage.getItem('erp_migration_completed') === 'true') {
+            return;
+        }
+
         window.ERP_LOG('Verificando datos para migración a la nube...');
+        let allCompleted = true;
 
         for (const [key, table] of Object.entries(TABLE_MAP)) {
             const localData = this.cache[key] || [];
@@ -138,12 +203,16 @@ window.Storage = {
                     if (insError) throw insError;
                     window.ERP_LOG(`Migración de ${table} exitosa`, 'success');
                 } else {
-                    // If cloud has data, we assume migration already happened or cloud is master
                     console.log(`Cloud table ${table} already has data, skipping bulk migration.`);
                 }
             } catch (err) {
                 console.warn(`Error migrando ${table}:`, err.message);
+                allCompleted = false;
             }
+        }
+
+        if (allCompleted) {
+            localStorage.setItem('erp_migration_completed', 'true');
         }
     },
 
