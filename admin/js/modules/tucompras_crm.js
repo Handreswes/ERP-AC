@@ -158,8 +158,21 @@ window.TuComprasCRM = {
     },
 
     async getCustomers() {
-        const { data, error } = await window.supabaseClient.from('tucompras_customers').select('*').order('created_at', { ascending: false });
-        return error ? [] : data;
+        // Sync in background to update local storage
+        Storage.syncTable(STORAGE_KEYS.TUCOMPRAS_CUSTOMERS).then(() => {
+            // Update UI if the panel is still open
+            if (document.getElementById('tucompras-crm-panel')) {
+                const refreshed = Storage.get(STORAGE_KEYS.TUCOMPRAS_CUSTOMERS).sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
+                this.customers = refreshed;
+                const list = document.getElementById('tc-crm-list');
+                if (list) list.innerHTML = this.renderListItems(refreshed);
+                const count = document.getElementById('tc-crm-total-count');
+                if (count) count.textContent = refreshed.length;
+            }
+        }).catch(err => console.warn('Could not sync tucompras_customers:', err));
+
+        // Return current cached customers immediately
+        return Storage.get(STORAGE_KEYS.TUCOMPRAS_CUSTOMERS).sort((a, b) => new Date(b.created_at || b.createdAt || 0) - new Date(a.created_at || a.createdAt || 0));
     },
 
     async addCustomer(customer) {
