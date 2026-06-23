@@ -3,6 +3,25 @@ window.Finances = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
+
+        // Lazy Load: Sincronizar en segundo plano las tablas de finanzas
+        const financeKeys = [
+            STORAGE_KEYS.EXPENSES,
+            STORAGE_KEYS.PAYMENTS,
+            STORAGE_KEYS.MOVEMENTS,
+            STORAGE_KEYS.RECURRING_EXPENSES
+        ];
+
+        financeKeys.forEach(key => {
+            Storage.syncTable(key).then(() => {
+                if (document.getElementById('finances-panel')) {
+                    this.updateBalancesUI();
+                    this.updateDebtUI();
+                    this.updateRecurringList();
+                    this.renderChart();
+                }
+            }).catch(e => console.warn(`Error al sincronizar ${key} en segundo plano:`, e.message));
+        });
     },
 
     renderPanel() {
