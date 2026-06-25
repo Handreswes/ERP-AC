@@ -8,6 +8,16 @@ window.Inventory = {
         await this.renderPanel();
         this.setupEventListeners();
 
+        // Listen for background sync updates to update inventory list
+        window.addEventListener('erp_table_updated_products', (e) => {
+            console.log('[Inventory] Products synced in background, refreshing list...');
+            if (document.getElementById('inventory-panel')) {
+                if (this.activeTab === 'stock' || this.activeTab === 'limbo') {
+                    this.updateInventoryList();
+                }
+            }
+        });
+
         // Lazy Load: Sincronizar en segundo plano las tablas de inventario
         const inventoryKeys = [
             STORAGE_KEYS.STOCK_ENTRIES,
