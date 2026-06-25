@@ -112,6 +112,12 @@ window.PDFManager = {
                 <p style="margin: 2px 0; font-size: 0.95rem;"><strong>Atendido por:</strong> ${sale.sellerName || 'Caja'}</p>
             </div>
 
+            ${sale.notes ? `
+            <div style="background: #fffbeb; padding: 12px 1.5rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b;">
+                <p style="margin: 0; font-size: 0.9rem; color: #78350f; text-align: left;"><strong>Observaciones:</strong> ${sale.notes}</p>
+            </div>
+            ` : ''}
+
             <table style="width: 100%; border-collapse: collapse; margin-bottom: 2rem;">
                 <thead>
                     <tr style="border-bottom: 2px solid #cbd5e1; text-align: left;">
