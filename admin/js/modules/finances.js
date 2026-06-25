@@ -323,12 +323,31 @@ window.Finances = {
 
         // 1. Sales (Cash + Transfers)
         sales.forEach(s => {
-            if (s.method === 'cash') {
-                if (s.totalM) balances.millenio.cash += s.totalM;
-                if (s.totalV) balances.vulcano.cash += s.totalV;
-            } else if (s.method === 'transfer') {
-                // Historically we didn't have accountId, so we might skip or put in 'other'
-                // For now, if no bank assigned, it's just recorded in history
+            if (s.paymentDetails) {
+                const pd = s.paymentDetails;
+                if (pd.cashM) balances.millenio.cash += parseFloat(pd.cashM);
+                if (pd.cashV) balances.vulcano.cash += parseFloat(pd.cashV);
+                
+                if (pd.transferM && pd.transferM > 0 && pd.accountIdM && balances.millenio.banks[pd.accountIdM]) {
+                    balances.millenio.banks[pd.accountIdM].balance += parseFloat(pd.transferM);
+                }
+                if (pd.transferV && pd.transferV > 0 && pd.accountIdV && balances.vulcano.banks[pd.accountIdV]) {
+                    balances.vulcano.banks[pd.accountIdV].balance += parseFloat(pd.transferV);
+                }
+            } else {
+                if (s.method === 'cash') {
+                    if (s.totalM) balances.millenio.cash += parseFloat(s.totalM || 0);
+                    if (s.totalV) balances.vulcano.cash += parseFloat(s.totalV || 0);
+                } else if (s.method === 'transfer') {
+                    if (s.accountId) {
+                        if (s.totalM && balances.millenio.banks[s.accountId]) {
+                            balances.millenio.banks[s.accountId].balance += parseFloat(s.totalM || 0);
+                        }
+                        if (s.totalV && balances.vulcano.banks[s.accountId]) {
+                            balances.vulcano.banks[s.accountId].balance += parseFloat(s.totalV || 0);
+                        }
+                    }
+                }
             }
         });
 
