@@ -7,6 +7,26 @@ window.Sales = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
+
+        // Listen for background sync updates to update product grid
+        window.addEventListener('erp_table_updated_products', (e) => {
+            console.log('[Sales] Products synced in background, re-rendering grid...');
+            const panel = document.getElementById('sales-panel');
+            if (panel && panel.classList.contains('active')) {
+                const searchEl = document.getElementById('pos-product-search');
+                this.renderProductGrid(searchEl ? searchEl.value : '');
+            }
+        });
+
+        // Also listen for clients updates to refresh client picker if open
+        window.addEventListener('erp_table_updated_clients', (e) => {
+            console.log('[Sales] Clients synced in background, refreshing picker...');
+            const pickerModal = document.getElementById('client-picker-modal');
+            if (pickerModal && pickerModal.classList.contains('show')) {
+                const searchEl = document.getElementById('client-search-input');
+                this.renderPickerList(searchEl ? searchEl.value : '');
+            }
+        });
     },
 
     renderPanel() {
@@ -64,7 +84,7 @@ window.Sales = {
                 <aside class="pos-sidebar">
                     <div class="cart-container" style="margin-bottom: 1.5rem;">
                         <div style="font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 0.5rem; letter-spacing: 0.5px; padding-left: 5px;">Carrito de Compras</div>
-                        <div id="cart-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 280px; overflow-y: auto; padding-right: 5px;">
+                        <div id="cart-list" style="display: flex; flex-direction: column; gap: 8px; max-height: 550px; overflow-y: auto; padding-right: 5px;">
                             <!-- Card items will be rendered here -->
                         </div>
                     </div>
@@ -650,6 +670,14 @@ window.Sales = {
                     else totalV += subtotal;
                 });
                 this.updateSplitPaymentTotals(totalM, totalV);
+            }
+        };
+
+        // 3. Centralized Event Delegation for Change Actions (Select Dropdowns)
+        container.onchange = (e) => {
+            // Show/Hide Bank Details
+            if (e.target.id === 'payment-method') {
+                this.updateBankAccountsSelect();
             }
         };
     },
