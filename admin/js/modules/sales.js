@@ -27,6 +27,87 @@ window.Sales = {
                 this.renderPickerList(searchEl ? searchEl.value : '');
             }
         });
+
+        // Also listen for sales updates to refresh consecutive number
+        window.addEventListener('erp_table_updated_sales', (e) => {
+            console.log('[Sales] Sales synced in background, updating consecutive number...');
+            Sales.updateRemissionInput();
+        });
+    },
+
+    calculateNextRemission() {
+        const sales = Storage.get(STORAGE_KEYS.SALES) || [];
+        let maxNum = 0;
+        const remPattern = /^REM-(\d+)/i;
+        
+        sales.forEach(s => {
+            if (s.remissionNumber) {
+                const match = s.remissionNumber.trim().match(remPattern);
+                if (match) {
+                    const num = parseInt(match[1], 10);
+                    if (num > maxNum) {
+                        maxNum = num;
+                    }
+                }
+            }
+        });
+        
+        const nextNum = maxNum + 1;
+        return `REM-${String(nextNum).padStart(4, '0')}`;
+    },
+
+    async updateRemissionInput() {
+        const remInput = document.getElementById('remision-number-input');
+        if (!remInput || remInput.dataset.userEdited === "true") return;
+
+        // 1. Calculate from local storage cache
+        let nextRem = this.calculateNextRemission();
+        remInput.value = nextRem;
+
+        // 2. Fetch from Cloud in background to double check (handles empty local cache/new devices)
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
+        if (supabase) {
+            try {
+                // Get the latest remission numbers from Supabase (sorted alphabetically descending)
+                const { data, error } = await supabase
+                    .from('sales')
+                    .select('remissionNumber')
+                    .not('remissionNumber', 'is', null)
+                    .order('remissionNumber', { ascending: false })
+                    .limit(20);
+
+                if (!error && data && data.length > 0) {
+                    let cloudMaxNum = 0;
+                    const remPattern = /^REM-(\d+)/i;
+                    
+                    data.forEach(s => {
+                        if (s.remissionNumber) {
+                            const match = s.remissionNumber.trim().match(remPattern);
+                            if (match) {
+                                const num = parseInt(match[1], 10);
+                                if (num > cloudMaxNum) {
+                                    cloudMaxNum = num;
+                                }
+                            }
+                        }
+                    });
+
+                    if (cloudMaxNum > 0) {
+                        const localMaxNum = parseInt(nextRem.replace('REM-', ''), 10) - 1;
+                        // Use the maximum between local cache and cloud
+                        const finalMaxNum = Math.max(localMaxNum, cloudMaxNum);
+                        const finalNextRem = `REM-${String(finalMaxNum + 1).padStart(4, '0')}`;
+                        
+                        // Double check the user hasn't typed in the meantime
+                        if (remInput && remInput.dataset.userEdited !== "true") {
+                            remInput.value = finalNextRem;
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn('[Sales] Failed to fetch latest remission number from cloud:', err.message);
+            }
+        }
     },
 
     renderPanel() {
@@ -140,7 +221,7 @@ window.Sales = {
                             </div>
                             <div id="remision-number-wrapper">
                                 <label style="font-size: 0.75rem;">N° Consecutivo</label>
-                                <input type="text" id="remision-number-input" class="form-control" style="padding: 6px; font-size: 0.9rem;">
+                                <input type="text" id="remision-number-input" class="form-control" style="padding: 6px; font-size: 0.9rem;" data-user-edited="false">
                             </div>
                         </div>
 
@@ -170,11 +251,8 @@ window.Sales = {
         this.renderProductGrid();
         this.updateCartUI();
 
-        // Auto-fill Remission Sequence
-        const salesCount = (Storage.get(STORAGE_KEYS.SALES) || []).length;
-        const nextRem = `REM-${String(salesCount + 1).padStart(4, '0')}`;
-        const remInput = document.getElementById('remision-number-input');
-        if(remInput) remInput.value = nextRem;
+        // Auto-fill Remission Sequence robustly
+        this.updateRemissionInput();
     },
 
     renderProductGrid(searchTerm = '') {
@@ -597,6 +675,12 @@ window.Sales = {
 
         // 2. Centralized Event Delegation for Input Actions (Search, Price)
         container.oninput = (e) => {
+            // Remission Number Manual Edit
+            if (e.target.id === 'remision-number-input') {
+                e.target.dataset.userEdited = "true";
+                return;
+            }
+
             // Product Search
             if (e.target.id === 'pos-product-search') {
                 this.renderProductGrid(e.target.value);
