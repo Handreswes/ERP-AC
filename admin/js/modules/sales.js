@@ -473,10 +473,11 @@ window.Sales = {
         // Centralized Event Delegation for Click Actions
         container.onclick = async (e) => {
             // 1. Company Switching — only re-render grid, don't rebuild whole panel
-            if (e.target.dataset.company !== undefined) {
-                this.activeCompany = e.target.dataset.company;
+            const targetCompany = e.target.dataset.company;
+            if (targetCompany !== undefined && ['all', 'millenio', 'vulcano'].includes(targetCompany)) {
+                this.activeCompany = targetCompany;
                 // Update active button styles
-                container.querySelectorAll('[data-company]').forEach(btn => {
+                container.querySelectorAll('.company-selector [data-company]').forEach(btn => {
                     btn.className = btn.dataset.company === this.activeCompany
                         ? 'btn btn-primary'
                         : 'btn btn-outline';
