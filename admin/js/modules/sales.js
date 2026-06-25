@@ -89,6 +89,7 @@ window.Sales = {
                                 <option value="cash">Efectivo</option>
                                 <option value="transfer">Consignación / Transferencia</option>
                                 <option value="credit">Crédito (Cuenta Corriente)</option>
+                                <option value="split">Pago Múltiple / Dividido</option>
                             </select>
                         </div>
 
@@ -103,6 +104,12 @@ window.Sales = {
                                 <option value="pickup">Entregado en Tienda</option>
                                 <option value="shipping">Para Despachar (Envío)</option>
                             </select>
+                        </div>
+
+                        <!-- Observations Box -->
+                        <div style="margin-top: 1rem; padding: 10px; background: rgba(245,158,11,0.05); border: 1px solid rgba(245,158,11,0.2); border-radius: 8px;">
+                            <label style="font-size: 0.75rem; font-weight: 600; display: block; margin-bottom: 5px; color: var(--text-secondary);">Observaciones de la Venta</label>
+                            <textarea id="pos-sale-notes" class="form-control" placeholder="Ej: Venta para Juan Pérez (Cliente Ocasional)" rows="2" style="font-size: 0.85rem; border-radius: 8px; resize: none; width: 100%; box-sizing: border-box; background: rgba(0,0,0,0.1); border: 1px solid var(--border); color: white;">${this.editingSale?.notes || ''}</textarea>
                         </div>
 
                         <!-- Remission Box -->
@@ -210,11 +217,24 @@ window.Sales = {
         list.innerHTML = this.cart.map((item, index) => {
             const subtotal = item.price * item.quantity;
             total += subtotal;
+            
+            const company = item.company || 'millenio';
+            const companyColor = company === 'vulcano' ? '#f59e0b' : (company === 'both' ? '#64748b' : '#3b82f6');
+            const companyLabel = company === 'vulcano' ? 'Vulcano' : (company === 'both' ? 'Mixto' : 'Millenio');
+
             return `
-                <div class="cart-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; position: relative;">
-                    <!-- Line 1: Name and Remove Button -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px; padding-right: 25px;">
-                        <span style="font-weight: 600; font-size: 0.85rem; word-break: break-word; color: var(--text-primary); text-align: left;" title="${item.name}">${item.name}</span>
+                <div class="cart-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-left: 4px solid ${companyColor}; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 8px; position: relative;">
+                    <!-- Line 1: Name, Number and Remove Button -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; padding-right: 25px;">
+                        <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap; text-align: left;">
+                            <span style="background: ${companyColor}; color: white; border-radius: 50%; width: 20px; height: 20px; display: inline-flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; flex-shrink: 0;" title="Item #${index + 1}">
+                                ${index + 1}
+                            </span>
+                            <span style="font-weight: 600; font-size: 0.85rem; word-break: break-word; color: var(--text-primary);" title="${item.name}">${item.name}</span>
+                            <span style="font-size: 0.65rem; font-weight: bold; padding: 2px 5px; border-radius: 4px; background: rgba(255, 255, 255, 0.08); border: 1px solid ${companyColor}; color: ${companyColor}; text-transform: uppercase;">
+                                ${companyLabel}
+                            </span>
+                        </div>
                         <button class="icon-btn text-danger remove-item" data-index="${index}" style="position: absolute; right: 10px; top: 10px; background: none; border: none; padding: 5px; cursor: pointer; font-size: 0.95rem; width: auto; height: auto;">
                             <i class="fas fa-times"></i>
                         </button>
@@ -255,7 +275,9 @@ window.Sales = {
     updateBankAccountsSelect() {
         const container = document.getElementById('payment-details-container');
         const pm = document.getElementById('payment-method');
-        if (container && pm && pm.value === 'transfer') {
+        if (!container || !pm) return;
+
+        if (pm.value === 'transfer') {
             const allAccounts = Storage.get(STORAGE_KEYS.ACCOUNTS) || [];
             const accounts = this.activeCompany === 'all'
                 ? allAccounts
@@ -272,8 +294,130 @@ window.Sales = {
             html += '</select>';
             container.innerHTML = html;
             container.style.display = 'block';
-        } else if (container) {
+        } else if (pm.value === 'split') {
+            let totalM = 0;
+            let totalV = 0;
+            this.cart.forEach(item => {
+                const subtotal = item.price * item.quantity;
+                let targetCompany = item.company || 'millenio';
+                if (targetCompany === 'both') {
+                    if (this.activeCompany !== 'all') {
+                        targetCompany = this.activeCompany;
+                    } else {
+                        targetCompany = (item.stockMillenio >= item.quantity) ? 'millenio' : 'vulcano';
+                    }
+                }
+                if (targetCompany === 'millenio') totalM += subtotal;
+                else totalV += subtotal;
+            });
+
+            const allAccounts = Storage.get(STORAGE_KEYS.ACCOUNTS) || [];
+            const accountsM = allAccounts.filter(a => a.company === 'millenio');
+            const accountsV = allAccounts.filter(a => a.company === 'vulcano');
+
+            const pd = this.editingSale?.paymentDetails;
+            const initCashM = pd ? parseFloat(pd.cashM) : totalM;
+            const initTransferM = pd ? parseFloat(pd.transferM) : 0;
+            const initAccountIdM = pd ? pd.accountIdM : (accountsM.length > 0 ? accountsM[0].id : '');
+            
+            const initCashV = pd ? parseFloat(pd.cashV) : totalV;
+            const initTransferV = pd ? parseFloat(pd.transferV) : 0;
+            const initAccountIdV = pd ? pd.accountIdV : (accountsV.length > 0 ? accountsV[0].id : '');
+
+            let html = '<div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 12px; border-radius: 12px; display:flex; flex-direction:column; gap:12px; margin-top: 1rem;">';
+            
+            if (totalM > 0) {
+                html += `
+                    <div style="border-bottom: ${totalV > 0 ? '1px dashed var(--border)' : 'none'}; padding-bottom: ${totalV > 0 ? '12px' : '0'};">
+                        <h4 style="margin:0 0 8px 0; color:#3b82f6; font-size:0.85rem; font-weight:700; text-transform:uppercase;">Pago Millenio (Total: $${totalM.toLocaleString('es-CO')})</h4>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                            <div class="form-group" style="margin:0">
+                                <label style="font-size:0.7rem; color:var(--text-secondary);">Efectivo</label>
+                                <input type="number" id="split-cash-m" class="form-control split-input" data-company="m" value="${initCashM}" min="0" style="padding:6px; font-size:0.85rem; background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border); border-radius:6px;">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label style="font-size:0.7rem; color:var(--text-secondary);">Consignación</label>
+                                <input type="number" id="split-transfer-m" class="form-control split-input" data-company="m" value="${initTransferM}" min="0" style="padding:6px; font-size:0.85rem; background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border); border-radius:6px;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:0 0 8px 0;" id="split-account-container-m">
+                            <label style="font-size:0.7rem; color:var(--text-secondary);">Cuenta Banco Millenio</label>
+                            <select id="split-account-m" class="form-control" style="padding:6px; font-size:0.85rem; background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border); border-radius:6px;">
+                                ${accountsM.map(a => `<option value="${a.id}" ${a.id === initAccountIdM ? 'selected' : ''}>${a.name}</option>`).join('')}
+                                ${accountsM.length === 0 ? '<option value="" disabled selected>No hay cuentas</option>' : ''}
+                            </select>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.15); padding:6px 10px; border-radius:6px; font-size:0.8rem;">
+                            <span style="color:var(--text-secondary);">Crédito (A Deber):</span>
+                            <strong id="split-credit-m-label" style="color:#ef4444; font-weight:700;">$0</strong>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (totalV > 0) {
+                html += `
+                    <div style="padding-top: ${totalM > 0 ? '4px' : '0'};">
+                        <h4 style="margin:0 0 8px 0; color:#f59e0b; font-size:0.85rem; font-weight:700; text-transform:uppercase;">Pago Vulcano (Total: $${totalV.toLocaleString('es-CO')})</h4>
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px; margin-bottom:8px;">
+                            <div class="form-group" style="margin:0">
+                                <label style="font-size:0.7rem; color:var(--text-secondary);">Efectivo</label>
+                                <input type="number" id="split-cash-v" class="form-control split-input" data-company="v" value="${initCashV}" min="0" style="padding:6px; font-size:0.85rem; background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border); border-radius:6px;">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label style="font-size:0.7rem; color:var(--text-secondary);">Consignación</label>
+                                <input type="number" id="split-transfer-v" class="form-control split-input" data-company="v" value="${initTransferV}" min="0" style="padding:6px; font-size:0.85rem; background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border); border-radius:6px;">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:0 0 8px 0;" id="split-account-container-v">
+                            <label style="font-size:0.7rem; color:var(--text-secondary);">Cuenta Banco Vulcano</label>
+                            <select id="split-account-v" class="form-control" style="padding:6px; font-size:0.85rem; background:rgba(0,0,0,0.2); color:white; border:1px solid var(--border); border-radius:6px;">
+                                ${accountsV.map(a => `<option value="${a.id}" ${a.id === initAccountIdV ? 'selected' : ''}>${a.name}</option>`).join('')}
+                                ${accountsV.length === 0 ? '<option value="" disabled selected>No hay cuentas</option>' : ''}
+                            </select>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.15); padding:6px 10px; border-radius:6px; font-size:0.8rem;">
+                            <span style="color:var(--text-secondary);">Crédito (A Deber):</span>
+                            <strong id="split-credit-v-label" style="color:#ef4444; font-weight:700;">$0</strong>
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+            container.style.display = 'block';
+
+            // Initial calculation
+            this.updateSplitPaymentTotals(totalM, totalV);
+        } else {
             container.style.display = 'none';
+        }
+    },
+
+    updateSplitPaymentTotals(totalM, totalV) {
+        const cashM = parseFloat(document.getElementById('split-cash-m')?.value) || 0;
+        const transferM = parseFloat(document.getElementById('split-transfer-m')?.value) || 0;
+        const creditM = Math.max(0, totalM - cashM - transferM);
+
+        const creditMLabel = document.getElementById('split-credit-m-label');
+        if (creditMLabel) creditMLabel.textContent = `$${creditM.toLocaleString('es-CO')}`;
+
+        const accountContainerM = document.getElementById('split-account-container-m');
+        if (accountContainerM) {
+            accountContainerM.style.display = transferM > 0 ? 'block' : 'none';
+        }
+
+        const cashV = parseFloat(document.getElementById('split-cash-v')?.value) || 0;
+        const transferV = parseFloat(document.getElementById('split-transfer-v')?.value) || 0;
+        const creditV = Math.max(0, totalV - cashV - transferV);
+
+        const creditVLabel = document.getElementById('split-credit-v-label');
+        if (creditVLabel) creditVLabel.textContent = `$${creditV.toLocaleString('es-CO')}`;
+
+        const accountContainerV = document.getElementById('split-account-container-v');
+        if (accountContainerV) {
+            accountContainerV.style.display = transferV > 0 ? 'block' : 'none';
         }
     },
 
@@ -487,6 +631,26 @@ window.Sales = {
             if (e.target.id === 'payment-method') {
                 this.updateBankAccountsSelect();
             }
+
+            // Split payment inputs change
+            if (e.target.classList.contains('split-input')) {
+                let totalM = 0;
+                let totalV = 0;
+                this.cart.forEach(item => {
+                    const subtotal = item.price * item.quantity;
+                    let targetCompany = item.company || 'millenio';
+                    if (targetCompany === 'both') {
+                        if (this.activeCompany !== 'all') {
+                            targetCompany = this.activeCompany;
+                        } else {
+                            targetCompany = (item.stockMillenio >= item.quantity) ? 'millenio' : 'vulcano';
+                        }
+                    }
+                    if (targetCompany === 'millenio') totalM += subtotal;
+                    else totalV += subtotal;
+                });
+                this.updateSplitPaymentTotals(totalM, totalV);
+            }
         };
     },
 
@@ -639,6 +803,37 @@ window.Sales = {
             const remissionNumberInput = document.getElementById('remision-number-input');
             const remNumber = remissionNumberInput?.value || `REM-${Date.now()}`;
             const generateRemision = document.getElementById('generate-remision-chk')?.checked;
+            const notes = document.getElementById('pos-sale-notes')?.value || '';
+
+            let paymentDetails = null;
+            let creditM = 0;
+            let creditV = 0;
+
+            if (method === 'split') {
+                const cashM = parseFloat(document.getElementById('split-cash-m')?.value) || 0;
+                const transferM = parseFloat(document.getElementById('split-transfer-m')?.value) || 0;
+                const accountIdM = document.getElementById('split-account-m')?.value || null;
+                creditM = Math.max(0, totalM - cashM - transferM);
+
+                const cashV = parseFloat(document.getElementById('split-cash-v')?.value) || 0;
+                const transferV = parseFloat(document.getElementById('split-transfer-v')?.value) || 0;
+                const accountIdV = document.getElementById('split-account-v')?.value || null;
+                creditV = Math.max(0, totalV - cashV - transferV);
+
+                paymentDetails = {
+                    cashM,
+                    transferM,
+                    accountIdM,
+                    creditM,
+                    cashV,
+                    transferV,
+                    accountIdV,
+                    creditV
+                };
+            } else {
+                creditM = method === 'credit' ? totalM : 0;
+                creditV = method === 'credit' ? totalV : 0;
+            }
             
             const sale = {
                 clientId: this.selectedClient.id,
@@ -656,6 +851,8 @@ window.Sales = {
                 totalV: totalV,
                 method: method,
                 accountId: accountId,
+                paymentDetails: paymentDetails,
+                notes: notes,
                 delivery_type: deliveryType,
                 delivery_status: deliveryType === 'shipping' ? 'pending' : 'completed',
                 company: totalM >= totalV ? 'millenio' : 'vulcano',
@@ -685,43 +882,33 @@ window.Sales = {
             if (this.editingSaleId && this.editingSale) {
                 const oldSale = this.editingSale;
                 
-                // Revertir deuda del cliente original si fue a crédito
-                if (oldSale.method === 'credit' && oldSale.clientId) {
+                // Revertir deuda del cliente original si tuvo porción a crédito
+                const oldCreditM = oldSale.paymentDetails ? parseFloat(oldSale.paymentDetails.creditM || 0) : (oldSale.method === 'credit' ? parseFloat(oldSale.totalM || 0) : 0);
+                const oldCreditV = oldSale.paymentDetails ? parseFloat(oldSale.paymentDetails.creditV || 0) : (oldSale.method === 'credit' ? parseFloat(oldSale.totalV || 0) : 0);
+
+                if ((oldCreditM > 0 || oldCreditV > 0) && oldSale.clientId) {
                     const oldClient = Storage.getById(STORAGE_KEYS.CLIENTS, oldSale.clientId);
                     if (oldClient) {
-                        const newBalM = Math.max(0, (oldClient.balanceMillenio || 0) - (oldSale.totalM || 0));
-                        const newBalV = Math.max(0, (oldClient.balanceVulcano || 0) - (oldSale.totalV || 0));
+                        const newBalM = Math.max(0, (oldClient.balanceMillenio || 0) - oldCreditM);
+                        const newBalV = Math.max(0, (oldClient.balanceVulcano || 0) - oldCreditV);
                         await Storage.updateItem(STORAGE_KEYS.CLIENTS, oldClient.id, {
                             balanceMillenio: newBalM,
                             balanceVulcano: newBalV
                         });
                     }
                 }
+            }
 
-                // Sumar deuda al cliente nuevo si el nuevo método es crédito
-                if (method === 'credit') {
-                    const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
-                    if (c) {
-                        const newBalM = (c.balanceMillenio || 0) + totalM;
-                        const newBalV = (c.balanceVulcano || 0) + totalV;
-                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
-                            balanceMillenio: newBalM,
-                            balanceVulcano: newBalV
-                        });
-                    }
-                }
-            } else {
-                // Venta Nueva
-                if (method === 'credit') {
-                    const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
-                    if (c) {
-                        c.balanceMillenio = (c.balanceMillenio || 0) + totalM;
-                        c.balanceVulcano = (c.balanceVulcano || 0) + totalV;
-                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
-                            balanceMillenio: c.balanceMillenio,
-                            balanceVulcano: c.balanceVulcano
-                        });
-                    }
+            // Sumar nueva deuda al cliente
+            if (creditM > 0 || creditV > 0) {
+                const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
+                if (c) {
+                    const newBalM = (c.balanceMillenio || 0) + creditM;
+                    const newBalV = (c.balanceVulcano || 0) + creditV;
+                    await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
+                        balanceMillenio: newBalM,
+                        balanceVulcano: newBalV
+                    });
                 }
             }
 
