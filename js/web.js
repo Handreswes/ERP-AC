@@ -266,7 +266,7 @@ async function loadWebsiteSettings() {
             }
         }
         if (data.tiktok_pixel_id && window.ttq) {
-            if (data.tiktok_pixel_id !== 'D8KO4LBC77U7JESGNN8G') {
+            if (data.tiktok_pixel_id !== 'CVFEO4JC77U7JQA7MOUH0') {
                 ttq.load(data.tiktok_pixel_id);
                 ttq.page();
             }
