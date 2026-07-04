@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     "cost" DECIMAL(12, 2) DEFAULT 0,
     "priceWholesale" DECIMAL(12, 2) DEFAULT 0,
     "priceFinal" DECIMAL(12, 2) DEFAULT 0,
+    "pricePrevious" DECIMAL(12, 2) DEFAULT 0,
     "commissionBase" DECIMAL(12, 2) DEFAULT 0,
     "stockMillenio" INTEGER DEFAULT 0,
     "stockVulcano" INTEGER DEFAULT 0,
