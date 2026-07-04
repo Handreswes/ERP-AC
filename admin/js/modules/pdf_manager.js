@@ -280,26 +280,6 @@ window.PDFManager = {
         const originalElement = document.getElementById('pdf-export-content');
         if (!originalElement) return;
 
-        // Clonamos el elemento para evitar alterar la vista del modal en pantalla
-        const clone = originalElement.cloneNode(true);
-        clone.id = 'pdf-clone-temp'; // ID temporal para localizarlo en el onclone
-        
-        // Estilizamos el clon para que esté en el viewport pero detrás de todo y casi transparente
-        clone.style.position = 'fixed';
-        clone.style.left = '0';
-        clone.style.top = '0';
-        clone.style.width = '800px'; // Mantenemos el ancho estándar para consistencia del PDF
-        clone.style.height = 'auto';
-        clone.style.maxHeight = 'none';
-        clone.style.overflow = 'visible';
-        clone.style.background = 'white';
-        clone.style.color = '#1e293b';
-        clone.style.colorScheme = 'light';
-        clone.style.zIndex = '-9999';
-        clone.style.opacity = '0.01';
-        
-        document.body.appendChild(clone);
-
         const opt = {
             margin:       10, // mm
             filename:     this.currentFilename || 'Documento_ERP.pdf',
@@ -310,15 +290,28 @@ window.PDFManager = {
                 letterRendering: true, 
                 logging: false,
                 scrollY: 0,
+                scrollX: 0,
+                backgroundColor: '#ffffff',
                 onclone: (clonedDoc) => {
-                    const clonedElement = clonedDoc.getElementById('pdf-clone-temp');
+                    // Force light theme and reset dark theme styles on cloned document elements
+                    const docEl = clonedDoc.documentElement;
+                    if (docEl) {
+                        docEl.style.colorScheme = 'light';
+                        docEl.style.background = 'white';
+                        docEl.style.color = '#1e293b';
+                    }
+                    
+                    const body = clonedDoc.body;
+                    if (body) {
+                        body.style.colorScheme = 'light';
+                        body.style.background = 'white';
+                        body.style.color = '#1e293b';
+                        body.classList.remove('dark-theme');
+                        body.className = ''; // Strip all body classes
+                    }
+
+                    const clonedElement = clonedDoc.getElementById('pdf-export-content');
                     if (clonedElement) {
-                        // En el documento de renderizado de html2canvas, lo hacemos totalmente visible y en flujo normal
-                        clonedElement.style.position = 'relative';
-                        clonedElement.style.left = '0';
-                        clonedElement.style.top = '0';
-                        clonedElement.style.zIndex = '9999';
-                        clonedElement.style.opacity = '1';
                         clonedElement.style.background = 'white';
                         clonedElement.style.color = '#1e293b';
                         clonedElement.style.colorScheme = 'light';
@@ -326,6 +319,7 @@ window.PDFManager = {
                         // Aseguramos que los textos hereden el color oscuro si no tienen color explícito
                         const allTexts = clonedElement.querySelectorAll('*');
                         allTexts.forEach(el => {
+                            el.style.colorScheme = 'light';
                             const styleAttr = el.getAttribute('style') || '';
                             if (!styleAttr.includes('color:')) {
                                 el.style.color = '#1e293b';
@@ -342,21 +336,13 @@ window.PDFManager = {
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando PDF...';
         btn.disabled = true;
 
-        html2pdf().set(opt).from(clone).save().then(() => {
-            // Removemos el clon del DOM tras guardar
-            if (clone.parentNode) {
-                document.body.removeChild(clone);
-            }
+        html2pdf().set(opt).from(originalElement).save().then(() => {
             setTimeout(() => {
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }, 1000);
         }).catch(err => {
             console.error("Error generating PDF:", err);
-            // Aseguramos limpiar el clon en caso de error
-            if (clone.parentNode) {
-                document.body.removeChild(clone);
-            }
             alert("Hubo un error al generar el PDF.");
             btn.innerHTML = originalText;
             btn.disabled = false;
