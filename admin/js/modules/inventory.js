@@ -246,6 +246,20 @@ window.Inventory = {
                                          oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
                                  </div>
                                  <div class="form-group">
+                                     <label>Precio Anterior (Tachado) ($)</label>
+                                     <input type="text" name="pricePrevious" placeholder="0" inputmode="numeric"
+                                         oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
+                                 </div>
+                                 <div class="form-group" style="grid-column: span 2; display: flex; align-items: flex-end; gap: 12px; background: rgba(37, 99, 235, 0.05); padding: 12px; border-radius: 12px; border: 1px dashed rgba(37, 99, 235, 0.2); margin-bottom: 8px;">
+                                     <div style="flex: 1;">
+                                         <label style="font-size:0.75rem; font-weight:700; color:var(--text-secondary); margin-bottom: 4px; display:block;">Calculadora de Descuento Rápido (%)</label>
+                                         <input type="number" id="quick-promo-pct" placeholder="Ej: 15" min="1" max="99" style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary);">
+                                     </div>
+                                     <button type="button" id="apply-quick-promo-btn" class="btn" style="background: #2563eb; color: white; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 0.85rem; height: 38px; border: none; cursor: pointer;">
+                                         <i class="fas fa-percent"></i> Aplicar
+                                     </button>
+                                 </div>
+                                 <div class="form-group">
                                      <label>Comisión Base (TUCOMPRAS) ($)</label>
                                      <input type="text" name="commissionBase" placeholder="0" inputmode="numeric"
                                          oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,'.')">
@@ -638,7 +652,10 @@ window.Inventory = {
                 <td data-label="Categoría">${p.category}</td>
                 <td data-label="Stock Millenio"><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
                  <td data-label="Stock Vulcano"><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
-                 <td data-label="Precio">$${(parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</td>
+                 <td data-label="Precio">
+                     <div>$${(parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</div>
+                     ${p.pricePrevious && parseFloat(p.pricePrevious) > (parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0) ? `<s style="color: var(--text-secondary); font-size: 0.72rem; display: block;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
+                 </td>
                  <td data-label="Estado">
                     <span class="status-badge ${p.active === false ? 'inactive' : 'active'}">
                         ${p.active === false ? 'Inactivo' : 'Activo'}
@@ -691,7 +708,13 @@ window.Inventory = {
                         const input = form.elements[key];
                         if (input) {
                             if (input.type === 'checkbox') input.checked = product[key] !== false;
-                            else if (input.type !== 'file') input.value = product[key] !== undefined ? product[key] : (input.type === 'number' ? 0 : '');
+                            else if (input.type !== 'file') {
+                                let val = product[key] !== undefined ? product[key] : (input.type === 'number' ? 0 : '');
+                                if (['cost', 'priceWholesale', 'priceFinal', 'pricePrevious', 'commissionBase'].includes(key) && val) {
+                                    val = String(val).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                }
+                                input.value = val;
+                            }
                         }
                     });
                     
@@ -804,6 +827,34 @@ window.Inventory = {
             // 3. Manual Save Button (Killer for blank screen)
             if (e.target.id === 'save-product-manual-btn') {
                 this.handleSaveProduct();
+                return;
+            }
+
+            if (e.target.id === 'apply-quick-promo-btn' || e.target.closest('#apply-quick-promo-btn')) {
+                const form = document.getElementById('product-form');
+                const priceFinalInput = form.querySelector('input[name="priceFinal"]');
+                const pricePreviousInput = form.querySelector('input[name="pricePrevious"]');
+                const pctInput = document.getElementById('quick-promo-pct');
+                
+                const finalValStr = priceFinalInput ? priceFinalInput.value : '';
+                const prevValStr = pricePreviousInput ? pricePreviousInput.value : '';
+                
+                // Use pricePrevious as base if filled, otherwise priceFinal
+                const basePriceVal = prevValStr || finalValStr;
+                const basePrice = parseFloat(String(basePriceVal).replace(/\./g, '')) || 0;
+                const pct = parseFloat(pctInput ? pctInput.value : '') || 0;
+                
+                if (basePrice > 0 && pct > 0 && pct < 100) {
+                    const discounted = Math.round(basePrice * (1 - pct/100));
+                    if (pricePreviousInput) {
+                        pricePreviousInput.value = String(basePrice).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    }
+                    if (priceFinalInput) {
+                        priceFinalInput.value = String(discounted).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                    }
+                } else {
+                    alert('Por favor ingrese un precio base y un porcentaje de descuento válido (entre 1% y 99%).');
+                }
                 return;
             }
 
@@ -1025,8 +1076,8 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
             const tempImg = new Image();
             tempImg.onload = () => {
                 // Resize rules for better resolution while balancing database size
-                const MAX_WIDTH = 1024;
-                const MAX_HEIGHT = 1024;
+                const MAX_WIDTH = 1200;
+                const MAX_HEIGHT = 1200;
                 let width = tempImg.width;
                 let height = tempImg.height;
 
@@ -1042,6 +1093,7 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                     }
                 }
 
+                // Final destination canvas
                 const canvas = document.createElement('canvas');
                 canvas.width = width;
                 canvas.height = height;
@@ -1050,10 +1102,46 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                 // Clear and draw image with white background in case of transparent PNGs
                 ctx.fillStyle = "#FFFFFF";
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(tempImg, 0, 0, width, height);
 
-                // Compress with higher quality
-                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.8);
+                // Multi-step downscaling for maximum anti-aliasing quality
+                let curWidth = tempImg.width;
+                let curHeight = tempImg.height;
+                
+                // Create a temporary canvas for step-down resampling
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.width = curWidth;
+                tempCanvas.height = curHeight;
+                tempCtx.drawImage(tempImg, 0, 0);
+
+                // Halve the size repeatedly until we are just above the target size
+                while (curWidth * 0.5 > width) {
+                    curWidth = Math.round(curWidth * 0.5);
+                    curHeight = Math.round(curHeight * 0.5);
+                    
+                    const nextCanvas = document.createElement('canvas');
+                    nextCanvas.width = curWidth;
+                    nextCanvas.height = curHeight;
+                    const nextCtx = nextCanvas.getContext('2d');
+                    
+                    nextCtx.imageSmoothingEnabled = true;
+                    nextCtx.imageSmoothingQuality = 'high';
+                    nextCtx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, curWidth, curHeight);
+                    
+                    // Update tempCanvas for the next step
+                    tempCanvas.width = curWidth;
+                    tempCanvas.height = curHeight;
+                    tempCtx.clearRect(0, 0, curWidth, curHeight);
+                    tempCtx.drawImage(nextCanvas, 0, 0);
+                }
+
+                // Draw the final step down to the main canvas
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+                ctx.drawImage(tempCanvas, 0, 0, tempCanvas.width, tempCanvas.height, 0, 0, width, height);
+
+                // Compress with higher quality (0.9 instead of 0.8 to remove jpeg artifacts)
+                const compressedBase64 = canvas.toDataURL('image/jpeg', 0.9);
 
                 const slot = document.querySelector(`.image-slot[data-index="${index}"]`);
                 if (slot) {
@@ -1124,6 +1212,7 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                 cost: cleanCurrency(formData.get('cost')),
                 priceWholesale: cleanCurrency(formData.get('priceWholesale')),
                 priceFinal: cleanCurrency(formData.get('priceFinal')),
+                pricePrevious: cleanCurrency(formData.get('pricePrevious')),
                 commissionBase: cleanCurrency(formData.get('commissionBase')),
                 stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
                 stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
