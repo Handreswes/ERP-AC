@@ -458,22 +458,82 @@ function handleRouting() {
 // Fetch Products from static JSON (Optimized to bypass Supabase Egress)
 async function fetchProducts() {
     try {
-        console.log('Fetching products from static products.json...');
-        let data;
+        console.log('Fetching products using hybrid delta sync...');
+        let data = [];
+        let localLoaded = false;
+
+        // 1. Try to load local products.json first (Very fast, 0 egress)
         try {
             const response = await fetch('./products.json');
-            if (!response.ok) throw new Error('Network response was not ok');
-            data = await response.json();
+            if (response.ok) {
+                data = await response.json();
+                localLoaded = true;
+                console.log(`Local Cache Loaded: ${data.length} products`);
+            }
         } catch (jsonErr) {
-            console.error('Error fetching products from JSON, falling back to Supabase:', jsonErr.message);
-            const { data: dbData, error } = await _supabase
-                .from('products')
-                .select('*')
-                .eq('active', true)
-                .order('name', { ascending: true });
+            console.warn("Could not load local products.json:", jsonErr);
+        }
 
-            if (error) throw error;
-            data = dbData;
+        // 2. Perform delta update from Supabase to keep it in real-time with minimum egress
+        try {
+            if (localLoaded) {
+                // Find latest timestamp in local products
+                let latestLocalTS = '2000-01-01T00:00:00.000Z';
+                data.forEach(p => {
+                    const ts = p.updatedAt || p.createdAt;
+                    if (ts && new Date(ts) > new Date(latestLocalTS)) {
+                        latestLocalTS = ts;
+                    }
+                });
+
+                // Get active IDs to handle deletions/deactivations (tiny query, ~10KB)
+                const { data: activeIds, error: idErr } = await _supabase
+                    .from('products')
+                    .select('id')
+                    .eq('active', true);
+                if (idErr) throw idErr;
+
+                const activeIdSet = new Set((activeIds || []).map(item => item.id));
+                data = data.filter(p => activeIdSet.has(p.id));
+
+                // Get only products updated after our latest local product (only downloads what changed)
+                const { data: updatedProducts, error: updateErr } = await _supabase
+                    .from('products')
+                    .select('*')
+                    .gt('updatedAt', latestLocalTS);
+                if (updateErr) throw updateErr;
+
+                if (updatedProducts && updatedProducts.length > 0) {
+                    console.log(`Supabase Real-time Sync: Loaded ${updatedProducts.length} updated products`);
+                    updatedProducts.forEach(newP => {
+                        const idx = data.findIndex(p => p.id === newP.id);
+                        if (idx !== -1) {
+                            if (newP.active === false) {
+                                data.splice(idx, 1);
+                            } else {
+                                data[idx] = newP;
+                            }
+                        } else if (newP.active !== false) {
+                            data.push(newP);
+                        }
+                    });
+                }
+            } else {
+                // Fallback: If local cache failed to load, download all from Supabase
+                console.log("Downloading all products from Supabase (fallback)...");
+                const { data: dbData, error: dbErr } = await _supabase
+                    .from('products')
+                    .select('*')
+                    .eq('active', true)
+                    .order('name', { ascending: true });
+                if (dbErr) throw dbErr;
+                data = dbData || [];
+            }
+        } catch (dbErr) {
+            console.warn("Supabase real-time sync failed, using static products.json cache:", dbErr);
+            if (data.length === 0) {
+                throw new Error("No products available.");
+            }
         }
         
         console.log('Raw products fetched:', data ? data.length : 0);
@@ -544,10 +604,16 @@ function renderProducts(items) {
         const card = document.createElement('div');
         card.className = 'glass product-card animate';
         const img = (Array.isArray(p.image) ? p.image[0] : (p.image || p.imageUrl)) || 'https://via.placeholder.com/300';
-        const price = (p.priceFinal || p.priceInternet || 0).toLocaleString();
+        
+        const finalPrice = p.priceFinal || p.priceInternet || 0;
+        const price = finalPrice.toLocaleString();
+        
+        const hasPromo = p.pricePrevious && parseFloat(p.pricePrevious) > parseFloat(finalPrice);
+        const discountPct = hasPromo ? Math.round(((parseFloat(p.pricePrevious) - parseFloat(finalPrice)) / parseFloat(p.pricePrevious)) * 100) : 0;
 
         card.innerHTML = `
-            <div class="product-img" onclick="window.location.hash = '#product?id=${p.id}'">
+            <div class="product-img" onclick="window.location.hash = '#product?id=${p.id}'" style="position: relative;">
+                ${discountPct > 0 ? `<span class="promo-badge" style="position: absolute; top: 12px; left: 12px; background: #ef4444; color: white; padding: 5px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); z-index: 5; text-transform: uppercase; letter-spacing: 0.5px; animation: pulse-promo 2s infinite;">-${discountPct}% DTO</span>` : ''}
                 <img src="${img}" alt="${p.name}">
                 <div class="product-overlay"><span>Ver Detalles</span></div>
             </div>
@@ -555,8 +621,9 @@ function renderProducts(items) {
                 <div class="product-details">
                     <h3>${p.name}</h3>
                     <p class="product-category">${p.category || 'General'}</p>
-                    <div class="product-price-container">
+                    <div class="product-price-container" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <span class="product-price">$${price}</span>
+                        ${hasPromo ? `<s class="price-previous" style="color: #94a3b8; font-size: 0.95rem; font-weight: 600; text-decoration: line-through;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
                     </div>
                 </div>
                 <div class="product-actions">
@@ -635,7 +702,10 @@ function renderProductLanding(id) {
 
     const images = Array.isArray(p.image) ? p.image : (p.image || p.imageUrl ? [p.image || p.imageUrl] : ['https://via.placeholder.com/600']);
     const mainImg = images[0];
-    const price = (p.priceFinal || p.priceInternet || 0).toLocaleString();
+    const finalPrice = p.priceFinal || p.priceInternet || 0;
+    const price = finalPrice.toLocaleString();
+    const hasPromo = p.pricePrevious && parseFloat(p.pricePrevious) > parseFloat(finalPrice);
+    const discountPct = hasPromo ? Math.round(((parseFloat(p.pricePrevious) - finalPrice) / parseFloat(p.pricePrevious)) * 100) : 0;
     
     let galleryHtml = '';
     if (images.length > 1) {
@@ -706,9 +776,13 @@ function renderProductLanding(id) {
                 </div>
                 
                 <div class="glass" style="padding: 2.5rem; border-radius: 25px; margin-bottom: 3rem; border: 2px solid var(--accent);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 10px;">
                         <span style="font-size: 1.1rem; color: var(--text-secondary);">Precio para Ti:</span>
-                        <span class="product-detail-price">$${price}</span>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <span class="product-detail-price">$${price}</span>
+                            ${hasPromo ? `<s class="price-previous" style="color: #94a3b8; font-size: 1.25rem; font-weight: 600; text-decoration: line-through;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
+                            ${discountPct > 0 ? `<span style="background: #ef4444; color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 800; animation: pulse-promo 2s infinite;">-${discountPct}% DTO</span>` : ''}
+                        </div>
                     </div>
                     
                     <div style="background: rgba(239, 68, 68, 0.1); color: #ef4444; padding: 10px; border-radius: 10px; text-align: center; font-size: 0.9rem; font-weight: 700; margin-bottom: 1.5rem;">
