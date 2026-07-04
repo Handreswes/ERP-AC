@@ -333,7 +333,8 @@ window.Storage = {
                 }
             }
 
-            const finalItem = { ...items[index], ...updatedData, updatedAt: new Date().toISOString() };
+            updatedData.updatedAt = new Date().toISOString();
+            const finalItem = { ...items[index], ...updatedData };
 
             // Cloud Sync Await
             if (table && supabase) {
