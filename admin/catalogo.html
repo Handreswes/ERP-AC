@@ -778,21 +778,83 @@
                     defaultRetailPhone = settings.whatsapp;
                 }
 
-                // Fetch Products
-                let products;
+                // Fetch Products - Optimized Hybrid Delta Sync
+                let products = [];
+                let localLoaded = false;
+
+                // 1. Try to load local products.json first (Very fast, 0 Supabase egress)
                 try {
                     const response = await fetch(basePath + 'products.json');
-                    if (!response.ok) throw new Error('Network response not ok');
-                    products = await response.json();
+                    if (response.ok) {
+                        products = await response.json();
+                        localLoaded = true;
+                        console.log(`Local Cache Loaded: ${products.length} products`);
+                    }
                 } catch (pErr) {
-                    console.warn("Could not load products.json, falling back to Supabase:", pErr);
-                    const { data: dbProducts, error: dbPErr } = await _supabase
-                        .from('products')
-                        .select('*')
-                        .eq('active', true)
-                        .order('name', { ascending: true });
-                    if (dbPErr) throw dbPErr;
-                    products = dbProducts;
+                    console.warn("Could not load local products.json:", pErr);
+                }
+
+                // 2. Perform delta update from Supabase to keep it in real-time with minimum egress
+                try {
+                    if (localLoaded) {
+                        // Find latest timestamp in local products
+                        let latestLocalTS = '2000-01-01T00:00:00.000Z';
+                        products.forEach(p => {
+                            const ts = p.updatedAt || p.createdAt;
+                            if (ts && new Date(ts) > new Date(latestLocalTS)) {
+                                latestLocalTS = ts;
+                            }
+                        });
+
+                        // Get active IDs to handle deletions/deactivations (tiny query, ~10KB)
+                        const { data: activeIds, error: idErr } = await _supabase
+                            .from('products')
+                            .select('id')
+                            .eq('active', true);
+                        if (idErr) throw idErr;
+
+                        const activeIdSet = new Set((activeIds || []).map(item => item.id));
+                        products = products.filter(p => activeIdSet.has(p.id));
+
+                        // Get only products updated after our latest local product (only downloads what changed)
+                        const { data: updatedProducts, error: updateErr } = await _supabase
+                            .from('products')
+                            .select('*')
+                            .gt('updatedAt', latestLocalTS);
+                        if (updateErr) throw updateErr;
+
+                        if (updatedProducts && updatedProducts.length > 0) {
+                            console.log(`Supabase Real-time Sync: Loaded ${updatedProducts.length} updated products`);
+                            updatedProducts.forEach(newP => {
+                                const idx = products.findIndex(p => p.id === newP.id);
+                                if (idx !== -1) {
+                                    if (newP.active === false) {
+                                        products.splice(idx, 1);
+                                    } else {
+                                        products[idx] = newP;
+                                    }
+                                } else if (newP.active !== false) {
+                                    products.push(newP);
+                                }
+                            });
+                        }
+                    } else {
+                        // Fallback: If local cache failed to load, download all from Supabase
+                        console.log("Downloading all products from Supabase (fallback)...");
+                        const { data: dbProducts, error: dbPErr } = await _supabase
+                            .from('products')
+                            .select('*')
+                            .eq('active', true)
+                            .order('name', { ascending: true });
+                        if (dbPErr) throw dbPErr;
+                        products = dbProducts || [];
+                    }
+                } catch (dbErr) {
+                    console.warn("Supabase real-time sync failed, using static products.json cache:", dbErr);
+                    // If Supabase fails but we have local products, we proceed with local products
+                    if (products.length === 0) {
+                        throw new Error("No products available.");
+                    }
                 }
 
                 // Filter out ghost products (no price) and products without images
