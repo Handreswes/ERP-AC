@@ -79,28 +79,37 @@ window.Storage = {
         window.dispatchEvent(new CustomEvent('erp_storage_ready'));
 
         // 2. Sync critical tables in the background (asynchronous, does not block page load)
-        const criticalKeys = [
-            STORAGE_KEYS.PRODUCTS,
-            STORAGE_KEYS.SALES,
-            STORAGE_KEYS.CLIENTS,
-            STORAGE_KEYS.ACCOUNTS
-        ];
-
         if (supabase) {
+            // Initial sync
             setTimeout(async () => {
-                for (const key of criticalKeys) {
-                    try {
-                        await this.syncTable(key);
-                    } catch (err) {
-                        console.warn(`Background delta sync failed for ${key}:`, err.message);
-                    }
-                }
+                await this.syncCriticalTables();
                 // Check migration once in background
                 this.migrateLocalToCloud();
             }, 500); // 500ms delay to prioritize UI load
+
+            // Periodic background sync every 30 seconds (Delta Sync)
+            setInterval(async () => {
+                await this.syncCriticalTables();
+            }, 30000);
         }
 
         return true;
+    },
+
+    async syncCriticalTables() {
+        const criticalKeys = [
+            window.STORAGE_KEYS.PRODUCTS,
+            window.STORAGE_KEYS.SALES,
+            window.STORAGE_KEYS.CLIENTS,
+            window.STORAGE_KEYS.ACCOUNTS
+        ];
+        for (const key of criticalKeys) {
+            try {
+                await this.syncTable(key);
+            } catch (err) {
+                console.warn(`Background delta sync failed for ${key}:`, err.message);
+            }
+        }
     },
 
     /**
