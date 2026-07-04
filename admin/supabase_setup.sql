@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS products (
     provider TEXT,
     cost DECIMAL DEFAULT 0,
     "priceFinal" DECIMAL DEFAULT 0,
+    "pricePrevious" DECIMAL DEFAULT 0,
     "priceWholesale" DECIMAL DEFAULT 0,
     "stockMillenio" INTEGER DEFAULT 0,
     "stockVulcano" INTEGER DEFAULT 0,
