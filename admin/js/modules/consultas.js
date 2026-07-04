@@ -7,6 +7,37 @@ window.Consultas = {
 
     init() {
         this.renderPanel();
+
+        // Listen for background sync updates to automatically refresh the historical list
+        window.addEventListener('erp_table_updated_sales', () => {
+            console.log('[Consultas] Sales synced in background, refreshing UI...');
+            if (document.getElementById('consultas-panel')) {
+                if (this.activeTab === 'local_sales') {
+                    const content = document.getElementById('consultas-content');
+                    if (content) this.renderActiveTabContent(content);
+                }
+            }
+        });
+
+        window.addEventListener('erp_table_updated_payments', () => {
+            console.log('[Consultas] Payments synced in background, refreshing UI...');
+            if (document.getElementById('consultas-panel')) {
+                if (this.activeTab === 'abonos_recibidos') {
+                    const content = document.getElementById('consultas-content');
+                    if (content) this.renderActiveTabContent(content);
+                }
+            }
+        });
+
+        window.addEventListener('erp_table_updated_tucompras_sales', () => {
+            console.log('[Consultas] External sales synced in background, refreshing UI...');
+            if (document.getElementById('consultas-panel')) {
+                if (['sales', 'millenio', 'vulcano', 'commissions'].includes(this.activeTab)) {
+                    const content = document.getElementById('consultas-content');
+                    if (content) this.renderActiveTabContent(content);
+                }
+            }
+        });
     },
 
     renderPanel() {
@@ -61,13 +92,36 @@ window.Consultas = {
     renderTab() {
         const content = document.getElementById('consultas-content');
         if (!content) return;
+
+        // 1. Render immediately from local cache (instant)
+        this.renderActiveTabContent(content);
+
+        // 2. Trigger background sync silently
+        const tabToKey = {
+            'millenio': window.STORAGE_KEYS.TUCOMPRAS_SALES,
+            'vulcano': window.STORAGE_KEYS.TUCOMPRAS_SALES,
+            'commissions': window.STORAGE_KEYS.TUCOMPRAS_SALES,
+            'sales': window.STORAGE_KEYS.TUCOMPRAS_SALES,
+            'local_sales': window.STORAGE_KEYS.SALES,
+            'abonos_recibidos': window.STORAGE_KEYS.PAYMENTS
+        };
+
+        const syncKey = tabToKey[this.activeTab];
+        if (syncKey && window.Storage && window.Storage.syncTable) {
+            window.Storage.syncTable(syncKey).catch(err => {
+                console.warn(`[Consultas] Tab background sync failed for ${syncKey}:`, err.message);
+            });
+        }
+    },
+
+    renderActiveTabContent(container) {
         switch (this.activeTab) {
-            case 'millenio': this.renderInventoryPayments(content, 'millenio'); break;
-            case 'vulcano': this.renderInventoryPayments(content, 'vulcano'); break;
-            case 'commissions': this.renderCommissionHistory(content); break;
-            case 'sales': this.renderSalesHistory(content); break;
-            case 'local_sales': this.renderLocalSalesHistory(content); break;
-            case 'abonos_recibidos': this.renderAbonosRecibidosHistory(content); break;
+            case 'millenio': this.renderInventoryPayments(container, 'millenio'); break;
+            case 'vulcano': this.renderInventoryPayments(container, 'vulcano'); break;
+            case 'commissions': this.renderCommissionHistory(container); break;
+            case 'sales': this.renderSalesHistory(container); break;
+            case 'local_sales': this.renderLocalSalesHistory(container); break;
+            case 'abonos_recibidos': this.renderAbonosRecibidosHistory(container); break;
         }
     },
 
