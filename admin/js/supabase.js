@@ -8,14 +8,8 @@ window.initSupabase = () => {
     if (window.supabase && typeof window.supabase.createClient === 'function') {
         window.supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
-        // Admin client that ignores active auth session to always bypass RLS in ERP operations
-        window.supabaseAdminClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-            auth: {
-                persistSession: false,
-                autoRefreshToken: false,
-                detectSessionInUrl: false
-            }
-        });
+        // Admin client points to the main client to share the authenticated session and satisfy RLS policies
+        window.supabaseAdminClient = window.supabaseClient;
         
         console.log('Supabase: Clients initialized successfully');
         return window.supabaseClient;
