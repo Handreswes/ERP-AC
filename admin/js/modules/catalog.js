@@ -299,9 +299,9 @@ window.Catalog = {
         .container { max-width: 1200px; margin: -1.5rem auto 4rem; padding: 0 1rem; }
         .catalog-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
         .product-card { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: 0.3s; display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.03); page-break-inside: avoid; break-inside: avoid; }
-        .product-gallery { width: 100%; height: 250px; position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: #f1f5f9; }
+        .product-gallery { width: 100%; height: 250px; position: relative; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; background: #ffffff; }
         .product-gallery::-webkit-scrollbar { display: none; }
-        .product-img { min-width: 100%; height: 250px; object-fit: cover; scroll-snap-align: start; }
+        .product-img { min-width: 100%; height: 250px; object-fit: contain; scroll-snap-align: start; }
         .product-info { padding: 1.25rem; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 0.5rem; }
         .category { font-size: 0.65rem; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.3rem; }
         .name { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; color: #1e293b; }
@@ -387,6 +387,7 @@ window.Catalog = {
                  height: 220px !important;
                  width: 100% !important;
                  overflow: hidden !important;
+                 background: #ffffff !important;
              }
              .product-img {
                  display: none !important;
@@ -395,7 +396,7 @@ window.Catalog = {
                  display: block !important;
                  width: 100% !important;
                  height: 220px !important;
-                 object-fit: cover !important;
+                 object-fit: contain !important;
              }
             .product-info {
                 padding: 14px !important;
@@ -412,6 +413,7 @@ window.Catalog = {
                 margin-bottom: 2px !important;
                 color: #2563eb !important;
                 font-weight: 700 !important;
+                text-transform: uppercase;
             }
             .desc {
                 font-size: 0.78rem !important;
@@ -593,7 +595,7 @@ window.Catalog = {
             <i class="fas fa-file-pdf"></i> Guardar como PDF
         </button>
         <span style="background: rgba(15, 23, 42, 0.9); color: #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.15); font-weight: 500; text-align: right; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" class="print-hint">
-            💡 Consejo: En la ventana que se abre, selecciona <strong>"Guardar como PDF"</strong> en la opción <em>Destino</em>.
+            💡 Consejo: En la ventana que se abre, selecciona <strong>\"Guardar como PDF\"</strong> en la option <em>Destino</em>.
         </span>
     </div>
 </body>
