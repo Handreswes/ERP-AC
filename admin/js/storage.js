@@ -126,7 +126,8 @@ window.Storage = {
         // Determine if this table should use full overwrite instead of delta sync
         const isFullSyncTable = key === STORAGE_KEYS.CLIENTS || 
                                 key === STORAGE_KEYS.ACCOUNTS || 
-                                key === STORAGE_KEYS.SELLERS;
+                                key === STORAGE_KEYS.SELLERS ||
+                                key === STORAGE_KEYS.PRODUCTS;
 
         // Find the latest timestamp from local data (only if not doing a full sync)
         let latestTimestamp = null;
