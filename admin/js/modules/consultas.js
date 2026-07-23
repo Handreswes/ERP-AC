@@ -601,7 +601,7 @@ window.Consultas = {
         container.innerHTML = `
             <!-- Filters -->
             <div class="search-filter-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
-                <input type="text" id="q-abonos-search" class="form-control" placeholder="Buscar por cliente o notas..." style="max-width: 280px;">
+                <input type="text" id="q-abonos-search" class="form-control" placeholder="Buscar por client o notas..." style="max-width: 280px;">
                 <input type="month" id="q-abonos-month" class="form-control" style="max-width: 160px;">
                 <select id="q-abonos-company" class="form-control" style="max-width: 170px;">
                     <option value="all">Millenio y Vulcano</option>
@@ -732,11 +732,15 @@ window.Consultas = {
             if (sale.method === 'credit' && sale.clientId) {
                 const c = Storage.getById(STORAGE_KEYS.CLIENTS, sale.clientId);
                 if (c) {
-                    c.balanceMillenio = Math.max(0, (c.balanceMillenio || 0) - (sale.totalM || 0));
-                    c.balanceVulcano = Math.max(0, (c.balanceVulcano || 0) - (sale.totalV || 0));
+                    const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, c.id, ['balanceMillenio', 'balanceVulcano']);
+                    const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(c.balanceMillenio) || 0);
+                    const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(c.balanceVulcano) || 0);
+
+                    const newBalM = Math.max(0, currentBalM - (sale.totalM || 0));
+                    const newBalV = Math.max(0, currentBalV - (sale.totalV || 0));
                     await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
-                        balanceMillenio: c.balanceMillenio,
-                        balanceVulcano: c.balanceVulcano
+                        balanceMillenio: newBalM,
+                        balanceVulcano: newBalV
                     });
                 }
             }
@@ -855,15 +859,21 @@ window.Consultas = {
             if (p.clientId) {
                 const c = Storage.getById(STORAGE_KEYS.CLIENTS, p.clientId);
                 if (c) {
+                    const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, c.id, ['balanceMillenio', 'balanceVulcano']);
+                    const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(c.balanceMillenio) || 0);
+                    const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(c.balanceVulcano) || 0);
+
                     const amt = parseFloat(p.amount) || 0;
+                    let newBalM = currentBalM;
+                    let newBalV = currentBalV;
                     if (p.company === 'millenio') {
-                        c.balanceMillenio = (c.balanceMillenio || 0) + amt;
+                        newBalM = currentBalM + amt;
                     } else {
-                        c.balanceVulcano = (c.balanceVulcano || 0) + amt;
+                        newBalV = currentBalV + amt;
                     }
                     await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
-                        balanceMillenio: c.balanceMillenio,
-                        balanceVulcano: c.balanceVulcano
+                        balanceMillenio: newBalM,
+                        balanceVulcano: newBalV
                     });
                 }
             }

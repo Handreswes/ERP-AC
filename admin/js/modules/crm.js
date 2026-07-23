@@ -504,11 +504,20 @@ window.CRM = {
             }
 
             // 2. Aplicar deducción de saldos
-            if (amountM > 0) client.balanceMillenio = (client.balanceMillenio || 0) - amountM;
-            if (amountV > 0) client.balanceVulcano = (client.balanceVulcano || 0) - amountV;
+            const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, clientId, ['balanceMillenio', 'balanceVulcano']);
+            const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(client.balanceMillenio) || 0);
+            const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(client.balanceVulcano) || 0);
+
+            const newBalM = currentBalM - amountM;
+            const newBalV = currentBalV - amountV;
 
             // 3. Guardar cliente actualizado
-            await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, client);
+            await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, {
+                balanceMillenio: newBalM,
+                balanceVulcano: newBalV
+            });
+            client.balanceMillenio = newBalM;
+            client.balanceVulcano = newBalV;
 
             // 4. Registrar abonos en tabla de payments
             if (amountM > 0) {
@@ -726,10 +735,16 @@ window.CRM = {
             const totalRefund = quantity * unitValue;
 
             // 1. Aplicar descuento de deuda
+            const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, clientId, ['balanceMillenio', 'balanceVulcano']);
+            const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(client.balanceMillenio) || 0);
+            const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(client.balanceVulcano) || 0);
+
+            let newBalM = currentBalM;
+            let newBalV = currentBalV;
             if (company === 'millenio') {
-                client.balanceMillenio = (client.balanceMillenio || 0) - totalRefund;
+                newBalM = currentBalM - totalRefund;
             } else {
-                client.balanceVulcano = (client.balanceVulcano || 0) - totalRefund;
+                newBalV = currentBalV - totalRefund;
             }
 
             // 2. Incrementar stock del producto
@@ -740,7 +755,12 @@ window.CRM = {
             }
 
             // 3. Guardar en Base de Datos (Cloud + Cache)
-            await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, client);
+            await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, {
+                balanceMillenio: newBalM,
+                balanceVulcano: newBalV
+            });
+            client.balanceMillenio = newBalM;
+            client.balanceVulcano = newBalV;
             await Storage.updateItem(STORAGE_KEYS.PRODUCTS, productId, product);
 
             // 4. Crear registro en payments (Abonos)

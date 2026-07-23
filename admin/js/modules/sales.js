@@ -1002,8 +1002,12 @@ window.Sales = {
                 if ((oldCreditM > 0 || oldCreditV > 0) && oldSale.clientId) {
                     const oldClient = Storage.getById(STORAGE_KEYS.CLIENTS, oldSale.clientId);
                     if (oldClient) {
-                        const newBalM = Math.max(0, (oldClient.balanceMillenio || 0) - oldCreditM);
-                        const newBalV = Math.max(0, (oldClient.balanceVulcano || 0) - oldCreditV);
+                        const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, oldClient.id, ['balanceMillenio', 'balanceVulcano']);
+                        const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(oldClient.balanceMillenio) || 0);
+                        const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(oldClient.balanceVulcano) || 0);
+
+                        const newBalM = Math.max(0, currentBalM - oldCreditM);
+                        const newBalV = Math.max(0, currentBalV - oldCreditV);
                         await Storage.updateItem(STORAGE_KEYS.CLIENTS, oldClient.id, {
                             balanceMillenio: newBalM,
                             balanceVulcano: newBalV
@@ -1016,8 +1020,12 @@ window.Sales = {
             if (creditM > 0 || creditV > 0) {
                 const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
                 if (c) {
-                    const newBalM = (c.balanceMillenio || 0) + creditM;
-                    const newBalV = (c.balanceVulcano || 0) + creditV;
+                    const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, c.id, ['balanceMillenio', 'balanceVulcano']);
+                    const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(c.balanceMillenio) || 0);
+                    const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(c.balanceVulcano) || 0);
+
+                    const newBalM = currentBalM + creditM;
+                    const newBalV = currentBalV + creditV;
                     await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
                         balanceMillenio: newBalM,
                         balanceVulcano: newBalV
@@ -1053,4 +1061,3 @@ window.Sales = {
         }
     }
 };
-

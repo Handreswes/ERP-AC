@@ -253,6 +253,28 @@ window.Storage = {
     },
 
     /**
+     * Get the latest values for specific fields of a row directly from Supabase (bypasses cache)
+     */
+    async getLatestFields(key, id, fieldsArray) {
+        const table = TABLE_MAP[key];
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
+        if (table && supabase) {
+            try {
+                const { data, error } = await supabase
+                    .from(table)
+                    .select(fieldsArray.join(','))
+                    .eq('id', id)
+                    .single();
+                if (error) throw error;
+                return data;
+            } catch (err) {
+                console.warn(`Could not fetch latest fields from cloud for ${table}:`, err.message);
+            }
+        }
+        return null;
+    },
+
+    /**
      * ADD ITEM: CLOUD-FIRST (Awaits network response)
      */
     async addItem(key, item) {
