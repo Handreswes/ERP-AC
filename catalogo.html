@@ -158,14 +158,14 @@
             width: 100%;
             height: 250px;
             position: relative;
-            background: #f1f5f9;
+            background: #ffffff;
             overflow: hidden;
         }
 
         .product-img {
             width: 100%;
             height: 100%;
-            object-fit: cover;
+            object-fit: contain;
         }
 
         .product-info {
@@ -221,6 +221,50 @@
             font-size: 1.15rem;
             display: inline-block;
             align-self: center;
+        }
+
+        /* Promo badge & crossed-out price styles */
+        .promo-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            background: #ef4444;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-size: 0.72rem;
+            font-weight: 800;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            animation: pulse-promo 2s infinite;
+        }
+
+        @keyframes pulse-promo {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .price-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            justify-content: center;
+            margin-top: auto;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .price-previous {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-decoration: line-through;
         }
 
         /* Specs table with dot leaders */
@@ -389,8 +433,18 @@
                 border-radius: 12px !important;
             }
 
-            .product-gallery, .product-img {
+            .product-gallery {
+                display: block !important;
                 height: 220px !important;
+                width: 100% !important;
+                overflow: hidden !important;
+                background: #ffffff !important;
+            }
+
+            .product-img {
+                width: 100% !important;
+                height: 220px !important;
+                object-fit: contain !important;
             }
 
             .product-info {
@@ -427,6 +481,26 @@
                 padding: 5px 15px !important;
                 border-radius: 25px !important;
                 align-self: center !important;
+            }
+
+            .price-previous {
+                color: #64748b !important;
+                font-size: 0.85rem !important;
+                text-decoration: line-through !important;
+                display: inline-block !important;
+            }
+
+            .promo-badge {
+                position: absolute !important;
+                top: 8px !important;
+                left: 8px !important;
+                background: #ef4444 !important;
+                color: white !important;
+                font-size: 0.65rem !important;
+                padding: 3px 8px !important;
+                border-radius: 20px !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
 
             .spec-row {
@@ -600,9 +674,12 @@
                 <option value="all">Todas las Categorías</option>
             </select>
             <!-- Print PDF Button -->
-            <button class="btn-print" onclick="window.print()">
-                <i class="fas fa-print"></i> Guardar PDF
-            </button>
+            <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 4px;" class="print-control-container">
+                <button class="btn-print" onclick="window.print()" style="margin: 0;">
+                    <i class="fas fa-file-pdf"></i> Guardar como PDF
+                </button>
+                <small style="font-size: 0.65rem; color: #64748b; font-weight: 500; white-space: nowrap;" class="print-control-hint">💡 En Destino, elige "Guardar como PDF".</small>
+            </div>
         </div>
     </div>
 
@@ -659,7 +736,7 @@
     <script>
         // Supabase initialization
         const SUPABASE_URL = 'https://zuondbguopirimvfuehu.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp1b25kYmd1b3BpcmltdmZ1ZWh1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjAzMjk2NiwiZXhwIjoyMDg3NjA4OTY2fQ.9Zja0di6OMtWwFyigiZiWnXo0burILHTVAuBOf6EhUE';
+        const SUPABASE_KEY = 'sb_publishable_29SdlPI3zzDkNvvEO38kOQ_2NTwiTC_';
         const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         let allProducts = [];
@@ -680,24 +757,106 @@
         // Initialize App
         async function init() {
             try {
+                const basePath = window.location.pathname.includes('/admin/') ? '../' : './';
+
                 // Fetch Website Settings to get default WhatsApp retail number
-                const { data: settings, error: sErr } = await _supabase
-                    .from('website_settings')
-                    .select('whatsapp')
-                    .eq('id', 'default')
-                    .single();
-                if (!sErr && settings && settings.whatsapp) {
+                let settings;
+                try {
+                    const response = await fetch(basePath + 'settings.json');
+                    if (!response.ok) throw new Error('Network response not ok');
+                    settings = await response.json();
+                } catch (sErr) {
+                    console.warn("Could not load settings.json, falling back to Supabase:", sErr);
+                    const { data: dbSettings, error: dbSErr } = await _supabase
+                        .from('website_settings')
+                        .select('whatsapp')
+                        .eq('id', 'default')
+                        .single();
+                    if (!dbSErr) settings = dbSettings;
+                }
+
+                if (settings && settings.whatsapp) {
                     defaultRetailPhone = settings.whatsapp;
                 }
 
-                // Fetch Products
-                const { data: products, error: pErr } = await _supabase
-                    .from('products')
-                    .select('*')
-                    .eq('active', true)
-                    .order('name', { ascending: true });
+                // Fetch Products - Optimized Hybrid Delta Sync
+                let products = [];
+                let localLoaded = false;
 
-                if (pErr) throw pErr;
+                // 1. Try to load local products.json first (Very fast, 0 Supabase egress)
+                try {
+                    const response = await fetch(basePath + 'products.json');
+                    if (response.ok) {
+                        products = await response.json();
+                        localLoaded = true;
+                        console.log(`Local Cache Loaded: ${products.length} products`);
+                    }
+                } catch (pErr) {
+                    console.warn("Could not load local products.json:", pErr);
+                }
+
+                // 2. Perform delta update from Supabase to keep it in real-time with minimum egress
+                try {
+                    if (localLoaded) {
+                        // Find latest timestamp in local products
+                        let latestLocalTS = '2000-01-01T00:00:00.000Z';
+                        products.forEach(p => {
+                            const ts = p.updatedAt || p.createdAt;
+                            if (ts && new Date(ts) > new Date(latestLocalTS)) {
+                                latestLocalTS = ts;
+                            }
+                        });
+
+                        // Get active IDs to handle deletions/deactivations (tiny query, ~10KB)
+                        const { data: activeIds, error: idErr } = await _supabase
+                            .from('products')
+                            .select('id')
+                            .eq('active', true);
+                        if (idErr) throw idErr;
+
+                        const activeIdSet = new Set((activeIds || []).map(item => item.id));
+                        products = products.filter(p => activeIdSet.has(p.id));
+
+                        // Get only products updated after our latest local product (only downloads what changed)
+                        const { data: updatedProducts, error: updateErr } = await _supabase
+                            .from('products')
+                            .select('*')
+                            .gt('updatedAt', latestLocalTS);
+                        if (updateErr) throw updateErr;
+
+                        if (updatedProducts && updatedProducts.length > 0) {
+                            console.log(`Supabase Real-time Sync: Loaded ${updatedProducts.length} updated products`);
+                            updatedProducts.forEach(newP => {
+                                const idx = products.findIndex(p => p.id === newP.id);
+                                if (idx !== -1) {
+                                    if (newP.active === false) {
+                                        products.splice(idx, 1);
+                                    } else {
+                                        products[idx] = newP;
+                                    }
+                                } else if (newP.active !== false) {
+                                    products.push(newP);
+                                }
+                            });
+                        }
+                    } else {
+                        // Fallback: If local cache failed to load, download all from Supabase
+                        console.log("Downloading all products from Supabase (fallback)...");
+                        const { data: dbProducts, error: dbPErr } = await _supabase
+                            .from('products')
+                            .select('*')
+                            .eq('active', true)
+                            .order('name', { ascending: true });
+                        if (dbPErr) throw dbPErr;
+                        products = dbProducts || [];
+                    }
+                } catch (dbErr) {
+                    console.warn("Supabase real-time sync failed, using static products.json cache:", dbErr);
+                    // If Supabase fails but we have local products, we proceed with local products
+                    if (products.length === 0) {
+                        throw new Error("No products available.");
+                    }
+                }
 
                 // Filter out ghost products (no price) and products without images
                 allProducts = products.filter(p => {
@@ -799,20 +958,29 @@
             }
 
             grid.innerHTML = filtered.map(p => {
-                const price = urlPrice === 'wholesale' ? p.priceWholesale : (p.priceFinal || p.priceInternet);
+                const isWholesale = urlPrice === 'wholesale';
+                const price = isWholesale ? p.priceWholesale : (p.priceFinal || p.priceInternet);
                 const displayDesc = getDisplayDescription(p);
                 const img = (Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/300?text=Premium+Product';
+
+                // Check for retail promotions
+                const hasPromo = !isWholesale && p.pricePrevious && parseFloat(p.pricePrevious) > parseFloat(price);
+                const discountPct = hasPromo ? Math.round(((parseFloat(p.pricePrevious) - parseFloat(price)) / parseFloat(p.pricePrevious)) * 100) : 0;
 
                 return `
                     <div class="product-card">
                         <div class="product-gallery">
+                            ${discountPct > 0 ? `<span class="promo-badge">-${discountPct}% DTO</span>` : ''}
                             <img src="${img}" class="product-img" alt="${p.name}">
                         </div>
                         <div class="product-info">
                             <div class="category">${p.category || 'General'}</div>
                             <div class="name">${p.name}</div>
                             ${displayDesc ? `<div class="desc">${formatCatalogDescription(displayDesc)}</div>` : ''}
-                            <div class="price-tag">$${parseFloat(price || 0).toLocaleString()}</div>
+                            <div class="price-container">
+                                <div class="price-tag">$${parseFloat(price || 0).toLocaleString()}</div>
+                                ${hasPromo ? `<s class="price-previous">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
+                            </div>
                         </div>
                     </div>
                 `;
