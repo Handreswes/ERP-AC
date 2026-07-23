@@ -711,7 +711,7 @@ function renderProductLanding(id) {
     if (images.length > 1) {
         galleryHtml = '<div style="display: flex; gap: 10px; margin-top: 15px; overflow-x: auto; padding-bottom: 10px;">';
         images.forEach((imgSrc, idx) => {
-            galleryHtml += `<img src="${imgSrc}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 10px; cursor: pointer; border: ${idx === 0 ? '2px solid var(--accent)' : '2px solid transparent'}" onclick="document.getElementById('main-product-img').src=this.src; document.querySelectorAll('.prod-thumb').forEach(t=>t.style.border='2px solid transparent'); this.style.border='2px solid var(--accent)';" class="prod-thumb">`;
+            galleryHtml += `<img src="${imgSrc}" style="width: 80px; height: 80px; object-fit: contain; background: #ffffff; border-radius: 10px; cursor: pointer; border: ${idx === 0 ? '2px solid var(--accent)' : '2px solid transparent'}" onclick="document.getElementById('main-product-img').src=this.src; document.querySelectorAll('.prod-thumb').forEach(t=>t.style.border='2px solid transparent'); this.style.border='2px solid var(--accent)';" class="prod-thumb">`;
         });
         galleryHtml += '</div>';
     }
@@ -733,7 +733,7 @@ function renderProductLanding(id) {
         return `
             <div class="glass product-card animate" style="padding: 1.5rem; border-radius: 20px; text-align: left; display: flex; flex-direction: column;">
                 <div onclick="window.location.hash = '#product?id=${rp.id}'" style="cursor: pointer; flex: 1 0 auto; display: flex; flex-direction: column;">
-                    <img src="${rpImg}" alt="${rp.name}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 15px; margin-bottom: 1rem;">
+                    <img src="${rpImg}" alt="${rp.name}" style="width: 100%; height: 180px; object-fit: contain; background: #ffffff; border-radius: 15px; margin-bottom: 1rem;">
                     <h3 style="font-size: 1.1rem; line-height: 1.3; margin-bottom: 0.5rem; height: 2.6rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${rp.name}</h3>
                     <p style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.75rem;">${rp.category || 'General'}</p>
                 </div>
@@ -755,7 +755,7 @@ function renderProductLanding(id) {
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 4rem; align-items: start;">
             <div class="animate">
-                <img id="main-product-img" src="${mainImg}" style="width: 100%; border-radius: 30px; box-shadow: var(--shadow-lg); object-fit: cover; aspect-ratio: 1/1;">
+                <img id="main-product-img" src="${mainImg}" style="width: 100%; border-radius: 30px; box-shadow: var(--shadow-lg); object-fit: contain; background: #ffffff; aspect-ratio: 1/1;">
                 ${galleryHtml}
             </div>
             <div class="animate" style="animation-delay: 0.1s;">
@@ -968,7 +968,7 @@ function renderCheckoutSummary() {
         
         html += `
             <div class="checkout-item" style="display: flex; gap: 15px; align-items: center; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.08);">
-                <img src="${imgUrl}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
+                <img src="${imgUrl}" style="width: 60px; height: 60px; object-fit: contain; background: #ffffff; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1);">
                 <div style="flex: 1; min-width: 0;">
                     <h4 style="margin: 0 0 5px 0; font-size: 0.9rem; font-weight: 700; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${i.name}</h4>
                     <span style="font-size: 0.85rem; color: var(--accent); font-weight: 700;">$${p.toLocaleString('es-CO')} COP</span>
