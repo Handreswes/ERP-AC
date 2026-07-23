@@ -592,12 +592,49 @@ window.Sales = {
             // 3. Client Selection from list
             const pickerItem = e.target.closest('.picker-item');
             if (pickerItem) {
-                this.selectedClient = CRM.getClients().find(c => c.id === pickerItem.dataset.id);
-                document.getElementById('selected-client-info').innerHTML = `
-                    <strong>${this.selectedClient.name}</strong>
-                    <span class="badge ${this.selectedClient.type === 'wholesale' ? 'bg-orange' : 'bg-blue'}">${this.selectedClient.type === 'wholesale' ? 'Mayorista' : 'Final'}</span>
-                `;
+                const clientId = pickerItem.dataset.id;
+                this.selectedClient = CRM.getClients().find(c => c.id === clientId);
+                
+                const updateSelectedClientUI = (c) => {
+                    const mDebt = parseFloat(c.balanceMillenio || 0);
+                    const vDebt = parseFloat(c.balanceVulcano || 0);
+                    const totalDebt = mDebt + vDebt;
+                    
+                    const infoEl = document.getElementById('selected-client-info');
+                    if (infoEl) {
+                        infoEl.innerHTML = `
+                            <strong>${c.name}</strong>
+                            <span class="badge ${c.type === 'wholesale' ? 'bg-orange' : 'bg-blue'}">${c.type === 'wholesale' ? 'Mayorista' : 'Final'}</span>
+                            <div style="font-size: 0.8rem; margin-top: 5px; color: var(--text-secondary);">
+                                Deuda: <strong style="color: ${totalDebt > 0 ? '#ef4444' : '#10b981'};">$${totalDebt.toLocaleString()}</strong>
+                                ${totalDebt > 0 ? ` (${mDebt.toLocaleString()} M / ${vDebt.toLocaleString()} V)` : ''}
+                            </div>
+                        `;
+                    }
+                };
+
+                // Draw initial cached info immediately
+                updateSelectedClientUI(this.selectedClient);
                 document.getElementById('client-picker-modal').classList.remove('show');
+
+                // Fetch fresh real-time balance in background just in case
+                Storage.getLatestFields(STORAGE_KEYS.CLIENTS, clientId, ['balanceMillenio', 'balanceVulcano']).then(latest => {
+                    if (latest && this.selectedClient && this.selectedClient.id === clientId) {
+                        this.selectedClient.balanceMillenio = parseFloat(latest.balanceMillenio) || 0;
+                        this.selectedClient.balanceVulcano = parseFloat(latest.balanceVulcano) || 0;
+                        
+                        // Update cache
+                        const idx = CRM.getClients().findIndex(c => c.id === clientId);
+                        if (idx !== -1) {
+                            CRM.getClients()[idx].balanceMillenio = this.selectedClient.balanceMillenio;
+                            CRM.getClients()[idx].balanceVulcano = this.selectedClient.balanceVulcano;
+                            Storage.save(STORAGE_KEYS.CLIENTS, CRM.getClients());
+                        }
+                        
+                        // Update UI if they are still selected
+                        updateSelectedClientUI(this.selectedClient);
+                    }
+                });
 
                 // Update cart prices ONLY for items that don't have a manual override
                 this.cart.forEach(item => {
