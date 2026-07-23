@@ -123,13 +123,20 @@ window.Storage = {
         const storageKey = `erp_${key}`;
         const localItems = this.cache[key] || [];
 
-        // Find the latest timestamp from local data
+        // Determine if this table should use full overwrite instead of delta sync
+        const isFullSyncTable = key === STORAGE_KEYS.CLIENTS || 
+                                key === STORAGE_KEYS.ACCOUNTS || 
+                                key === STORAGE_KEYS.SELLERS;
+
+        // Find the latest timestamp from local data (only if not doing a full sync)
         let latestTimestamp = null;
-        for (const item of localItems) {
-            const ts = item.updatedAt || item.createdAt || item.date;
-            if (ts) {
-                if (!latestTimestamp || new Date(ts) > new Date(latestTimestamp)) {
-                    latestTimestamp = ts;
+        if (!isFullSyncTable) {
+            for (const item of localItems) {
+                const ts = item.updatedAt || item.createdAt || item.date;
+                if (ts) {
+                    if (!latestTimestamp || new Date(ts) > new Date(latestTimestamp)) {
+                        latestTimestamp = ts;
+                    }
                 }
             }
         }
@@ -150,32 +157,42 @@ window.Storage = {
             const { data, error } = await query;
             if (error) throw error;
 
-            if (data && data.length > 0) {
-                console.log(`Cloud Delta Sync: ${table} (Downloaded ${data.length} new/modified items)`);
+            if (data) {
+                let finalItems = null;
 
-                // Merge data: replace existing items by ID, and insert new ones
-                const merged = [...localItems];
-                for (const newItem of data) {
-                    const idx = merged.findIndex(item => item.id === newItem.id);
-                    if (idx !== -1) {
-                        merged[idx] = newItem; // Update existing
-                    } else {
-                        merged.unshift(newItem); // Insert new
+                if (isFullSyncTable) {
+                    // For full sync tables, completely overwrite local cache to handle updates and deletions correctly
+                    finalItems = data;
+                    console.log(`Cloud Full Sync: ${table} (Downloaded ${data.length} items)`);
+                } else if (data.length > 0) {
+                    // For delta sync tables, merge updates
+                    console.log(`Cloud Delta Sync: ${table} (Downloaded ${data.length} new/modified items)`);
+                    const merged = [...localItems];
+                    for (const newItem of data) {
+                        const idx = merged.findIndex(item => item.id === newItem.id);
+                        if (idx !== -1) {
+                            merged[idx] = newItem; // Update existing
+                        } else {
+                            merged.unshift(newItem); // Insert new
+                        }
                     }
+                    finalItems = merged;
+                } else {
+                    console.log(`Cloud Delta Sync: ${table} (Already up to date)`);
                 }
 
-                // Update cache and localStorage
-                this.cache[key] = merged;
-                localStorage.setItem(storageKey, JSON.stringify(merged));
+                if (finalItems !== null) {
+                    // Update cache and localStorage
+                    this.cache[key] = finalItems;
+                    localStorage.setItem(storageKey, JSON.stringify(finalItems));
 
-                // Dispatch event indicating this specific table has updated
-                window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: data }));
-            } else {
-                console.log(`Cloud Delta Sync: ${table} (Already up to date)`);
+                    // Dispatch event indicating this specific table has updated
+                    window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: data }));
+                }
             }
             this.updateStatus(true);
         } catch (err) {
-            console.warn(`Delta sync failed for ${table}:`, err.message);
+            console.warn(`Sync failed for ${table}:`, err.message);
             this.updateStatus(false);
             throw err;
         }

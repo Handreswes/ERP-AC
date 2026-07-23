@@ -3,6 +3,16 @@ window.CRM = {
     init() {
         this.renderPanel();
         this.setupEventListeners();
+
+        // Listen to cloud updates for clients and refresh the UI list in real time
+        if (this._handleCloudUpdate) {
+            window.removeEventListener('erp_table_updated_clients', this._handleCloudUpdate);
+        }
+        this._handleCloudUpdate = () => {
+            const searchInput = document.getElementById('crm-search');
+            this.updateClientList(searchInput ? searchInput.value : '');
+        };
+        window.addEventListener('erp_table_updated_clients', this._handleCloudUpdate);
     },
 
     getClients() {
@@ -590,13 +600,10 @@ window.CRM = {
             dateRangeStr = `Últimos ${periodDays} días (${startDate.toLocaleDateString('es-CO')} - ${now.toLocaleDateString('es-CO')})`;
         }
 
-        // Get all Sales for this client
-        const allSales = Storage.get(STORAGE_KEYS.SALES).filter(s => s.clientId === clientId && s.method === 'credit');
-        
-        // Get all Payments for this client
-        const allPayments = Storage.get(STORAGE_KEYS.PAYMENTS).filter(p => p.clientId === clientId);
+        // Fetch Sales & Payments
+        const allSales = (Storage.get(STORAGE_KEYS.SALES) || []).filter(s => s.clientId === clientId);
+        const allPayments = (Storage.get(STORAGE_KEYS.PAYMENTS) || []).filter(p => p.clientId === clientId);
 
-        // Filter and Build Movements
         let movimientos = [];
         let salesInRange = 0;
         let paymentsInRange = 0;
