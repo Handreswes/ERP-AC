@@ -1051,7 +1051,7 @@
             const lines = descText.split(/\r?\n/);
             const hasColons = lines.some(line => line.includes(':'));
             
-            if (hasHasColons || descText.length < 120) {
+            if (hasColons || descText.length < 120) {
                 return descText;
             }
             
