@@ -183,6 +183,19 @@ window.Storage = {
                 }
 
                 if (finalItems !== null) {
+                    if (key === STORAGE_KEYS.PRODUCTS) {
+                        // Reconcile out-of-stock products to ensure active=false if stock <= 0
+                        finalItems.forEach(p => {
+                            const totalStock = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
+                            if (totalStock <= 0 && p.active !== false) {
+                                p.active = false;
+                                if (supabase) {
+                                    supabase.from('products').update({ active: false }).eq('id', p.id).then();
+                                }
+                            }
+                        });
+                    }
+
                     // Update cache and localStorage
                     this.cache[key] = finalItems;
                     localStorage.setItem(storageKey, JSON.stringify(finalItems));
@@ -358,7 +371,7 @@ window.Storage = {
         const index = items.findIndex(item => item.id === id);
 
         if (index !== -1) {
-            // Auto-Limbo Trigger
+            // Auto-Limbo Trigger: Any product with stock <= 0 MUST be deactivated automatically
             if (key === STORAGE_KEYS.PRODUCTS) {
                 const existing = items[index];
                 const oldStock = (parseInt(existing.stockMillenio) || 0) + (parseInt(existing.stockVulcano) || 0);
@@ -366,9 +379,9 @@ window.Storage = {
                 const newStockV = updatedData.stockVulcano !== undefined ? (parseInt(updatedData.stockVulcano) || 0) : (parseInt(existing.stockVulcano) || 0);
                 const newStock = newStockM + newStockV;
 
-                if (newStock <= 0 && oldStock > 0) {
+                if (newStock <= 0) {
                     updatedData.active = false;
-                } else if (newStock > 0 && oldStock <= 0) {
+                } else if (newStock > 0 && oldStock <= 0 && updatedData.active === undefined) {
                     updatedData.active = true;
                 }
             }
