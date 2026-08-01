@@ -1217,7 +1217,7 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                 stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
                 stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
                 company: formData.get('company'),
-                active: formData.get('active') === 'true',
+                active: ((parseInt(formData.get('stockMillenio')) || 0) + (parseInt(formData.get('stockVulcano')) || 0)) > 0 ? (formData.get('active') === 'true') : false,
                 image: Array.from(document.querySelectorAll('.image-base64'))
                     .map(input => input.value)
                     .filter(val => val && val.startsWith('data:image')),
