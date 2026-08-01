@@ -94,6 +94,87 @@ window.Catalog = {
             </div>
 
             <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
+                <h2 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-link" style="color: var(--accent);"></i> Enlaces Oficiales Listos para Enviar (Copia en 1-Clic)
+                </h2>
+
+                <!-- Grupo 1: Al Por Mayor -->
+                <div style="margin-bottom: 1.5rem; background: rgba(245, 158, 11, 0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; color: #f59e0b; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-boxes"></i> CATÁLOGOS AL POR MAYOR (MAYORISTAS)
+                    </h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Link 1: Multinegocio Mayorista -->
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="min-width: 230px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🌐 Multinegocio (Todos los Productos):</span>
+                            <input type="text" readonly value="https://tucomprascol.com/catalogo.html?price=wholesale&company=all" class="form-control" style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.85rem; color: #f59e0b; font-weight: 700; background: var(--bg-body);">
+                            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('https://tucomprascol.com/catalogo.html?price=wholesale&company=all'); alert('¡Enlace Mayorista Multinegocio copiado!');" style="white-space: nowrap;">
+                                <i class="fas fa-copy"></i> Copiar Enlace
+                            </button>
+                        </div>
+
+                        <!-- Link 2: Millenio Mayorista -->
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="min-width: 230px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🔵 Solo Productos MILLENIO:</span>
+                            <input type="text" readonly value="https://tucomprascol.com/catalogo.html?price=wholesale&company=millenio" class="form-control" style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.85rem; color: #3b82f6; font-weight: 700; background: var(--bg-body);">
+                            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('https://tucomprascol.com/catalogo.html?price=wholesale&company=millenio'); alert('¡Enlace Mayorista Millenio copiado!');" style="white-space: nowrap;">
+                                <i class="fas fa-copy"></i> Copiar Enlace
+                            </button>
+                        </div>
+
+                        <!-- Link 3: Vulcano Mayorista -->
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="min-width: 230px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🟠 Solo Productos VULCANO:</span>
+                            <input type="text" readonly value="https://tucomprascol.com/catalogo.html?price=wholesale&company=vulcano" class="form-control" style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.85rem; color: #f97316; font-weight: 700; background: var(--bg-body);">
+                            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('https://tucomprascol.com/catalogo.html?price=wholesale&company=vulcano'); alert('¡Enlace Mayorista Vulcano copiado!');" style="white-space: nowrap;">
+                                <i class="fas fa-copy"></i> Copiar Enlace
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grupo 2: Venta Directa / Internet -->
+                <div style="background: rgba(16, 185, 129, 0.05); padding: 1.25rem; border-radius: 12px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                    <h3 style="font-size: 0.95rem; font-weight: 700; color: #10b981; margin-top: 0; margin-bottom: 1rem; display: flex; align-items: center; gap: 8px;">
+                        <i class="fas fa-shopping-bag"></i> CATÁLOGOS VENTA DIRECTA / PÚBLICO (PRECIO INTERNET)
+                    </h3>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <!-- Link 4: Multinegocio Público -->
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="min-width: 230px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🌐 Multinegocio (Todos los Productos):</span>
+                            <input type="text" readonly value="https://tucomprascol.com/catalogo.html?price=internet&company=all" class="form-control" style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.85rem; color: #10b981; font-weight: 700; background: var(--bg-body);">
+                            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('https://tucomprascol.com/catalogo.html?price=internet&company=all'); alert('¡Enlace Público Multinegocio copiado!');" style="white-space: nowrap;">
+                                <i class="fas fa-copy"></i> Copiar Enlace
+                            </button>
+                        </div>
+
+                        <!-- Link 5: Millenio Público -->
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="min-width: 230px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🔵 Solo Productos MILLENIO:</span>
+                            <input type="text" readonly value="https://tucomprascol.com/catalogo.html?price=internet&company=millenio" class="form-control" style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.85rem; color: #3b82f6; font-weight: 700; background: var(--bg-body);">
+                            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('https://tucomprascol.com/catalogo.html?price=internet&company=millenio'); alert('¡Enlace Público Millenio copiado!');" style="white-space: nowrap;">
+                                <i class="fas fa-copy"></i> Copiar Enlace
+                            </button>
+                        </div>
+
+                        <!-- Link 6: Vulcano Público -->
+                        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <span style="min-width: 230px; font-weight: 600; font-size: 0.85rem; color: var(--text-primary);">🟠 Solo Productos VULCANO:</span>
+                            <input type="text" readonly value="https://tucomprascol.com/catalogo.html?price=internet&company=vulcano" class="form-control" style="flex: 1; min-width: 260px; font-family: monospace; font-size: 0.85rem; color: #f97316; font-weight: 700; background: var(--bg-body);">
+                            <button class="btn btn-secondary btn-sm" onclick="navigator.clipboard.writeText('https://tucomprascol.com/catalogo.html?price=internet&company=vulcano'); alert('¡Enlace Público Vulcano copiado!');" style="white-space: nowrap;">
+                                <i class="fas fa-copy"></i> Copiar Enlace
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
+                <h3 style="font-size: 1rem; font-weight: 700; margin-top: 0; margin-bottom: 1rem; color: var(--text-primary);">
+                    <i class="fas fa-sliders-h"></i> Vista Previa e Impresión PDF Elegante
+                </h3>
                 <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
                         <label><i class="fas fa-tags"></i> Tipo de Lista de Precios</label>
@@ -112,17 +193,7 @@ window.Catalog = {
                     </div>
                 </div>
                 <div class="alert alert-info" style="margin-top: 1.5rem; background: rgba(59,130,246,0.1); border: 1px solid var(--accent); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
-                    <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos e inventario disponible utilizando los precios seleccionados.
-                </div>
-                <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px;">
-                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);"><i class="fas fa-link"></i> Enlace Oficial Compartible (Tiempo Real):</label>
-                    <div style="display: flex; gap: 10px;">
-                        <input type="text" id="shareable-catalog-url" class="form-control" readonly value="https://tucomprascol.com/catalogo.html" style="background: var(--bg-body); color: #3b82f6; font-weight: 700; border: 1px solid var(--border); font-family: monospace; font-size: 0.9rem; flex-grow: 1;">
-                        <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('shareable-catalog-url').value); alert('¡Enlace de Catálogo copiado al portapapeles!');" style="white-space: nowrap;">
-                            <i class="fas fa-copy"></i> Copiar Enlace
-                        </button>
-                    </div>
-                    <small style="color: var(--text-secondary);">Enlace oficial corto para enviar por WhatsApp a clientes o vendedores. Se actualiza automáticamente con los productos del ERP.</small>
+                    <i class="fas fa-magic"></i> Selecciona los filtros arriba para explorar la tabla de productos o presionar el botón <strong>"Ver Catálogo Elegante"</strong>.
                 </div>
             </div>
 
