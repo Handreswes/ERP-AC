@@ -79,7 +79,9 @@ try {
             }
         }
         
-        if (!$price -or $price -le 0 -or !$imgUrl) {
+        $stockM = [int]$p.stockMillenio
+        $stockV = [int]$p.stockVulcano
+        if (!$price -or $price -le 0 -or !$imgUrl -or ($stockM + $stockV) -le 0) {
             continue
         }
 
