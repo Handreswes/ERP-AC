@@ -601,7 +601,7 @@ window.Consultas = {
         container.innerHTML = `
             <!-- Filters -->
             <div class="search-filter-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
-                <input type="text" id="q-abonos-search" class="form-control" placeholder="Buscar por client o notas..." style="max-width: 280px;">
+                <input type="text" id="q-abonos-search" class="form-control" placeholder="Buscar por cliente o notas..." style="max-width: 280px;">
                 <input type="month" id="q-abonos-month" class="form-control" style="max-width: 160px;">
                 <select id="q-abonos-company" class="form-control" style="max-width: 170px;">
                     <option value="all">Millenio y Vulcano</option>
