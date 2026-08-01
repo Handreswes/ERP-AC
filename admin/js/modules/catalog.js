@@ -3,8 +3,8 @@
  */
 
 window.Catalog = {
-    currentCompany: 'millenio',
-    currentPriceType: 'wholesale', // 'wholesale' or 'internet'
+    currentCompany: 'all',
+    currentPriceType: 'internet', // 'internet' or 'wholesale'
 
     init() {
         this.renderPanel();
@@ -94,28 +94,35 @@ window.Catalog = {
             </div>
 
             <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--bg-card); border-radius: var(--radius); border: 1px solid var(--border);">
-                <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
                     <div class="form-group">
-                        <label><i class="fas fa-file-invoice-dollar"></i> Seleccionar Catálogo Mayorista a Generar</label>
-                        <select id="catalog-select-type" class="form-control">
-                            <option value="millenio" ${this.currentCompany === 'millenio' ? 'selected' : ''}>Catálogo MILLENIO (Al por Mayor)</option>
-                            <option value="all" ${this.currentCompany === 'all' ? 'selected' : ''}>Catálogo MULTINEGOCIO - Millenio & Vulcano (Al por Mayor)</option>
-                            <option value="vulcano" ${this.currentCompany === 'vulcano' ? 'selected' : ''}>Catálogo VULCANO (Al por Mayor)</option>
+                        <label><i class="fas fa-tags"></i> Tipo de Lista de Precios</label>
+                        <select id="catalog-select-price-type" class="form-control">
+                            <option value="internet" ${this.currentPriceType === 'internet' ? 'selected' : ''}>Precios Venta por Internet / Final (Venta Directa)</option>
+                            <option value="wholesale" ${this.currentPriceType === 'wholesale' ? 'selected' : ''}>Precios Al por Mayor (Mayoristas)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-building"></i> Empresa / Filtro de Productos</label>
+                        <select id="catalog-select-company" class="form-control">
+                            <option value="all" ${this.currentCompany === 'all' ? 'selected' : ''}>Todos los Productos (MULTINEGOCIO - Millenio & Vulcano)</option>
+                            <option value="millenio" ${this.currentCompany === 'millenio' ? 'selected' : ''}>Solo Productos MILLENIO</option>
+                            <option value="vulcano" ${this.currentCompany === 'vulcano' ? 'selected' : ''}>Solo Productos VULCANO</option>
                         </select>
                     </div>
                 </div>
                 <div class="alert alert-info" style="margin-top: 1.5rem; background: rgba(59,130,246,0.1); border: 1px solid var(--accent); padding: 1rem; border-radius: 12px; font-size: 0.85rem;">
-                    <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos de la empresa seleccionada utilizando sus precios al por mayor.
+                    <i class="fas fa-magic"></i> El catálogo se genera automáticamente con todos los productos activos e inventario disponible utilizando los precios seleccionados.
                 </div>
                 <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 8px;">
-                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);"><i class="fas fa-link"></i> Enlace de Catálogo Compartible (Tiempo Real):</label>
+                    <label style="font-weight: 700; font-size: 0.85rem; color: var(--text-primary);"><i class="fas fa-link"></i> Enlace Oficial Compartible (Tiempo Real):</label>
                     <div style="display: flex; gap: 10px;">
-                        <input type="text" id="shareable-catalog-url" class="form-control" readonly value="https://Handreswes.github.io/ERP-AC/catalogo.html?price=wholesale" style="background: var(--bg-body); color: var(--text-primary); border: 1px solid var(--border); font-family: monospace; font-size: 0.85rem; flex-grow: 1;">
+                        <input type="text" id="shareable-catalog-url" class="form-control" readonly value="https://tucomprascol.com/catalogo.html" style="background: var(--bg-body); color: #3b82f6; font-weight: 700; border: 1px solid var(--border); font-family: monospace; font-size: 0.9rem; flex-grow: 1;">
                         <button class="btn btn-secondary" onclick="navigator.clipboard.writeText(document.getElementById('shareable-catalog-url').value); alert('¡Enlace de Catálogo copiado al portapapeles!');" style="white-space: nowrap;">
                             <i class="fas fa-copy"></i> Copiar Enlace
                         </button>
                     </div>
-                    <small style="color: var(--text-secondary);">Envíale este enlace directo a tus clientes mayoristas. Se actualiza en tiempo real con los productos del ERP.</small>
+                    <small style="color: var(--text-secondary);">Enlace oficial corto para enviar por WhatsApp a clientes o vendedores. Se actualiza automáticamente con los productos del ERP.</small>
                 </div>
             </div>
 
@@ -210,7 +217,15 @@ window.Catalog = {
     updateShareableLink() {
         const urlInput = document.getElementById('shareable-catalog-url');
         if (urlInput) {
-            urlInput.value = `https://Handreswes.github.io/ERP-AC/catalogo.html?price=${this.currentPriceType}&company=${this.currentCompany}`;
+            let link = 'https://tucomprascol.com/catalogo.html';
+            const params = [];
+            if (this.currentPriceType === 'wholesale') params.push('price=wholesale');
+            if (this.currentCompany && this.currentCompany !== 'all') params.push(`company=${this.currentCompany}`);
+            
+            if (params.length > 0) {
+                link += '?' + params.join('&');
+            }
+            urlInput.value = link;
         }
     },
 
@@ -219,9 +234,12 @@ window.Catalog = {
         if (!panel) return;
 
         panel.onchange = (e) => {
-            if (e.target.id === 'catalog-select-type') {
+            if (e.target.id === 'catalog-select-price-type') {
+                this.currentPriceType = e.target.value;
+                this.updatePreview();
+                this.updateShareableLink();
+            } else if (e.target.id === 'catalog-select-company') {
                 this.currentCompany = e.target.value;
-                this.currentPriceType = 'wholesale';
                 this.updatePreview();
                 this.updateShareableLink();
             }
@@ -289,7 +307,7 @@ window.Catalog = {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; }
@@ -413,7 +431,6 @@ window.Catalog = {
                 margin-bottom: 2px !important;
                 color: #2563eb !important;
                 font-weight: 700 !important;
-                text-transform: uppercase;
             }
             .desc {
                 font-size: 0.78rem !important;
@@ -595,7 +612,7 @@ window.Catalog = {
             <i class="fas fa-file-pdf"></i> Guardar como PDF
         </button>
         <span style="background: rgba(15, 23, 42, 0.9); color: #cbd5e1; padding: 8px 14px; border-radius: 8px; font-size: 0.78rem; border: 1px solid rgba(255,255,255,0.15); font-weight: 500; text-align: right; box-shadow: 0 4px 12px rgba(0,0,0,0.3);" class="print-hint">
-            💡 Consejo: En la ventana que se abre, selecciona <strong>\"Guardar como PDF\"</strong> en la option <em>Destino</em>.
+            💡 Consejo: En la ventana que se abre, selecciona <strong>"Guardar como PDF"</strong> en la opción <em>Destino</em>.
         </span>
     </div>
 </body>
