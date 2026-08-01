@@ -669,6 +669,11 @@
                 <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.85rem;"></i>
                 <input type="text" id="search-input" placeholder="Buscar productos..." class="filter-select" oninput="applyFilters()" style="padding-left: 35px; width: 180px; box-sizing: border-box;">
             </div>
+            <!-- Price type selector -->
+            <select id="select-price-type" class="filter-select" onchange="applyFilters()">
+                <option value="internet">Precios Venta Internet</option>
+                <option value="wholesale">Precios Al por Mayor</option>
+            </select>
             <!-- Dynamic Categories loaded dynamically -->
             <select id="select-category" class="filter-select" onchange="applyFilters()">
                 <option value="all">Todas las Categorías</option>
@@ -745,7 +750,7 @@
         // Load query parameters on startup
         const urlParams = new URLSearchParams(window.location.search);
         const urlCompany = urlParams.get('company') || 'all';
-        const urlPrice = urlParams.get('price') || 'wholesale'; // default is wholesale
+        let urlPrice = urlParams.get('price') || 'internet';
 
         // Date population
         document.getElementById('cover-date').innerText = new Date().toLocaleDateString('es-CO', { 
@@ -858,11 +863,13 @@
                     }
                 }
 
-                // Filter out ghost products (no price) and products without images
+                // Filter out out-of-stock products (stock <= 0), ghost products (no price) and products without images
                 allProducts = products.filter(p => {
-                    const hasPrice = (p.priceInternet || p.priceFinal || p.priceWholesale) > 0;
+                    const totalStock = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
+                    const hasStock = totalStock > 0;
+                    const hasPrice = (parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || parseFloat(p.priceWholesale)) > 0;
                     const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
-                    return hasPrice && hasImage;
+                    return p.active !== false && hasStock && hasPrice && hasImage;
                 });
 
                 // Populate Category Filter dropdown dynamically from actual products
@@ -874,6 +881,9 @@
                     opt.innerText = cat;
                     catSelect.appendChild(opt);
                 });
+
+                const priceSelect = document.getElementById('select-price-type');
+                if (priceSelect) priceSelect.value = urlPrice;
 
                 applyFilters();
 
@@ -897,6 +907,8 @@
 
         // Filter and Render Logic
         function applyFilters() {
+            const priceSelect = document.getElementById('select-price-type');
+            if (priceSelect) urlPrice = priceSelect.value;
             const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
             const activeCategory = document.getElementById('select-category').value;
 
@@ -1039,7 +1051,7 @@
             const lines = descText.split(/\r?\n/);
             const hasColons = lines.some(line => line.includes(':'));
             
-            if (hasColons || descText.length < 120) {
+            if (hasHasColons || descText.length < 120) {
                 return descText;
             }
             
