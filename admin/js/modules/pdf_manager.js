@@ -259,7 +259,7 @@ window.PDFManager = {
                 </tbody>
             </table>
 
-            <div class="no-break" style="margin-top: 2.5rem; text-align: center; color: #94a3b8; font-size: 0.78rem; border-top: 1px dashed #cbd5e1; padding-top: 0.8rem; page-break-inside: avoid; break-inside: avoid;">
+            <div style="margin-top: 3rem; text-align: center; color: #94a3b8; font-size: 0.8rem; border-top: 1px dashed #cbd5e1; padding-top: 1rem;">
                 <p style="margin: 0;">Si tiene dudas sobre su estado de cuenta, comuníquese con nuestro equipo de cartera.</p>
                 <p style="margin: 4px 0 0 0;">Documento impreso desde ERP Multinegocio</p>
             </div>
