@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listado de Precios y Comisiones - TuCompras Col / Millenio / Vulcano</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --border: rgba(255,255,255,0.1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        h1 { margin: 0; font-size: 1.8rem; font-weight: 800; }
+        p { margin: 0.25rem 0 0 0; color: var(--text-secondary); font-size: 0.9rem; }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .view-btn-group {
+            display: inline-flex;
+            background: rgba(255,255,255,0.05);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .view-btn {
+            background: transparent;
+            color: var(--text-secondary);
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: var(--accent);
+            color: white;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        .table-container {
+            background: var(--card);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            overflow-x: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.88rem;
+        }
+
+        th {
+            background: rgba(255,255,255,0.03);
+            padding: 14px 16px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            vertical-align: middle;
+        }
+
+        tr:hover { background: rgba(255,255,255,0.02); }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .bg-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+        .bg-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+
+        .btn-action {
+            background: rgba(255,255,255,0.08);
+            color: white;
+            border: 1px solid var(--border);
+            padding: 8px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-action:hover { background: rgba(255,255,255,0.15); }
+
+        @media print {
+            body { background: white; color: black; padding: 0; }
+            .controls, .btn-action { display: none !important; }
+            .table-container { border: none; box-shadow: none; }
+            th { background: #f1f5f9; color: black; border-bottom: 2px solid #000; }
+            td { border-bottom: 1px solid #cbd5e1; color: black; }
+            .badge { border: 1px solid #000; color: black !important; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>Listado de Precios y Comisiones</h1>
+            <p>Catálogo Oficial TuCompras Col / Millenio / Vulcano</p>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-action" onclick="window.print()"><i class="fas fa-print"></i> Imprimir / Guardar PDF</button>
+        </div>
+    </div>
+
+    <div class="controls">
+        <div class="view-btn-group">
+            <button id="btn-view-admin" class="view-btn active" onclick="switchMode('admin')"><i class="fas fa-user-shield"></i> Vista Administración</button>
+            <button id="btn-view-sellers" class="view-btn" onclick="switchMode('sellers')"><i class="fas fa-user-tie"></i> Vista Vendedores (Solo Disponibles)</button>
+        </div>
+
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="search-input" placeholder="Buscar por producto, ref o categoría..." oninput="renderTable()">
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead id="table-head"></thead>
+            <tbody id="table-body"></tbody>
+        </table>
+    </div>
+
+    <script>
+        let currentMode = 'admin';
+        let productsData = [];
+
+        fetch('./products_dump.json')
+            .then(res => res.json())
+            .then(data => {
+                productsData = data;
+                renderTable();
+            })
+            .catch(() => {
+                const url = 'https://zuondbguopirimvfuehu.supabase.co/rest/v1/products?select=*&order=name.asc';
+                const key = 'sb_publishable_29SdlPI3zzDkNvvEO38kOQ_2NTwiTC_';
+                fetch(url, { headers: { 'apikey': key, 'Authorization': 'Bearer ' + key } })
+                    .then(res => res.json())
+                    .then(data => { productsData = data; renderTable(); });
+            });
+
+        function switchMode(mode) {
+            currentMode = mode;
+            document.getElementById('btn-view-admin').classList.toggle('active', mode === 'admin');
+            document.getElementById('btn-view-sellers').classList.toggle('active', mode === 'sellers');
+            renderTable();
+        }
+
+        const fmt = num => '$' + (parseFloat(num) || 0).toLocaleString('es-CO');
+
+        function renderTable() {
+            const head = document.getElementById('table-head');
+            const body = document.getElementById('table-body');
+            const query = document.getElementById('search-input').value.toLowerCase().trim();
+
+            let filtered = productsData.filter(p => {
+                const name = (p.name || '').toLowerCase();
+                const ref = (p.ref || '').toLowerCase();
+                const cat = (p.category || '').toLowerCase();
+                return name.includes(query) || ref.includes(query) || cat.includes(query);
+            });
+
+            if (currentMode === 'admin') {
+                head.innerHTML = `
+                    <tr>
+                        <th>REF</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Costo ($)</th>
+                        <th>Precio Internet/Final</th>
+                        <th>Precio Mayorista</th>
+                        <th>Comisión Base</th>
+                        <th>Stock Millenio</th>
+                        <th>Stock Vulcano</th>
+                        <th>Stock Total</th>
+                        <th>Estado</th>
+                    </tr>
+                `;
+                body.innerHTML = filtered.map(p => {
+                    const total = (p.stockMillenio || 0) + (p.stockVulcano || 0);
+                    const isAvailable = total > 0 && p.active !== false;
+                    return `
+                        <tr>
+                            <td><small>${p.ref || '-'}</small></td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${p.category || 'General'}</td>
+                            <td style="color:#ef4444; font-weight:600;">${fmt(p.cost)}</td>
+                            <td style="color:#3b82f6; font-weight:700;">${fmt(p.priceFinal || p.priceInternet)}</td>
+                            <td style="color:#f59e0b; font-weight:600;">${fmt(p.priceWholesale)}</td>
+                            <td style="color:#10b981; font-weight:700;">${fmt(p.commissionBase)}</td>
+                            <td>${p.stockMillenio || 0}</td>
+                            <td>${p.stockVulcano || 0}</td>
+                            <td><strong>${total}</strong></td>
+                            <td><span class="badge ${isAvailable ? 'bg-green' : 'bg-red'}">${isAvailable ? 'Activo' : 'Agotado'}</span></td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                // Vendedore View: Filter OUT out-of-stock items
+                filtered = filtered.filter(p => {
+                    const total = (p.stockMillenio || 0) + (p.stockVulcano || 0);
+                    return total > 0 && p.active !== false;
+                });
+
+                head.innerHTML = `
+                    <tr>
+                        <th>REF</th>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio Venta Público / Internet</th>
+                        <th>Comisión Vendedor ($)</th>
+                        <th>Stock Disponible</th>
+                    </tr>
+                `;
+                body.innerHTML = filtered.map(p => {
+                    const total = (p.stockMillenio || 0) + (p.stockVulcano || 0);
+                    return `
+                        <tr>
+                            <td><small>${p.ref || '-'}</small></td>
+                            <td><strong>${p.name}</strong></td>
+                            <td>${p.category || 'General'}</td>
+                            <td style="color:#3b82f6; font-weight:700;">${fmt(p.priceFinal || p.priceInternet)}</td>
+                            <td style="color:#10b981; font-weight:800; font-size:0.95rem;">${fmt(p.commissionBase)}</td>
+                            <td><strong style="color:#10b981;">${total} unid.</strong></td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+    </script>
+</body>
+</html>
