@@ -422,10 +422,23 @@ window.TuCompras = {
     },
 
     getSellersList() {
+        let sellers = [];
         if (window.Vendedores && typeof window.Vendedores.getSellers === 'function') {
-            return Vendedores.getSellers() || [];
+            sellers = Vendedores.getSellers() || [];
         }
-        return Storage.get(STORAGE_KEYS.SELLERS) || [];
+        if (!sellers || sellers.length === 0) {
+            sellers = Storage.get(STORAGE_KEYS.SELLERS) || [];
+        }
+        if (!sellers || sellers.length === 0) {
+            sellers = [
+                { id: 'vendedor_cindy', name: 'Cindy', status: 'activo' },
+                { id: 'vendedor_andres', name: 'Andrés', status: 'activo' },
+                { id: 'vendedor_web', name: 'Vendedor Web / Meta Ads', status: 'activo' },
+                { id: 'vendedor_general', name: 'Vendedor General', status: 'activo' }
+            ];
+            Storage.set(STORAGE_KEYS.SELLERS, sellers);
+        }
+        return sellers;
     },
 
     populateSellersDropdown(selectId = 'tc-seller-select') {
@@ -445,12 +458,8 @@ window.TuCompras = {
 
         const listToRender = activeSellers.length > 0 ? activeSellers : sellers;
 
-        if (listToRender.length === 0) {
-            select.innerHTML = '<option value="">⚠️ No hay vendedores creados en el sistema</option>';
-        } else {
-            select.innerHTML = '<option value="">Seleccione Vendedor...</option>' + 
-                listToRender.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-        }
+        select.innerHTML = '<option value="">Seleccione Vendedor...</option>' + 
+            listToRender.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
     },
 
     renderLiquidationView() {
