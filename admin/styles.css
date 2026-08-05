@@ -2047,6 +2047,17 @@ textarea:focus {
     .mobile-only {
         display: none !important;
     }
+    .mobile-header {
+        display: none !important;
+    }
+    .sidebar-close-btn {
+        display: none !important;
+    }
+    .sidebar {
+        transform: none !important;
+        left: 0 !important;
+        position: fixed !important;
+    }
 }
 
 /* Catalog Mobile Cards */
