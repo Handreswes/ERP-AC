@@ -2047,16 +2047,19 @@ textarea:focus {
     .mobile-only {
         display: none !important;
     }
-    .mobile-header {
+    .mobile-header, .mobile-top-bar {
         display: none !important;
     }
-    .sidebar-close-btn {
+    .sidebar-close-btn, #close-sidebar-btn {
         display: none !important;
     }
     .sidebar {
         transform: none !important;
         left: 0 !important;
         position: fixed !important;
+    }
+    .main-content {
+        margin-left: 260px !important;
     }
 }
 
