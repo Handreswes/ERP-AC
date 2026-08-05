@@ -115,26 +115,38 @@ document.addEventListener('DOMContentLoaded', async () => {
 // ========================================================
 window.initNavigation = initNavigation;
 function initNavigation() {
-    const sheet = document.getElementById('bottom-sheet');
-    const overlay = document.getElementById('bottom-sheet-overlay');
-    const closeMenu = document.getElementById('close-mobile-menu');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const closeBtn = document.getElementById('sidebar-close-btn');
 
     window.toggleMobileMenu = (show) => {
-        if (sheet && overlay) {
-            sheet.classList.toggle('active', show);
-            overlay.classList.toggle('active', show);
-            document.body.style.overflow = show ? 'hidden' : '';
+        if (sidebar) {
+            sidebar.classList.toggle('open', show);
+            sidebar.classList.toggle('active', show);
         }
+        if (overlay) {
+            overlay.classList.toggle('active', show);
+        }
+        document.body.style.overflow = show ? 'hidden' : '';
     };
 
-    if (closeMenu) closeMenu.addEventListener('click', () => window.toggleMobileMenu(false));
-    if (overlay) overlay.addEventListener('click', () => window.toggleMobileMenu(false));
+    if (mobileBtn) mobileBtn.onclick = (e) => { e.preventDefault(); window.toggleMobileMenu(true); };
+    if (closeBtn) closeBtn.onclick = (e) => { e.preventDefault(); window.toggleMobileMenu(false); };
+    if (overlay) overlay.onclick = () => window.toggleMobileMenu(false);
 
     document.addEventListener('click', (e) => {
-        // Handle Mobile Menu Trigger
-        if (e.target.closest('#mobile-menu-trigger')) {
+        const trigger = e.target.closest('#mobile-menu-btn, #mobile-menu-trigger');
+        if (trigger) {
             e.preventDefault();
             window.toggleMobileMenu(true);
+            return;
+        }
+
+        const closeTrigger = e.target.closest('#sidebar-close-btn');
+        if (closeTrigger) {
+            e.preventDefault();
+            window.toggleMobileMenu(false);
             return;
         }
 
@@ -143,14 +155,14 @@ function initNavigation() {
             e.preventDefault();
             const panelName = navItem.dataset.panel;
             window.handleNavClick(panelName);
+            window.toggleMobileMenu(false);
         }
     });
 
-    // Handle back/forward and manual hash changes
     window.addEventListener('hashchange', () => {
         const panelName = window.location.hash.replace('#', '');
         if (panelName && panelName !== localStorage.getItem('erp_active_panel')) {
-            window.handleNavClick(panelName, false); // false = don't update hash again
+            window.handleNavClick(panelName, false);
         }
     });
 };
@@ -221,65 +233,14 @@ window.handleNavClick = function (panelName, updateHash = true) {
         if (isActive) found = true;
     });
 
-    // 3. Fallback: If panel not found, create it (Emergency)
     if (!found) {
-        console.warn(`Panel ${panelName}-panel not found in DOM after render attempt.`);
+        console.warn(`Panel HTML element non-existent for: ${panelName}`);
     }
-};
 
-window.clearAllSystemData = async function () {
-    if (!confirm('¿Limpiar todo el sistema?')) return;
-    localStorage.clear();
-    location.reload(true);
-};
-
-// Logistics Badge Update Logic
-window.updateLogisticsBadge = async function() {
-    try {
-        if (!window.supabaseClient || !window.Storage) return;
-
-        // 1. POS sales pending shipment
-        const sales = window.Storage.get('sales') || [];
-        const pendingPOS = sales.filter(s => s.delivery_type === 'shipping' && s.delivery_status === 'pending').length;
-
-        // 2. Web orders pending confirmation
-        const { data: webOrders, error } = await (window.supabaseAdminClient || window.supabaseClient)
-            .from('orders')
-            .select('id')
-            .eq('status', 'Pendiente por Confirmar');
-        
-        const pendingWeb = error ? 0 : (webOrders || []).length;
-        const totalPending = pendingPOS + pendingWeb;
-
-        // 3. Update the UI badges
-        const navItems = document.querySelectorAll('[data-panel="logistics"]');
-        navItems.forEach(item => {
-            let badge = item.querySelector('.logistics-badge');
-            if (totalPending > 0) {
-                if (!badge) {
-                    badge = document.createElement('span');
-                    badge.className = 'logistics-badge';
-                    badge.style.background = '#10b981'; // Green dot
-                    badge.style.color = 'white';
-                    badge.style.fontSize = '10px';
-                    badge.style.fontWeight = 'bold';
-                    badge.style.borderRadius = '50%';
-                    badge.style.padding = '2px 6px';
-                    badge.style.marginLeft = '8px';
-                    badge.style.display = 'inline-flex';
-                    badge.style.alignItems = 'center';
-                    badge.style.justifyContent = 'center';
-                    badge.style.minWidth = '16px';
-                    badge.style.height = '16px';
-                    badge.style.boxShadow = '0 0 8px rgba(16, 185, 129, 0.5)';
-                    item.appendChild(badge);
-                }
-                badge.textContent = totalPending;
-            } else {
-                if (badge) badge.remove();
-            }
-        });
-    } catch (e) {
-        console.error('Error updating logistics badge:', e);
+    // Scroll to top of content area on navigation
+    const contentArea = document.getElementById('content-area');
+    if (contentArea) {
+        contentArea.scrollTop = 0;
     }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
 };
