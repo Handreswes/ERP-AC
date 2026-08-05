@@ -101,7 +101,8 @@ window.Storage = {
             window.STORAGE_KEYS.PRODUCTS,
             window.STORAGE_KEYS.SALES,
             window.STORAGE_KEYS.CLIENTS,
-            window.STORAGE_KEYS.ACCOUNTS
+            window.STORAGE_KEYS.ACCOUNTS,
+            window.STORAGE_KEYS.SELLERS
         ];
         for (const key of criticalKeys) {
             try {
