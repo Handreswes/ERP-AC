@@ -223,6 +223,7 @@ window.Catalog = {
         `;
 
         this.updatePreview();
+        this.updateShareableLink();
         this.setupEventListeners();
     },
 
@@ -284,6 +285,21 @@ window.Catalog = {
         }
     },
 
+    updateShareableLink() {
+        const urlInput = document.getElementById('shareable-catalog-url');
+        if (urlInput) {
+            let link = 'https://tucomprascol.com/catalogo.html';
+            const params = [];
+            if (this.currentPriceType === 'wholesale') params.push('price=wholesale');
+            if (this.currentCompany && this.currentCompany !== 'all') params.push(`company=${this.currentCompany}`);
+            
+            if (params.length > 0) {
+                link += '?' + params.join('&');
+            }
+            urlInput.value = link;
+        }
+    },
+
     setupEventListeners() {
         const panel = document.getElementById('catalog-panel');
         if (!panel) return;
@@ -292,9 +308,11 @@ window.Catalog = {
             if (e.target.id === 'catalog-select-price-type') {
                 this.currentPriceType = e.target.value;
                 this.updatePreview();
+                this.updateShareableLink();
             } else if (e.target.id === 'catalog-select-company') {
                 this.currentCompany = e.target.value;
                 this.updatePreview();
+                this.updateShareableLink();
             }
         };
 
@@ -360,7 +378,7 @@ window.Catalog = {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${title}</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         :root { --primary: #0f172a; --accent: #3b82f6; --bg: #f8fafc; }
