@@ -364,7 +364,7 @@ window.TuCompras = {
             return;
         }
 
-        const sellers = Vendedores.getSellers();
+        const sellers = this.getSellersList();
         const products = Inventory.getProducts();
 
         list.innerHTML = sales.map(s => {
@@ -422,6 +422,38 @@ window.TuCompras = {
                 </tr>
             `;
         }).join('');
+    },
+
+    getSellersList() {
+        if (window.Vendedores && typeof window.Vendedores.getSellers === 'function') {
+            return Vendedores.getSellers() || [];
+        }
+        return Storage.get(STORAGE_KEYS.SELLERS) || [];
+    },
+
+    populateSellersDropdown(selectId = 'tc-seller-select') {
+        const select = document.getElementById(selectId);
+        if (!select) return;
+
+        const sellers = this.getSellersList();
+        const activeSellers = sellers.filter(s => 
+            s && s.name && (
+                s.status === 'active' || 
+                s.status === 'activo' || 
+                s.active === true || 
+                (!s.status && s.active !== false) ||
+                (s.status !== 'inactive' && s.status !== 'inactivo')
+            )
+        );
+
+        const listToRender = activeSellers.length > 0 ? activeSellers : sellers;
+
+        if (listToRender.length === 0) {
+            select.innerHTML = '<option value="">⚠️ No hay vendedores creados en el sistema</option>';
+        } else {
+            select.innerHTML = '<option value="">Seleccione Vendedor...</option>' + 
+                listToRender.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+        }
     },
 
     renderLiquidationView() {
@@ -498,24 +530,27 @@ window.TuCompras = {
         if (!panel) return;
 
         panel.onclick = async (e) => {
-            const tabBtn = e.target.closest('.tab-btn');
-            if (tabBtn) {
+            const tabBtn = e.target.closest('.inventory-tabs .tab-btn');
+            if (tabBtn && tabBtn.dataset.status) {
                 this.activeStatus = tabBtn.dataset.status;
                 this.renderPanel();
                 return;
             }
 
-            if (e.target.id === 'new-tucompras-sale-btn') {
+            const newSaleBtn = e.target.closest('#new-tucompras-sale-btn');
+            if (newSaleBtn) {
                 this.openNewSaleModal();
                 return;
             }
 
-            if (e.target.id === 'tc-wizard-next') {
+            const wizardNextBtn = e.target.closest('#tc-wizard-next');
+            if (wizardNextBtn) {
                 this.navigateWizard(1);
                 return;
             }
 
-            if (e.target.id === 'tc-wizard-prev') {
+            const wizardPrevBtn = e.target.closest('#tc-wizard-prev');
+            if (wizardPrevBtn) {
                 this.navigateWizard(-1);
                 return;
             }
