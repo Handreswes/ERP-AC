@@ -8,7 +8,17 @@ window.Vendedores = {
     },
 
     getSellers() {
-        return Storage.get(STORAGE_KEYS.SELLERS);
+        let sellers = Storage.get(STORAGE_KEYS.SELLERS) || [];
+        if (!sellers || sellers.length === 0) {
+            sellers = [
+                { id: 'vendedor_cindy', name: 'Cindy', phone: 'N/A', status: 'activo', activeCampaign: 'Meta Ads' },
+                { id: 'vendedor_andres', name: 'Andrés', phone: 'N/A', status: 'activo', activeCampaign: 'Meta Ads' },
+                { id: 'vendedor_web', name: 'Vendedor Web / Meta Ads', phone: 'N/A', status: 'activo', activeCampaign: 'TuCompras Web' },
+                { id: 'vendedor_general', name: 'Vendedor General', phone: 'N/A', status: 'activo', activeCampaign: 'Ventas Directas' }
+            ];
+            Storage.set(STORAGE_KEYS.SELLERS, sellers);
+        }
+        return sellers;
     },
 
     async addSeller(seller) {
