@@ -179,10 +179,7 @@ window.handleNavClick = function (panelName, updateHash = true) {
         'dashboard': () => { if (window.Dashboard && window.Dashboard.updateStats) window.Dashboard.updateStats(); },
         'inventory': () => { 
             if (window.Inventory) {
-                if (!document.getElementById('inventory-panel')) {
-                    console.log('Force rendering Inventory...');
-                    window.Inventory.renderPanel();
-                }
+                if (!document.getElementById('inventory-panel')) window.Inventory.renderPanel();
                 if (window.Inventory.updateInventoryList) window.Inventory.updateInventoryList();
             }
         },
@@ -197,13 +194,16 @@ window.handleNavClick = function (panelName, updateHash = true) {
         'tucompras': () => { if (window.TuCompras && window.TuCompras.renderPanel) window.TuCompras.renderPanel(); },
         'vendedores': () => { if (window.Vendedores && window.Vendedores.renderPanel) window.Vendedores.renderPanel(); },
         'tucompras-crm': () => { if (window.TuComprasCRM && window.TuComprasCRM.renderPanel) window.TuComprasCRM.renderPanel(); },
+        'tucompras_crm': () => { if (window.TuComprasCRM && window.TuComprasCRM.renderPanel) window.TuComprasCRM.renderPanel(); },
         'marketing': () => { if (window.Marketing && window.Marketing.renderPanel) window.Marketing.renderPanel(); },
         'consultas': () => { if (window.Consultas && window.Consultas.renderPanel) window.Consultas.renderPanel(); },
         'catalog': () => { if (window.Catalog && window.Catalog.renderPanel) window.Catalog.renderPanel(); },
         'logistics': () => { if (window.Logistics && window.Logistics.renderPanel) window.Logistics.renderPanel(); },
         'categories': () => { if (window.CategoriesModule && window.CategoriesModule.init) window.CategoriesModule.init(); },
         'user-management': () => { if (window.UserManagement && window.UserManagement.init) window.UserManagement.init(); },
+        'user_management': () => { if (window.UserManagement && window.UserManagement.init) window.UserManagement.init(); },
         'website_admin': () => { if (window.WebsiteAdmin && window.WebsiteAdmin.renderPanel) window.WebsiteAdmin.renderPanel(); },
+        'website-admin': () => { if (window.WebsiteAdmin && window.WebsiteAdmin.renderPanel) window.WebsiteAdmin.renderPanel(); },
         'settings': () => { if (window.Settings && window.Settings.renderPanel) window.Settings.renderPanel(); }
     };
 
@@ -220,15 +220,20 @@ window.handleNavClick = function (panelName, updateHash = true) {
     }
 
     // Update Nav Active State
+    const altNameHyphen = panelName.replace('_', '-');
+    const altNameUnderscore = panelName.replace('-', '_');
     document.querySelectorAll('[data-panel]').forEach(item => {
-        item.classList.toggle('active', item.dataset.panel === panelName);
+        const dp = item.dataset.panel;
+        item.classList.toggle('active', dp === panelName || dp === altNameHyphen || dp === altNameUnderscore);
     });
 
     // Toggle Panels
     const panels = document.querySelectorAll('.panel');
     let found = false;
     panels.forEach(p => {
-        const isActive = p.id === `${panelName}-panel`;
+        const isActive = p.id === `${panelName}-panel` || 
+                         p.id === `${altNameHyphen}-panel` || 
+                         p.id === `${altNameUnderscore}-panel`;
         p.classList.toggle('active', isActive);
         if (isActive) found = true;
     });
