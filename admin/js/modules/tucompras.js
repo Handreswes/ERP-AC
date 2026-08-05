@@ -416,8 +416,10 @@ window.TuCompras = {
                             ${s.money_confirmed ? 'PAGADA' : 'PENDIENTE'}
                         </span>
                     </td>
-                    <td data-label="Acciones">
-                        <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}">Actualizar</button>
+                    <td data-label="Acciones" style="white-space: nowrap; display: flex; gap: 4px; align-items: center;">
+                        <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}" title="Cambiar Estado"><i class="fas fa-sync-alt"></i> Estado</button>
+                        <button class="btn btn-sm btn-outline tc-edit-btn" data-id="${s.id}" style="color: var(--accent); border-color: var(--accent);" title="Editar Venta"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn btn-sm btn-outline tc-delete-sale-btn" data-id="${s.id}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Eliminar Venta"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `;
@@ -576,6 +578,18 @@ window.TuCompras = {
             const updateBtn = e.target.closest('.tc-update-btn');
             if (updateBtn) {
                 this.openStatusModal(updateBtn.dataset.id);
+                return;
+            }
+
+            const editBtn = e.target.closest('.tc-edit-btn');
+            if (editBtn) {
+                this.openEditSaleModal(editBtn.dataset.id);
+                return;
+            }
+
+            const delSaleBtn = e.target.closest('.tc-delete-sale-btn');
+            if (delSaleBtn) {
+                this.deleteSale(delSaleBtn.dataset.id);
                 return;
             }
 
@@ -1017,6 +1031,7 @@ window.TuCompras = {
     },
 
     openNewSaleModal() {
+        this.editingSaleId = null;
         this.cart = [];
         this.activeStep = 1;
         this.activeCompanyFilter = 'all';
@@ -1040,7 +1055,82 @@ window.TuCompras = {
         document.getElementById('tc-cust-phone').value = '';
         const searchInput = document.getElementById('tc-product-search');
         if (searchInput) searchInput.value = '';
+
+        const wizardTitle = document.getElementById('tc-wizard-title');
+        if (wizardTitle) {
+            wizardTitle.innerHTML = `<span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">1</span> Información del Cliente`;
+        }
+
         document.getElementById('tucompras-sale-modal').classList.add('show');
+    },
+
+    openEditSaleModal(saleId) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        this.openNewSaleModal();
+        this.editingSaleId = saleId;
+        this.cart = sale.items ? JSON.parse(JSON.stringify(sale.items)) : [];
+        this.updateCartUI();
+        this.renderProductGrid();
+
+        document.getElementById('tc-cust-name').value = sale.customer_name || '';
+        document.getElementById('tc-cust-phone').value = sale.customer_phone || '';
+
+        const citySelect = document.getElementById('tc-cust-city');
+        if (citySelect && sale.customer_city) citySelect.value = sale.customer_city;
+
+        const sellerSelect = document.getElementById('tc-seller-select');
+        if (sellerSelect && sale.seller_id) sellerSelect.value = sale.seller_id;
+
+        const carrierSelect = document.querySelector('#tucompras-sale-form select[name="carrier"]');
+        if (carrierSelect && sale.carrier) carrierSelect.value = sale.carrier;
+
+        const trackingInput = document.querySelector('#tucompras-sale-form input[name="tracking_number"]');
+        if (trackingInput) trackingInput.value = sale.tracking_number || '';
+
+        const shippingInput = document.querySelector('#tucompras-sale-form input[name="shipping_cost"]');
+        if (shippingInput) shippingInput.value = sale.shipping_cost || 0;
+
+        const wizardTitle = document.getElementById('tc-wizard-title');
+        if (wizardTitle) {
+            wizardTitle.innerHTML = `<span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">1</span> Editando Venta #${sale.tracking_number || sale.id.substring(0,6)}`;
+        }
+    },
+
+    async deleteSale(saleId) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        if (!confirm(`¿Seguro que deseas eliminar la venta de "${sale.customer_name || 'este cliente'}"?\n\nEsta acción restaurará la cantidad de productos a sus bodegas.`)) {
+            return;
+        }
+
+        try {
+            // Restore stock to inventory
+            if (sale.items && Array.isArray(sale.items)) {
+                for (const item of sale.items) {
+                    const product = Inventory.getProducts().find(p => p.id === item.product_id);
+                    if (product) {
+                        const itemSource = item.inventory_source || sale.inventory_source || 'millenio';
+                        if (itemSource === 'millenio') {
+                            product.stockMillenio = (parseInt(product.stockMillenio) || 0) + item.qty;
+                        } else {
+                            product.stockVulcano = (parseInt(product.stockVulcano) || 0) + item.qty;
+                        }
+                        await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+                    }
+                }
+            }
+
+            // Delete from STORAGE_KEYS.TUCOMPRAS_SALES
+            await Storage.deleteItem(STORAGE_KEYS.TUCOMPRAS_SALES, saleId);
+            this.renderPanel();
+            alert('Venta eliminada con éxito y stock restaurado.');
+        } catch (err) {
+            console.error('[TUCOMPRAS] Error al eliminar venta:', err);
+            alert('❌ Error al eliminar la venta: ' + err.message);
+        }
     },
 
     navigateWizard(stepChange) {
@@ -1221,6 +1311,16 @@ window.TuCompras = {
     },
 
     async handleNewSale(formData) {
+        if (this.isSubmittingSale) return;
+        this.isSubmittingSale = true;
+
+        const submitBtn = document.querySelector('#tucompras-sale-form button[type="submit"]');
+        const origBtnText = submitBtn ? submitBtn.innerHTML : 'REGISTRAR DESPACHO';
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+        }
+
         try {
             const cityEl = document.getElementById('tc-cust-city');
             let city = cityEl ? cityEl.value.trim() : '';
@@ -1260,60 +1360,93 @@ window.TuCompras = {
             const shippingInput = document.querySelector('#tucompras-sale-form input[name="shipping_cost"]');
             const shipping_cost = formData && typeof formData.get === 'function' ? (parseFloat(formData.get('shipping_cost')) || 0) : (shippingInput ? (parseFloat(shippingInput.value) || 0) : 0);
 
-            // FIX: Smart Stock Validation per Product Item
-            const stockErrors = [];
-            for (const item of this.cart) {
-                const product = Inventory.getProducts().find(p => p.id === item.product_id);
-                if (!product) {
-                    stockErrors.push(`"${item.name}" ya no existe en inventario.`);
-                    continue;
-                }
-                const stockM = parseInt(product.stockMillenio) || 0;
-                const stockV = parseInt(product.stockVulcano) || 0;
-                const totalStock = stockM + stockV;
+            // FIX: Smart Stock Validation per Product Item (only for new sales)
+            if (!this.editingSaleId) {
+                const stockErrors = [];
+                for (const item of this.cart) {
+                    const product = Inventory.getProducts().find(p => p.id === item.product_id);
+                    if (!product) {
+                        stockErrors.push(`"${item.name}" ya no existe en inventario.`);
+                        continue;
+                    }
+                    const stockM = parseInt(product.stockMillenio) || 0;
+                    const stockV = parseInt(product.stockVulcano) || 0;
+                    const totalStock = stockM + stockV;
 
-                let itemSource = item.inventory_source || (stockM > 0 ? 'millenio' : 'vulcano');
-                let available = itemSource === 'millenio' ? stockM : stockV;
+                    let itemSource = item.inventory_source || (stockM > 0 ? 'millenio' : 'vulcano');
+                    let available = itemSource === 'millenio' ? stockM : stockV;
 
-                // If current warehouse stock is lower than requested quantity, auto-switch to the other warehouse if it has stock
-                if (item.qty > available) {
-                    const altSource = itemSource === 'millenio' ? 'vulcano' : 'millenio';
-                    const altAvailable = altSource === 'millenio' ? stockM : stockV;
-                    if (item.qty <= altAvailable) {
-                        item.inventory_source = altSource; // Auto switch
-                    } else {
-                        stockErrors.push(`"${product.name}": Solicitados ${item.qty}, disponible total en bodegas: ${totalStock} (Millenio: ${stockM}, Vulcano: ${stockV}).`);
+                    if (item.qty > available) {
+                        const altSource = itemSource === 'millenio' ? 'vulcano' : 'millenio';
+                        const altAvailable = altSource === 'millenio' ? stockM : stockV;
+                        if (item.qty <= altAvailable) {
+                            item.inventory_source = altSource; // Auto switch
+                        } else {
+                            stockErrors.push(`"${product.name}": Solicitados ${item.qty}, disponible total en bodegas: ${totalStock} (Millenio: ${stockM}, Vulcano: ${stockV}).`);
+                        }
                     }
                 }
-            }
 
-            if (stockErrors.length > 0) {
-                alert('❌ Stock insuficiente:\n\n' + stockErrors.join('\n'));
-                return;
+                if (stockErrors.length > 0) {
+                    alert('❌ Stock insuficiente:\n\n' + stockErrors.join('\n'));
+                    return;
+                }
             }
 
             const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
 
-            const sale = {
-                date: new Date().toISOString(),
-                customer_name: name,
-                customer_phone: phone,
-                seller_id: sellerId,
-                carrier: carrier,
-                tracking_number: tracking_number,
-                inventory_source: this.cart[0].inventory_source || 'millenio',
-                status: 'despachado',
-                shipping_cost: shipping_cost,
-                commission_paid: totalCommission,
-                items: this.cart,
-                money_confirmed: false,
-                is_paid_to_inventory: false
-            };
+            let sale;
+            if (this.editingSaleId) {
+                const existing = this.getSales().find(s => s.id === this.editingSaleId);
+                sale = {
+                    ...(existing || {}),
+                    id: this.editingSaleId,
+                    customer_name: name,
+                    customer_phone: phone,
+                    customer_city: city,
+                    seller_id: sellerId,
+                    carrier: carrier,
+                    tracking_number: tracking_number,
+                    shipping_cost: shipping_cost,
+                    commission_paid: totalCommission,
+                    items: this.cart
+                };
+                await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, this.editingSaleId, sale);
+                this.editingSaleId = null;
+                alert('Venta actualizada con éxito.');
+            } else {
+                sale = {
+                    date: new Date().toISOString(),
+                    customer_name: name,
+                    customer_phone: phone,
+                    customer_city: city,
+                    seller_id: sellerId,
+                    carrier: carrier,
+                    tracking_number: tracking_number,
+                    inventory_source: this.cart[0].inventory_source || 'millenio',
+                    status: 'despachado',
+                    shipping_cost: shipping_cost,
+                    commission_paid: totalCommission,
+                    items: this.cart,
+                    money_confirmed: false,
+                    is_paid_to_inventory: false
+                };
+                await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale);
 
-            // 1. SAVE SALE FIRST (Primary Data)
-            await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale);
+                // Discount Inventory
+                for (const item of this.cart) {
+                    const product = Inventory.getProducts().find(p => p.id === item.product_id);
+                    if (product) {
+                        const itemSource = item.inventory_source || 'millenio';
+                        if (itemSource === 'millenio') product.stockMillenio = Math.max(0, (parseInt(product.stockMillenio) || 0) - item.qty);
+                        else product.stockVulcano = Math.max(0, (parseInt(product.stockVulcano) || 0) - item.qty);
+                        await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+                    }
+                }
+                alert('Despacho registrado con éxito.');
+            }
 
-            // 2. DEPENDENT DATA (Customer CRM)
+            // DEPENDENT DATA (Customer CRM)
             const deptEl = document.getElementById('tc-cust-dept');
             const addressEl = document.getElementById('tc-cust-address');
             await TuComprasCRM.addCustomer({
@@ -1323,22 +1456,17 @@ window.TuCompras = {
                 address: addressEl ? addressEl.value : ''
             });
 
-            // 3. DEPENDENT DATA (Inventory Discount)
-            for (const item of this.cart) {
-                const product = Inventory.getProducts().find(p => p.id === item.product_id);
-                if (product) {
-                    const itemSource = item.inventory_source || 'millenio';
-                    if (itemSource === 'millenio') product.stockMillenio = Math.max(0, (parseInt(product.stockMillenio) || 0) - item.qty);
-                    else product.stockVulcano = Math.max(0, (parseInt(product.stockVulcano) || 0) - item.qty);
-                    await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
-                }
-            }
             document.getElementById('tucompras-sale-modal').classList.remove('show');
             this.renderPanel();
-            alert('Despacho registrado con éxito.');
         } catch (err) {
-            console.error('[TUCOMPRAS] Error al registrar venta:', err);
-            alert('❌ Error al registrar la venta: ' + err.message);
+            console.error('[TUCOMPRAS] Error al registrar/editar venta:', err);
+            alert('❌ Error: ' + err.message);
+        } finally {
+            this.isSubmittingSale = false;
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = origBtnText;
+            }
         }
     },
 
