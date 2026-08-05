@@ -59,9 +59,9 @@ window.Locations = {
         if (tag === 'datalist') {
             el.innerHTML = cities.map(c => `<option value="${c}"></option>`).join('');
         } else if (tag === 'select') {
-            el.innerHTML = '<option value="">Seleccione o escriba ciudad...</option>' +
-                cities.map(c => `<option value="${c}">${c}</option>`).join('') +
-                '<option value="OTRO">Escribir otra ciudad...</option>';
+            el.innerHTML = '<option value="">-- Seleccione Ciudad (' + cities.length + ' municipios) --</option>' +
+                '<option value="OTRO">✏️ OTRO (Escribir ciudad manualmente)...</option>' +
+                cities.map(c => `<option value="${c}">${c}</option>`).join('');
         }
     },
 
