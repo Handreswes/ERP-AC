@@ -163,13 +163,10 @@ window.Auth = {
     },
 
     updateProfileUI() {
-        const nameEl = document.querySelector('.user-profile span') || document.getElementById('user-display-name');
-        const roleEl = document.querySelector('.user-profile small') || document.getElementById('user-display-role');
+        const nameEl = document.querySelector('.user-profile span');
+        const roleEl = document.querySelector('.user-profile small');
         if (nameEl && this.currentUser) {
             nameEl.textContent = this.currentUser.name;
-        }
-        if (roleEl && this.currentUser) {
-            roleEl.textContent = this.currentUser.role.toUpperCase();
         }
     },
 
@@ -200,23 +197,17 @@ window.Auth = {
             password,
             full_name: fullName,
             role
-        }]).select();
-
-        if (error) {
-            console.error('Error creating user:', error);
-            return { success: false, error: error.message };
-        }
-        return { success: true, data: data[0] };
+        }]);
+        if (error) return { success: false, error: error.message };
+        return { success: true };
     },
 
-    async deleteUser(id) {
+    async deleteUser(userId) {
+        if (!this.isPrincipal()) return { success: false, error: 'No tienes permisos' };
         const supabase = window.supabaseClient;
-        if (!supabase) return false;
-        const { error } = await supabase.from('users').delete().eq('id', id);
-        if (error) {
-            console.error('Error deleting user:', error);
-            return false;
-        }
-        return true;
+        if (!supabase) return { success: false };
+        const { error } = await supabase.from('users').delete().eq('id', userId);
+        if (error) return { success: false, error: error.message };
+        return { success: true };
     }
 };
