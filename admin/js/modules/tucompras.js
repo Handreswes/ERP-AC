@@ -1403,7 +1403,6 @@ window.TuCompras = {
                     id: this.editingSaleId,
                     customer_name: name,
                     customer_phone: phone,
-                    customer_city: city,
                     seller_id: sellerId,
                     carrier: carrier,
                     tracking_number: tracking_number,
@@ -1411,6 +1410,7 @@ window.TuCompras = {
                     commission_paid: totalCommission,
                     items: this.cart
                 };
+                delete sale.customer_city;
                 await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, this.editingSaleId, sale);
                 this.editingSaleId = null;
                 alert('Venta actualizada con éxito.');
@@ -1419,7 +1419,6 @@ window.TuCompras = {
                     date: new Date().toISOString(),
                     customer_name: name,
                     customer_phone: phone,
-                    customer_city: city,
                     seller_id: sellerId,
                     carrier: carrier,
                     tracking_number: tracking_number,
