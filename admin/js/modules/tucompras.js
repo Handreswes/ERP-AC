@@ -1212,100 +1212,121 @@ window.TuCompras = {
     },
 
     async handleNewSale(formData) {
-        let city = document.getElementById('tc-cust-city').value;
-        if (city === 'OTRO (Escribir manualmente)') {
-            city = document.getElementById('tc-cust-city-other').value;
-            if (!city) { alert('Debe escribir la ciudad'); return; }
-        }
-        const name = document.getElementById('tc-cust-name').value;
-        const phone = document.getElementById('tc-cust-phone').value;
+        try {
+            const cityEl = document.getElementById('tc-cust-city');
+            const city = cityEl ? cityEl.value.trim() : '';
+            const nameEl = document.getElementById('tc-cust-name');
+            const name = nameEl ? nameEl.value.trim() : '';
+            const phoneEl = document.getElementById('tc-cust-phone');
+            const phone = phoneEl ? phoneEl.value.trim() : '';
 
-        if (!name || !phone || this.cart.length === 0) {
-            alert('Faltan datos obligatorios (Cliente o Productos)');
-            return;
-        }
-
-        // FIX: Vendor is required
-        const sellerId = formData.get('seller_id');
-        if (!sellerId) {
-            alert('⚠️ Debes seleccionar un Vendedor antes de registrar el despacho.');
-            return;
-        }
-
-        // FIX: Smart Stock Validation per Product Item
-        const stockErrors = [];
-        for (const item of this.cart) {
-            const product = Inventory.getProducts().find(p => p.id === item.product_id);
-            if (!product) {
-                stockErrors.push(`"${item.name}" ya no existe en inventario.`);
-                continue;
+            if (!name || !phone || !city) {
+                alert('Faltan datos obligatorios del cliente (Nombre, Teléfono y Ciudad)');
+                return;
             }
-            const stockM = parseInt(product.stockMillenio) || 0;
-            const stockV = parseInt(product.stockVulcano) || 0;
-            const totalStock = stockM + stockV;
 
-            let itemSource = item.inventory_source || (stockM > 0 ? 'millenio' : 'vulcano');
-            let available = itemSource === 'millenio' ? stockM : stockV;
+            if (!this.cart || this.cart.length === 0) {
+                alert('Debe agregar al menos un producto al despacho');
+                return;
+            }
 
-            // If current warehouse stock is lower than requested quantity, auto-switch to the other warehouse if it has stock
-            if (item.qty > available) {
-                const altSource = itemSource === 'millenio' ? 'vulcano' : 'millenio';
-                const altAvailable = altSource === 'millenio' ? stockM : stockV;
-                if (item.qty <= altAvailable) {
-                    item.inventory_source = altSource; // Auto switch
-                } else {
-                    stockErrors.push(`"${product.name}": Solicitados ${item.qty}, disponible total en bodegas: ${totalStock} (Millenio: ${stockM}, Vulcano: ${stockV}).`);
+            const sellerSelect = document.getElementById('tc-seller-select');
+            const sellerId = formData && typeof formData.get === 'function' ? formData.get('seller_id') : (sellerSelect ? sellerSelect.value : '');
+
+            if (!sellerId) {
+                alert('⚠️ Debes seleccionar un Vendedor antes de registrar el despacho.');
+                return;
+            }
+
+            const carrierSelect = document.querySelector('#tucompras-sale-form select[name="carrier"]');
+            const carrier = formData && typeof formData.get === 'function' ? formData.get('carrier') : (carrierSelect ? carrierSelect.value : 'Interrapidisimo');
+
+            const trackingInput = document.querySelector('#tucompras-sale-form input[name="tracking_number"]');
+            const tracking_number = formData && typeof formData.get === 'function' ? (formData.get('tracking_number') || '') : (trackingInput ? trackingInput.value : '');
+
+            const shippingInput = document.querySelector('#tucompras-sale-form input[name="shipping_cost"]');
+            const shipping_cost = formData && typeof formData.get === 'function' ? (parseFloat(formData.get('shipping_cost')) || 0) : (shippingInput ? (parseFloat(shippingInput.value) || 0) : 0);
+
+            // FIX: Smart Stock Validation per Product Item
+            const stockErrors = [];
+            for (const item of this.cart) {
+                const product = Inventory.getProducts().find(p => p.id === item.product_id);
+                if (!product) {
+                    stockErrors.push(`"${item.name}" ya no existe en inventario.`);
+                    continue;
+                }
+                const stockM = parseInt(product.stockMillenio) || 0;
+                const stockV = parseInt(product.stockVulcano) || 0;
+                const totalStock = stockM + stockV;
+
+                let itemSource = item.inventory_source || (stockM > 0 ? 'millenio' : 'vulcano');
+                let available = itemSource === 'millenio' ? stockM : stockV;
+
+                // If current warehouse stock is lower than requested quantity, auto-switch to the other warehouse if it has stock
+                if (item.qty > available) {
+                    const altSource = itemSource === 'millenio' ? 'vulcano' : 'millenio';
+                    const altAvailable = altSource === 'millenio' ? stockM : stockV;
+                    if (item.qty <= altAvailable) {
+                        item.inventory_source = altSource; // Auto switch
+                    } else {
+                        stockErrors.push(`"${product.name}": Solicitados ${item.qty}, disponible total en bodegas: ${totalStock} (Millenio: ${stockM}, Vulcano: ${stockV}).`);
+                    }
                 }
             }
-        }
 
-        if (stockErrors.length > 0) {
-            alert('❌ Stock insuficiente:\n\n' + stockErrors.join('\n'));
-            return;
-        }
-
-        const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
-
-        const sale = {
-            date: new Date().toISOString(),
-            customer_name: name,
-            customer_phone: phone,
-            seller_id: formData.get('seller_id'),
-            carrier: formData.get('carrier'),
-            tracking_number: formData.get('tracking_number'),
-            inventory_source: this.cart[0].inventory_source, // Use the source of the first product as primary
-            status: 'despachado',
-            shipping_cost: parseFloat(formData.get('shipping_cost')) || 0,
-            commission_paid: totalCommission,
-            items: this.cart,
-            money_confirmed: false,
-            is_paid_to_inventory: false
-        };
-
-        // 1. SAVE SALE FIRST (Primary Data)
-        await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale);
-
-        // 2. DEPENDENT DATA (Customer CRM)
-        await TuComprasCRM.addCustomer({
-            name, phone,
-            dept: document.getElementById('tc-cust-dept').value,
-            city: document.getElementById('tc-cust-city').value,
-            address: document.getElementById('tc-cust-address').value
-        });
-
-        // 3. DEPENDENT DATA (Inventory Discount)
-        for (const item of this.cart) {
-            const product = Inventory.getProducts().find(p => p.id === item.product_id);
-            if (product) {
-                const itemSource = item.inventory_source || 'millenio';
-                if (itemSource === 'millenio') product.stockMillenio -= item.qty;
-                else product.stockVulcano -= item.qty;
-                await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+            if (stockErrors.length > 0) {
+                alert('❌ Stock insuficiente:\n\n' + stockErrors.join('\n'));
+                return;
             }
+
+            const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
+
+            const sale = {
+                date: new Date().toISOString(),
+                customer_name: name,
+                customer_phone: phone,
+                seller_id: sellerId,
+                carrier: carrier,
+                tracking_number: tracking_number,
+                inventory_source: this.cart[0].inventory_source || 'millenio',
+                status: 'despachado',
+                shipping_cost: shipping_cost,
+                commission_paid: totalCommission,
+                items: this.cart,
+                money_confirmed: false,
+                is_paid_to_inventory: false
+            };
+
+            // 1. SAVE SALE FIRST (Primary Data)
+            await Storage.addItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale);
+
+            // 2. DEPENDENT DATA (Customer CRM)
+            const deptEl = document.getElementById('tc-cust-dept');
+            const addressEl = document.getElementById('tc-cust-address');
+            await TuComprasCRM.addCustomer({
+                name, phone,
+                dept: deptEl ? deptEl.value : '',
+                city: city,
+                address: addressEl ? addressEl.value : ''
+            });
+
+            // 3. DEPENDENT DATA (Inventory Discount)
+            for (const item of this.cart) {
+                const product = Inventory.getProducts().find(p => p.id === item.product_id);
+                if (product) {
+                    const itemSource = item.inventory_source || 'millenio';
+                    if (itemSource === 'millenio') product.stockMillenio = Math.max(0, (parseInt(product.stockMillenio) || 0) - item.qty);
+                    else product.stockVulcano = Math.max(0, (parseInt(product.stockVulcano) || 0) - item.qty);
+                    await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+                }
+            }
+            document.getElementById('tucompras-sale-modal').classList.remove('show');
+            this.renderPanel();
+            alert('Despacho registrado con éxito.');
+        } catch (err) {
+            console.error('[TUCOMPRAS] Error al registrar venta:', err);
+            alert('❌ Error al registrar la venta: ' + err.message);
         }
-        document.getElementById('tucompras-sale-modal').classList.remove('show');
-        this.renderPanel();
-        alert('Despacho registrado con éxito.');
     },
 
     openStatusModal(saleId) {
