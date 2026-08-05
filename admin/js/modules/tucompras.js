@@ -128,17 +128,14 @@ window.TuCompras = {
                                 </div>
                                 <div class="form-group">
                                     <label>Ciudad *</label>
-                                    <select id="tc-cust-city" class="form-control" required>
-                                        <option value="">Seleccione depto primero...</option>
-                                    </select>
+                                    <div style="position: relative;">
+                                        <input type="text" id="tc-cust-city" list="tc-cust-city-list" class="form-control" placeholder="Escribe o selecciona la ciudad..." required autocomplete="off">
+                                        <datalist id="tc-cust-city-list"></datalist>
+                                    </div>
                                 </div>
                                 <div class="form-group" style="grid-column: span 2;">
                                     <label>Dirección (Opcional)</label>
                                     <input type="text" id="tc-cust-address" class="form-control" placeholder="Calle, Carrera, Apto...">
-                                </div>
-                                <div class="form-group" id="tc-cust-city-other-group" style="display: none; grid-column: span 2;">
-                                    <label>Escriba Ciudad *</label>
-                                    <input type="text" id="tc-cust-city-other" class="form-control" placeholder="Nombre de la ciudad">
                                 </div>
                             </div>
                         </div>
