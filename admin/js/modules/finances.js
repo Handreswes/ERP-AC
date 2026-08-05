@@ -107,6 +107,38 @@ window.Finances = {
                         <tbody id="debt-list"></tbody>
                     </table>
                 </div>
+
+                <div class="panel-header" style="margin-top: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="margin:0; color: var(--danger);"><i class="fas fa-receipt"></i> Historial de Salidas y Gastos</h2>
+                        <p class="text-secondary" style="font-size: 0.85rem; margin-top: 4px;">Registro visible en tiempo real de todos los gastos y salidas de dinero.</p>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <select id="expense-company-filter" class="form-control" style="width: auto;">
+                            <option value="all">Todas las Empresas</option>
+                            <option value="millenio">🔵 Millenio</option>
+                            <option value="vulcano">🟠 Vulcano</option>
+                            <option value="tucompras">🌐 TuCompras</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Empresa</th>
+                                <th>Categoría / Concepto</th>
+                                <th>Descripción</th>
+                                <th>Monto ($)</th>
+                                <th>Origen / Cuenta</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="finance-expenses-list"></tbody>
+                    </table>
+                </div>
             </div>
 
             <!-- Accounts Modal -->
@@ -515,6 +547,71 @@ window.Finances = {
         if (debtVEl) debtVEl.textContent = `$${totalV.toLocaleString()}`;
     },
 
+    updateExpensesList() {
+        const list = document.getElementById('finance-expenses-list');
+        if (!list) return;
+
+        const expenses = Storage.get(STORAGE_KEYS.EXPENSES) || [];
+        const movements = (Storage.get(STORAGE_KEYS.MOVEMENTS) || []).filter(m => m.type === 'outflow');
+        const selectedCompany = document.getElementById('expense-company-filter')?.value || 'all';
+
+        let allOutflows = [
+            ...expenses.map(e => ({
+                id: e.id,
+                date: e.date || new Date().toISOString(),
+                company: e.company || 'multinegocio',
+                category: e.category || 'Gasto General',
+                description: e.description || e.name || 'Gasto',
+                amount: parseFloat(e.amount || 0),
+                source: e.payment_method || e.originAccount || 'Caja / Banco',
+                isExpense: true
+            })),
+            ...movements.map(m => ({
+                id: m.id,
+                date: m.date || new Date().toISOString(),
+                company: m.company || 'multinegocio',
+                category: 'Salida de Caja',
+                description: m.description || 'Egreso de Dinero',
+                amount: parseFloat(m.amount || 0),
+                source: m.account_id === 'cash' ? 'Caja Efectivo' : (m.account_id || 'Caja'),
+                isExpense: false
+            }))
+        ];
+
+        if (selectedCompany !== 'all') {
+            allOutflows = allOutflows.filter(o => o.company === selectedCompany);
+        }
+
+        allOutflows.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        if (allOutflows.length === 0) {
+            list.innerHTML = '<tr><td colspan="7" class="text-center text-secondary" style="padding: 2rem;">No hay registros de salidas o gastos</td></tr>';
+            return;
+        }
+
+        list.innerHTML = allOutflows.map(item => `
+            <tr>
+                <td data-label="Fecha">${new Date(item.date).toLocaleDateString()} ${new Date(item.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                <td data-label="Empresa">
+                    <span class="badge ${item.company === 'millenio' ? 'bg-blue' : (item.company === 'vulcano' ? 'bg-orange' : 'bg-success')}">
+                        ${(item.company || 'General').toUpperCase()}
+                    </span>
+                </td>
+                <td data-label="Categoría"><strong>${item.category}</strong></td>
+                <td data-label="Descripción">${item.description}</td>
+                <td data-label="Monto" class="text-danger" style="font-weight: 700; font-size: 1rem;">
+                    -$${item.amount.toLocaleString()}
+                </td>
+                <td data-label="Origen">${item.source}</td>
+                <td data-label="Acciones">
+                    <button class="btn btn-sm btn-outline tc-delete-expense-btn" data-id="${item.id}" data-is-expense="${item.isExpense}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);">
+                        <i class="fas fa-trash"></i> Eliminar
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    },
+
     setupEventListeners() {
         // 1. Delegated Clicks (Buttons, Close, etc.)
         document.addEventListener('click', async (e) => {
@@ -622,6 +719,23 @@ window.Finances = {
                 return;
             }
 
+            const delExpenseBtn = e.target.closest('.tc-delete-expense-btn');
+            if (delExpenseBtn) {
+                if (confirm('¿Seguro que deseas eliminar este registro de gasto / salida?')) {
+                    const id = delExpenseBtn.dataset.id;
+                    const isExpense = delExpenseBtn.dataset.isExpense === 'true';
+                    if (isExpense) {
+                        await Storage.deleteItem(STORAGE_KEYS.EXPENSES, id);
+                    } else {
+                        await Storage.deleteItem(STORAGE_KEYS.MOVEMENTS, id);
+                    }
+                    this.updateBalancesUI();
+                    this.updateExpensesList();
+                    this.renderChart();
+                }
+                return;
+            }
+
             const payRecBtn = e.target.closest('.pay-recurring-btn');
             if (payRecBtn) {
                 const item = Storage.getById(STORAGE_KEYS.RECURRING_EXPENSES, payRecBtn.dataset.id);
@@ -651,6 +765,15 @@ window.Finances = {
         });
 
         // 3. Delegated Inputs (Formatting, Search)
+        document.addEventListener('change', (e) => {
+            if (e.target.id === 'finance-client-select') {
+                this.updateDebtUI(e.target.value);
+            }
+            if (e.target.id === 'expense-company-filter') {
+                this.updateExpensesList();
+            }
+        });
+
         document.addEventListener('input', (e) => {
             if (e.target.id === 'finance-client-select') {
                 this.updateDebtUI(e.target.value);
