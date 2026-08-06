@@ -546,8 +546,23 @@ async function fetchProducts() {
             const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
             return p.active !== false && hasStock && hasPrice && hasImage;
         });
+
+        // Sort products: Tools/Hardware FIRST, Cuadros LAST
+        products.sort((a, b) => {
+            const catA = (a.category || '').toLowerCase();
+            const catB = (b.category || '').toLowerCase();
+            const nameA = (a.name || '').toLowerCase();
+            const nameB = (b.name || '').toLowerCase();
+
+            const isCuadroA = catA.includes('cuadro') || nameA.includes('cuadro');
+            const isCuadroB = catB.includes('cuadro') || nameB.includes('cuadro');
+
+            if (isCuadroA && !isCuadroB) return 1;
+            if (!isCuadroA && isCuadroB) return -1;
+            return 0;
+        });
         
-        console.log('Filtered products:', products.length);
+        console.log('Filtered & Sorted products (Herramientas primero, Cuadros al final):', products.length);
 
         renderProducts(products);
         renderCategories();
@@ -585,8 +600,19 @@ function populateCylinder() {
 function renderProducts(items) {
     productGrid.innerHTML = '';
     let filtered = activeCategory === 'all' 
-        ? items.filter(p => (p.category || '').toLowerCase() !== 'cuadros') 
+        ? [...items] 
         : items.filter(p => p.category === activeCategory);
+
+    // Ensure cuadros are at the very end when displaying 'all'
+    if (activeCategory === 'all') {
+        filtered.sort((a, b) => {
+            const isCuadroA = (a.category || '').toLowerCase().includes('cuadro') || (a.name || '').toLowerCase().includes('cuadro');
+            const isCuadroB = (b.category || '').toLowerCase().includes('cuadro') || (b.name || '').toLowerCase().includes('cuadro');
+            if (isCuadroA && !isCuadroB) return 1;
+            if (!isCuadroA && isCuadroB) return -1;
+            return 0;
+        });
+    }
 
     if (currentSearchQuery) {
         filtered = filtered.filter(p => (p.name || '').toLowerCase().includes(currentSearchQuery));
