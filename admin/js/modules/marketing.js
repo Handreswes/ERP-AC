@@ -71,7 +71,8 @@ window.MetaAPI = {
                 event_name: 'Purchase',
                 event_time: eventTime,
                 event_id: eventId,
-                action_source: 'system',
+                action_source: 'website',
+                event_source_url: 'https://tucomprascol.com',
                 user_data: {
                     fn: fnHash ? [fnHash] : undefined,
                     ln: lnHash ? [lnHash] : undefined,
