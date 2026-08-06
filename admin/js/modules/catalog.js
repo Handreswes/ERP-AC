@@ -245,6 +245,21 @@ window.Catalog = {
             );
         }
 
+        // Sort products: Herramientas / General FIRST, Cuadros / Cuadros Decorativos LAST
+        filtered.sort((a, b) => {
+            const catA = (a.category || '').toLowerCase();
+            const catB = (b.category || '').toLowerCase();
+            const nameA = (a.name || '').toLowerCase();
+            const nameB = (b.name || '').toLowerCase();
+
+            const isCuadroA = catA.includes('cuadro') || nameA.includes('cuadro');
+            const isCuadroB = catB.includes('cuadro') || nameB.includes('cuadro');
+
+            if (isCuadroA && !isCuadroB) return 1;
+            if (!isCuadroA && isCuadroB) return -1;
+            return 0;
+        });
+
         const list = document.getElementById('catalog-preview-list');
         const mobileList = document.getElementById('catalog-mobile-list');
 
