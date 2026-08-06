@@ -201,7 +201,7 @@ window.CRM = {
                 <td data-label="Deuda Millenio" class="text-danger">$${(c.balanceMillenio || 0).toLocaleString()}</td>
                 <td data-label="Deuda Vulcano" class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
                 <td data-label="Total Deuda"><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
-                <td class="table-actions">
+                <td class="table-actions" data-label="Acciones">
                     <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono" onclick="window.CRM.openPaymentModal(this.dataset.id);"><i class="fas fa-hand-holding-usd"></i></button>
                     <button class="icon-btn refund-btn" data-id="${c.id}" title="Registrar Devolución" onclick="window.CRM.openReturnModal(this.dataset.id);" style="color: #f87171;"><i class="fas fa-undo"></i></button>
                     <button class="icon-btn state-btn" data-id="${c.id}" title="Estado de Cuenta"><i class="fas fa-file-invoice-dollar"></i></button>
