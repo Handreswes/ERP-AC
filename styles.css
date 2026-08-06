@@ -129,17 +129,6 @@ body {
     transition: var(--transition);
 }
 
-.nav-links a::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 0;
-    height: 2px;
-    background: var(--primary-gradient);
-    transition: var(--transition);
-}
-
 .nav-links a:hover::after {
     width: 100%;
 }
