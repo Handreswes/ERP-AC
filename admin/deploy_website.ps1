@@ -41,15 +41,24 @@ try {
     
     $googleXmlPath = Join-Path $sourceDir "google_feed.xml"
     $tiktokXmlPath = Join-Path $sourceDir "tiktok_feed.xml"
-    Write-Host "Generating Product Feeds: $googleXmlPath and $tiktokXmlPath" -ForegroundColor Cyan
+    $wholesaleXmlPath = Join-Path $sourceDir "wholesale_feed.xml"
+    Write-Host "Generating Product Feeds: $googleXmlPath, $tiktokXmlPath, and $wholesaleXmlPath" -ForegroundColor Cyan
     
-    # Initialize Google/Meta XML Feed
+    # Initialize Google/Meta XML Feed (Retail)
     $googleXml = "<?xml version=`"1.0`"?>`n"
     $googleXml += "<rss xmlns:g=`"http://base.google.com/ns/1.0`" version=`"2.0`">`n"
     $googleXml += "  <channel>`n"
-    $googleXml += "    <title>TuCompras Col</title>`n"
+    $googleXml += "    <title>TuCompras Col Retail</title>`n"
     $googleXml += "    <link>https://tucomprascol.com</link>`n"
     $googleXml += "    <description>Distribuidora lider en herramientas y hogar en Colombia</description>`n"
+
+    # Initialize Wholesale XML Feed (Millenio & Vulcano)
+    $wholesaleXml = "<?xml version=`"1.0`"?>`n"
+    $wholesaleXml += "<rss xmlns:g=`"http://base.google.com/ns/1.0`" version=`"2.0`">`n"
+    $wholesaleXml += "  <channel>`n"
+    $wholesaleXml += "    <title>Millenio y Vulcano - Al Por Mayor</title>`n"
+    $wholesaleXml += "    <link>https://tucomprascol.com/catalogo.html?price=wholesale</link>`n"
+    $wholesaleXml += "    <description>Catálogo Mayorista oficial de herramientas para ferreterías y distribuidores</description>`n"
     
     # Initialize TikTok XML Feed
     $tiktokXml = "<?xml version=`"1.0`" encoding=`"UTF-8`"?>`n"
@@ -64,6 +73,9 @@ try {
         if (!$price -or $price -le 0) { $price = $p.priceInternet }
         if (!$price -or $price -le 0) { $price = $p.priceWholesale }
         
+        $wPrice = $p.priceWholesale
+        if (!$wPrice -or $wPrice -le 0) { $wPrice = $price }
+
         $imgUrl = ""
         if ($p.image) {
             if ($p.image -is [array]) {
@@ -139,7 +151,7 @@ try {
         $categoryEscaped = if ($p.category) { [System.Security.SecurityElement]::Escape($p.category) } else { "General" }
         $brand = if ($p.provider) { [System.Security.SecurityElement]::Escape($p.provider) } else { "TuCompras" }
         
-        # Add to Google/Meta Feed
+        # Add to Google/Meta Feed (Retail)
         $googleXml += "    <item>`n"
         $googleXml += "      <g:id>$($p.id)</g:id>`n"
         $googleXml += "      <title>$titleEscaped</title>`n"
@@ -152,6 +164,20 @@ try {
         $googleXml += "      <g:brand>$brand</g:brand>`n"
         $googleXml += "      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>`n"
         $googleXml += "    </item>`n"
+
+        # Add to Meta Wholesale Feed (Line 3113979396)
+        $wholesaleXml += "    <item>`n"
+        $wholesaleXml += "      <g:id>$($p.id)</g:id>`n"
+        $wholesaleXml += "      <title>$titleEscaped</title>`n"
+        $wholesaleXml += "      <description>$descEscaped</description>`n"
+        $wholesaleXml += "      <link>https://tucomprascol.com/catalogo.html?price=wholesale</link>`n"
+        $wholesaleXml += "      <g:image_link>$imgUrl</g:image_link>`n"
+        $wholesaleXml += "      <g:condition>new</g:condition>`n"
+        $wholesaleXml += "      <g:availability>$g_availability</g:availability>`n"
+        $wholesaleXml += "      <g:price>$wPrice COP</g:price>`n"
+        $wholesaleXml += "      <g:brand>$brand</g:brand>`n"
+        $wholesaleXml += "      <g:google_product_category>Hardware &gt; Tools</g:google_product_category>`n"
+        $wholesaleXml += "    </item>`n"
 
         # Add to TikTok Feed
         $tiktokXml += "    <item>`n"
@@ -170,14 +196,18 @@ try {
     
     $googleXml += "  </channel>`n"
     $googleXml += "</rss>"
+
+    $wholesaleXml += "  </channel>`n"
+    $wholesaleXml += "</rss>"
     
     $tiktokXml += "  </channel>`n"
     $tiktokXml += "</rss>"
     
     $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
     [System.IO.File]::WriteAllText($googleXmlPath, $googleXml, $utf8NoBom)
+    [System.IO.File]::WriteAllText($wholesaleXmlPath, $wholesaleXml, $utf8NoBom)
     [System.IO.File]::WriteAllText($tiktokXmlPath, $tiktokXml, $utf8NoBom)
-    Write-Host "Product Feeds generated successfully!" -ForegroundColor Green
+    Write-Host "Product Feeds generated successfully (including wholesale_feed.xml)!" -ForegroundColor Green
 } catch {
     Write-Host "Warning: Failed to generate Product Feeds: $($_.Exception.Message)" -ForegroundColor Yellow
 }
