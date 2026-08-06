@@ -538,11 +538,13 @@ async function fetchProducts() {
         
         console.log('Raw products fetched:', data ? data.length : 0);
 
-        // Filter out ghost products (no price) and products without images
+        // Filter out out-of-stock products (stock <= 0), ghost products (no price) and products without images
         products = data.filter(p => {
-            const hasPrice = (p.priceInternet || p.priceFinal || p.priceWholesale) > 0;
+            const totalStock = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
+            const hasStock = totalStock > 0;
+            const hasPrice = (parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || parseFloat(p.priceWholesale)) > 0;
             const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
-            return hasPrice && hasImage;
+            return p.active !== false && hasStock && hasPrice && hasImage;
         });
         
         console.log('Filtered products:', products.length);
