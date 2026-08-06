@@ -4,21 +4,24 @@
 
 window.MetaAPI = {
     getSettings() {
-        const validToken = 'EAAZAStMI40MIBSOsL0j3ohraFrlG8Em0DghFUDmbZAFCs37z79mbzIIrDDxDlfxRZCgUZBolgyETQ0iOaIDNeI9ZCkBbI8FyZC0OYjVPpONmAg6vUdcslZBaIumjAHKzyx21V352wRTJwc77C97bPHmLti7QJ1mUlwBKia3ZBxZALsbjEMbuLcP6k111OwOtvsZAcM7QZDZD';
+        const validToken = 'EAAZAStMI40MIBSAHZBBlzmodFapo1uPeedZCYPYud2JyHWpGfC85NJLD4oVQYUJqSRDm3RUWxagrrLJtc9ScyEKEtdP19bHbiO2OZBflFGZCidEaOUF4divXIeq76zORGXfU87Fz9xNHsERVInF9vR6PPqM9qR6hjivL103ANDfWCLToS5I6taMqxOqfDtLUq9wZDZD';
+        const pageToken = 'EAAZAStMI40MIBSNo4OKU8CakZBNqnGA6wZBa1SQWwTETlywcbYmo0UxfSc24XEskIpMGguYXEtOV5GTsiZCrl4PDqaKrT1bMeaw9jyNZAUJ7Mj2V8AGpJrGZCSCZA3811ie8e70f26VAFrRSZBrHyrzPZCcQ7zIBetUWZAvybjOKQkW0gXP8OxPMKHTZBROQfz626vsv5fjB00ZD';
         try {
             const raw = localStorage.getItem('erp_meta_config');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                if (!parsed.accessToken || parsed.accessToken.startsWith('EAAaDm')) {
-                    parsed.accessToken = validToken;
-                }
-                if (!parsed.adsToken) parsed.adsToken = validToken;
+                parsed.accessToken = validToken;
+                parsed.adsToken = validToken;
+                parsed.pageId = '102895847941335';
+                parsed.pageToken = pageToken;
                 return parsed;
             }
         } catch (e) {}
         return {
             pixelId: '1765263381138535',
             adAccountId: 'act_1730680554708708',
+            pageId: '102895847941335',
+            pageToken: pageToken,
             accessToken: validToken,
             adsToken: validToken,
             testEventCode: '',
