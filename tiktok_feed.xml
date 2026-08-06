@@ -5,18 +5,6 @@
     <link>https://tucomprascol.com</link>
     <description>Distribuidora lider en herramientas y hogar en Colombia</description>
     <item>
-      <sku_id>0cb6b37f-8847-49cb-a71a-629d08b10bc6</sku_id>
-      <title>Taladro de 720W</title>
-      <description>taladro con percutor y motor de 720w</description>
-      <link>https://tucomprascol.com/?p=0cb6b37f-8847-49cb-a71a-629d08b10bc6</link>
-      <image_link>https://tucomprascol.com/images/products/0cb6b37f-8847-49cb-a71a-629d08b10bc6.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>169000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>b0c3dd69-d6d7-4ce7-891a-8f4a6470a0a1</sku_id>
       <title>Taladro 28v</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
@@ -25,6 +13,18 @@
       <condition>new</condition>
       <availability>in stock</availability>
       <price>189000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>0cb6b37f-8847-49cb-a71a-629d08b10bc6</sku_id>
+      <title>Taladro de 720W</title>
+      <description>taladro con percutor y motor de 720w</description>
+      <link>https://tucomprascol.com/?p=0cb6b37f-8847-49cb-a71a-629d08b10bc6</link>
+      <image_link>https://tucomprascol.com/images/products/0cb6b37f-8847-49cb-a71a-629d08b10bc6.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>169000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -41,17 +41,14 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>86b294ff-9813-473b-8068-136ca6b74d0a</sku_id>
-      <title>Combo llave Impacto y Taladro </title>
-      <description>Realiza tus proyectos de construcción y mantenimiento con la máxima eficiencia y autonomía. Este conjunto inalámbrico de alto rendimiento te proporciona la potencia y precisión necesarias para afrontar cualquier tarea exigente sin interrupciones.
-
-* El taladro con mandril de 1/2 pulgada ofrece un agarre firme y versatilidad para perforar diversos materiales con absoluta precisión.
-*</description>
-      <link>https://tucomprascol.com/?p=86b294ff-9813-473b-8068-136ca6b74d0a</link>
-      <image_link>https://tucomprascol.com/images/products/86b294ff-9813-473b-8068-136ca6b74d0a.jpg</image_link>
+      <sku_id>a0146cc4-57a4-4e9e-a03d-178027081fc6</sku_id>
+      <title>Rebordeadora Azul</title>
+      <description>rebordeadora de 750w  hasta 30000rpm  tiene un peso de 2 kg</description>
+      <link>https://tucomprascol.com/?p=a0146cc4-57a4-4e9e-a03d-178027081fc6</link>
+      <image_link>https://tucomprascol.com/images/products/a0146cc4-57a4-4e9e-a03d-178027081fc6.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>349000.00 COP</price>
+      <price>169000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -73,30 +70,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>be05522b-d3bd-445f-aa6b-bdf93d22a76b</sku_id>
-      <title>Sierra Circular 7&quot; Amarilla</title>
-      <description>Sierra</description>
-      <link>https://tucomprascol.com/?p=be05522b-d3bd-445f-aa6b-bdf93d22a76b</link>
-      <image_link>https://tucomprascol.com/images/products/be05522b-d3bd-445f-aa6b-bdf93d22a76b.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>289000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>a0146cc4-57a4-4e9e-a03d-178027081fc6</sku_id>
-      <title>Rebordeadora Azul</title>
-      <description>rebordeadora de 750w  hasta 30000rpm  tiene un peso de 2 kg</description>
-      <link>https://tucomprascol.com/?p=a0146cc4-57a4-4e9e-a03d-178027081fc6</link>
-      <image_link>https://tucomprascol.com/images/products/a0146cc4-57a4-4e9e-a03d-178027081fc6.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>169000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>e8e789e4-740c-4736-9973-1200af7f05cc</sku_id>
       <title>TENSIOMETRO</title>
       <description>Monitorear su salud cardiovascular en casa es ahora un proceso sencillo, rápido y de máxima precisión. Este tensiómetro digital le permite obtener lecturas confiables en segundos, facilitando un control riguroso de su bienestar diario sin complicaciones.
@@ -114,27 +87,54 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>1cfd5861-4dd7-400e-8492-b94f99f10d29</sku_id>
-      <title>Taladro y pulidora con accesorios </title>
-      <description>taladro y pulidora con accesorios color amarillo azul y verde</description>
-      <link>https://tucomprascol.com/?p=1cfd5861-4dd7-400e-8492-b94f99f10d29</link>
-      <image_link>https://tucomprascol.com/images/products/1cfd5861-4dd7-400e-8492-b94f99f10d29.jpg</image_link>
+      <sku_id>27e74a3b-9434-4459-bdc7-e7445040bff9</sku_id>
+      <title>GUADAÑA ECONOMICA </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=27e74a3b-9434-4459-bdc7-e7445040bff9</link>
+      <image_link>https://tucomprascol.com/images/products/27e74a3b-9434-4459-bdc7-e7445040bff9.jpg</image_link>
       <condition>new</condition>
-      <availability>out of stock</availability>
-      <price>209000.00 COP</price>
+      <availability>in stock</availability>
+      <price>399000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>e7ce74b9-71db-4952-a33a-09b7f844efe9</sku_id>
+      <title>Taladro Brushless mandril metalico</title>
+      <description>Realice sus proyectos de remodelación y montaje con la precisión y eficiencia que exigen los trabajos de alta calidad. Este taladro inalámbrico optimiza el consumo de energía y proporciona una fuerza constante para perforar o atornillar con el mínimo esfuerzo y la máxima seguridad.
+
+* Mandril metálico de 3/8 de pulgada con sistema de bloqueo integrado que impide que la broca se afloje o se caiga durante el uso exigente.
+*</description>
+      <link>https://tucomprascol.com/?p=e7ce74b9-71db-4952-a33a-09b7f844efe9</link>
+      <image_link>https://tucomprascol.com/images/products/e7ce74b9-71db-4952-a33a-09b7f844efe9.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>159000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>15ffe4ca-a0b0-417e-b8a0-de1607df8c62</sku_id>
-      <title>Laser 5 lineas</title>
+      <sku_id>b038593b-c352-4c7e-8dff-f32b1cdc0784</sku_id>
+      <title>Motosierra 5801</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=15ffe4ca-a0b0-417e-b8a0-de1607df8c62</link>
-      <image_link>https://tucomprascol.com/images/products/15ffe4ca-a0b0-417e-b8a0-de1607df8c62.jpg</image_link>
+      <link>https://tucomprascol.com/?p=b038593b-c352-4c7e-8dff-f32b1cdc0784</link>
+      <image_link>https://tucomprascol.com/images/products/b038593b-c352-4c7e-8dff-f32b1cdc0784.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>269000.00 COP</price>
+      <price>449000.00 COP</price>
       <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>891aea78-abea-45bc-bb66-212f51702c83</sku_id>
+      <title>SILLA RECLANABLE</title>
+      <description>SI</description>
+      <link>https://tucomprascol.com/?p=891aea78-abea-45bc-bb66-212f51702c83</link>
+      <image_link>https://tucomprascol.com/images/products/891aea78-abea-45bc-bb66-212f51702c83.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>MILLENIO</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -147,6 +147,18 @@
       <availability>in stock</availability>
       <price>349000.00 COP</price>
       <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>e71be1e1-92c6-4f56-87f7-d8d13a2a581f</sku_id>
+      <title>CHAZOS, FULMINATES </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=e71be1e1-92c6-4f56-87f7-d8d13a2a581f</link>
+      <image_link>https://tucomprascol.com/images/products/e71be1e1-92c6-4f56-87f7-d8d13a2a581f.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>99000.00 COP</price>
+      <brand>BRITO</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -178,6 +190,54 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
+      <sku_id>4cec1898-2d6e-415f-8019-059b61d0f093</sku_id>
+      <title>TALADRO 24V MANDRIL METALICO DE MEDIA</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=4cec1898-2d6e-415f-8019-059b61d0f093</link>
+      <image_link>https://tucomprascol.com/images/products/4cec1898-2d6e-415f-8019-059b61d0f093.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>179000.00 COP</price>
+      <brand>GORDO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>0301ba27-9f73-4f1e-8715-0baf9c20dd3d</sku_id>
+      <title>COMBO LASER Y TALADRO</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=0301ba27-9f73-4f1e-8715-0baf9c20dd3d</link>
+      <image_link>https://tucomprascol.com/images/products/0301ba27-9f73-4f1e-8715-0baf9c20dd3d.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>369000.00 COP</price>
+      <brand>GORDO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>449e1097-78b4-4323-a13f-26bdb4e34df5</sku_id>
+      <title>Rache de 12pcs</title>
+      <description>Rache con copas de 12 piezas execelte calidad rache e de 1/2</description>
+      <link>https://tucomprascol.com/?p=449e1097-78b4-4323-a13f-26bdb4e34df5</link>
+      <image_link>https://tucomprascol.com/images/products/449e1097-78b4-4323-a13f-26bdb4e34df5.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>89000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>6d4c88aa-35ad-4bbc-8362-a68e5ca62935</sku_id>
+      <title>MULTIMETRO TRADICIONAL </title>
+      <description>MU</description>
+      <link>https://tucomprascol.com/?p=6d4c88aa-35ad-4bbc-8362-a68e5ca62935</link>
+      <image_link>https://tucomprascol.com/images/products/6d4c88aa-35ad-4bbc-8362-a68e5ca62935.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>70000.00 COP</price>
+      <brand>ANDRES</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
       <sku_id>58a0dfcb-8c79-436a-abb8-808ce902d54e</sku_id>
       <title>sierra circular Verde</title>
       <description>Realice cortes limpios, rápidos y precisos con la potencia que sus proyectos de carpintería exigen. Esta sierra circular combina un rendimiento de alta gama con un control total en cada pasada, garantizando acabados impecables en menor tiempo.
@@ -195,39 +255,27 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>e71be1e1-92c6-4f56-87f7-d8d13a2a581f</sku_id>
-      <title>CHAZOS, FULMINATES </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=e71be1e1-92c6-4f56-87f7-d8d13a2a581f</link>
-      <image_link>https://tucomprascol.com/images/products/e71be1e1-92c6-4f56-87f7-d8d13a2a581f.jpg</image_link>
+      <sku_id>ce16436f-9239-4d62-bc4a-044e5f5d554f</sku_id>
+      <title>ARCANGEL GOV  </title>
+      <description>77cm*60cm</description>
+      <link>https://tucomprascol.com/?p=ce16436f-9239-4d62-bc4a-044e5f5d554f</link>
+      <image_link>https://tucomprascol.com/images/products/ce16436f-9239-4d62-bc4a-044e5f5d554f.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>99000.00 COP</price>
-      <brand>BRITO</brand>
+      <price>189000.00 COP</price>
+      <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>4cec1898-2d6e-415f-8019-059b61d0f093</sku_id>
-      <title>TALADRO 24V MANDRIL METALICO DE MEDIA</title>
+      <sku_id>21f541f9-ab8e-4b9d-8304-8c3a234d9428</sku_id>
+      <title>SOLDADOR VULCANO 3 EN 1</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=4cec1898-2d6e-415f-8019-059b61d0f093</link>
-      <image_link>https://tucomprascol.com/images/products/4cec1898-2d6e-415f-8019-059b61d0f093.jpg</image_link>
+      <link>https://tucomprascol.com/?p=21f541f9-ab8e-4b9d-8304-8c3a234d9428</link>
+      <image_link>https://tucomprascol.com/images/products/21f541f9-ab8e-4b9d-8304-8c3a234d9428.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>199000.00 COP</price>
-      <brand>GORDO</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>0301ba27-9f73-4f1e-8715-0baf9c20dd3d</sku_id>
-      <title>COMBO LASER Y TALADRO</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=0301ba27-9f73-4f1e-8715-0baf9c20dd3d</link>
-      <image_link>https://tucomprascol.com/images/products/0301ba27-9f73-4f1e-8715-0baf9c20dd3d.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>419000.00 COP</price>
-      <brand>GORDO</brand>
+      <price>800000.00 COP</price>
+      <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -243,62 +291,78 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>6d4c88aa-35ad-4bbc-8362-a68e5ca62935</sku_id>
-      <title>MULTIMETRO TRADICIONAL </title>
-      <description>MU</description>
-      <link>https://tucomprascol.com/?p=6d4c88aa-35ad-4bbc-8362-a68e5ca62935</link>
-      <image_link>https://tucomprascol.com/images/products/6d4c88aa-35ad-4bbc-8362-a68e5ca62935.jpg</image_link>
+      <sku_id>2f4e63eb-6803-4168-b5ea-17171b169d87</sku_id>
+      <title>ARCANGEL GR GOV </title>
+      <description>100cm*79cm</description>
+      <link>https://tucomprascol.com/?p=2f4e63eb-6803-4168-b5ea-17171b169d87</link>
+      <image_link>https://tucomprascol.com/images/products/2f4e63eb-6803-4168-b5ea-17171b169d87.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>25000.00 COP</price>
-      <brand>ANDRES</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>ce16436f-9239-4d62-bc4a-044e5f5d554f</sku_id>
-      <title>ARCANGEL GOV  </title>
-      <description>77cm*60cm</description>
-      <link>https://tucomprascol.com/?p=ce16436f-9239-4d62-bc4a-044e5f5d554f</link>
-      <image_link>https://tucomprascol.com/images/products/ce16436f-9239-4d62-bc4a-044e5f5d554f.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>189000.00 COP</price>
+      <price>399000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>449e1097-78b4-4323-a13f-26bdb4e34df5</sku_id>
-      <title>Rache de 12pcs</title>
-      <description>Rache con copas de 12 piezas execelte calidad rache e de 1/2</description>
-      <link>https://tucomprascol.com/?p=449e1097-78b4-4323-a13f-26bdb4e34df5</link>
-      <image_link>https://tucomprascol.com/images/products/449e1097-78b4-4323-a13f-26bdb4e34df5.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>89000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>83ec3cd6-5b1b-4953-968a-b90af5afb5eb</sku_id>
-      <title>Combo llave Impacto y Taladro  amarillo</title>
+      <sku_id>dbd29fc8-682c-45fc-9a02-791bdca2620c</sku_id>
+      <title>Guadaña 40v </title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=83ec3cd6-5b1b-4953-968a-b90af5afb5eb</link>
-      <image_link>https://tucomprascol.com/images/products/83ec3cd6-5b1b-4953-968a-b90af5afb5eb.jpg</image_link>
+      <link>https://tucomprascol.com/?p=dbd29fc8-682c-45fc-9a02-791bdca2620c</link>
+      <image_link>https://tucomprascol.com/images/products/dbd29fc8-682c-45fc-9a02-791bdca2620c.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>349000.00 COP</price>
+      <price>409000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>f3e5371a-d61e-4f6f-924e-7b01f84e6389</sku_id>
-      <title>Fumigadora de 16 litros</title>
-      <description>fumigadora manual de 16 litros</description>
-      <link>https://tucomprascol.com/?p=f3e5371a-d61e-4f6f-924e-7b01f84e6389</link>
-      <image_link>https://tucomprascol.com/images/products/f3e5371a-d61e-4f6f-924e-7b01f84e6389.jpg</image_link>
+      <sku_id>c5c274c5-9686-48b5-9313-32aa2059805b</sku_id>
+      <title>ARMASX3</title>
+      <description>95cm *44cm</description>
+      <link>https://tucomprascol.com/?p=c5c274c5-9686-48b5-9313-32aa2059805b</link>
+      <image_link>https://tucomprascol.com/images/products/c5c274c5-9686-48b5-9313-32aa2059805b.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>129000.00 COP</price>
+      <price>299000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>886a14e1-15f6-4224-bc26-1a0bf379d15e</sku_id>
+      <title>Pistola Anclaje</title>
+      <description>pistola de anclaje para chazo fulmínante</description>
+      <link>https://tucomprascol.com/?p=886a14e1-15f6-4224-bc26-1a0bf379d15e</link>
+      <image_link>https://tucomprascol.com/images/products/886a14e1-15f6-4224-bc26-1a0bf379d15e.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>99000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>fb625f73-79c0-4347-b50e-b41fa6375315</sku_id>
+      <title>CARETA FOTOSENSIBLE</title>
+      <description>Proteja su visión con la tecnología de oscurecimiento automático de alta precisión. Esta careta fotosensible aerografiada combina una seguridad superior contra la radiación con la practicidad de la carga solar continua para optimizar sus jornadas de trabajo.
+
+*</description>
+      <link>https://tucomprascol.com/?p=fb625f73-79c0-4347-b50e-b41fa6375315</link>
+      <image_link>https://tucomprascol.com/images/products/fb625f73-79c0-4347-b50e-b41fa6375315.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>115000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>182d1019-bb4d-4d26-8064-f4d5c23b2cc9</sku_id>
+      <title>Sierra Sable </title>
+      <description>Realice cortes precisos, limpios y rápidos en madera, metal e incluso hueso con total libertad de movimiento. Esta sierra sable inalámbrica optimiza sus jornadas de trabajo gracias a su potencia constante y un rendimiento superior libre de cables.
+
+*</description>
+      <link>https://tucomprascol.com/?p=182d1019-bb4d-4d26-8064-f4d5c23b2cc9</link>
+      <image_link>https://tucomprascol.com/images/products/182d1019-bb4d-4d26-8064-f4d5c23b2cc9.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>289000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -320,14 +384,26 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>886a14e1-15f6-4224-bc26-1a0bf379d15e</sku_id>
-      <title>Pistola Anclaje</title>
-      <description>pistola de anclaje para chazo fulmínante</description>
-      <link>https://tucomprascol.com/?p=886a14e1-15f6-4224-bc26-1a0bf379d15e</link>
-      <image_link>https://tucomprascol.com/images/products/886a14e1-15f6-4224-bc26-1a0bf379d15e.jpg</image_link>
+      <sku_id>016456cc-77c8-4b23-bc5d-64b2870c025c</sku_id>
+      <title>Armas y barco</title>
+      <description>54*54cm</description>
+      <link>https://tucomprascol.com/?p=016456cc-77c8-4b23-bc5d-64b2870c025c</link>
+      <image_link>https://tucomprascol.com/images/products/016456cc-77c8-4b23-bc5d-64b2870c025c.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>99000.00 COP</price>
+      <price>299000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>f3e5371a-d61e-4f6f-924e-7b01f84e6389</sku_id>
+      <title>Fumigadora de 16 litros</title>
+      <description>fumigadora manual de 16 litros</description>
+      <link>https://tucomprascol.com/?p=f3e5371a-d61e-4f6f-924e-7b01f84e6389</link>
+      <image_link>https://tucomprascol.com/images/products/f3e5371a-d61e-4f6f-924e-7b01f84e6389.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>129000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -344,18 +420,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>dbd29fc8-682c-45fc-9a02-791bdca2620c</sku_id>
-      <title>Guadaña 40v </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=dbd29fc8-682c-45fc-9a02-791bdca2620c</link>
-      <image_link>https://tucomprascol.com/images/products/dbd29fc8-682c-45fc-9a02-791bdca2620c.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>409000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>569326dd-6534-48cc-a694-1677c357c1ee</sku_id>
       <title>MULTIMETRO DIGITAL AUTOMATICO</title>
       <description>MU</description>
@@ -363,46 +427,8 @@
       <image_link>https://tucomprascol.com/images/products/569326dd-6534-48cc-a694-1677c357c1ee.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>150000.00 COP</price>
+      <price>130000.00 COP</price>
       <brand>ANDRES</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>016456cc-77c8-4b23-bc5d-64b2870c025c</sku_id>
-      <title>Armas y barco</title>
-      <description>54*54cm</description>
-      <link>https://tucomprascol.com/?p=016456cc-77c8-4b23-bc5d-64b2870c025c</link>
-      <image_link>https://tucomprascol.com/images/products/016456cc-77c8-4b23-bc5d-64b2870c025c.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>299000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>c5c274c5-9686-48b5-9313-32aa2059805b</sku_id>
-      <title>ARMASX3</title>
-      <description>95cm *44cm</description>
-      <link>https://tucomprascol.com/?p=c5c274c5-9686-48b5-9313-32aa2059805b</link>
-      <image_link>https://tucomprascol.com/images/products/c5c274c5-9686-48b5-9313-32aa2059805b.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>299000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>182d1019-bb4d-4d26-8064-f4d5c23b2cc9</sku_id>
-      <title>Sierra Sable </title>
-      <description>Realice cortes precisos, limpios y rápidos en madera, metal e incluso hueso con total libertad de movimiento. Esta sierra sable inalámbrica optimiza sus jornadas de trabajo gracias a su potencia constante y un rendimiento superior libre de cables.
-
-*</description>
-      <link>https://tucomprascol.com/?p=182d1019-bb4d-4d26-8064-f4d5c23b2cc9</link>
-      <image_link>https://tucomprascol.com/images/products/182d1019-bb4d-4d26-8064-f4d5c23b2cc9.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>289000.00 COP</price>
-      <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -414,114 +440,6 @@
       <condition>new</condition>
       <availability>in stock</availability>
       <price>499000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>2f4e63eb-6803-4168-b5ea-17171b169d87</sku_id>
-      <title>ARCANGEL GR GOV </title>
-      <description>100cm*79cm</description>
-      <link>https://tucomprascol.com/?p=2f4e63eb-6803-4168-b5ea-17171b169d87</link>
-      <image_link>https://tucomprascol.com/images/products/2f4e63eb-6803-4168-b5ea-17171b169d87.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>399000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>4df784a8-d79e-40eb-83c9-d7040353223c</sku_id>
-      <title>Pistola Calor Amarilla</title>
-      <description>Pistola calor amarilla</description>
-      <link>https://tucomprascol.com/?p=4df784a8-d79e-40eb-83c9-d7040353223c</link>
-      <image_link>https://tucomprascol.com/images/products/4df784a8-d79e-40eb-83c9-d7040353223c.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>149000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>3090563b-00d7-4c64-89c3-1f34e0a0886f</sku_id>
-      <title>JESUS GRANDE GOV </title>
-      <description>98</description>
-      <link>https://tucomprascol.com/?p=3090563b-00d7-4c64-89c3-1f34e0a0886f</link>
-      <image_link>https://tucomprascol.com/images/products/3090563b-00d7-4c64-89c3-1f34e0a0886f.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>399000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>a0b49d3a-390e-4881-85f8-a3034a1d3f92</sku_id>
-      <title>Rotomartillo </title>
-      <description>Rotomartillo Verde  incluye 3 brocas y 2 puntas</description>
-      <link>https://tucomprascol.com/?p=a0b49d3a-390e-4881-85f8-a3034a1d3f92</link>
-      <image_link>https://tucomprascol.com/images/products/a0b49d3a-390e-4881-85f8-a3034a1d3f92.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>259000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>e57ac0e9-aa17-4ebc-b5ca-420add554ccc</sku_id>
-      <title>pistola calor Azul</title>
-      <description>pistola calor azul</description>
-      <link>https://tucomprascol.com/?p=e57ac0e9-aa17-4ebc-b5ca-420add554ccc</link>
-      <image_link>https://tucomprascol.com/images/products/e57ac0e9-aa17-4ebc-b5ca-420add554ccc.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>149000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>817a871b-02c0-4544-9d45-c30cc86a9cd9</sku_id>
-      <title>Ruteadora</title>
-      <description>Ruteadora</description>
-      <link>https://tucomprascol.com/?p=817a871b-02c0-4544-9d45-c30cc86a9cd9</link>
-      <image_link>https://tucomprascol.com/images/products/817a871b-02c0-4544-9d45-c30cc86a9cd9.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>279000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>a40fd90d-dc33-4f21-978f-a58ce84a5ed6</sku_id>
-      <title>Cepillo Amarillo</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=a40fd90d-dc33-4f21-978f-a58ce84a5ed6</link>
-      <image_link>https://tucomprascol.com/images/products/a40fd90d-dc33-4f21-978f-a58ce84a5ed6.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>199000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>bfebffea-706d-43e0-9745-61ec019275c2</sku_id>
-      <title>DOS PISTOLAS </title>
-      <description>79cm*57cm</description>
-      <link>https://tucomprascol.com/?p=bfebffea-706d-43e0-9745-61ec019275c2</link>
-      <image_link>https://tucomprascol.com/images/products/bfebffea-706d-43e0-9745-61ec019275c2.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>409000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>4bf68cb4-5b68-4057-a628-22a79b0fdef7</sku_id>
-      <title>sierra Circular Azul</title>
-      <description>sierra</description>
-      <link>https://tucomprascol.com/?p=4bf68cb4-5b68-4057-a628-22a79b0fdef7</link>
-      <image_link>https://tucomprascol.com/images/products/4bf68cb4-5b68-4057-a628-22a79b0fdef7.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>289000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -538,86 +456,14 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>8a3bba7b-c85f-4aeb-a8b6-fe5ffb39ab85</sku_id>
-      <title>ROTOMARTILLO 800W</title>
-      <description>Marca Milenio. 3.5J, 110V. Kit completo con brocas y puntas.</description>
-      <link>https://tucomprascol.com/?p=8a3bba7b-c85f-4aeb-a8b6-fe5ffb39ab85</link>
-      <image_link>https://tucomprascol.com/images/products/8a3bba7b-c85f-4aeb-a8b6-fe5ffb39ab85.jpg</image_link>
+      <sku_id>3090563b-00d7-4c64-89c3-1f34e0a0886f</sku_id>
+      <title>JESUS GRANDE GOV </title>
+      <description>98</description>
+      <link>https://tucomprascol.com/?p=3090563b-00d7-4c64-89c3-1f34e0a0886f</link>
+      <image_link>https://tucomprascol.com/images/products/3090563b-00d7-4c64-89c3-1f34e0a0886f.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>289000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>bd4d4c86-2476-4993-93a0-27c17ac6fcb3</sku_id>
-      <title>JESUS ACRILICO</title>
-      <description>76</description>
-      <link>https://tucomprascol.com/?p=bd4d4c86-2476-4993-93a0-27c17ac6fcb3</link>
-      <image_link>https://tucomprascol.com/images/products/bd4d4c86-2476-4993-93a0-27c17ac6fcb3.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>199000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>e68fb37b-485d-47c8-8012-e1e47820def6</sku_id>
-      <title>Polichadora de 7 pulgadas </title>
-      <description>Polichadora de 7 pulgadas  color azul</description>
-      <link>https://tucomprascol.com/?p=e68fb37b-485d-47c8-8012-e1e47820def6</link>
-      <image_link>https://tucomprascol.com/images/products/e68fb37b-485d-47c8-8012-e1e47820def6.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>249000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>2d4f62c3-f413-4a81-a69c-d3c007a55b16</sku_id>
-      <title>CENA GOV </title>
-      <description>87</description>
-      <link>https://tucomprascol.com/?p=2d4f62c3-f413-4a81-a69c-d3c007a55b16</link>
-      <image_link>https://tucomprascol.com/images/products/2d4f62c3-f413-4a81-a69c-d3c007a55b16.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>299000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>8c301622-d851-42ba-92b4-d201be6f6397</sku_id>
-      <title>pulidora 4.5 Amarilla</title>
-      <description>pulidora 4.5</description>
-      <link>https://tucomprascol.com/?p=8c301622-d851-42ba-92b4-d201be6f6397</link>
-      <image_link>https://tucomprascol.com/images/products/8c301622-d851-42ba-92b4-d201be6f6397.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>169000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>66e41a16-826b-40df-bd68-71eccaff28bb</sku_id>
-      <title>Rache Neumático </title>
-      <description>rache neumático con copas y cuadrante de media</description>
-      <link>https://tucomprascol.com/?p=66e41a16-826b-40df-bd68-71eccaff28bb</link>
-      <image_link>https://tucomprascol.com/images/products/66e41a16-826b-40df-bd68-71eccaff28bb.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>229000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>e68ea0a1-5709-47be-beaa-07774e69d58d</sku_id>
-      <title>Cepillo Azul</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=e68ea0a1-5709-47be-beaa-07774e69d58d</link>
-      <image_link>https://tucomprascol.com/images/products/e68ea0a1-5709-47be-beaa-07774e69d58d.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>199000.00 COP</price>
+      <price>399000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -634,6 +480,162 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
+      <sku_id>4df784a8-d79e-40eb-83c9-d7040353223c</sku_id>
+      <title>Pistola Calor Amarilla</title>
+      <description>Pistola calor amarilla</description>
+      <link>https://tucomprascol.com/?p=4df784a8-d79e-40eb-83c9-d7040353223c</link>
+      <image_link>https://tucomprascol.com/images/products/4df784a8-d79e-40eb-83c9-d7040353223c.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>149000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>e57ac0e9-aa17-4ebc-b5ca-420add554ccc</sku_id>
+      <title>pistola calor Azul</title>
+      <description>pistola calor azul</description>
+      <link>https://tucomprascol.com/?p=e57ac0e9-aa17-4ebc-b5ca-420add554ccc</link>
+      <image_link>https://tucomprascol.com/images/products/e57ac0e9-aa17-4ebc-b5ca-420add554ccc.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>149000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>f8020cfd-766d-4c63-ab4d-fecfdc3592c1</sku_id>
+      <title>taladro y pulidora azul</title>
+      <description>combo de taladro y pulidora con accesorios</description>
+      <link>https://tucomprascol.com/?p=f8020cfd-766d-4c63-ab4d-fecfdc3592c1</link>
+      <image_link>https://tucomprascol.com/images/products/f8020cfd-766d-4c63-ab4d-fecfdc3592c1.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>209000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>8c301622-d851-42ba-92b4-d201be6f6397</sku_id>
+      <title>pulidora 4.5 Amarilla</title>
+      <description>pulidora 4.5</description>
+      <link>https://tucomprascol.com/?p=8c301622-d851-42ba-92b4-d201be6f6397</link>
+      <image_link>https://tucomprascol.com/images/products/8c301622-d851-42ba-92b4-d201be6f6397.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>169000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>bfebffea-706d-43e0-9745-61ec019275c2</sku_id>
+      <title>DOS PISTOLAS </title>
+      <description>79cm*57cm</description>
+      <link>https://tucomprascol.com/?p=bfebffea-706d-43e0-9745-61ec019275c2</link>
+      <image_link>https://tucomprascol.com/images/products/bfebffea-706d-43e0-9745-61ec019275c2.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>409000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>a40fd90d-dc33-4f21-978f-a58ce84a5ed6</sku_id>
+      <title>Cepillo Amarillo</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=a40fd90d-dc33-4f21-978f-a58ce84a5ed6</link>
+      <image_link>https://tucomprascol.com/images/products/a40fd90d-dc33-4f21-978f-a58ce84a5ed6.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>199000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>ce65cccb-6f1f-4445-81e4-c0b963e5d19c</sku_id>
+      <title>MILAGROSA GOV </title>
+      <description>100</description>
+      <link>https://tucomprascol.com/?p=ce65cccb-6f1f-4445-81e4-c0b963e5d19c</link>
+      <image_link>https://tucomprascol.com/images/products/ce65cccb-6f1f-4445-81e4-c0b963e5d19c.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>299000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>e68fb37b-485d-47c8-8012-e1e47820def6</sku_id>
+      <title>Polichadora de 7 pulgadas </title>
+      <description>Polichadora de 7 pulgadas  color azul</description>
+      <link>https://tucomprascol.com/?p=e68fb37b-485d-47c8-8012-e1e47820def6</link>
+      <image_link>https://tucomprascol.com/images/products/e68fb37b-485d-47c8-8012-e1e47820def6.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>a0b49d3a-390e-4881-85f8-a3034a1d3f92</sku_id>
+      <title>Rotomartillo </title>
+      <description>Rotomartillo Verde  incluye 3 brocas y 2 puntas</description>
+      <link>https://tucomprascol.com/?p=a0b49d3a-390e-4881-85f8-a3034a1d3f92</link>
+      <image_link>https://tucomprascol.com/images/products/a0b49d3a-390e-4881-85f8-a3034a1d3f92.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>259000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>4bf68cb4-5b68-4057-a628-22a79b0fdef7</sku_id>
+      <title>sierra Circular Azul</title>
+      <description>sierra</description>
+      <link>https://tucomprascol.com/?p=4bf68cb4-5b68-4057-a628-22a79b0fdef7</link>
+      <image_link>https://tucomprascol.com/images/products/4bf68cb4-5b68-4057-a628-22a79b0fdef7.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>279000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>e49ddaf4-8a46-4377-a428-c82e0402b0a6</sku_id>
+      <title>Pistola IMPACTO </title>
+      <description>pistola de impacto de 330n.m</description>
+      <link>https://tucomprascol.com/?p=e49ddaf4-8a46-4377-a428-c82e0402b0a6</link>
+      <image_link>https://tucomprascol.com/images/products/e49ddaf4-8a46-4377-a428-c82e0402b0a6.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>269000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>66e41a16-826b-40df-bd68-71eccaff28bb</sku_id>
+      <title>Rache Neumático </title>
+      <description>rache neumático con copas y cuadrante de media</description>
+      <link>https://tucomprascol.com/?p=66e41a16-826b-40df-bd68-71eccaff28bb</link>
+      <image_link>https://tucomprascol.com/images/products/66e41a16-826b-40df-bd68-71eccaff28bb.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>229000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>bd4d4c86-2476-4993-93a0-27c17ac6fcb3</sku_id>
+      <title>JESUS ACRILICO</title>
+      <description>76</description>
+      <link>https://tucomprascol.com/?p=bd4d4c86-2476-4993-93a0-27c17ac6fcb3</link>
+      <image_link>https://tucomprascol.com/images/products/bd4d4c86-2476-4993-93a0-27c17ac6fcb3.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>199000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
       <sku_id>8fbc5a76-6b33-4f47-bb44-2b6784e85bb0</sku_id>
       <title>PISTOLA Y DAGA </title>
       <description>54</description>
@@ -646,14 +648,14 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>055876a1-3bf7-4eb2-bb25-dcd1e9c6af30</sku_id>
-      <title>Pulidora 9 pulgadas</title>
-      <description>Pulidora 9 pulgadas</description>
-      <link>https://tucomprascol.com/?p=055876a1-3bf7-4eb2-bb25-dcd1e9c6af30</link>
-      <image_link>https://tucomprascol.com/images/products/055876a1-3bf7-4eb2-bb25-dcd1e9c6af30.jpg</image_link>
+      <sku_id>e68ea0a1-5709-47be-beaa-07774e69d58d</sku_id>
+      <title>Cepillo Azul</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=e68ea0a1-5709-47be-beaa-07774e69d58d</link>
+      <image_link>https://tucomprascol.com/images/products/e68ea0a1-5709-47be-beaa-07774e69d58d.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>299000.00 COP</price>
+      <price>199000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -682,18 +684,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>f8020cfd-766d-4c63-ab4d-fecfdc3592c1</sku_id>
-      <title>taladro y pulidora azul</title>
-      <description>combo de taladro y pulidora con accesorios</description>
-      <link>https://tucomprascol.com/?p=f8020cfd-766d-4c63-ab4d-fecfdc3592c1</link>
-      <image_link>https://tucomprascol.com/images/products/f8020cfd-766d-4c63-ab4d-fecfdc3592c1.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>209000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>d6284011-8882-4955-af9d-517e46724425</sku_id>
       <title>Taladro 850w</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
@@ -706,14 +696,14 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>d1407bfb-91ea-46a2-95c2-a1d363f31ae7</sku_id>
-      <title>CENA PE GOV </title>
-      <description>77cm*60cm</description>
-      <link>https://tucomprascol.com/?p=d1407bfb-91ea-46a2-95c2-a1d363f31ae7</link>
-      <image_link>https://tucomprascol.com/images/products/d1407bfb-91ea-46a2-95c2-a1d363f31ae7.jpg</image_link>
+      <sku_id>055876a1-3bf7-4eb2-bb25-dcd1e9c6af30</sku_id>
+      <title>Pulidora 9 pulgadas</title>
+      <description>Pulidora 9 pulgadas</description>
+      <link>https://tucomprascol.com/?p=055876a1-3bf7-4eb2-bb25-dcd1e9c6af30</link>
+      <image_link>https://tucomprascol.com/images/products/055876a1-3bf7-4eb2-bb25-dcd1e9c6af30.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>199000.00 COP</price>
+      <price>299000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -730,26 +720,26 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>e49ddaf4-8a46-4377-a428-c82e0402b0a6</sku_id>
-      <title>Pistola IMPACTO </title>
-      <description>pistola de impacto de 330n.m</description>
-      <link>https://tucomprascol.com/?p=e49ddaf4-8a46-4377-a428-c82e0402b0a6</link>
-      <image_link>https://tucomprascol.com/images/products/e49ddaf4-8a46-4377-a428-c82e0402b0a6.jpg</image_link>
+      <sku_id>817a871b-02c0-4544-9d45-c30cc86a9cd9</sku_id>
+      <title>Ruteadora</title>
+      <description>Ruteadora</description>
+      <link>https://tucomprascol.com/?p=817a871b-02c0-4544-9d45-c30cc86a9cd9</link>
+      <image_link>https://tucomprascol.com/images/products/817a871b-02c0-4544-9d45-c30cc86a9cd9.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>299000.00 COP</price>
+      <price>279000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>ce65cccb-6f1f-4445-81e4-c0b963e5d19c</sku_id>
-      <title>MILAGROSA GOV </title>
-      <description>100</description>
-      <link>https://tucomprascol.com/?p=ce65cccb-6f1f-4445-81e4-c0b963e5d19c</link>
-      <image_link>https://tucomprascol.com/images/products/ce65cccb-6f1f-4445-81e4-c0b963e5d19c.jpg</image_link>
+      <sku_id>d1407bfb-91ea-46a2-95c2-a1d363f31ae7</sku_id>
+      <title>CENA PE GOV </title>
+      <description>77cm*60cm</description>
+      <link>https://tucomprascol.com/?p=d1407bfb-91ea-46a2-95c2-a1d363f31ae7</link>
+      <image_link>https://tucomprascol.com/images/products/d1407bfb-91ea-46a2-95c2-a1d363f31ae7.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>299000.00 COP</price>
+      <price>199000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -766,6 +756,18 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
+      <sku_id>c6dd4824-094b-4901-907d-3824cfbb1bbd</sku_id>
+      <title>PISTOLA DE IMPACTO ROJO </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=c6dd4824-094b-4901-907d-3824cfbb1bbd</link>
+      <image_link>https://tucomprascol.com/images/products/c6dd4824-094b-4901-907d-3824cfbb1bbd.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>320000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
       <sku_id>31f6ee28-3e21-48dc-99b3-ae7a7f7edde9</sku_id>
       <title>Guadalupe pequeña </title>
       <description>77x59 cm</description>
@@ -774,18 +776,6 @@
       <condition>new</condition>
       <availability>in stock</availability>
       <price>219000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>22b38e59-3a2c-42e9-9b9f-bbef883b8425</sku_id>
-      <title>Combo llave Impacto y Taladro con accesorios </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=22b38e59-3a2c-42e9-9b9f-bbef883b8425</link>
-      <image_link>https://tucomprascol.com/images/products/22b38e59-3a2c-42e9-9b9f-bbef883b8425.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>389000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -802,14 +792,26 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>b038593b-c352-4c7e-8dff-f32b1cdc0784</sku_id>
-      <title>Motosierra 5801</title>
+      <sku_id>22b38e59-3a2c-42e9-9b9f-bbef883b8425</sku_id>
+      <title>Combo llave Impacto y Taladro con accesorios </title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=b038593b-c352-4c7e-8dff-f32b1cdc0784</link>
-      <image_link>https://tucomprascol.com/images/products/b038593b-c352-4c7e-8dff-f32b1cdc0784.jpg</image_link>
+      <link>https://tucomprascol.com/?p=22b38e59-3a2c-42e9-9b9f-bbef883b8425</link>
+      <image_link>https://tucomprascol.com/images/products/22b38e59-3a2c-42e9-9b9f-bbef883b8425.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>449000.00 COP</price>
+      <price>359000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>529a1617-ff4e-4f47-9760-a28c67bcbb2a</sku_id>
+      <title>TALADRO ROJO </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=529a1617-ff4e-4f47-9760-a28c67bcbb2a</link>
+      <image_link>https://tucomprascol.com/images/products/529a1617-ff4e-4f47-9760-a28c67bcbb2a.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>210000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -826,32 +828,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>f832963e-83fe-441e-82f4-b4bdaa03deb4</sku_id>
-      <title>Fumigadora Varilla Roja</title>
-      <description>Proteja la salud de sus cultivos y optimice el control de plagas con la Fumigadora Varilla Roja de 20 litros, desarrollada para ofrecer una cobertura uniforme en grandes extensiones. Su ingeniería le permite trabajar con total fluidez, asegurando que cada aplicación sea precisa, rápida y libre de interrupciones innecesarias.
-
-*</description>
-      <link>https://tucomprascol.com/?p=f832963e-83fe-441e-82f4-b4bdaa03deb4</link>
-      <image_link>https://tucomprascol.com/images/products/f832963e-83fe-441e-82f4-b4bdaa03deb4.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>689000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>c6434844-9638-4f45-bd4b-cadc8c55ac57</sku_id>
-      <title>MOTO TOOL</title>
-      <description>Realiza cortes, grabados y pulidos con la máxima precisión gracias al Moto</description>
-      <link>https://tucomprascol.com/?p=c6434844-9638-4f45-bd4b-cadc8c55ac57</link>
-      <image_link>https://tucomprascol.com/images/products/c6434844-9638-4f45-bd4b-cadc8c55ac57.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>189000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>932fb8be-bab8-404b-b58a-ba6688b63ce0</sku_id>
       <title>HIDRO LAVADORA </title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
@@ -860,18 +836,6 @@
       <condition>new</condition>
       <availability>in stock</availability>
       <price>339000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>29440e5b-5958-4c66-88a7-a0ba638ee107</sku_id>
-      <title>Polichadora 4.5&quot; </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=29440e5b-5958-4c66-88a7-a0ba638ee107</link>
-      <image_link>https://tucomprascol.com/images/products/29440e5b-5958-4c66-88a7-a0ba638ee107.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>169000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -892,18 +856,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>3234cc14-306f-48d8-8865-e2f31aa16b27</sku_id>
-      <title>Rotomartillo Amarillo Inalambrico</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=3234cc14-306f-48d8-8865-e2f31aa16b27</link>
-      <image_link>https://tucomprascol.com/images/products/3234cc14-306f-48d8-8865-e2f31aa16b27.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>389000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>627ef7e4-e455-4526-ae5e-a243bdeac02e</sku_id>
       <title>GUADALUPE CUERPO ENTERO</title>
       <description>87X66</description>
@@ -916,38 +868,14 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>f8b56e70-dd59-46d6-b0d8-f97172fd5435</sku_id>
-      <title>pulidora 7 velocidades </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=f8b56e70-dd59-46d6-b0d8-f97172fd5435</link>
-      <image_link>https://tucomprascol.com/images/products/f8b56e70-dd59-46d6-b0d8-f97172fd5435.jpg</image_link>
+      <sku_id>b6144949-579f-4d07-8bb2-8c585448fb87</sku_id>
+      <title>Laser 16 lineas BT</title>
+      <description>¿Buscas precisión milimétrica en tus proyectos de construcción y remodelación? El **Nivel</description>
+      <link>https://tucomprascol.com/?p=b6144949-579f-4d07-8bb2-8c585448fb87</link>
+      <image_link>https://tucomprascol.com/images/products/b6144949-579f-4d07-8bb2-8c585448fb87.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>189000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>7cf2689c-b943-418f-ada3-0286d8d8a38b</sku_id>
-      <title>ZAPATERO 8 NIVELES</title>
-      <description>Z</description>
-      <link>https://tucomprascol.com/?p=7cf2689c-b943-418f-ada3-0286d8d8a38b</link>
-      <image_link>https://tucomprascol.com/images/products/7cf2689c-b943-418f-ada3-0286d8d8a38b.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>79000.00 COP</price>
-      <brand>CRISTIAN MARIN</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>a91e9e94-dded-400c-a69f-51566f8ce2a4</sku_id>
-      <title>Pistola Impacto </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=a91e9e94-dded-400c-a69f-51566f8ce2a4</link>
-      <image_link>https://tucomprascol.com/images/products/a91e9e94-dded-400c-a69f-51566f8ce2a4.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>289000.00 COP</price>
+      <price>349000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -964,14 +892,50 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>4eb9efb3-c864-4944-a9f3-aad45ed79819</sku_id>
-      <title>Zapatero 8 niveles</title>
-      <description>Zapatero</description>
-      <link>https://tucomprascol.com/?p=4eb9efb3-c864-4944-a9f3-aad45ed79819</link>
-      <image_link>https://tucomprascol.com/images/products/4eb9efb3-c864-4944-a9f3-aad45ed79819.jpg</image_link>
+      <sku_id>a91e9e94-dded-400c-a69f-51566f8ce2a4</sku_id>
+      <title>Pistola Impacto </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=a91e9e94-dded-400c-a69f-51566f8ce2a4</link>
+      <image_link>https://tucomprascol.com/images/products/a91e9e94-dded-400c-a69f-51566f8ce2a4.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>79000.00 COP</price>
+      <price>239000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>f8b56e70-dd59-46d6-b0d8-f97172fd5435</sku_id>
+      <title>pulidora 7 velocidades </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=f8b56e70-dd59-46d6-b0d8-f97172fd5435</link>
+      <image_link>https://tucomprascol.com/images/products/f8b56e70-dd59-46d6-b0d8-f97172fd5435.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>189000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>39eca54f-c3dc-483f-9f6b-a44eb08aef3e</sku_id>
+      <title>NIVEL LASER 16 LIN AMARILLO</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=39eca54f-c3dc-483f-9f6b-a44eb08aef3e</link>
+      <image_link>https://tucomprascol.com/images/products/39eca54f-c3dc-483f-9f6b-a44eb08aef3e.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>2f196a92-bd29-4ef0-ad0c-8d39a7fc7ae0</sku_id>
+      <title>Llave Impacto 330n.m</title>
+      <description>llave de impacto con 330n.m y accesorio</description>
+      <link>https://tucomprascol.com/?p=2f196a92-bd29-4ef0-ad0c-8d39a7fc7ae0</link>
+      <image_link>https://tucomprascol.com/images/products/2f196a92-bd29-4ef0-ad0c-8d39a7fc7ae0.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>269000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -992,44 +956,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>a724919b-b87a-4096-83fd-b84ea069b777</sku_id>
-      <title>Combo Taladro y pulidora Inalambrica</title>
-      <description>Realice sus proyectos de construcción, remodelación o mantenimiento con total libertad de movimiento y la máxima precisión técnica. Este sistema inalámbrico profesional le proporciona la potencia necesaria para ejecutar cortes, pulidos y perforaciones exigentes sin depender de tomas de corriente ni cables molestos.
-
-*</description>
-      <link>https://tucomprascol.com/?p=a724919b-b87a-4096-83fd-b84ea069b777</link>
-      <image_link>https://tucomprascol.com/images/products/a724919b-b87a-4096-83fd-b84ea069b777.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>389000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>2f196a92-bd29-4ef0-ad0c-8d39a7fc7ae0</sku_id>
-      <title>Llave Impacto 330n.m</title>
-      <description>llave de impacto con 330n.m y accesorio</description>
-      <link>https://tucomprascol.com/?p=2f196a92-bd29-4ef0-ad0c-8d39a7fc7ae0</link>
-      <image_link>https://tucomprascol.com/images/products/2f196a92-bd29-4ef0-ad0c-8d39a7fc7ae0.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>299000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>39925a64-3de2-4c8b-ac72-504a98026837</sku_id>
-      <title>guadalupe Acrilico PQ</title>
-      <description>Rinde homenaje a tu fe con una pieza de arte sacro contemporáneo que aporta serenidad y distinción a tus espacios más importantes. Este cuadro de la Virgen de</description>
-      <link>https://tucomprascol.com/?p=39925a64-3de2-4c8b-ac72-504a98026837</link>
-      <image_link>https://tucomprascol.com/images/products/39925a64-3de2-4c8b-ac72-504a98026837.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>209000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>b56a5cdf-3b9b-4805-816f-e0e0c020e9ec</sku_id>
       <title>BATERIA GRANDE</title>
       <description>B</description>
@@ -1037,8 +963,59 @@
       <image_link>https://tucomprascol.com/images/products/b56a5cdf-3b9b-4805-816f-e0e0c020e9ec.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>60000.00 COP</price>
+      <price>89000.00 COP</price>
       <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>86b294ff-9813-473b-8068-136ca6b74d0a</sku_id>
+      <title>Combo llave Impacto y Taladro </title>
+      <description>Realiza tus proyectos de construcción y mantenimiento con la máxima eficiencia y autonomía. Este conjunto inalámbrico de alto rendimiento te proporciona la potencia y precisión necesarias para afrontar cualquier tarea exigente sin interrupciones.
+
+* El taladro con mandril de 1/2 pulgada ofrece un agarre firme y versatilidad para perforar diversos materiales con absoluta precisión.
+*</description>
+      <link>https://tucomprascol.com/?p=86b294ff-9813-473b-8068-136ca6b74d0a</link>
+      <image_link>https://tucomprascol.com/images/products/86b294ff-9813-473b-8068-136ca6b74d0a.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>340000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>75afbd36-807b-4fdf-90c4-0c7290e28166</sku_id>
+      <title>COMBO PULIDORA Y PISTOLA CON ACCESORIOS</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=75afbd36-807b-4fdf-90c4-0c7290e28166</link>
+      <image_link>https://tucomprascol.com/images/products/75afbd36-807b-4fdf-90c4-0c7290e28166.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>340000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>763d8950-b7d2-4219-8cee-9775584b1b94</sku_id>
+      <title>Batería 21v</title>
+      <description>Batería de 21v con 5 celdas</description>
+      <link>https://tucomprascol.com/?p=763d8950-b7d2-4219-8cee-9775584b1b94</link>
+      <image_link>https://tucomprascol.com/images/products/763d8950-b7d2-4219-8cee-9775584b1b94.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>69000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>7db2f965-9b8a-41ca-b186-1b5c3633d801</sku_id>
+      <title>ROTOMARTILLO B</title>
+      <description>rotomartillo doble mandrekl b</description>
+      <link>https://tucomprascol.com/?p=7db2f965-9b8a-41ca-b186-1b5c3633d801</link>
+      <image_link>https://tucomprascol.com/images/products/7db2f965-9b8a-41ca-b186-1b5c3633d801.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>259000.00 COP</price>
+      <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -1075,31 +1052,27 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>5eb2d6fb-84e2-4c1e-9acb-3b1bb2203bb5</sku_id>
-      <title>Fumigadora Cañon</title>
-      <description>Protege tus cultivos a gran escala con la potente **Fumigadora de</description>
-      <link>https://tucomprascol.com/?p=5eb2d6fb-84e2-4c1e-9acb-3b1bb2203bb5</link>
-      <image_link>https://tucomprascol.com/images/products/5eb2d6fb-84e2-4c1e-9acb-3b1bb2203bb5.jpg</image_link>
+      <sku_id>574acfec-8833-45d7-85eb-02a22ae814a6</sku_id>
+      <title>COMBO X 4 ROJO</title>
+      <description>Enfronte sus proyectos de construcción, remodelación y mantenimiento con máxima potencia y total libertad de movimiento. El</description>
+      <link>https://tucomprascol.com/?p=574acfec-8833-45d7-85eb-02a22ae814a6</link>
+      <image_link>https://tucomprascol.com/images/products/574acfec-8833-45d7-85eb-02a22ae814a6.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>729000.00 COP</price>
+      <price>649000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>a78afbe6-03e4-4ba8-a330-7d2f31455e57</sku_id>
-      <title>RACHE 121 PCS</title>
-      <description>Simplifica tus reparaciones y proyectos mecánicos con un juego de copas y raches de alta precisión. Este maletín de 121 piezas te ofrece la versatilidad exacta que necesitas para resolver cualquier ajuste con rapidez, seguridad y el máximo rendimiento en tu taller u hogar.
-
-* Variedad absoluta para cada tarea: Incluye una selección exhaustiva de dados, llaves y puntas que se adaptan con precisión a múltiples medidas y tipos de tornillos.
-* Eficiencia en el ajuste: Su mecanismo de rache de alta precisión facilita el trabajo en espacios reducidos, reduciendo el esfuerzo físico y optimizando el tiempo de cada tarea.
-*</description>
-      <link>https://tucomprascol.com/?p=a78afbe6-03e4-4ba8-a330-7d2f31455e57</link>
-      <image_link>https://tucomprascol.com/images/products/a78afbe6-03e4-4ba8-a330-7d2f31455e57.jpg</image_link>
+      <sku_id>c3f10407-08b8-4526-bb9f-2418b1b5953a</sku_id>
+      <title>PULIDORA GRANDE 9 PUL</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=c3f10407-08b8-4526-bb9f-2418b1b5953a</link>
+      <image_link>https://tucomprascol.com/images/products/c3f10407-08b8-4526-bb9f-2418b1b5953a.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>449000.00 COP</price>
-      <brand>GORDO</brand>
+      <price>279000.00 COP</price>
+      <brand>MILLENIO</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -1118,26 +1091,29 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>0f18d001-7196-453f-9175-d3e9406d3331</sku_id>
-      <title>Polichadora 7&quot;</title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=0f18d001-7196-453f-9175-d3e9406d3331</link>
-      <image_link>https://tucomprascol.com/images/products/0f18d001-7196-453f-9175-d3e9406d3331.jpg</image_link>
+      <sku_id>PROD-1785614476708-267</sku_id>
+      <title>Pistola anclaje metalica</title>
+      <description>Pistola de anclaje Metálica en un 90%</description>
+      <link>https://tucomprascol.com/?p=PROD-1785614476708-267</link>
+      <image_link>https://tucomprascol.com/images/products/PROD-1785614476708-267.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>249000.00 COP</price>
+      <price>119000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>b3fec210-3c91-4365-b434-7caa8d505925</sku_id>
-      <title>Laser 16 líneas con trípode </title>
-      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=b3fec210-3c91-4365-b434-7caa8d505925</link>
-      <image_link>https://tucomprascol.com/images/products/b3fec210-3c91-4365-b434-7caa8d505925.jpg</image_link>
+      <sku_id>ec4fc931-0abf-4097-9de5-9e971b57770d</sku_id>
+      <title>Caladora Guia laser</title>
+      <description>Realice cortes exactos y limpios en sus proyectos con la precisión milimétrica que ofrece la guía láser integrada. Esta caladora combina la potencia necesaria para trabajar diversos materiales con un control absoluto en cada trazo, garantizando acabados de taller profesional en su propio espacio.
+
+* Motor de alto rendimiento de 980W con velocidad de hasta 3000 RPM, que asegura cortes rápidos y fluidos incluso en jornadas de trabajo exigentes.
+*</description>
+      <link>https://tucomprascol.com/?p=ec4fc931-0abf-4097-9de5-9e971b57770d</link>
+      <image_link>https://tucomprascol.com/images/products/ec4fc931-0abf-4097-9de5-9e971b57770d.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>299000.00 COP</price>
+      <price>189000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -1171,45 +1147,6 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>ec4fc931-0abf-4097-9de5-9e971b57770d</sku_id>
-      <title>Caladora Guia laser</title>
-      <description>Realice cortes exactos y limpios en sus proyectos con la precisión milimétrica que ofrece la guía láser integrada. Esta caladora combina la potencia necesaria para trabajar diversos materiales con un control absoluto en cada trazo, garantizando acabados de taller profesional en su propio espacio.
-
-* Motor de alto rendimiento de 980W con velocidad de hasta 3000 RPM, que asegura cortes rápidos y fluidos incluso en jornadas de trabajo exigentes.
-*</description>
-      <link>https://tucomprascol.com/?p=ec4fc931-0abf-4097-9de5-9e971b57770d</link>
-      <image_link>https://tucomprascol.com/images/products/ec4fc931-0abf-4097-9de5-9e971b57770d.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>189000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>7b9eceae-8e77-459e-b739-76cffe264793</sku_id>
-      <title>RACHE 94 PCS </title>
-      <description>R</description>
-      <link>https://tucomprascol.com/?p=7b9eceae-8e77-459e-b739-76cffe264793</link>
-      <image_link>https://tucomprascol.com/images/products/7b9eceae-8e77-459e-b739-76cffe264793.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>300000.00 COP</price>
-      <brand>GORDO</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>f5c6568a-5ec5-40e7-83b6-0977413a1b27</sku_id>
-      <title>RACHE 61 PCS</title>
-      <description>R</description>
-      <link>https://tucomprascol.com/?p=f5c6568a-5ec5-40e7-83b6-0977413a1b27</link>
-      <image_link>https://tucomprascol.com/images/products/f5c6568a-5ec5-40e7-83b6-0977413a1b27.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>289000.00 COP</price>
-      <brand>GORDO</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
       <sku_id>691f155c-7674-42db-998f-0bbf8197a1fd</sku_id>
       <title>VIBRADORA DE CERAMICA</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
@@ -1219,18 +1156,6 @@
       <availability>in stock</availability>
       <price>390000.00 COP</price>
       <brand>GORDO</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>b6144949-579f-4d07-8bb2-8c585448fb87</sku_id>
-      <title>Laser 16 lineas BT</title>
-      <description>¿Buscas precisión milimétrica en tus proyectos de construcción y remodelación? El **Nivel</description>
-      <link>https://tucomprascol.com/?p=b6144949-579f-4d07-8bb2-8c585448fb87</link>
-      <image_link>https://tucomprascol.com/images/products/b6144949-579f-4d07-8bb2-8c585448fb87.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>389000.00 COP</price>
-      <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
@@ -1260,6 +1185,18 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
+      <sku_id>66222759-ab8e-4d03-9575-83a30b7c18b8</sku_id>
+      <title>MOTORTOOL  183 PCSAZUL</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=66222759-ab8e-4d03-9575-83a30b7c18b8</link>
+      <image_link>https://tucomprascol.com/images/products/66222759-ab8e-4d03-9575-83a30b7c18b8.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>230000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
       <sku_id>7d1b8038-0add-42c5-ae72-4da14dab34ae</sku_id>
       <title>Rebordeadora Amarilla</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
@@ -1268,6 +1205,78 @@
       <condition>new</condition>
       <availability>in stock</availability>
       <price>169000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>d5e78711-ae9f-484f-8f5a-46723251a542</sku_id>
+      <title>NIVEL LASER 16 LIN ROJO</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=d5e78711-ae9f-484f-8f5a-46723251a542</link>
+      <image_link>https://tucomprascol.com/images/products/d5e78711-ae9f-484f-8f5a-46723251a542.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>c50cf84f-717b-48f6-b8f5-c2c139cb9765</sku_id>
+      <title>PULIDORA DE 6 PULGADAS </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=c50cf84f-717b-48f6-b8f5-c2c139cb9765</link>
+      <image_link>https://tucomprascol.com/images/products/c50cf84f-717b-48f6-b8f5-c2c139cb9765.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>209000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>945507de-752a-4ad8-a465-8aadb97a5493</sku_id>
+      <title>JUEGO TALADRO Y PULIDORA AZUL</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=945507de-752a-4ad8-a465-8aadb97a5493</link>
+      <image_link>https://tucomprascol.com/images/products/945507de-752a-4ad8-a465-8aadb97a5493.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>c023a5ca-082e-4c53-80d6-8d95d9ec1c6c</sku_id>
+      <title>PACHA TALADRO Y PULIDORA </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=c023a5ca-082e-4c53-80d6-8d95d9ec1c6c</link>
+      <image_link>https://tucomprascol.com/images/products/c023a5ca-082e-4c53-80d6-8d95d9ec1c6c.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>ce2a6570-9fbe-4bb2-842c-ab799d26dce8</sku_id>
+      <title>NIVEL LASER AZUL</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=ce2a6570-9fbe-4bb2-842c-ab799d26dce8</link>
+      <image_link>https://tucomprascol.com/images/products/ce2a6570-9fbe-4bb2-842c-ab799d26dce8.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>466ea2c2-4f61-4da2-818d-e0afc7242b09</sku_id>
+      <title>Ahoyadora de 10cm </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=466ea2c2-4f61-4da2-818d-e0afc7242b09</link>
+      <image_link>https://tucomprascol.com/images/products/466ea2c2-4f61-4da2-818d-e0afc7242b09.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>599000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -1284,6 +1293,30 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
+      <sku_id>717c221d-f2ee-427d-8568-1726d0fa97e3</sku_id>
+      <title>JUEGO TALADRO Y PULIDORA AMARILLO </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=717c221d-f2ee-427d-8568-1726d0fa97e3</link>
+      <image_link>https://tucomprascol.com/images/products/717c221d-f2ee-427d-8568-1726d0fa97e3.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>210000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>d1cc8276-ba8a-457a-89ee-cf69fa3acb6e</sku_id>
+      <title>MOTORTOOL 183 PCS AMARILLO</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=d1cc8276-ba8a-457a-89ee-cf69fa3acb6e</link>
+      <image_link>https://tucomprascol.com/images/products/d1cc8276-ba8a-457a-89ee-cf69fa3acb6e.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>230000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
       <sku_id>807cf099-b8ca-40ba-83ec-1c58fe19e468</sku_id>
       <title>Arcangel pequeño</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
@@ -1296,40 +1329,11 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>e7ce74b9-71db-4952-a33a-09b7f844efe9</sku_id>
-      <title>Taladro Brushless mandril metalico</title>
-      <description>Realice sus proyectos de remodelación y montaje con la precisión y eficiencia que exigen los trabajos de alta calidad. Este taladro inalámbrico optimiza el consumo de energía y proporciona una fuerza constante para perforar o atornillar con el mínimo esfuerzo y la máxima seguridad.
-
-* Mandril metálico de 3/8 de pulgada con sistema de bloqueo integrado que impide que la broca se afloje o se caiga durante el uso exigente.
-*</description>
-      <link>https://tucomprascol.com/?p=e7ce74b9-71db-4952-a33a-09b7f844efe9</link>
-      <image_link>https://tucomprascol.com/images/products/e7ce74b9-71db-4952-a33a-09b7f844efe9.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>209000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>fb625f73-79c0-4347-b50e-b41fa6375315</sku_id>
-      <title>CARETA FOTOSENSIBLE</title>
-      <description>Proteja su visión con la tecnología de oscurecimiento automático de alta precisión. Esta careta fotosensible aerografiada combina una seguridad superior contra la radiación con la practicidad de la carga solar continua para optimizar sus jornadas de trabajo.
-
-*</description>
-      <link>https://tucomprascol.com/?p=fb625f73-79c0-4347-b50e-b41fa6375315</link>
-      <image_link>https://tucomprascol.com/images/products/fb625f73-79c0-4347-b50e-b41fa6375315.jpg</image_link>
-      <condition>new</condition>
-      <availability>in stock</availability>
-      <price>115000.00 COP</price>
-      <brand>TuCompras</brand>
-      <category>Hardware &gt; Tools</category>
-    </item>
-    <item>
-      <sku_id>466ea2c2-4f61-4da2-818d-e0afc7242b09</sku_id>
-      <title>Ahoyadora de 10cm </title>
+      <sku_id>8a38aa01-21d7-440f-86fa-fd3e5347662d</sku_id>
+      <title>Cortasetos</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=466ea2c2-4f61-4da2-818d-e0afc7242b09</link>
-      <image_link>https://tucomprascol.com/images/products/466ea2c2-4f61-4da2-818d-e0afc7242b09.jpg</image_link>
+      <link>https://tucomprascol.com/?p=8a38aa01-21d7-440f-86fa-fd3e5347662d</link>
+      <image_link>https://tucomprascol.com/images/products/8a38aa01-21d7-440f-86fa-fd3e5347662d.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
       <price>599000.00 COP</price>
@@ -1349,14 +1353,26 @@
       <category>Hardware &gt; Tools</category>
     </item>
     <item>
-      <sku_id>8a38aa01-21d7-440f-86fa-fd3e5347662d</sku_id>
-      <title>Cortasetos</title>
+      <sku_id>a627f438-9b55-4f13-8ea3-e5a2225a2aca</sku_id>
+      <title>PISTOLA DE IMPACTO CON ADAPTADOR DE TALADRO</title>
       <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
-      <link>https://tucomprascol.com/?p=8a38aa01-21d7-440f-86fa-fd3e5347662d</link>
-      <image_link>https://tucomprascol.com/images/products/8a38aa01-21d7-440f-86fa-fd3e5347662d.jpg</image_link>
+      <link>https://tucomprascol.com/?p=a627f438-9b55-4f13-8ea3-e5a2225a2aca</link>
+      <image_link>https://tucomprascol.com/images/products/a627f438-9b55-4f13-8ea3-e5a2225a2aca.jpg</image_link>
       <condition>new</condition>
       <availability>in stock</availability>
-      <price>599000.00 COP</price>
+      <price>269000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>29440e5b-5958-4c66-88a7-a0ba638ee107</sku_id>
+      <title>Polichadora 4.5&quot; </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=29440e5b-5958-4c66-88a7-a0ba638ee107</link>
+      <image_link>https://tucomprascol.com/images/products/29440e5b-5958-4c66-88a7-a0ba638ee107.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>169000.00 COP</price>
       <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
@@ -1370,6 +1386,114 @@
       <availability>in stock</availability>
       <price>552500.00 COP</price>
       <brand>GORDO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>39925a64-3de2-4c8b-ac72-504a98026837</sku_id>
+      <title>guadalupe Acrilico PQ</title>
+      <description>Rinde homenaje a tu fe con una pieza de arte sacro contemporáneo que aporta serenidad y distinción a tus espacios más importantes. Este cuadro de la Virgen de</description>
+      <link>https://tucomprascol.com/?p=39925a64-3de2-4c8b-ac72-504a98026837</link>
+      <image_link>https://tucomprascol.com/images/products/39925a64-3de2-4c8b-ac72-504a98026837.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>209000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>7ce6bc58-09b1-4355-94e7-e4df126284a7</sku_id>
+      <title>GATO HIDRAULICO</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=7ce6bc58-09b1-4355-94e7-e4df126284a7</link>
+      <image_link>https://tucomprascol.com/images/products/7ce6bc58-09b1-4355-94e7-e4df126284a7.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>450000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>3980ed21-19b8-48ff-b9a8-afb1979ff51c</sku_id>
+      <title>PISTOLA DE IMPACTO </title>
+      <description>PIS</description>
+      <link>https://tucomprascol.com/?p=3980ed21-19b8-48ff-b9a8-afb1979ff51c</link>
+      <image_link>https://tucomprascol.com/images/products/3980ed21-19b8-48ff-b9a8-afb1979ff51c.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>259000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>83ec3cd6-5b1b-4953-968a-b90af5afb5eb</sku_id>
+      <title>Combo llave Impacto y Taladro  amarillo</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=83ec3cd6-5b1b-4953-968a-b90af5afb5eb</link>
+      <image_link>https://tucomprascol.com/images/products/83ec3cd6-5b1b-4953-968a-b90af5afb5eb.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>340000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>b3fec210-3c91-4365-b434-7caa8d505925</sku_id>
+      <title>Laser 16 líneas con trípode </title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=b3fec210-3c91-4365-b434-7caa8d505925</link>
+      <image_link>https://tucomprascol.com/images/products/b3fec210-3c91-4365-b434-7caa8d505925.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>259000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>0f18d001-7196-453f-9175-d3e9406d3331</sku_id>
+      <title>Polichadora 7&quot;</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=0f18d001-7196-453f-9175-d3e9406d3331</link>
+      <image_link>https://tucomprascol.com/images/products/0f18d001-7196-453f-9175-d3e9406d3331.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>249000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>1ddf8928-61c5-4446-a0ac-e489f9889d91</sku_id>
+      <title>COMBO PULIDORA Y TALADRO INALAMBRICO ROJO</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=1ddf8928-61c5-4446-a0ac-e489f9889d91</link>
+      <image_link>https://tucomprascol.com/images/products/1ddf8928-61c5-4446-a0ac-e489f9889d91.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>340000.00 COP</price>
+      <brand>MILLENIO</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>5eb2d6fb-84e2-4c1e-9acb-3b1bb2203bb5</sku_id>
+      <title>Fumigadora Cañon</title>
+      <description>Protege tus cultivos a gran escala con la potente **Fumigadora de</description>
+      <link>https://tucomprascol.com/?p=5eb2d6fb-84e2-4c1e-9acb-3b1bb2203bb5</link>
+      <image_link>https://tucomprascol.com/images/products/5eb2d6fb-84e2-4c1e-9acb-3b1bb2203bb5.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>729000.00 COP</price>
+      <brand>TuCompras</brand>
+      <category>Hardware &gt; Tools</category>
+    </item>
+    <item>
+      <sku_id>15ffe4ca-a0b0-417e-b8a0-de1607df8c62</sku_id>
+      <title>Laser 5 lineas</title>
+      <description>Calidad y rendimiento profesional para tu hogar o taller. Compra seguro con pago contra entrega.</description>
+      <link>https://tucomprascol.com/?p=15ffe4ca-a0b0-417e-b8a0-de1607df8c62</link>
+      <image_link>https://tucomprascol.com/images/products/15ffe4ca-a0b0-417e-b8a0-de1607df8c62.jpg</image_link>
+      <condition>new</condition>
+      <availability>in stock</availability>
+      <price>269000.00 COP</price>
+      <brand>TuCompras</brand>
       <category>Hardware &gt; Tools</category>
     </item>
   </channel>
