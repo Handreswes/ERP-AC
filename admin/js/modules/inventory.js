@@ -661,7 +661,7 @@ window.Inventory = {
                         ${p.active === false ? 'Inactivo' : 'Activo'}
                     </span>
                 </td>
-                <td class="table-actions">
+                <td class="table-actions" data-label="Acciones">
                     <button class="icon-btn receive-btn" data-id="${p.id}" title="Recibir Mercancía (Sumar)" style="color: var(--success);"><i class="fas fa-plus"></i></button>
                     <button class="icon-btn edit-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
                     <button class="icon-btn delete-btn" data-id="${p.id}"><i class="fas fa-trash"></i></button>
