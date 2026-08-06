@@ -4,15 +4,23 @@
 
 window.MetaAPI = {
     getSettings() {
+        const validToken = 'EAAZAStMI40MIBSOsL0j3ohraFrlG8Em0DghFUDmbZAFCs37z79mbzIIrDDxDlfxRZCgUZBolgyETQ0iOaIDNeI9ZCkBbI8FyZC0OYjVPpONmAg6vUdcslZBaIumjAHKzyx21V352wRTJwc77C97bPHmLti7QJ1mUlwBKia3ZBxZALsbjEMbuLcP6k111OwOtvsZAcM7QZDZD';
         try {
             const raw = localStorage.getItem('erp_meta_config');
-            if (raw) return JSON.parse(raw);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                if (!parsed.accessToken || parsed.accessToken.startsWith('EAAaDm')) {
+                    parsed.accessToken = validToken;
+                }
+                if (!parsed.adsToken) parsed.adsToken = validToken;
+                return parsed;
+            }
         } catch (e) {}
         return {
             pixelId: '1765263381138535',
             adAccountId: 'act_1730680554708708',
-            accessToken: 'EAAaDmZC6MvwYBSMGfLBYZAZCLbTT8kUZA1X88mJdUtxcMgchSYZAMyi8Hlo2rWTDgiFDVwg4rKB8ZCOTNKxZBdZCA7CSNeRPjxCr4EkUxxDNLVZCYUANXeHDbkBqakybMTHagYprjKJg87dZC9t7LLiZAOr7NFp4Wi2vTiUHIBRp2yOUYk1vLTQM6bycsvvB9kzQTsURQZDZD',
-            adsToken: 'EAAZAStMI40MIBSOsL0j3ohraFrlG8Em0DghFUDmbZAFCs37z79mbzIIrDDxDlfxRZCgUZBolgyETQ0iOaIDNeI9ZCkBbI8FyZC0OYjVPpONmAg6vUdcslZBaIumjAHKzyx21V352wRTJwc77C97bPHmLti7QJ1mUlwBKia3ZBxZALsbjEMbuLcP6k111OwOtvsZAcM7QZDZD',
+            accessToken: validToken,
+            adsToken: validToken,
             testEventCode: '',
             enabled: true
         };
