@@ -1461,6 +1461,19 @@ window.TuCompras = {
                 address: addressEl ? addressEl.value : ''
             });
 
+            // AUTOMATIC META ADS CONVERSION API TRIGGER
+            if (window.MetaAPI && typeof window.MetaAPI.sendPurchaseEvent === 'function') {
+                const totalValue = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0);
+                MetaAPI.sendPurchaseEvent({
+                    sale: sale,
+                    customerName: name,
+                    customerPhone: phone,
+                    customerCity: city,
+                    totalValue: totalValue,
+                    items: this.cart
+                });
+            }
+
             document.getElementById('tucompras-sale-modal').classList.remove('show');
             this.renderPanel();
         } catch (err) {
