@@ -1,5 +1,5 @@
 /**
- * ERP AC Marketing & Meta Ads (CAPI) Module
+ * ERP AC Marketing, Meta Ads CAPI & Campaign Management System
  */
 
 window.MetaAPI = {
@@ -10,7 +10,9 @@ window.MetaAPI = {
         } catch (e) {}
         return {
             pixelId: '1765263381138535',
+            adAccountId: 'act_1730680554708708',
             accessToken: 'EAAaDmZC6MvwYBSMGfLBYZAZCLbTT8kUZA1X88mJdUtxcMgchSYZAMyi8Hlo2rWTDgiFDVwg4rKB8ZCOTNKxZBdZCA7CSNeRPjxCr4EkUxxDNLVZCYUANXeHDbkBqakybMTHagYprjKJg87dZC9t7LLiZAOr7NFp4Wi2vTiUHIBRp2yOUYk1vLTQM6bycsvvB9kzQTsURQZDZD',
+            adsToken: 'EAAZAStMI40MIBSOsL0j3ohraFrlG8Em0DghFUDmbZAFCs37z79mbzIIrDDxDlfxRZCgUZBolgyETQ0iOaIDNeI9ZCkBbI8FyZC0OYjVPpONmAg6vUdcslZBaIumjAHKzyx21V352wRTJwc77C97bPHmLti7QJ1mUlwBKia3ZBxZALsbjEMbuLcP6k111OwOtvsZAcM7QZDZD',
             testEventCode: '',
             enabled: true
         };
@@ -127,6 +129,78 @@ window.MetaAPI = {
         }
     },
 
+    async fetchCampaigns() {
+        const config = this.getSettings();
+        const token = config.adsToken || config.accessToken;
+        const actId = config.adAccountId || 'act_1730680554708708';
+
+        if (!token) return { success: false, data: [] };
+
+        try {
+            const url = `https://graph.facebook.com/v19.0/${actId}/campaigns?fields=id,name,status,objective,daily_budget,lifetime_budget,created_time,insights{spend,impressions,reach,clicks,cpc,ctr,actions}&access_token=${token.trim()}`;
+            const res = await fetch(url);
+            const json = await res.json();
+            if (json.data) {
+                return { success: true, data: json.data };
+            } else {
+                return { success: false, error: json.error, data: [] };
+            }
+        } catch (err) {
+            console.error('[Meta API] Error fetching campaigns:', err);
+            return { success: false, error: err, data: [] };
+        }
+    },
+
+    async createCampaignDraft({ name, objective, dailyBudgetCOP }) {
+        const config = this.getSettings();
+        const token = config.adsToken || config.accessToken;
+        const actId = config.adAccountId || 'act_1730680554708708';
+
+        if (!token) throw new Error('Token de Meta no configurado.');
+
+        // Daily budget in COP cents for Meta API (e.g. 20000 COP -> 2000000 cents or 20000 COP directly depending on currency format)
+        // For COP, Meta accepts daily_budget in COP (minimum ~10000 COP)
+        const budgetCents = Math.max(10000, parseInt(dailyBudgetCOP) || 20000) * 100;
+
+        const payload = new URLSearchParams();
+        payload.append('name', '[BORRADOR ERP] ' + name);
+        payload.append('objective', objective || 'OUTCOME_SALES');
+        payload.append('status', 'PAUSED'); // Always created in PAUSED / DRAFT mode for security!
+        payload.append('special_ad_categories', '[]');
+        payload.append('access_token', token.trim());
+
+        const url = `https://graph.facebook.com/v19.0/${actId}/campaigns`;
+        const res = await fetch(url, {
+            method: 'POST',
+            body: payload
+        });
+
+        const json = await res.json();
+        if (json.id) {
+            return { success: true, campaignId: json.id, data: json };
+        } else {
+            throw new Error(json.error?.message || 'Error desconocido al crear la campaña');
+        }
+    },
+
+    async toggleCampaignStatus(campaignId, newStatus) {
+        const config = this.getSettings();
+        const token = config.adsToken || config.accessToken;
+        if (!token) return { success: false };
+
+        const payload = new URLSearchParams();
+        payload.append('status', newStatus);
+        payload.append('access_token', token.trim());
+
+        const url = `https://graph.facebook.com/v19.0/${campaignId}`;
+        const res = await fetch(url, {
+            method: 'POST',
+            body: payload
+        });
+        const json = await res.json();
+        return { success: json.success || false, data: json };
+    },
+
     logEvent(logEntry) {
         try {
             let logs = [];
@@ -172,68 +246,96 @@ window.Marketing = {
 
         panel.innerHTML = `
             <div class="panel-header">
-                <h1>Marketing & Meta Ads (Conversions API)</h1>
+                <h1>Marketing & Meta Ads (CAPI & Campañas)</h1>
                 <div class="actions">
+                    <button class="btn btn-outline" onclick="Marketing.showNewCampaignModal()">
+                        <i class="fas fa-plus-circle"></i> + Nueva Campaña en Borrador
+                    </button>
                     <button class="btn btn-primary" onclick="Marketing.showNotificationModal()">
-                        <i class="fas fa-paper-plane"></i> Nueva Notificación Web
+                        <i class="fas fa-paper-plane"></i> Notificación Web
                     </button>
                 </div>
             </div>
 
-            <!-- META ADS INTEGRATION CARD -->
+            <!-- META ADS ACCOUNT STATUS CARD -->
             <div class="stat-card" style="margin-top: 1.5rem; background: var(--card-bg, #1e293b); border-radius: 12px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.1);">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.8rem;">
-                    <div style="display: flex; align-items: center; gap: 10px;">
-                        <i class="fab fa-facebook-square" style="font-size: 2rem; color: #1877f2;"></i>
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fab fa-facebook-square" style="font-size: 2.4rem; color: #1877f2;"></i>
                         <div>
-                            <h3 style="margin:0;">Conexión Meta Ads / Conversions API (CAPI)</h3>
-                            <small class="text-secondary">Cuenta Publicitaria: <strong>Tucomprascol COP</strong></small>
+                            <h3 style="margin:0;">Cuenta Publicitaria: <strong>Tucomprascol COP</strong></h3>
+                            <small class="text-secondary">ID: <code>${metaConfig.adAccountId || 'act_1730680554708708'}</code> | Divisa: <strong>COP ($)</strong> | Zona Horaria: <strong>America/Bogota</strong></small>
                         </div>
                     </div>
-                    <div>
-                        <span class="badge ${metaConfig.enabled ? 'bg-success' : 'bg-secondary'}" style="font-size: 0.9rem; padding: 6px 12px;">
-                            ${metaConfig.enabled ? '🟢 CONECTADO (Activo)' : '⚪ DESCONECTADO'}
+                    <div style="display: flex; gap: 8px;">
+                        <span class="badge bg-success" style="font-size: 0.9rem; padding: 8px 14px;">
+                            🟢 CONECTADO (System User Token Activo)
                         </span>
                     </div>
                 </div>
 
-                <form id="meta-config-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem;">
+                <form id="meta-config-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem;">
                     <div class="form-group">
-                        <label style="font-weight: 600;">ID del Píxel / Conjunto de Datos (Meta Pixel ID) *</label>
-                        <input type="text" id="meta-pixel-id" class="form-control" value="${metaConfig.pixelId || ''}" required placeholder="Ej: 1765263381138535">
+                        <label style="font-weight: 600;">ID del Píxel (Meta Pixel ID)</label>
+                        <input type="text" id="meta-pixel-id" class="form-control" value="${metaConfig.pixelId || ''}" required>
                     </div>
 
                     <div class="form-group">
-                        <label style="font-weight: 600;">Código de Evento de Prueba (Opcional - Test Event Code)</label>
-                        <input type="text" id="meta-test-code" class="form-control" value="${metaConfig.testEventCode || ''}" placeholder="Ej: TEST12345 (Dejar vacío en producción)">
+                        <label style="font-weight: 600;">ID Cuenta Publicitaria (Ad Account ID)</label>
+                        <input type="text" id="meta-ad-account-id" class="form-control" value="${metaConfig.adAccountId || 'act_1730680554708708'}" required>
                     </div>
 
                     <div class="form-group" style="grid-column: 1 / -1;">
-                        <label style="font-weight: 600;">Token de Acceso de la API de Conversiones (CAPI Token) *</label>
-                        <textarea id="meta-access-token" class="form-control" rows="3" required placeholder="EAAa...">${metaConfig.accessToken || ''}</textarea>
+                        <label style="font-weight: 600;">Token de Gestión de Anuncios y Reportes (Ads Token con ads_management)</label>
+                        <textarea id="meta-ads-token" class="form-control" rows="2" required>${metaConfig.adsToken || metaConfig.accessToken || ''}</textarea>
                     </div>
 
                     <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
                         <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
                             <input type="checkbox" id="meta-enabled-toggle" ${metaConfig.enabled ? 'checked' : ''}>
-                            <span>Activar envío automático de ventas de TuCompras a Meta Ads</span>
+                            <span>Activar envío automático de conversiones CAPI</span>
                         </label>
                         <div style="display: flex; gap: 10px;">
                             <button type="button" class="btn btn-outline" onclick="Marketing.testMetaConversion()">
-                                <i class="fas fa-vial"></i> Enviar Conversión de Prueba
+                                <i class="fas fa-vial"></i> Probar CAPI
                             </button>
                             <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> Guardar Configuración
+                                <i class="fas fa-save"></i> Guardar Token
                             </button>
                         </div>
                     </div>
                 </form>
             </div>
 
-            <!-- LOGS TABLE -->
+            <!-- CAMPAIGNS PERFORMANCE REPORT TABLE -->
             <div class="table-container" style="margin-top: 2rem;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <h3><i class="fas fa-chart-line" style="color: #1877f2;"></i> Historial de Conversiones Enviadas a Meta (CAPI)</h3>
+                    <h3><i class="fas fa-bullhorn" style="color: #1877f2;"></i> Informe de Rendimiento de Campañas Meta Ads</h3>
+                    <button class="btn btn-outline btn-sm" onclick="Marketing.fetchCampaignsReport()"><i class="fas fa-sync"></i> Actualizar Informe</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Nombre Campaña</th>
+                            <th>Objetivo</th>
+                            <th>Estado</th>
+                            <th>Inversión (COP)</th>
+                            <th>Impresiones</th>
+                            <th>Clics</th>
+                            <th>CPC Prom.</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="meta-campaigns-tbody">
+                        <tr><td colspan="8" class="text-center">Cargando informe de campañas desde Meta...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- CAPI EVENT LOGS TABLE -->
+            <div class="table-container" style="margin-top: 2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h3><i class="fas fa-exchange-alt" style="color: #10b981;"></i> Historial de Ventas Enviadas a Meta CAPI</h3>
                     <button class="btn btn-outline btn-sm" onclick="Marketing.renderPanel()"><i class="fas fa-sync"></i> Actualizar</button>
                 </div>
                 <table class="data-table">
@@ -243,11 +345,11 @@ window.Marketing = {
                             <th>Evento</th>
                             <th>Cliente</th>
                             <th>Valor Venta (COP)</th>
-                            <th>Respuesta Meta (CAPI)</th>
+                            <th>Respuesta Meta</th>
                         </tr>
                     </thead>
                     <tbody id="meta-logs-tbody">
-                        ${logs.length === 0 ? '<tr><td colspan="5" class="text-center">Aún no se han enviado conversiones. Al registrar despachos en TuCompras aparecerán aquí en tiempo real.</td></tr>' : 
+                        ${logs.length === 0 ? '<tr><td colspan="5" class="text-center">Aún no se han enviado conversiones. Al registrar despachos en TuCompras aparecerán aquí.</td></tr>' : 
                             logs.map(l => `
                                 <tr>
                                     <td>${new Date(l.timestamp).toLocaleString()}</td>
@@ -261,36 +363,16 @@ window.Marketing = {
                     </tbody>
                 </table>
             </div>
-
-            <!-- NOTIFICATIONS HISTORIAL -->
-            <div class="table-container" style="margin-top: 2rem;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-                    <h3>Historial de Notificaciones Web</h3>
-                    <button class="btn btn-outline btn-sm" onclick="Marketing.fetchNotifications()"><i class="fas fa-sync"></i></button>
-                </div>
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Cliente (ID)</th>
-                            <th>Título</th>
-                            <th>Mensaje</th>
-                            <th>Estado</th>
-                        </tr>
-                    </thead>
-                    <tbody id="notif-history">
-                        <tr><td colspan="5" class="text-center">Cargando historial...</td></tr>
-                    </tbody>
-                </table>
-            </div>
         `;
 
         document.getElementById('meta-config-form').onsubmit = (e) => {
             e.preventDefault();
             const config = {
                 pixelId: document.getElementById('meta-pixel-id').value.trim(),
-                accessToken: document.getElementById('meta-access-token').value.trim(),
-                testEventCode: document.getElementById('meta-test-code').value.trim(),
+                adAccountId: document.getElementById('meta-ad-account-id').value.trim(),
+                accessToken: metaConfig.accessToken,
+                adsToken: document.getElementById('meta-ads-token').value.trim(),
+                testEventCode: metaConfig.testEventCode || '',
                 enabled: document.getElementById('meta-enabled-toggle').checked
             };
             MetaAPI.saveSettings(config);
@@ -298,7 +380,150 @@ window.Marketing = {
             this.renderPanel();
         };
 
+        this.fetchCampaignsReport();
         this.fetchNotifications();
+    },
+
+    async fetchCampaignsReport() {
+        const tbody = document.getElementById('meta-campaigns-tbody');
+        if (!tbody) return;
+
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center"><i class="fas fa-spinner fa-spin"></i> Consultando métricas en vivo a Meta Ads...</td></tr>';
+
+        const res = await MetaAPI.fetchCampaigns();
+        if (!res.success || !res.data) {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">⚠️ ${res.error?.message || 'No se pudieron consultar las campañas. Verifica el Token.'}</td></tr>`;
+            return;
+        }
+
+        if (res.data.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="text-center">No hay campañas en la cuenta publicitaria <strong>Tucomprascol COP</strong>. ¡Crea tu primera campaña en borrador con el botón de arriba!</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = res.data.map(c => {
+            const ins = (c.insights && c.insights.data && c.insights.data[0]) ? c.insights.data[0] : {};
+            const spend = parseFloat(ins.spend || 0);
+            const impressions = parseInt(ins.impressions || 0);
+            const clicks = parseInt(ins.clicks || 0);
+            const cpc = parseFloat(ins.cpc || 0);
+
+            const isPaused = c.status === 'PAUSED';
+            const statusBadge = isPaused ? 
+                '<span class="badge bg-secondary">⏸️ BORRADOR / PAUSADA</span>' : 
+                '<span class="badge bg-success">▶️ ACTIVA</span>';
+
+            return `
+                <tr>
+                    <td><strong>${c.name}</strong><br><small class="text-secondary">ID: ${c.id}</small></td>
+                    <td><small>${c.objective || 'N/A'}</small></td>
+                    <td>${statusBadge}</td>
+                    <td><strong>$${spend.toLocaleString()} COP</strong></td>
+                    <td>${impressions.toLocaleString()}</td>
+                    <td>${clicks.toLocaleString()}</td>
+                    <td>$${cpc.toFixed(2)} COP</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline" onclick="Marketing.toggleCampaign('${c.id}', '${isPaused ? 'ACTIVE' : 'PAUSED'}')">
+                            <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i> ${isPaused ? 'Activar' : 'Pausar'}
+                        </button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    },
+
+    async toggleCampaign(campaignId, newStatus) {
+        const actionText = newStatus === 'ACTIVE' ? 'activar' : 'pausar';
+        if (!confirm(`¿Deseas ${actionText} esta campaña en Meta Ads?`)) return;
+
+        const res = await MetaAPI.toggleCampaignStatus(campaignId, newStatus);
+        if (res.success) {
+            alert(`Campaña ${actionText === 'activar' ? 'activada' : 'pausada'} con éxito.`);
+            this.fetchCampaignsReport();
+        } else {
+            alert('Error al cambiar estado de la campaña.');
+        }
+    },
+
+    showNewCampaignModal() {
+        const modalId = 'meta-new-campaign-modal';
+        let modal = document.getElementById(modalId);
+        if (!modal) {
+            modal = document.createElement('div');
+            modal.id = modalId;
+            modal.className = 'modal';
+            document.body.appendChild(modal);
+        }
+
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 550px;">
+                <div class="modal-header">
+                    <h2><i class="fab fa-facebook" style="color:#1877f2;"></i> Nueva Campaña en Borrador (Meta Ads)</h2>
+                    <span class="close-modal" onclick="document.getElementById('${modalId}').style.display='none'">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <p class="text-secondary" style="font-size:0.85rem; margin-bottom:1rem;">
+                        🛡️ <strong>Seguridad de Presupuesto:</strong> La campaña se creará siempre en modo <strong>BORRADOR / PAUSADA</strong> para que tú la revises y apruebes antes de ponerla a rodar.
+                    </p>
+                    <form id="meta-new-campaign-form">
+                        <div class="form-group">
+                            <label>Nombre de la Campaña *</label>
+                            <input type="text" id="camp-name" class="form-control" required placeholder="Ej: Combo Pulidora + Pistola Roja Colombia">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Objetivo de la Campaña *</label>
+                            <select id="camp-objective" class="form-control" required>
+                                <option value="OUTCOME_SALES">🛍️ Ventas & Conversiones (TuCompras / Web)</option>
+                                <option value="OUTCOME_ENGAGEMENT">💬 Interacción & Mensajes WhatsApp / Redes</option>
+                                <option value="OUTCOME_TRAFFIC">🌐 Tráfico a la Página Web</option>
+                                <option value="OUTCOME_LEADS">📋 Clientes Potenciales (Formulario)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Presupuesto Diario Sugerido (COP) *</label>
+                            <input type="number" id="camp-budget" class="form-control" value="20000" min="10000" step="5000" required placeholder="Ej: 20000">
+                            <small class="text-secondary">Se sugiere entre $15.000 y $30.000 COP/día.</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem; height: 50px; font-weight: 700;">
+                            🚀 CREAR CAMPAÑA EN BORRADOR EN META
+                        </button>
+                    </form>
+                </div>
+            </div>
+        `;
+
+        modal.style.display = 'flex';
+
+        document.getElementById('meta-new-campaign-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Generando en Meta Ads...';
+
+            try {
+                const name = document.getElementById('camp-name').value;
+                const objective = document.getElementById('camp-objective').value;
+                const budget = document.getElementById('camp-budget').value;
+
+                const res = await MetaAPI.createCampaignDraft({
+                    name: name,
+                    objective: objective,
+                    dailyBudgetCOP: budget
+                });
+
+                alert('🎉 ¡Campaña creada con éxito en Meta Ads en estado BORRADOR!\n\nPuedes verla e inspeccionarla en tu Administrador de Anuncios.');
+                modal.style.display = 'none';
+                this.fetchCampaignsReport();
+            } catch (err) {
+                alert('❌ Error al generar campaña: ' + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🚀 CREAR CAMPAÑA EN BORRADOR EN META';
+            }
+        };
     },
 
     async testMetaConversion() {
@@ -318,16 +543,16 @@ window.Marketing = {
             });
 
             if (res.success) {
-                alert('🎉 ¡Prueba Exitosa! Meta Ads (CAPI) recibió la conversión de prueba correctamente (200 OK).');
+                alert('🎉 ¡Prueba CAPI Exitosa! Meta Ads recibió la conversión de prueba correctamente (200 OK).');
             } else {
-                alert('⚠️ Meta devolvió un aviso o error:\n\n' + JSON.stringify(res.response || res.error));
+                alert('⚠️ Meta devolvió un aviso:\n\n' + JSON.stringify(res.response || res.error));
             }
         } catch (e) {
             alert('❌ Error al probar envío: ' + e.message);
         } finally {
             if (btn) {
                 btn.disabled = false;
-                btn.innerHTML = '<i class="fas fa-vial"></i> Enviar Conversión de Prueba';
+                btn.innerHTML = '<i class="fas fa-vial"></i> Probar CAPI';
             }
             this.renderPanel();
         }
@@ -376,7 +601,7 @@ window.Marketing = {
         modal.innerHTML = `
             <div class="modal-content" style="max-width: 500px;">
                 <div class="modal-header">
-                    <h2>Nueva Notificación</h2>
+                    <h2>Nueva Notificación Web</h2>
                     <span class="close-modal" onclick="document.getElementById('${modalId}').style.display='none'">&times;</span>
                 </div>
                 <div class="modal-body">
