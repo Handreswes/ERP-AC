@@ -1445,12 +1445,18 @@ window.TuCompras = {
                 alert('Despacho registrado con éxito.');
             }
 
-            // DEPENDENT DATA (Customer CRM)
+            // DEPENDENT DATA (Customer CRM & Custom Locations Persistence)
             const deptEl = document.getElementById('tc-cust-dept');
+            const deptName = deptEl ? deptEl.value : '';
             const addressEl = document.getElementById('tc-cust-address');
+
+            if (city && window.Locations && typeof window.Locations.addCustomCity === 'function') {
+                Locations.addCustomCity(deptName, city);
+            }
+
             await TuComprasCRM.addCustomer({
                 name, phone,
-                dept: deptEl ? deptEl.value : '',
+                dept: deptName,
                 city: city,
                 address: addressEl ? addressEl.value : ''
             });
