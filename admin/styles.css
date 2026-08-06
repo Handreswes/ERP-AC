@@ -1424,25 +1424,51 @@ option:checked {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.85rem 0;
+        padding: 0.75rem 0;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         text-align: right;
-        gap: 10px;
+        gap: 12px;
         word-break: break-word;
         overflow-wrap: anywhere;
+        box-sizing: border-box;
     }
 
-    .data-table td[data-label="Acciones"] {
-        flex-wrap: wrap;
-        justify-content: flex-end;
-        gap: 6px;
-    }
-
-    .data-table td > span {
-        flex: 1;
+    .data-table td > strong,
+    .data-table td > span,
+    .data-table td > div,
+    .data-table td > small {
         text-align: right;
-        display: block;
         word-break: break-word;
+        overflow-wrap: anywhere;
+        max-width: 62%;
+    }
+
+    .data-table td.table-actions,
+    .data-table td[data-label="Acciones"] {
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+        padding-top: 1rem !important;
+        margin-top: 0.5rem !important;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1) !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .data-table td.table-actions .icon-btn,
+    .data-table td[data-label="Acciones"] .icon-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        border-radius: 10px !important;
+        background: rgba(255, 255, 255, 0.06) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1rem !important;
+        margin: 0 !important;
     }
 
     .data-table td:last-child {
