@@ -33,6 +33,11 @@ $supabaseUrl = "$($env:SUPABASE_URL)/rest/v1/products?active=eq.true&select=*"
 try {
     Write-Host "Fetching products from Supabase to generate feed..." -ForegroundColor Cyan
     $products = Invoke-RestMethod -Uri $supabaseUrl -Headers $supabaseHeaders -Method Get
+
+    # Sort products: Herramientas / General FIRST, Cuadros / Cuadros Decorativos LAST
+    if ($products) {
+        $products = $products | Sort-Object @{ Expression = { if ($_.category -like "*cuadro*" -or $_.name -like "*cuadro*") { 1 } else { 0 } } }
+    }
     
     $googleXmlPath = Join-Path $sourceDir "google_feed.xml"
     $tiktokXmlPath = Join-Path $sourceDir "tiktok_feed.xml"
