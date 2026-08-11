@@ -942,17 +942,6 @@
                 hideLoadingScreen();
             }
         }
-                console.error("Error loading catalog:", err);
-                document.getElementById('catalog-grid').innerHTML = `
-                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: 16px; border: 1px solid var(--border);">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
-                        <h3>Error al cargar los productos</h3>
-                        <p style="color: var(--text-secondary);">Por favor revisa tu conexión e intenta refrescar la página.</p>
-                    </div>
-                `;
-                document.getElementById('loading-screen').style.display = 'none';
-            }
-        }
 
         // Filter and Render Logic
         function applyFilters() {
