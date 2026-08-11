@@ -774,140 +774,172 @@
             day: 'numeric' 
         });
 
+        function hideLoadingScreen() {
+            const loader = document.getElementById('loading-screen');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 400);
+            }
+        }
+
+        function updateCategoryDropdown() {
+            const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
+            const catSelect = document.getElementById('select-category');
+            if (!catSelect) return;
+            const currentVal = catSelect.value;
+            catSelect.innerHTML = '<option value="all">Todas las Categorías</option>';
+            categories.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                catSelect.appendChild(opt);
+            });
+            if (categories.includes(currentVal)) {
+                catSelect.value = currentVal;
+            }
+        }
+
+        function processRawProducts(productsList) {
+            return productsList.filter(p => {
+                const totalStock = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
+                const hasStock = totalStock > 0;
+                const hasPrice = (parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || parseFloat(p.priceWholesale)) > 0;
+                const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
+                return p.active !== false && hasStock && hasPrice && hasImage;
+            });
+        }
+
+        async function bgDeltaSync(localProducts) {
+            try {
+                let latestLocalTS = '2000-01-01T00:00:00.000Z';
+                localProducts.forEach(p => {
+                    const ts = p.updatedAt || p.createdAt;
+                    if (ts && new Date(ts) > new Date(latestLocalTS)) {
+                        latestLocalTS = ts;
+                    }
+                });
+
+                const { data: activeIds, error: idErr } = await _supabase
+                    .from('products')
+                    .select('id')
+                    .eq('active', true);
+                if (idErr) return;
+
+                const activeIdSet = new Set((activeIds || []).map(item => item.id));
+                let products = localProducts.filter(p => activeIdSet.has(p.id));
+
+                const { data: updatedProducts, error: updateErr } = await _supabase
+                    .from('products')
+                    .select('*')
+                    .gt('updatedAt', latestLocalTS);
+                if (updateErr) return;
+
+                if (updatedProducts && updatedProducts.length > 0) {
+                    updatedProducts.forEach(newP => {
+                        if (newP.image && typeof newP.image === 'string' && newP.image.startsWith('data:image')) {
+                            newP.image = `https://tucomprascol.com/images/products/${newP.id}.jpg`;
+                        }
+                        const idx = products.findIndex(p => p.id === newP.id);
+                        if (idx !== -1) {
+                            if (newP.active === false) products.splice(idx, 1);
+                            else products[idx] = newP;
+                        } else if (newP.active !== false) {
+                            products.push(newP);
+                        }
+                    });
+
+                    allProducts = processRawProducts(products);
+                    updateCategoryDropdown();
+                    applyFilters();
+                }
+            } catch (err) {
+                console.warn("Background delta sync skipped:", err);
+            }
+        }
+
+        async function fallbackSupabaseLoad() {
+            try {
+                const { data: dbProducts, error: dbPErr } = await _supabase
+                    .from('products')
+                    .select('*')
+                    .eq('active', true)
+                    .order('name', { ascending: true });
+                if (dbPErr) throw dbPErr;
+
+                const products = (dbProducts || []).map(p => {
+                    if (p.image && typeof p.image === 'string' && p.image.startsWith('data:image')) {
+                        p.image = `https://tucomprascol.com/images/products/${p.id}.jpg`;
+                    }
+                    return p;
+                });
+
+                allProducts = processRawProducts(products);
+                updateCategoryDropdown();
+                const priceSelect = document.getElementById('select-price-type');
+                if (priceSelect) priceSelect.value = urlPrice;
+                applyFilters();
+            } finally {
+                hideLoadingScreen();
+            }
+        }
+
         // Initialize App
         async function init() {
             try {
                 const basePath = window.location.pathname.includes('/admin/') ? '../' : './';
 
                 // Fetch Website Settings to get default WhatsApp retail number
-                let settings;
-                try {
-                    const response = await fetch(basePath + 'settings.json');
-                    if (!response.ok) throw new Error('Network response not ok');
-                    settings = await response.json();
-                } catch (sErr) {
-                    console.warn("Could not load settings.json, falling back to Supabase:", sErr);
-                    const { data: dbSettings, error: dbSErr } = await _supabase
-                        .from('website_settings')
-                        .select('whatsapp')
-                        .eq('id', 'default')
-                        .single();
-                    if (!dbSErr) settings = dbSettings;
-                }
+                fetch(basePath + 'settings.json')
+                    .then(res => res.ok ? res.json() : null)
+                    .then(settings => {
+                        if (settings && settings.whatsapp) defaultRetailPhone = settings.whatsapp;
+                    })
+                    .catch(() => {});
 
-                if (settings && settings.whatsapp) {
-                    defaultRetailPhone = settings.whatsapp;
-                }
-
-                // Fetch Products - Optimized Hybrid Delta Sync
+                // 1. Try loading static products.json (123 KB cache) with 3s timeout
                 let products = [];
                 let localLoaded = false;
-
-                // 1. Try to load local products.json first (Very fast, 0 Supabase egress)
                 try {
-                    const response = await fetch(basePath + 'products.json');
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 3000);
+                    const response = await fetch(basePath + 'products.json', { signal: controller.signal });
+                    clearTimeout(timeoutId);
                     if (response.ok) {
                         products = await response.json();
                         localLoaded = true;
                         console.log(`Local Cache Loaded: ${products.length} products`);
                     }
                 } catch (pErr) {
-                    console.warn("Could not load local products.json:", pErr);
+                    console.warn("Local products.json load skipped or timed out:", pErr);
                 }
 
-                // 2. Perform delta update from Supabase to keep it in real-time with minimum egress
-                try {
-                    if (localLoaded) {
-                        // Find latest timestamp in local products
-                        let latestLocalTS = '2000-01-01T00:00:00.000Z';
-                        products.forEach(p => {
-                            const ts = p.updatedAt || p.createdAt;
-                            if (ts && new Date(ts) > new Date(latestLocalTS)) {
-                                latestLocalTS = ts;
-                            }
-                        });
+                if (localLoaded && products.length > 0) {
+                    allProducts = processRawProducts(products);
+                    updateCategoryDropdown();
+                    const priceSelect = document.getElementById('select-price-type');
+                    if (priceSelect) priceSelect.value = urlPrice;
+                    applyFilters();
+                    hideLoadingScreen();
 
-                        // Get active IDs to handle deletions/deactivations (tiny query, ~10KB)
-                        const { data: activeIds, error: idErr } = await _supabase
-                            .from('products')
-                            .select('id')
-                            .eq('active', true);
-                        if (idErr) throw idErr;
-
-                        const activeIdSet = new Set((activeIds || []).map(item => item.id));
-                        products = products.filter(p => activeIdSet.has(p.id));
-
-                        // Get only products updated after our latest local product (only downloads what changed)
-                        const { data: updatedProducts, error: updateErr } = await _supabase
-                            .from('products')
-                            .select('*')
-                            .gt('updatedAt', latestLocalTS);
-                        if (updateErr) throw updateErr;
-
-                        if (updatedProducts && updatedProducts.length > 0) {
-                            console.log(`Supabase Real-time Sync: Loaded ${updatedProducts.length} updated products`);
-                            updatedProducts.forEach(newP => {
-                                const idx = products.findIndex(p => p.id === newP.id);
-                                if (idx !== -1) {
-                                    if (newP.active === false) {
-                                        products.splice(idx, 1);
-                                    } else {
-                                        products[idx] = newP;
-                                    }
-                                } else if (newP.active !== false) {
-                                    products.push(newP);
-                                }
-                            });
-                        }
-                    } else {
-                        // Fallback: If local cache failed to load, download all from Supabase
-                        console.log("Downloading all products from Supabase (fallback)...");
-                        const { data: dbProducts, error: dbPErr } = await _supabase
-                            .from('products')
-                            .select('*')
-                            .eq('active', true)
-                            .order('name', { ascending: true });
-                        if (dbPErr) throw dbPErr;
-                        products = dbProducts || [];
-                    }
-                } catch (dbErr) {
-                    console.warn("Supabase real-time sync failed, using static products.json cache:", dbErr);
-                    // If Supabase fails but we have local products, we proceed with local products
-                    if (products.length === 0) {
-                        throw new Error("No products available.");
-                    }
+                    // Background Delta Sync (Non-blocking)
+                    bgDeltaSync(products);
+                } else {
+                    // Fallback to Supabase directly if products.json missing
+                    await fallbackSupabaseLoad();
                 }
-
-                // Filter out out-of-stock products (stock <= 0), ghost products (no price) and products without images
-                allProducts = products.filter(p => {
-                    const totalStock = (parseInt(p.stockMillenio) || 0) + (parseInt(p.stockVulcano) || 0);
-                    const hasStock = totalStock > 0;
-                    const hasPrice = (parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || parseFloat(p.priceWholesale)) > 0;
-                    const hasImage = p.image && (Array.isArray(p.image) ? p.image.some(img => img && img.trim() !== '') : p.image.trim() !== '');
-                    return p.active !== false && hasStock && hasPrice && hasImage;
-                });
-
-                // Populate Category Filter dropdown dynamically from actual products
-                const categories = [...new Set(allProducts.map(p => p.category).filter(Boolean))].sort();
-                const catSelect = document.getElementById('select-category');
-                categories.forEach(cat => {
-                    const opt = document.createElement('option');
-                    opt.value = cat;
-                    opt.innerText = cat;
-                    catSelect.appendChild(opt);
-                });
-
-                const priceSelect = document.getElementById('select-price-type');
-                if (priceSelect) priceSelect.value = urlPrice;
-
-                applyFilters();
-
-                // Hide loading screen
-                const loader = document.getElementById('loading-screen');
-                loader.style.opacity = '0';
-                setTimeout(() => loader.style.display = 'none', 500);
 
             } catch (err) {
+                console.error("Error loading catalog:", err);
+                document.getElementById('catalog-grid').innerHTML = `
+                    <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: 16px; border: 1px solid var(--border);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; color: #ef4444; margin-bottom: 1rem;"></i>
+                        <h3>Error al cargar los productos</h3>
+                        <p style="color: var(--text-secondary);">Por favor revisa tu conexión e intenta refrescar la página.</p>
+                    </div>
+                `;
+                hideLoadingScreen();
+            }
+        }
                 console.error("Error loading catalog:", err);
                 document.getElementById('catalog-grid').innerHTML = `
                     <div style="grid-column: 1/-1; text-align: center; padding: 3rem; background: white; border-radius: 16px; border: 1px solid var(--border);">
