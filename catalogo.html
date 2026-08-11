@@ -859,17 +859,16 @@
 
         async function fallbackSupabaseLoad() {
             try {
+                // Fetch product data without heavy base64 images column to ensure instant 35KB download
                 const { data: dbProducts, error: dbPErr } = await _supabase
                     .from('products')
-                    .select('*')
+                    .select('id, name, description, ref, priceInternet, priceWholesale, priceFinal, pricePrevious, category, company, stockMillenio, stockVulcano, active, updatedAt, createdAt')
                     .eq('active', true)
                     .order('name', { ascending: true });
                 if (dbPErr) throw dbPErr;
 
                 const products = (dbProducts || []).map(p => {
-                    if (p.image && typeof p.image === 'string' && p.image.startsWith('data:image')) {
-                        p.image = `https://tucomprascol.com/images/products/${p.id}.jpg`;
-                    }
+                    p.image = `https://tucomprascol.com/images/products/${p.id}.jpg`;
                     return p;
                 });
 
@@ -878,6 +877,8 @@
                 const priceSelect = document.getElementById('select-price-type');
                 if (priceSelect) priceSelect.value = urlPrice;
                 applyFilters();
+            } catch (sErr) {
+                console.error("Supabase fallback failed:", sErr);
             } finally {
                 hideLoadingScreen();
             }
@@ -896,13 +897,14 @@
                     })
                     .catch(() => {});
 
-                // 1. Try loading static products.json (123 KB cache) with 3s timeout
+                // 1. Try loading static products.json (123 KB cache) with cache-busting timestamp and 8s timeout
                 let products = [];
                 let localLoaded = false;
                 try {
                     const controller = new AbortController();
-                    const timeoutId = setTimeout(() => controller.abort(), 3000);
-                    const response = await fetch(basePath + 'products.json', { signal: controller.signal });
+                    const timeoutId = setTimeout(() => controller.abort(), 8000);
+                    const cacheBuster = '?v=' + Date.now();
+                    const response = await fetch(basePath + 'products.json' + cacheBuster, { signal: controller.signal });
                     clearTimeout(timeoutId);
                     if (response.ok) {
                         products = await response.json();
@@ -924,7 +926,7 @@
                     // Background Delta Sync (Non-blocking)
                     bgDeltaSync(products);
                 } else {
-                    // Fallback to Supabase directly if products.json missing
+                    // Fallback to Supabase lightweight select directly
                     await fallbackSupabaseLoad();
                 }
 
