@@ -753,11 +753,26 @@
         <span id="whatsapp-btn-text">Ventas al por Mayor</span>
     </a>
 
+    <!-- Supabase JS Client CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // Supabase initialization
         const SUPABASE_URL = 'https://zuondbguopirimvfuehu.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_29SdlPI3zzDkNvvEO38kOQ_2NTwiTC_';
-        const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let _supabaseClient = null;
+
+        function getSupabase() {
+            if (_supabaseClient) return _supabaseClient;
+            try {
+                if (window.supabase && typeof window.supabase.createClient === 'function') {
+                    _supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    return _supabaseClient;
+                }
+            } catch (e) {
+                console.warn("Supabase init skipped:", e);
+            }
+            return null;
+        }
 
         let allProducts = [];
         let defaultRetailPhone = '573167862554';
@@ -811,6 +826,9 @@
 
         async function bgDeltaSync(localProducts) {
             try {
+                const _supabase = getSupabase();
+                if (!_supabase) return;
+
                 let latestLocalTS = '2000-01-01T00:00:00.000Z';
                 localProducts.forEach(p => {
                     const ts = p.updatedAt || p.createdAt;
@@ -859,6 +877,9 @@
 
         async function fallbackSupabaseLoad() {
             try {
+                const _supabase = getSupabase();
+                if (!_supabase) return;
+
                 // Fetch product data without heavy base64 images column to ensure instant 35KB download
                 const { data: dbProducts, error: dbPErr } = await _supabase
                     .from('products')
