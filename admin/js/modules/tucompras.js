@@ -416,7 +416,7 @@ window.TuCompras = {
                             ${s.money_confirmed ? 'PAGADA' : 'PENDIENTE'}
                         </span>
                     </td>
-                    <td data-label="Acciones" style="white-space: nowrap; display: flex; gap: 4px; align-items: center;">
+                    <td data-label="Acciones" class="tc-table-actions">
                         <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}" title="Cambiar Estado"><i class="fas fa-sync-alt"></i> Estado</button>
                         <button class="btn btn-sm btn-outline tc-edit-btn" data-id="${s.id}" style="color: var(--accent); border-color: var(--accent);" title="Editar Venta"><i class="fas fa-edit"></i> Editar</button>
                         <button class="btn btn-sm btn-outline tc-delete-sale-btn" data-id="${s.id}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Eliminar Venta"><i class="fas fa-trash"></i></button>
