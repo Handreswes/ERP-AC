@@ -2554,6 +2554,93 @@ textarea:focus {
         max-width: 100% !important;
         overflow-x: auto !important;
     }
+
+    /* 10. Dashboard Mobile Responsive Layout */
+    .charts-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .dashboard-details {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr !important;
+        gap: 1rem !important;
+    }
+
+    .detail-card[style*="grid-column: span 2"] {
+        grid-column: span 1 !important;
+    }
+
+    .dashboard-filters {
+        display: flex !important;
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 8px !important;
+    }
+
+    #custom-date-inputs {
+        flex-direction: column !important;
+        width: 100% !important;
+    }
+
+    /* 11. Data-table Card Values Visibility & Flex Formatting */
+    .data-table td {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+        padding: 0.65rem 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .data-table td:before {
+        content: attr(data-label);
+        font-weight: 700;
+        color: var(--accent-vibrant, #f97316);
+        font-size: 0.72rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        min-width: 100px;
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    .data-table td > strong,
+    .data-table td > span,
+    .data-table td > div,
+    .data-table td > small,
+    .data-table td > a,
+    .data-table td > img {
+        text-align: right !important;
+        max-width: 65% !important;
+        word-break: break-word !important;
+        overflow-wrap: anywhere !important;
+    }
+
+    /* 12. Search Input & TuCompras Stats Constraints */
+    .search-input-wrapper,
+    #crm-search,
+    #inventory-search,
+    #tc-product-search {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    #tc-stats-container {
+        grid-template-columns: 1fr !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .stat-card[style*="grid-column: span"] {
+        grid-column: span 1 !important;
+    }
 }
 
 @media (max-width: 480px) {
