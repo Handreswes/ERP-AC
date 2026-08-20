@@ -66,16 +66,16 @@ window.CRM = {
                 <h1>Clientes / CRM</h1>
             </div>
 
-            <div class="actions-block" style="margin-bottom: 1.5rem; display: flex; gap: 1rem; background: var(--bg-card); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border); align-items: center;">
-                <div style="flex: 1;">
+            <div class="actions-block" style="margin-bottom: 1.5rem; background: var(--bg-card); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border);">
+                <div>
                     <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Gestión de Clientes</h3>
                     <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Agrega nuevos clientes para llevar su control de cartera y facturación.</p>
                 </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button type="button" id="crm-sync-btn" class="btn btn-outline" style="padding: 0.75rem 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 8px; border: 1px solid var(--border); color: var(--text-primary); background: transparent; border-radius: 8px; cursor: pointer;" onclick="window.CRM.forceSync(this);">
+                <div>
+                    <button type="button" id="crm-sync-btn" class="btn btn-outline" style="padding: 0.75rem 1.2rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--border); color: var(--text-primary); background: transparent; border-radius: 8px; cursor: pointer;" onclick="window.CRM.forceSync(this);">
                         <i class="fas fa-sync-alt"></i> Sincronizar Nube
                     </button>
-                    <button type="button" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-weight: 600; background: #10b981; border-color: #10b981;" onclick="window.CRM.editingId = null; document.getElementById('client-form').reset(); document.getElementById('client-modal-title').textContent = 'Nuevo Cliente'; document.getElementById('client-modal').classList.add('show');">
+                    <button type="button" class="btn btn-primary" style="padding: 0.75rem 1.5rem; font-weight: 600; background: #10b981; border-color: #10b981; display: flex; align-items: center; justify-content: center;" onclick="window.CRM.editingId = null; document.getElementById('client-form').reset(); document.getElementById('client-modal-title').textContent = 'Nuevo Cliente'; document.getElementById('client-modal').classList.add('show');">
                         <i class="fas fa-plus-circle" style="margin-right: 8px;"></i> Crear Nuevo Cliente
                     </button>
                 </div>
