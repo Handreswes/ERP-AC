@@ -4,26 +4,24 @@
 
 window.MetaAPI = {
     getSettings() {
-        const validToken = 'EAAZAStMI40MIBSBkiTDDHklI01ilo5VQ3uATrRIwNqoZBAgbiEs4N7uCRebQ3ZCQkz8GZCVwwoZCzZBKxhPOQQ7BQLV1AcDrQ8CaJTr925tYeb4Sl7CnmNZCbofcr11G95vfkV8xAjZBBFHlIZB0nnBZBmG8CLSTMgTunMk8FfZB18DnXYVTIQtSaIPlkLySZCM3C88VrAZDZD';
-        const pageToken = 'EAAZAStMI40MIBSJlSaAnz80FVEY0ZBBuWgHNbNtBV4eTfjFq78EwthpN9yE8StACHApOB5g7eZCSk0p42bFZA61BMuZAiaqz0XSitb81Nv4AIduaW9KMryCNyzP1ruZAiPjOdZC0zSgQWPXYETlZBAJN4ZBMCeBkyB912GqlYIOZBRcjvS8HkJ5amZCgRIwVtXC2TOGJ1vV3AkZD';
         try {
             const raw = localStorage.getItem('erp_meta_config');
             if (raw) {
                 const parsed = JSON.parse(raw);
-                parsed.accessToken = validToken;
-                parsed.adsToken = validToken;
-                parsed.pageId = '102895847941335';
-                parsed.pageToken = pageToken;
-                return parsed;
+                if (parsed.adsToken || parsed.accessToken) {
+                    return parsed;
+                }
             }
         } catch (e) {}
+        
+        // Fallback default structure
         return {
             pixelId: '1765263381138535',
             adAccountId: 'act_1730680554708708',
             pageId: '102895847941335',
-            pageToken: pageToken,
-            accessToken: validToken,
-            adsToken: validToken,
+            pageToken: '',
+            accessToken: '',
+            adsToken: '',
             testEventCode: '',
             enabled: true
         };
@@ -404,7 +402,17 @@ window.Marketing = {
 
         const res = await MetaAPI.fetchCampaigns();
         if (!res.success || !res.data) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center text-danger">⚠️ ${res.error?.message || 'No se pudieron consultar las campañas. Verifica el Token.'}</td></tr>`;
+            const errMsg = res.error?.message || 'No se pudieron consultar las campañas.';
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="8" class="text-center text-danger" style="padding: 1.5rem;">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
+                        <strong>Error de Meta Ads API:</strong> ${errMsg}<br>
+                        <small style="color: #cbd5e1; display: inline-block; margin-top: 0.5rem;">
+                            💡 <strong>Solución:</strong> Pega tu nuevo <strong>Token de Meta Ads</strong> en el formulario superior y haz clic en <strong>"Guardar Token"</strong> para refrescar las métricas.
+                        </small>
+                    </td>
+                </tr>`;
             return;
         }
 
