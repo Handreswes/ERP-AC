@@ -76,16 +76,14 @@ window.Inventory = {
             </div>
 
             <div class="inventory-tabs" style="margin-bottom: 2rem;">
-                <div style="display:flex; gap: 1rem;">
-                    <button class="tab-btn ${this.activeTab === 'stock' ? 'active' : ''}" data-tab="stock">Inventario Disponible</button>
-                    <button class="tab-btn ${this.activeTab === 'limbo' ? 'active' : ''}" data-tab="limbo">🌪️ El Limbo (Agotados)</button>
-                    <button class="tab-btn ${this.activeTab === 'transit' ? 'active' : ''}" data-tab="transit">📦 En Tránsito / Importaciones</button>
-                    <button class="tab-btn ${this.activeTab === 'history' ? 'active' : ''}" data-tab="history">📜 Historial de Entradas</button>
-                </div>
+                <button class="tab-btn ${this.activeTab === 'stock' ? 'active' : ''}" data-tab="stock">Inventario Disponible</button>
+                <button class="tab-btn ${this.activeTab === 'limbo' ? 'active' : ''}" data-tab="limbo">🌪️ El Limbo (Agotados)</button>
+                <button class="tab-btn ${this.activeTab === 'transit' ? 'active' : ''}" data-tab="transit">📦 En Tránsito / Importaciones</button>
+                <button class="tab-btn ${this.activeTab === 'history' ? 'active' : ''}" data-tab="history">📜 Historial de Entradas</button>
             </div>
 
             <div id="inventory-stock-view" style="display: ${this.activeTab === 'stock' || this.activeTab === 'limbo' ? 'block' : 'none'};">
-                <div class="inventory-tabs" style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 25px; display: inline-flex;">
+                <div class="inventory-tabs" style="margin-bottom: 1.5rem; background: rgba(255,255,255,0.02); padding: 5px; border-radius: 25px;">
                     <button class="tab-btn ${this.activeCompanyFilter === 'all' ? 'active' : ''}" data-company="all" style="font-size: 0.8rem; padding: 4px 15px;">Todos</button>
                     <button class="tab-btn ${this.activeCompanyFilter === 'millenio' ? 'active' : ''}" data-company="millenio" style="font-size: 0.8rem; padding: 4px 15px;">Millenio</button>
                     <button class="tab-btn ${this.activeCompanyFilter === 'vulcano' ? 'active' : ''}" data-company="vulcano" style="font-size: 0.8rem; padding: 4px 15px;">Vulcano</button>
