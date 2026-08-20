@@ -315,7 +315,7 @@ window.TuCompras = {
                 <p class="stat-value text-danger" style="font-size: 1.8rem;">$${debtVulcano.toLocaleString()}</p>
                 <span style="font-size:0.75rem; color:var(--text-secondary);">Pendiente liquidar</span>
             </div>
-            <div class="stat-card" style="grid-column: span 1.5; background: rgba(16,185,129,0.05);">
+            <div class="stat-card" style="background: rgba(16,185,129,0.05);">
                 <h3>Rendimiento Logística (${shippingStats.length} trans.)</h3>
                 <div style="font-size: 0.75rem; margin-top: 5px;">
                     ${shippingStats.map(s => `
