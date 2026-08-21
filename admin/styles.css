@@ -1436,8 +1436,11 @@ option:checked {
     .data-table td > strong,
     .data-table td > span,
     .data-table td > div,
-    .data-table td > small {
+    .data-table td > small,
+    .data-table td > a,
+    .data-table td > img {
         text-align: right;
+        margin-left: auto;
         word-break: break-word;
         overflow-wrap: anywhere;
         max-width: 62%;
@@ -1916,30 +1919,34 @@ textarea:focus {
     }
 
     .data-table td {
-        border: none !important;
         position: relative !important;
-        padding-left: 50% !important;
+        padding: 0.75rem 0.5rem !important;
         text-align: right !important;
-        min-height: 35px !important;
+        min-height: 38px !important;
         display: flex !important;
         align-items: center !important;
-        justify-content: flex-end !important;
+        justify-content: space-between !important;
         width: 100% !important;
         box-sizing: border-box !important;
+        gap: 12px !important;
     }
 
     .data-table td:before {
         content: attr(data-label) !important;
-        position: absolute !important;
-        left: 12px !important;
-        width: 45% !important;
-        padding-right: 10px !important;
-        white-space: nowrap !important;
+        position: static !important;
+        display: inline-block !important;
+        width: auto !important;
+        min-width: 100px !important;
+        max-width: 40% !important;
+        padding-right: 8px !important;
+        white-space: normal !important;
         text-align: left !important;
         font-weight: 700 !important;
-        color: var(--accent) !important;
+        color: var(--accent-vibrant, #f97316) !important;
         font-size: 0.75rem !important;
         text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+        flex-shrink: 0 !important;
     }
 
     /* Search row fix */
@@ -2555,6 +2562,12 @@ textarea:focus {
         overflow-x: auto !important;
     }
 
+    #pdf-export-content {
+        padding: 15px !important;
+        box-sizing: border-box !important;
+        max-width: 100% !important;
+    }
+
     /* 10. Dashboard Mobile Responsive Layout */
     .charts-grid {
         grid-template-columns: 1fr !important;
@@ -2687,5 +2700,98 @@ textarea:focus {
     #ai-chat-bubble {
         bottom: 55px !important;
         right: 15px !important;
+    }
+}
+
+/* ========================================================
+   PRINT STYLES FOR STATEMENTS & PDF (ERP AC)
+   ======================================================== */
+@media print {
+    /* Hide ERP UI chrome during printing */
+    .sidebar,
+    .top-bar,
+    .mobile-top-bar,
+    .bottom-nav,
+    .bottom-sheet,
+    .bottom-sheet-overlay,
+    #sidebar-overlay,
+    #ai-chat-container,
+    #ai-chat-bubble,
+    .chat-window,
+    .modal-header,
+    #pdf-preview-modal .modal-header,
+    #pdf-preview-modal .modal-body > div:first-child,
+    .btn,
+    button {
+        display: none !important;
+    }
+
+    body, html {
+        background: #ffffff !important;
+        color: #000000 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+
+    .modal {
+        position: static !important;
+        background: transparent !important;
+        display: block !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+    }
+
+    .modal-content {
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        box-shadow: none !important;
+        border: none !important;
+        background: white !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .modal-body {
+        padding: 0 !important;
+        overflow: visible !important;
+    }
+
+    #pdf-export-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+        width: 100% !important;
+    }
+
+    /* Table formatting for paper print */
+    table {
+        width: 100% !important;
+        border-collapse: collapse !important;
+        margin-bottom: 1rem !important;
+    }
+
+    thead {
+        display: table-header-group !important;
+    }
+
+    tr {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    th, td {
+        padding: 6px 8px !important;
+        font-size: 11pt !important;
+        color: #000000 !important;
+    }
+
+    .no-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
 }
