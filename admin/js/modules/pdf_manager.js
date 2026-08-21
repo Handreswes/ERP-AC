@@ -219,7 +219,7 @@ window.PDFManager = {
                 </div>
             </div>
 
-            <div class="no-break" style="background: #f8fafc; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.25rem; border-left: 4px solid #10b981; display: flex; justify-content: space-between; page-break-inside: avoid; break-inside: avoid;">
+            <div class="no-break" style="background: #f8fafc; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1.25rem; border-left: 4px solid #10b981; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; page-break-inside: avoid; break-inside: avoid;">
                 <div>
                     <h3 style="margin: 0 0 6px 0; font-size: 0.85rem; color: #64748b; text-transform: uppercase;">Datos del Cliente</h3>
                     <p style="margin: 2px 0; font-size: 1.05rem;"><strong>${client.name}</strong></p>
