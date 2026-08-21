@@ -226,13 +226,13 @@ window.Vendedores = {
                 : (s.date ? new Date(s.date).toLocaleDateString() + ' *' : 'N/A');
             return `
                 <tr>
-                    <td><input type="checkbox" class="comm-check" data-id="${s.id}" data-amount="${commission}"></td>
-                    <td>${moneyDate}</td>
-                    <td><strong>${seller ? seller.name : 'Vendedor Desconocido'}</strong></td>
-                    <td>${s.customer_name || 'N/A'}</td>
-                    <td><span class="badge bg-success">Entregado</span></td>
-                    <td class="text-right"><strong>$${commission.toLocaleString()}</strong></td>
-                    <td><span class="badge" style="background: #10b98122; color: #10b981;"><i class="fas fa-check"></i> Sí</span></td>
+                    <td data-label="Seleccionar"><input type="checkbox" class="comm-check" data-id="${s.id}" data-amount="${commission}"></td>
+                    <td data-label="Fecha">$${moneyDate}</td>
+                    <td data-label="Vendedor"><strong>${seller ? seller.name : 'Vendedor Desconocido'}</strong></td>
+                    <td data-label="Cliente">${s.customer_name || 'N/A'}</td>
+                    <td data-label="Estado"><span class="badge bg-success">Entregado</span></td>
+                    <td data-label="Comisión" class="text-right"><strong>$${commission.toLocaleString()}</strong></td>
+                    <td data-label="Confirmado"><span class="badge" style="background: #10b98122; color: #10b981;"><i class="fas fa-check"></i> Sí</span></td>
                 </tr>
             `;
         }).join('');
@@ -330,16 +330,16 @@ window.Vendedores = {
 
             return `
                 <tr class="${s.status === 'inactive' ? 'inactive-row' : ''}">
-                    <td><strong>${s.name}</strong></td>
-                    <td>${s.phone || '-'}</td>
-                    <td>
+                    <td data-label="Nombre"><strong>${s.name}</strong></td>
+                    <td data-label="Teléfono">${s.phone || '-'}</td>
+                    <td data-label="Estado">
                         <span class="status-badge ${s.status}">
                             ${s.status === 'active' ? 'Activo' : 'Inactivo'}
                         </span>
                     </td>
-                    <td>${activeCampaign ? `<span class="badge bg-blue">Activa (${activeCampaign.end_date ? 'Período' : 'Día'})</span>` : '<span class="text-secondary">Ninguna</span>'}</td>
-                    <td><strong>${fulfillment}</strong></td>
-                    <td class="table-actions">
+                    <td data-label="Campaña">${activeCampaign ? `<span class="badge bg-blue">Activa (${activeCampaign.end_date ? 'Período' : 'Día'})</span>` : '<span class="text-secondary">Ninguna</span>'}</td>
+                    <td data-label="Meta"><strong>${fulfillment}</strong></td>
+                    <td data-label="Acciones" class="table-actions">
                         <button class="btn btn-sm btn-outline campaign-btn" data-id="${s.id}"><i class="fas fa-bullseye"></i> Campañas</button>
                         <button class="icon-btn edit-seller-btn" data-id="${s.id}"><i class="fas fa-edit"></i></button>
                     </td>
