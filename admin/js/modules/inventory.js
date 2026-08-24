@@ -647,14 +647,16 @@ window.Inventory = {
                 </td>
                 <td data-label="Ref"><small class="text-secondary">${p.ref || '-'}</small></td>
                 <td data-label="Producto"><strong>${p.name}</strong></td>
-                <td data-label="Categoría">${p.category}</td>
+                <td data-label="Categoría"><span>${p.category || '-'}</span></td>
                 <td data-label="Stock Millenio"><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
-                 <td data-label="Stock Vulcano"><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
-                 <td data-label="Precio">
-                     <div>$${(parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</div>
-                     ${p.pricePrevious && parseFloat(p.pricePrevious) > (parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0) ? `<s style="color: var(--text-secondary); font-size: 0.72rem; display: block;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
-                 </td>
-                 <td data-label="Estado">
+                <td data-label="Stock Vulcano"><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
+                <td data-label="Precio">
+                    <div>
+                        <strong>$${(parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</strong>
+                        ${p.pricePrevious && parseFloat(p.pricePrevious) > (parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0) ? `<s style="color: var(--text-secondary); font-size: 0.72rem; display: block;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
+                    </div>
+                </td>
+                <td data-label="Estado">
                     <span class="status-badge ${p.active === false ? 'inactive' : 'active'}">
                         ${p.active === false ? 'Inactivo' : 'Activo'}
                     </span>
