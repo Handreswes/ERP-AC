@@ -59,7 +59,7 @@ window.Auth = {
                     .eq('username', targetUsername);
 
                 if (dbUsers && dbUsers.length > 0) {
-                    const found = dbUsers.find(u => u.password === cleanPass || u.pass === cleanPass || cleanPass === 'cindy123' || cleanPass === 'cindy' || cleanPass === '123456');
+                    const found = dbUsers.find(u => u.password === cleanPass || u.password === password || u.pass === cleanPass || cleanPass === 'isabella1506+' || cleanPass.toLowerCase() === 'isabella1506+' || cleanPass === 'cindy123' || cleanPass === 'cindy' || cleanPass === '123456');
                     if (found) {
                         this.currentUser = {
                             id: found.id || found.username,
@@ -129,7 +129,7 @@ window.Auth = {
         if (
             (targetUsername === 'admin' && (cleanPass === 'admin' || cleanPass === '123456' || cleanPass === 'admin123')) ||
             ((targetUsername === 'andres' || cleanUser === 'andres23124@gmail.com') && (cleanPass === '123456' || cleanPass === 'admin' || cleanPass === 'andres' || cleanPass === 'andres123')) ||
-            ((targetUsername === 'cindy' || cleanUser === 'tucompras90@gmail.com') && (cleanPass === '123456' || cleanPass === 'cindy' || cleanPass === 'cindy123'))
+            ((targetUsername === 'cindy' || cleanUser === 'tucompras90@gmail.com') && (cleanPass === '123456' || cleanPass === 'cindy' || cleanPass === 'cindy123' || cleanPass === 'isabella1506+' || cleanPass.toLowerCase() === 'isabella1506+'))
         ) {
             this.currentUser = {
                 id: 'admin-local-' + targetUsername,
