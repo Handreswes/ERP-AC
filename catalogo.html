@@ -833,7 +833,9 @@
         // Load query parameters on startup
         const urlParams = new URLSearchParams(window.location.search);
         const urlCompany = urlParams.get('company') || 'all';
-        let urlPrice = urlParams.get('price') || 'internet';
+        const priceParam = urlParams.get('price');
+        const isPriceLocked = urlParams.has('price');
+        let urlPrice = priceParam || 'internet';
 
         // Date population
         document.getElementById('cover-date').innerText = new Date().toLocaleDateString('es-CO', { 
@@ -949,7 +951,13 @@
                 allProducts = processRawProducts(products);
                 updateCategoryDropdown();
                 const priceSelect = document.getElementById('select-price-type');
-                if (priceSelect) priceSelect.value = urlPrice;
+                if (priceSelect) {
+                    if (isPriceLocked) {
+                        priceSelect.style.display = 'none';
+                    } else {
+                        priceSelect.value = urlPrice;
+                    }
+                }
                 applyFilters();
             } catch (sErr) {
                 console.error("Supabase fallback failed:", sErr);
@@ -993,7 +1001,13 @@
                     allProducts = processRawProducts(products);
                     updateCategoryDropdown();
                     const priceSelect = document.getElementById('select-price-type');
-                    if (priceSelect) priceSelect.value = urlPrice;
+                if (priceSelect) {
+                    if (isPriceLocked) {
+                        priceSelect.style.display = 'none';
+                    } else {
+                        priceSelect.value = urlPrice;
+                    }
+                }
                     applyFilters();
                     hideLoadingScreen();
 
@@ -1020,7 +1034,12 @@
         // Filter and Render Logic
         function applyFilters() {
             const priceSelect = document.getElementById('select-price-type');
-            if (priceSelect) urlPrice = priceSelect.value;
+            if (isPriceLocked) {
+                urlPrice = priceParam;
+                if (priceSelect) priceSelect.style.display = 'none';
+            } else if (priceSelect) {
+                urlPrice = priceSelect.value;
+            }
             const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
             const activeCategory = document.getElementById('select-category').value;
 
