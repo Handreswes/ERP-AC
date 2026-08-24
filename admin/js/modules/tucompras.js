@@ -73,8 +73,15 @@ window.TuCompras = {
         panel.innerHTML = `
             <div class="panel-header">
                 <h1>E-commerce TUCOMPRAS</h1>
-                <div class="actions">
-                    <button id="new-tucompras-sale-btn" class="btn btn-primary">
+            </div>
+
+            <div class="actions-block" style="margin-bottom: 1.5rem; background: var(--bg-card); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border);">
+                <div>
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Control de Pedidos y Ventas TuCompras</h3>
+                    <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Gestiona despachos, entregas, comisiones y liquidación de bodegas.</p>
+                </div>
+                <div>
+                    <button id="new-tucompras-sale-btn" class="btn btn-primary" style="font-weight: 600;">
                         <i class="fas fa-plus"></i> Nueva Venta
                     </button>
                 </div>
