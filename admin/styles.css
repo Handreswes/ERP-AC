@@ -2479,28 +2479,38 @@ textarea:focus {
 
     /* 6. CRM & General actions-block Mobile Responsive Stack */
     .actions-block {
+        display: flex !important;
         flex-direction: column !important;
         align-items: stretch !important;
         padding: 1.25rem 1rem !important;
         gap: 12px !important;
         width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box !important;
     }
 
     .actions-block > div {
         width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
     .actions-block > div:last-child {
         display: flex !important;
         flex-direction: column !important;
         gap: 8px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
     }
 
-    .actions-block > div:last-child button,
-    .actions-block button {
+    .actions-block button,
+    .actions-block .btn {
         width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
         justify-content: center !important;
+        margin: 0 !important;
     }
 
     /* 7. Inventory & Module Tabs Horizontal Scroll Fix */
