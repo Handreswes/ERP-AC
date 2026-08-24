@@ -42,16 +42,23 @@ window.Vendedores = {
         panel.innerHTML = `
             <div class="panel-header">
                 <h1>Gestión de Vendedores</h1>
-                <div class="actions">
-                    <button id="add-seller-btn" class="btn btn-primary">Nuevo Vendedor</button>
+            </div>
+
+            <div class="actions-block" style="margin-bottom: 1.5rem; background: var(--bg-card); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border);">
+                <div>
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Comisiones y Rendimiento de Vendedores</h3>
+                    <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Administra tu equipo comercial y realiza la liquidación de comisiones.</p>
+                </div>
+                <div>
+                    <button id="add-seller-btn" class="btn btn-primary" style="font-weight: 600;">
+                        <i class="fas fa-user-plus"></i> Nuevo Vendedor
+                    </button>
                 </div>
             </div>
 
             <div class="inventory-tabs" style="margin-bottom: 2rem;">
-                <div style="display:flex; gap: 1rem;">
-                    <button class="tab-btn ${this.activeTab === 'summary' ? 'active' : ''}" data-tab="summary">Listado de Vendedores</button>
-                    <button class="tab-btn ${this.activeTab === 'settlements' ? 'active' : ''}" data-tab="settlements">💰 Liquidación de Comisiones</button>
-                </div>
+                <button class="tab-btn ${this.activeTab === 'summary' ? 'active' : ''}" data-tab="summary">Listado de Vendedores</button>
+                <button class="tab-btn ${this.activeTab === 'settlements' ? 'active' : ''}" data-tab="settlements">💰 Liquidación de Comisiones</button>
             </div>
 
             <div id="vendedores-summary-view" style="display: ${this.activeTab === 'summary' ? 'block' : 'none'};">
