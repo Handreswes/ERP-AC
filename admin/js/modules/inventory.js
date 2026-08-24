@@ -67,11 +67,17 @@ window.Inventory = {
         const panel = document.getElementById('inventory-panel');
         panel.innerHTML = `
             <div class="panel-header">
-                <h1>Inventarios</h1>
-                <div class="actions">
-                    <button id="load-test-data" class="btn btn-secondary" style="margin-right: 10px;">Cargar Datos Prueba</button>
-                    <button id="cleanup-products-btn" class="btn btn-outline" style="margin-right: 10px; color: #ef4444; border-color: #ef4444;"><i class="fas fa-broom"></i> Depurar Fantasmas</button>
-                    <button id="add-product-btn" class="btn btn-primary">Nuevo Producto</button>
+                <h1>Inventarios / Stock</h1>
+            </div>
+
+            <div class="actions-block" style="margin-bottom: 1.5rem; background: var(--bg-card); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border);">
+                <div>
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Gestión de Productos e Inventarios</h3>
+                    <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Controla el stock disponible, productos en tránsito y depuración de inventario.</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="cleanup-products-btn" class="btn btn-outline" style="color: #ef4444; border-color: #ef4444; font-weight: 600;"><i class="fas fa-broom"></i> Depurar Fantasmas</button>
+                    <button id="add-product-btn" class="btn btn-primary" style="font-weight: 600;"><i class="fas fa-plus"></i> Nuevo Producto</button>
                 </div>
             </div>
 
