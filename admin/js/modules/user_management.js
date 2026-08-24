@@ -309,19 +309,33 @@ window.UserManagement = {
             return;
         }
 
-        // 1. Update in Supabase
+        // 1. Update in Supabase 'users' table
         if (window.supabaseClient) {
             try {
-                await window.supabaseClient
+                const { error } = await window.supabaseClient
                     .from('users')
-                    .update({ password: newPassword })
-                    .eq('username', username);
+                    .upsert({ username: username, password: newPassword }, { onConflict: 'username' });
+                if (error) {
+                    console.warn('Supabase pass update error:', error.message);
+                }
             } catch (err) {
-                console.warn('Supabase pass update error:', err.message);
+                console.warn('Supabase pass update exception:', err.message);
             }
         }
 
-        // 2. Update local custom users
+        // 2. Update Storage for multi-device sync
+        if (window.Storage) {
+            let users = Storage.get(STORAGE_KEYS.USERS) || [];
+            const idx = users.findIndex(u => u.username === username);
+            if (idx !== -1) {
+                users[idx].password = newPassword;
+            } else {
+                users.push({ username, password: newPassword });
+            }
+            Storage.save(STORAGE_KEYS.USERS, users);
+        }
+
+        // 3. Update local custom users
         let customUsers = JSON.parse(localStorage.getItem('erp_custom_users') || '[]');
         const idx = customUsers.findIndex(u => u.username === username);
         if (idx !== -1) {
