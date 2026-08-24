@@ -394,7 +394,7 @@ window.TuCompras = {
 
             return `
                 <tr class="${s.status === 'proceso_devolucion' ? 'highlight-return' : ''}">
-                    <td data-label="Fecha">${new Date(s.date).toLocaleDateString()}</td>
+                    <td data-label="Fecha"><span>${new Date(s.date).toLocaleDateString()}</span></td>
                     <td data-label="Cliente">
                         <div style="font-size: 0.85rem;">
                             <strong>${customer}</strong><br>
@@ -406,11 +406,11 @@ window.TuCompras = {
                             </span>
                         </div>
                     </td>
-                    <td data-label="Productos" style="font-size: 0.8rem;">${productNames}</td>
-                    <td data-label="Vendedor">${seller}</td>
-                    <td data-label="Precio Venta">$${parseFloat(totalSaleValue).toLocaleString()}</td>
-                    <td data-label="Comisión" class="text-orange">$${parseFloat(totalCommValue).toLocaleString()}</td>
-                    <td data-label="Utilidad" class="${utility >= 0 ? 'text-success' : 'text-danger'}"><strong>$${utility.toLocaleString()}</strong></td>
+                    <td data-label="Productos"><span style="font-size: 0.8rem;">${productNames}</span></td>
+                    <td data-label="Vendedor"><span>${seller}</span></td>
+                    <td data-label="Precio Venta"><strong>$${parseFloat(totalSaleValue).toLocaleString()}</strong></td>
+                    <td data-label="Comisión"><strong class="text-orange">$${parseFloat(totalCommValue).toLocaleString()}</strong></td>
+                    <td data-label="Utilidad"><strong class="${utility >= 0 ? 'text-success' : 'text-danger'}">$${utility.toLocaleString()}</strong></td>
                     <td data-label="Estado Pago">
                         <span class="badge ${s.money_confirmed ? 'bg-success' : 'bg-secondary'}">
                             ${s.money_confirmed ? 'PAGADA' : 'PENDIENTE'}
@@ -1920,15 +1920,15 @@ window.TuCompras = {
 
             return `
                 <tr id="tc-pending-row-${orderIdx}" class="${!order.seller_id && !isImported ? 'highlight-warning' : ''}" ${disabledRowStyle}>
-                    <td>${checkboxHtml}</td>
-                    <td>${customerStr}</td>
-                    <td>${logisticsStr}</td>
-                    <td style="vertical-align: top;">${itemsHtml}</td>
-                    <td style="vertical-align: top;">${mapHtml}</td>
-                    <td style="vertical-align: top;">${warehouseHtml}</td>
-                    <td style="vertical-align: middle;">${sellerDropdown}</td>
-                    <td style="vertical-align: middle;"><strong>$${(order.sale_price || 0).toLocaleString()}</strong></td>
-                    <td class="table-actions" style="vertical-align: middle;">
+                    <td data-label="Seleccionar">${checkboxHtml}</td>
+                    <td data-label="Cliente">${customerStr}</td>
+                    <td data-label="Logística">${logisticsStr}</td>
+                    <td data-label="Productos" style="vertical-align: top;">${itemsHtml}</td>
+                    <td data-label="Mapeo M/V" style="vertical-align: top;">${mapHtml}</td>
+                    <td data-label="Bodega Origen" style="vertical-align: top;">${warehouseHtml}</td>
+                    <td data-label="Vendedor" style="vertical-align: middle;">${sellerDropdown}</td>
+                    <td data-label="Precio Venta" style="vertical-align: middle;"><strong>$${(order.sale_price || 0).toLocaleString()}</strong></td>
+                    <td data-label="Acciones" class="tc-table-actions" style="vertical-align: middle;">
                         ${actionBtnHtml}
                     </td>
                 </tr>
