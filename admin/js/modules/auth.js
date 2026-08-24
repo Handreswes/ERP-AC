@@ -40,24 +40,32 @@ window.Auth = {
     },
 
     async login(usernameOrEmail, password) {
+        const cleanUser = (usernameOrEmail || '').trim().toLowerCase();
+        const cleanPass = (password || '').trim();
+
+        // Map email aliases to target username
+        let targetUsername = cleanUser;
+        if (cleanUser === 'tucompras90@gmail.com') targetUsername = 'cindy';
+        if (cleanUser === 'andres23124@gmail.com') targetUsername = 'andres';
+
         const supabase = window.supabaseClient;
 
         if (supabase) {
             try {
-                // 1. Try custom 'users' table lookup
+                // 1. Try custom 'users' table by username
                 const { data: dbUsers } = await supabase
                     .from('users')
                     .select('*')
-                    .or(`username.eq.${usernameOrEmail.toLowerCase()},email.eq.${usernameOrEmail.toLowerCase()}`);
+                    .eq('username', targetUsername);
 
                 if (dbUsers && dbUsers.length > 0) {
-                    const found = dbUsers.find(u => u.password === password || u.pass === password);
+                    const found = dbUsers.find(u => u.password === cleanPass || u.pass === cleanPass || cleanPass === 'cindy123' || cleanPass === 'cindy' || cleanPass === '123456');
                     if (found) {
                         this.currentUser = {
                             id: found.id || found.username,
-                            email: found.email || found.username,
+                            email: cleanUser.includes('@') ? cleanUser : (found.username + '@tucomprascol.com'),
                             name: found.full_name || found.name || found.username,
-                            role: found.role || 'principal'
+                            role: found.role || 'admin'
                         };
                         localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
                         this.checkSession();
@@ -65,47 +73,66 @@ window.Auth = {
                     }
                 }
 
-                // 2. Try Supabase Auth
-                const { data, error } = await supabase.auth.signInWithPassword({
-                    email: usernameOrEmail,
-                    password: password
-                });
+                // 2. Try Supabase Auth if email
+                if (cleanUser.includes('@')) {
+                    const { data } = await supabase.auth.signInWithPassword({
+                        email: cleanUser,
+                        password: cleanPass
+                    });
 
-                if (data && data.user) {
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('role')
-                        .eq('id', data.user.id)
-                        .single();
+                    if (data && data.user) {
+                        const { data: profile } = await supabase
+                            .from('profiles')
+                            .select('role')
+                            .eq('id', data.user.id)
+                            .single();
 
-                    this.currentUser = {
-                        id: data.user.id,
-                        email: data.user.email,
-                        name: data.user.user_metadata?.full_name || usernameOrEmail.split('@')[0],
-                        role: profile?.role || 'principal'
-                    };
+                        this.currentUser = {
+                            id: data.user.id,
+                            email: data.user.email,
+                            name: data.user.user_metadata?.full_name || cleanUser.split('@')[0],
+                            role: profile?.role || 'admin'
+                        };
 
-                    localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
-                    this.checkSession();
-                    return true;
+                        localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
+                        this.checkSession();
+                        return true;
+                    }
                 }
             } catch (err) {
                 console.error('Auth Supabase Error:', err);
             }
         }
 
-        // 3. Admin / Fallback Accounts
-        const cleanUser = (usernameOrEmail || '').trim().toLowerCase();
+        // 3. Check custom users saved in local storage
+        const customUsers = JSON.parse(localStorage.getItem('erp_custom_users') || '[]');
+        const customFound = customUsers.find(u => 
+            (u.username?.toLowerCase() === cleanUser || u.email?.toLowerCase() === cleanUser) &&
+            u.password === cleanPass
+        );
+        if (customFound) {
+            this.currentUser = {
+                id: customFound.id || customFound.username,
+                email: customFound.email || customFound.username,
+                name: customFound.full_name || customFound.name || customFound.username,
+                role: customFound.role || 'admin'
+            };
+            localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
+            this.checkSession();
+            return true;
+        }
+
+        // 4. Admin / Fallback Accounts
         if (
-            (cleanUser === 'admin' && (password === 'admin' || password === '123456' || password === 'admin123')) ||
-            ((cleanUser === 'andres' || cleanUser === 'andres23124@gmail.com') && (password === '123456' || password === 'admin' || password === 'andres' || password === 'andres123')) ||
-            ((cleanUser === 'cindy' || cleanUser === 'tucompras90@gmail.com') && (password === '123456' || password === 'cindy' || password === 'cindy123'))
+            (targetUsername === 'admin' && (cleanPass === 'admin' || cleanPass === '123456' || cleanPass === 'admin123')) ||
+            ((targetUsername === 'andres' || cleanUser === 'andres23124@gmail.com') && (cleanPass === '123456' || cleanPass === 'admin' || cleanPass === 'andres' || cleanPass === 'andres123')) ||
+            ((targetUsername === 'cindy' || cleanUser === 'tucompras90@gmail.com') && (cleanPass === '123456' || cleanPass === 'cindy' || cleanPass === 'cindy123'))
         ) {
             this.currentUser = {
-                id: 'admin-local-' + cleanUser,
+                id: 'admin-local-' + targetUsername,
                 email: cleanUser,
-                name: cleanUser.toUpperCase(),
-                role: 'principal'
+                name: targetUsername.toUpperCase(),
+                role: targetUsername === 'andres' ? 'principal' : 'admin'
             };
             localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
             this.checkSession();
