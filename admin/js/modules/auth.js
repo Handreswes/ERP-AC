@@ -104,17 +104,20 @@ window.Auth = {
             }
         }
 
-        // 3. Check custom users saved in local storage
+        // 3. Check synced users from Storage and LocalStorage
+        const syncedUsers = (window.Storage && typeof window.Storage.get === 'function' ? window.Storage.get(STORAGE_KEYS.USERS) : null) || [];
         const customUsers = JSON.parse(localStorage.getItem('erp_custom_users') || '[]');
-        const customFound = customUsers.find(u => 
-            (u.username?.toLowerCase() === cleanUser || u.email?.toLowerCase() === cleanUser) &&
-            u.password === cleanPass
+        const allLocalUsers = [...syncedUsers, ...customUsers];
+
+        const customFound = allLocalUsers.find(u => 
+            (u.username?.toLowerCase() === targetUsername || u.username?.toLowerCase() === cleanUser || u.email?.toLowerCase() === cleanUser) &&
+            (u.password === cleanPass || u.pass === cleanPass)
         );
         if (customFound) {
             this.currentUser = {
                 id: customFound.id || customFound.username,
-                email: customFound.email || customFound.username,
-                name: customFound.full_name || customFound.name || customFound.username,
+                email: customFound.email || cleanUser,
+                name: customFound.full_name || customFound.name || targetUsername.toUpperCase(),
                 role: customFound.role || 'admin'
             };
             localStorage.setItem('erp_session', JSON.stringify(this.currentUser));
