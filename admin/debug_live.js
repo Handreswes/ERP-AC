@@ -1,34 +1,58 @@
+const http = require('http');
+const fs = require('fs');
+const path = require('path');
 const puppeteer = require('puppeteer');
 
-async function debugPage() {
-    console.log('Testing live page in Puppeteer with cache-busting...');
+const PORT = 8099;
+const root = 'c:/Users/ANDRES/OneDrive/Desktop/PROYECTOS ANTIGRAVITY/ERP AC Website';
+
+const server = http.createServer((req, res) => {
+    let filePath = path.join(root, req.url.split('?')[0]);
+    if (filePath.endsWith('/')) filePath = path.join(filePath, 'catalogo.html');
+
+    if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {
+        const ext = path.extname(filePath);
+        let contentType = 'text/html';
+        if (ext === '.js') contentType = 'text/javascript';
+        if (ext === '.json') contentType = 'application/json';
+        if (ext === '.css') contentType = 'text/css';
+
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(fs.readFileSync(filePath));
+    } else {
+        res.writeHead(404);
+        res.end('Not Found');
+    }
+});
+
+server.listen(PORT, async () => {
+    console.log(`Server running at http://localhost:${PORT}`);
+
     const browser = await puppeteer.launch({ headless: 'new', args: ['--no-sandbox'] });
     const page = await browser.newPage();
 
-    page.on('console', msg => console.log('PAGE LOG:', msg.type(), msg.text()));
-    page.on('pageerror', err => console.error('PAGE ERROR:', err.message));
+    // Test Retail Link
+    const retailUrl = `http://localhost:${PORT}/catalogo.html?price=internet`;
+    console.log('Navigating to Retail URL:', retailUrl);
+    await page.goto(retailUrl, { waitUntil: 'networkidle2' });
 
-    try {
-        const url = 'https://tucomprascol.com/catalogo.html?price=wholesale&company=all&t=' + Date.now();
-        console.log('Navigating to:', url);
-        const res = await page.goto(url, {
-            waitUntil: 'networkidle2',
-            timeout: 15000
-        });
-        console.log('Response Status:', res.status());
+    const selectDisplayRetail = await page.$eval('#select-price-type', el => window.getComputedStyle(el).display);
+    const cardCountRetail = await page.$$eval('.product-card', cards => cards.length);
+    console.log('--- RETAIL MODE TEST ---');
+    console.log('Price Selector Display:', selectDisplayRetail);
+    console.log('Cards rendered:', cardCountRetail);
 
-        const loaderDisplay = await page.$eval('#loading-screen', el => window.getComputedStyle(el).display);
-        const loaderOpacity = await page.$eval('#loading-screen', el => window.getComputedStyle(el).opacity);
-        console.log('Loader computed display:', loaderDisplay, 'opacity:', loaderOpacity);
+    // Test Wholesale Link
+    const wholesaleUrl = `http://localhost:${PORT}/catalogo.html?price=wholesale`;
+    console.log('\nNavigating to Wholesale URL:', wholesaleUrl);
+    await page.goto(wholesaleUrl, { waitUntil: 'networkidle2' });
 
-        const cardCount = await page.$$eval('.product-card', cards => cards.length);
-        console.log('Product cards rendered in DOM:', cardCount);
+    const selectDisplayWholesale = await page.$eval('#select-price-type', el => window.getComputedStyle(el).display);
+    const cardCountWholesale = await page.$$eval('.product-card', cards => cards.length);
+    console.log('--- WHOLESALE MODE TEST ---');
+    console.log('Price Selector Display:', selectDisplayWholesale);
+    console.log('Cards rendered:', cardCountWholesale);
 
-    } catch (e) {
-        console.error('Puppeteer navigation error:', e.message);
-    } finally {
-        await browser.close();
-    }
-}
-
-debugPage();
+    await browser.close();
+    server.close();
+});
