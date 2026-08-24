@@ -98,8 +98,8 @@ window.Auth = {
         const cleanUser = (usernameOrEmail || '').trim().toLowerCase();
         if (
             (cleanUser === 'admin' && (password === 'admin' || password === '123456' || password === 'admin123')) ||
-            (cleanUser === 'andres' && (password === '123456' || password === 'admin' || password === 'andres')) ||
-            (cleanUser === 'cindy' && (password === '123456' || password === 'cindy'))
+            (cleanUser === 'andres' && (password === '123456' || password === 'admin' || password === 'andres' || password === 'andres123')) ||
+            (cleanUser === 'cindy' && (password === '123456' || password === 'cindy' || password === 'cindy123'))
         ) {
             this.currentUser = {
                 id: 'admin-local-' + cleanUser,
