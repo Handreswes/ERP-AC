@@ -343,13 +343,16 @@ window.Finances = {
 
         const balances = {
             millenio: { cash: 0, banks: {} },
-            vulcano: { cash: 0, banks: {} }
+            vulcano: { cash: 0, banks: {} },
+            tucompras: { cash: 0, banks: {} }
         };
 
         // Initialize bank balances from account registration
         accounts.forEach(acc => {
-            if (!balances[acc.company].banks[acc.id]) {
-                balances[acc.company].banks[acc.id] = { name: acc.name, balance: parseFloat(acc.balance || 0) };
+            const comp = acc.company || 'millenio';
+            if (!balances[comp]) balances[comp] = { cash: 0, banks: {} };
+            if (!balances[comp].banks[acc.id]) {
+                balances[comp].banks[acc.id] = { name: acc.name, balance: parseFloat(acc.balance || 0) };
             }
         });
 
