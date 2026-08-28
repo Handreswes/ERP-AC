@@ -267,22 +267,111 @@ window.Vendedores = {
         const checks = document.querySelectorAll('.comm-check:checked');
         if (checks.length === 0) return;
 
-        if (!confirm(`¿Confirmas el pago de comisiones por un total de ${document.getElementById('comm-selected-total').textContent}?`)) return;
+        const totalText = document.getElementById('comm-selected-total')?.textContent || '$0';
+        if (!confirm(`¿Confirmas el pago de comisiones por un total de ${totalText}?`)) return;
+
+        const accounts = (Storage.get(STORAGE_KEYS.ACCOUNTS) || []).filter(a => a.company === 'tucompras' || a.company === 'millenio' || a.company === 'vulcano');
+        let optionsText = "Selecciona la cuenta de salida para el pago de comisiones:\n\n";
+        accounts.forEach((acc, idx) => {
+            optionsText += `${idx + 1}: ${acc.name} (${acc.bankName || acc.company})\n`;
+        });
+        
+        const sel = prompt(optionsText, "1");
+        if (sel === null) return;
+        const selectedAcc = accounts[parseInt(sel) - 1] || accounts[0];
+        const accountId = selectedAcc ? selectedAcc.id : 'wallet_tucompras';
 
         const sales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
         const idsToPay = Array.from(checks).map(c => c.dataset.id);
 
+        let totalCommPaid = 0;
         for (const id of idsToPay) {
             const sale = sales.find(s => s.id === id);
             if (sale) {
+                totalCommPaid += parseFloat(sale.commission_paid) || 0;
                 sale.is_commission_paid = true;
                 sale.commission_paid_at = new Date().toISOString();
+                sale.commission_paid_account_id = accountId;
                 await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
             }
         }
 
-        alert('¡Comisiones liquidadas exitosamente!');
+        // Real Outflow Accounting Entry
+        if (totalCommPaid > 0) {
+            await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+                company: 'tucompras',
+                type: 'outflow',
+                originAccount: accountId,
+                amount: totalCommPaid,
+                concept: `Pago Comisiones Vendedor (${idsToPay.length} ventas)`,
+                date: new Date().toISOString(),
+                notes: `Pago comisiones | Cuenta: ${selectedAcc ? selectedAcc.name : accountId}`
+            });
+        }
+
+        alert('¡Comisiones liquidadas exitosamente y registradas como egreso contable!');
+        this.showCommissionVoucher(idsToPay, totalCommPaid);
         this.updateCommissionList();
+    },
+
+    showCommissionVoucher(paidSaleIds, totalAmount) {
+        const sales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
+        const paidSales = sales.filter(s => paidSaleIds.includes(s.id));
+        const sellers = this.getSellers();
+        const seller = sellers.find(s => s.id === paidSales[0]?.seller_id)?.name || 'Vendedor';
+
+        const voucherWin = window.open('', '_blank', 'width=750,height=850');
+        if (!voucherWin) return;
+
+        voucherWin.document.write(`
+            <html>
+            <head>
+                <title>Comprobante de Pago de Comisiones - ${seller}</title>
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 25px; color: #1e293b; background: #fff; }
+                    h2 { color: #0f172a; border-bottom: 2px solid #3b82f6; padding-bottom: 8px; margin-top: 0; }
+                    .info-box { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+                    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+                    th, td { border: 1px solid #cbd5e1; padding: 8px 12px; text-align: left; font-size: 13px; }
+                    th { background: #f1f5f9; font-weight: bold; }
+                    .total-box { margin-top: 20px; background: #dbeafe; border: 1px solid #bfdbfe; color: #1e40af; padding: 15px; border-radius: 8px; text-align: right; font-size: 16px; font-weight: bold; }
+                    .btn-print { margin-top: 20px; padding: 10px 20px; font-size: 14px; background: #2563eb; color: #fff; border: none; border-radius: 6px; cursor: pointer; }
+                </style>
+            </head>
+            <body>
+                <h2>📄 COMPROBANTE DE LIQUIDACIÓN DE COMISIONES</h2>
+                <div class="info-box">
+                    <strong>Vendedor:</strong> ${seller}<br>
+                    <strong>Fecha de Pago:</strong> ${new Date().toLocaleString()}<br>
+                    <strong>Cantidad de Ventas Liquidadas:</strong> ${paidSales.length} despachos
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha Venta</th>
+                            <th>Guía / ID</th>
+                            <th>Cliente</th>
+                            <th>Valor Venta</th>
+                            <th>Comisión Pagada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${paidSales.map(s => `
+                            <tr>
+                                <td>${new Date(s.date).toLocaleDateString()}</td>
+                                <td>${s.carrier || ''} - ${s.tracking_number || s.id}</td>
+                                <td>${s.customer_name || ''}</td>
+                                <td>$${(s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0) : parseFloat(s.sale_price || 0)).toLocaleString('es-CO')}</td>
+                                <td>$${(parseFloat(s.commission_paid) || 0).toLocaleString('es-CO')}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                <div class="total-box">TOTAL COMISIONES LIQUIDADAS: $${totalAmount.toLocaleString('es-CO')} COP</div>
+                <button class="btn-print" onclick="window.print()">🖨️ Imprimir Comprobante</button>
+            </body>
+            </html>
+        `);
     },
 
     updateSellersList() {
