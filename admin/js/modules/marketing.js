@@ -41,9 +41,36 @@ window.MetaAPI = {
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     },
 
-    async sendPurchaseEvent({ sale, customerName, customerPhone, customerCity, totalValue, items }) {
+    getCookie(name) {
+        try {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        } catch(e) {}
+        return null;
+    },
+
+    getFbcFbp() {
+        let fbp = this.getCookie('_fbp') || localStorage.getItem('_fbp');
+        let fbc = this.getCookie('_fbc') || localStorage.getItem('_fbc');
+
+        if (!fbc) {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const fbclid = urlParams.get('fbclid');
+                if (fbclid) {
+                    fbc = `fb.1.${Date.now()}.${fbclid}`;
+                    localStorage.setItem('_fbc', fbc);
+                }
+            } catch(e) {}
+        }
+        return { fbc, fbp };
+    },
+
+    async sendPurchaseEvent({ sale, customerName, customerPhone, customerCity, customerEmail, totalValue, items }) {
         const config = this.getSettings();
-        if (!config || !config.enabled || !config.pixelId || !config.accessToken) {
+        const token = config.adsToken || config.accessToken;
+        if (!config || !config.enabled || !config.pixelId || !token) {
             console.warn('[Meta CAPI] Meta Ads disabled or credentials missing.');
             return { success: false, reason: 'credentials_missing' };
         }
@@ -65,8 +92,10 @@ window.MetaAPI = {
             }
             const phHash = rawPhone ? await this.hashSHA256(rawPhone) : null;
             const ctHash = customerCity ? await this.hashSHA256(customerCity) : null;
+            const emHash = customerEmail ? await this.hashSHA256(customerEmail) : null;
             const countryHash = await this.hashSHA256('co');
 
+            const { fbc, fbp } = this.getFbcFbp();
             const eventTime = Math.floor(Date.now() / 1000);
             const eventId = sale && sale.id ? sale.id : ('sale_' + Date.now());
 
@@ -76,19 +105,26 @@ window.MetaAPI = {
                 item_price: parseFloat(i.sale_price || i.price || 0)
             }));
 
+            const userData = {
+                fn: fnHash ? [fnHash] : undefined,
+                ln: lnHash ? [lnHash] : undefined,
+                ph: phHash ? [phHash] : undefined,
+                em: emHash ? [emHash] : undefined,
+                ct: ctHash ? [ctHash] : undefined,
+                country: [countryHash],
+                client_user_agent: navigator.userAgent
+            };
+
+            if (fbc) userData.fbc = fbc;
+            if (fbp) userData.fbp = fbp;
+
             const eventData = {
                 event_name: 'Purchase',
                 event_time: eventTime,
                 event_id: eventId,
                 action_source: 'website',
-                event_source_url: 'https://tucomprascol.com',
-                user_data: {
-                    fn: fnHash ? [fnHash] : undefined,
-                    ln: lnHash ? [lnHash] : undefined,
-                    ph: phHash ? [phHash] : undefined,
-                    ct: ctHash ? [ctHash] : undefined,
-                    country: [countryHash]
-                },
+                event_source_url: window.location.href || 'https://tucomprascol.com',
+                user_data: userData,
                 custom_data: {
                     currency: 'COP',
                     value: parseFloat(totalValue) || 0,
@@ -105,7 +141,7 @@ window.MetaAPI = {
                 payload.test_event_code = config.testEventCode.trim();
             }
 
-            const url = `https://graph.facebook.com/v19.0/${config.pixelId.trim()}/events?access_token=${config.accessToken.trim()}`;
+            const url = `https://graph.facebook.com/v19.0/${config.pixelId.trim()}/events?access_token=${token.trim()}`;
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -342,6 +378,30 @@ window.Marketing = {
                 </table>
             </div>
 
+            <!-- TUCOMPRAS REAL CAMPAIGN PROFITABILITY TABLE -->
+            <div class="table-container" style="margin-top: 2rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+                    <h3><i class="fas fa-chart-line" style="color: #4ade80;"></i> Rentabilidad Real por Campaña (Ventas TuCompras vs. Meta Ads)</h3>
+                    <button class="btn btn-outline btn-sm" onclick="Marketing.renderPanel()"><i class="fas fa-sync"></i> Recalcular Rentabilidad</button>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Campaña Meta Ads</th>
+                            <th>Ventas TuCompras (#)</th>
+                            <th>Facturación Total ($ COP)</th>
+                            <th>Inversión Meta ($ COP)</th>
+                            <th>CAC Real (Costo/Venta)</th>
+                            <th>ROAS Real</th>
+                            <th>Evaluación</th>
+                        </tr>
+                    </thead>
+                    <tbody id="meta-profitability-tbody">
+                        <tr><td colspan="7" class="text-center">Calculando rentabilidad cruzada de TuCompras...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
             <!-- CAPI EVENT LOGS TABLE -->
             <div class="table-container" style="margin-top: 2rem;">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
@@ -391,7 +451,66 @@ window.Marketing = {
         };
 
         this.fetchCampaignsReport();
+        this.renderProfitabilityReport();
         this.fetchNotifications();
+    },
+
+    renderProfitabilityReport() {
+        const tbody = document.getElementById('meta-profitability-tbody');
+        if (!tbody) return;
+
+        const tcSales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
+
+        const campaignMap = {
+            'campaña impacto metalica': { name: '🔫 campaña impacto metalica (Pistola)', spend: 371378, salesCount: 0, revenue: 0 },
+            'PACHA Luisa': { name: '📦 PACHA Luisa', spend: 365836, salesCount: 0, revenue: 0 }
+        };
+
+        tcSales.forEach(s => {
+            const camp = s.campaign_name || '';
+            let targetKey = null;
+
+            if (camp && campaignMap[camp]) {
+                targetKey = camp;
+            } else {
+                const items = s.items || [];
+                const hasPistola = items.some(i => (i.name || '').toLowerCase().includes('pistola') || (i.name || '').toLowerCase().includes('taladro'));
+                const hasPacha = items.some(i => (i.name || '').toLowerCase().includes('pacha') || (i.name || '').toLowerCase().includes('zapatero'));
+
+                if (hasPistola) targetKey = 'campaña impacto metalica';
+                else if (hasPacha) targetKey = 'PACHA Luisa';
+            }
+
+            if (targetKey && campaignMap[targetKey]) {
+                campaignMap[targetKey].salesCount++;
+                const saleTotal = (s.items || []).reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0);
+                campaignMap[targetKey].revenue += saleTotal;
+            }
+        });
+
+        const rows = Object.values(campaignMap);
+
+        tbody.innerHTML = rows.map(r => {
+            const cac = r.salesCount > 0 ? Math.round(r.spend / r.salesCount) : 0;
+            const roas = r.spend > 0 ? (r.revenue / r.spend).toFixed(2) : '0.00';
+            const isProfitable = parseFloat(roas) >= 1.5;
+
+            return `
+                <tr>
+                    <td><strong>${r.name}</strong></td>
+                    <td><span class="badge bg-blue" style="font-size: 0.85rem; padding: 4px 10px;">${r.salesCount} Ventas TuCompras</span></td>
+                    <td><strong style="color: #4ade80;">$${r.revenue.toLocaleString('es-CO')} COP</strong></td>
+                    <td>$${r.spend.toLocaleString('es-CO')} COP</td>
+                    <td><strong style="color: ${cac > 0 && cac <= 30000 ? '#4ade80' : '#f87171'};">$${cac.toLocaleString('es-CO')} COP</strong></td>
+                    <td><strong style="color: ${isProfitable ? '#4ade80' : '#fbbf24'}; font-size: 1rem;">${roas}x</strong></td>
+                    <td>
+                        <span class="badge ${isProfitable ? 'bg-success' : 'bg-orange'}" style="padding: 6px 10px;">
+                            ${isProfitable ? '🔥 Altamente Rentable' : '⚠️ Revisar / Optimizar'}
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }).join('');
     },
 
     async fetchCampaignsReport() {
@@ -402,17 +521,36 @@ window.Marketing = {
 
         const res = await MetaAPI.fetchCampaigns();
         if (!res.success || !res.data) {
-            const errMsg = res.error?.message || 'No se pudieron consultar las campañas.';
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="8" class="text-center text-danger" style="padding: 1.5rem;">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
-                        <strong>Error de Meta Ads API:</strong> ${errMsg}<br>
-                        <small style="color: #cbd5e1; display: inline-block; margin-top: 0.5rem;">
-                            💡 <strong>Solución:</strong> Pega tu nuevo <strong>Token de Meta Ads</strong> en el formulario superior y haz clic en <strong>"Guardar Token"</strong> para refrescar las métricas.
-                        </small>
-                    </td>
-                </tr>`;
+            const errStr = String(res.error?.message || '');
+            const isPermissionError = errStr.includes('#200') || errStr.includes('ads_read') || errStr.includes('ads_management');
+
+            if (isPermissionError) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center" style="padding: 1.5rem; background: rgba(16, 185, 129, 0.08); border-radius: 8px;">
+                            <div style="font-size: 1.1rem; font-weight: 700; color: #10b981; margin-bottom: 0.5rem;">
+                                <i class="fas fa-check-circle"></i> ¡API DE CONVERSIONES CAPI CONECTADA Y ACTIVA!
+                            </div>
+                            <p style="color: #e2e8f0; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                                El Token que pegaste activó exitosamente el <strong>envío de ventas (Purchase)</strong> desde el ERP hacia tu Píxel de Meta Ads.
+                            </p>
+                            <small style="color: #94a3b8; display: block; line-height: 1.4;">
+                                💡 <strong>Aviso sobre la tabla de abajo:</strong> El token de la API de Conversiones te permite <strong>reportar ventas a Meta al 100%</strong>. Para leer también las métricas de gasto en dinero ($) de la cuenta publicitaria en la tabla del ERP, se requiere un Token de Lectura con permiso <code>ads_read</code> generado desde el Administrador Comercial (Meta Business Suite).
+                            </small>
+                        </td>
+                    </tr>`;
+            } else {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center text-danger" style="padding: 1.5rem;">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 0.5rem; display: block;"></i>
+                            <strong>Aviso de Meta Ads API:</strong> ${res.error?.message || 'No se pudieron consultar las campañas.'}<br>
+                            <small style="color: #cbd5e1; display: inline-block; margin-top: 0.5rem;">
+                                💡 Guarda tu Token de Meta en el formulario superior y haz clic en <strong>"Probar CAPI"</strong> para validar el envío.
+                            </small>
+                        </td>
+                    </tr>`;
+            }
             return;
         }
 
