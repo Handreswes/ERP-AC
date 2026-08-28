@@ -10,8 +10,37 @@ window.TuCompras = {
     hideCancelled: true,
     statusFilter: 'active',
 
-    init() {
+    returnCategories: {
+        'cliente_no_recibio': '❌ Cliente no recibió',
+        'cliente_rechazo': '🚫 Cliente rechazó producto',
+        'cliente_no_reclamo': '🏢 Cliente no reclamó en oficina',
+        'direccion_incorrecta': '📍 Dirección incorrecta / incompleta',
+        'cliente_no_contesto': '📞 Cliente no contestó llamadas/mensajes',
+        'producto_equivocado': '📦 Producto equivocado enviado',
+        'problema_transporte': '🚚 Problema de transporte / logística',
+        'producto_averiado': '⚠️ Producto averiado en transporte',
+        'pedido_duplicado': '🔁 Pedido duplicado',
+        'otra_causa': '❓ Otra causa / Especificar'
+    },
+
+    async init() {
+        await this.ensureWalletAccount();
         this.renderPanel();
+    },
+
+    async ensureWalletAccount() {
+        const accounts = Storage.get(STORAGE_KEYS.ACCOUNTS) || [];
+        const wallet = accounts.find(a => a.id === 'wallet_tucompras' || a.accountNumber === 'WALLET-TC');
+        if (!wallet) {
+            await Storage.addItem(STORAGE_KEYS.ACCOUNTS, {
+                id: 'wallet_tucompras',
+                name: 'Billetera TuCompras / Dropi',
+                bankName: 'Billetera Digital',
+                accountNumber: 'WALLET-TC',
+                balance: 0,
+                company: 'tucompras'
+            });
+        }
     },
 
     getSales() {
@@ -87,6 +116,10 @@ window.TuCompras = {
                 </div>
             </div>
 
+            <div id="tc-alerts-container" style="margin-bottom: 1rem;">
+                <!-- Critical Alerts Banner loads here -->
+            </div>
+
             <div class="stats-grid" id="tc-stats-container">
                 <!-- Stats load here -->
             </div>
@@ -97,6 +130,8 @@ window.TuCompras = {
                 <button class="tab-btn ${this.activeStatus === 'proceso_devolucion' ? 'active' : ''}" data-status="proceso_devolucion">En Proceso Dev.</button>
                 <button class="tab-btn ${this.activeStatus === 'devolucion_recibida' ? 'active' : ''}" data-status="devolucion_recibida">Devueltos</button>
                 <button class="tab-btn ${this.activeStatus === 'liquidacion' ? 'active' : ''}" data-status="liquidacion" style="border: 1px solid var(--accent);">Liquidación Bodegas</button>
+                <button class="tab-btn ${this.activeStatus === 'conciliacion' ? 'active' : ''}" data-status="conciliacion" style="border: 1px solid #10b981; color: #10b981;"><i class="fas fa-coins"></i> Conciliación Wallet</button>
+                <button class="tab-btn ${this.activeStatus === 'retiros' ? 'active' : ''}" data-status="retiros" style="border: 1px solid #a855f7; color: #a855f7;"><i class="fas fa-hand-holding-usd"></i> Retiro Utilidades</button>
                 <button class="tab-btn ${this.activeStatus === 'importar_dropi' ? 'active' : ''}" data-status="importar_dropi" style="border: 1px solid var(--success);"><i class="fas fa-cloud-download-alt"></i> Importar Dropi</button>
                 <button class="tab-btn ${this.activeStatus === 'gastos' ? 'active' : ''}" data-status="gastos" style="border: 1px solid var(--warning);"><i class="fas fa-wallet"></i> Gastos TuCompras</button>
             </div>
@@ -195,9 +230,17 @@ window.TuCompras = {
                                         <input type="text" name="tracking_number" class="form-control" placeholder="Guía #">
                                     </div>
                                     <div class="form-group">
-                                        <label>Flete (Valor Cobrado por Dropi)</label>
-                                        <input type="number" name="shipping_cost" class="form-control" required value="0">
-                                    </div>
+                                         <label>Flete (Valor Cobrado por Dropi)</label>
+                                         <input type="number" name="shipping_cost" class="form-control" required value="0">
+                                     </div>
+                                     <div class="form-group">
+                                         <label style="font-weight: 700; color: #38bdf8;"><i class="fab fa-facebook" style="color: #1877f2;"></i> Campaña de Origen (Meta Ads)</label>
+                                         <select id="tc-campaign-select" name="campaign_name" class="form-control">
+                                             <option value="">-- Sin campaña / Orgánico / Directo --</option>
+                                             <option value="campaña impacto metalica">🔫 campaña impacto metalica (Pistola)</option>
+                                             <option value="PACHA Luisa">📦 PACHA Luisa</option>
+                                         </select>
+                                     </div>
                                 </div>
 
                                 <div class="summary-section" style="display: flex; flex-direction: column; gap: 1.25rem;">
@@ -248,6 +291,10 @@ window.TuCompras = {
 
         if (this.activeStatus === 'liquidacion') {
             this.renderLiquidationView();
+        } else if (this.activeStatus === 'conciliacion') {
+            this.renderConciliationView();
+        } else if (this.activeStatus === 'retiros') {
+            this.renderWithdrawalsView();
         } else if (this.activeStatus === 'importar_dropi') {
             this.renderImportDropiView();
         } else if (this.activeStatus === 'gastos') {
@@ -256,31 +303,207 @@ window.TuCompras = {
             this.renderSalesView();
         }
 
+        this.renderCriticalAlerts();
         this.updateStats();
         this.setupEventListeners();
     },
 
+    renderCriticalAlerts() {
+        const container = document.getElementById('tc-alerts-container');
+        if (!container) return;
+
+        const sales = this.getSales() || [];
+        const now = new Date();
+
+        const uncollectedSales = sales.filter(s => {
+            if (s.status !== 'recibido' || s.money_confirmed === true) return false;
+            const refDate = s.money_confirmed_at || s.date;
+            const days = (now - new Date(refDate)) / (1000 * 60 * 60 * 24);
+            return days >= 5;
+        });
+
+        const stuckReturns = sales.filter(s => {
+            if (s.status !== 'proceso_devolucion') return false;
+            const days = (now - new Date(s.date)) / (1000 * 60 * 60 * 24);
+            return days >= 10;
+        });
+
+        const discrepancySales = sales.filter(s => s.money_confirmed === true && s.reconciliation_status === 'discrepancy');
+
+        if (uncollectedSales.length === 0 && stuckReturns.length === 0 && discrepancySales.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+
+        container.innerHTML = `
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 14px; padding: 12px 16px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-exclamation-triangle" style="color: #ef4444; font-size: 1.2rem;"></i>
+                    <strong style="color: #f87171; font-size: 0.95rem;">Alertas Críticas de Control Financiero:</strong>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    ${uncollectedSales.length > 0 ? `
+                        <button class="btn btn-sm" onclick="TuCompras.activeStatus = 'recibido'; TuCompras.renderPanel();" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; font-size: 0.8rem;">
+                            🔴 ${uncollectedSales.length} Entregados sin cobro (>5 días)
+                        </button>
+                    ` : ''}
+                    ${stuckReturns.length > 0 ? `
+                        <button class="btn btn-sm" onclick="TuCompras.activeStatus = 'proceso_devolucion'; TuCompras.renderPanel();" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 8px; font-size: 0.8rem;">
+                            🟡 ${stuckReturns.length} Devoluciones retenidas (>10 días)
+                        </button>
+                    ` : ''}
+                    ${discrepancySales.length > 0 ? `
+                        <button class="btn btn-sm" onclick="TuCompras.activeStatus = 'conciliacion'; TuCompras.renderPanel();" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; font-size: 0.8rem;">
+                            🔴 ${discrepancySales.length} Discrepancias de dinero en Wallet
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    },
+
+    renderConciliationView() {
+        const container = document.getElementById('tucompras-main-content');
+        if (!container) return;
+
+        const sales = this.getSales() || [];
+
+        let totalExpectedNet = 0;
+        let totalReceivedReal = 0;
+        let totalDiscrepancies = 0;
+
+        sales.forEach(s => {
+            if (s.status === 'cancelado') return;
+            const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+            const shippingCost = parseFloat(s.shipping_cost || 0);
+            const netExp = Math.max(0, totalSale - shippingCost);
+
+            totalExpectedNet += netExp;
+
+            if (s.money_confirmed) {
+                const netRec = parseFloat(s.money_received_value !== undefined ? s.money_received_value : netExp);
+                totalReceivedReal += netRec;
+                if (s.discrepancy_value) {
+                    totalDiscrepancies += Math.abs(parseFloat(s.discrepancy_value) || 0);
+                }
+            }
+        });
+
+        container.innerHTML = `
+            <div style="margin-bottom: 1.5rem;">
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid var(--accent);">
+                        <h3>Total Neto Esperado</h3>
+                        <p class="stat-value" style="color: var(--accent-vibrant);">$${totalExpectedNet.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Ventas activas (Valor venta - Flete)</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #10b981;">
+                        <h3>Total Ingresado a Wallet</h3>
+                        <p class="stat-value" style="color: #10b981;">$${totalReceivedReal.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Dinero confirmado en billetera</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid ${totalDiscrepancies > 0 ? '#ef4444' : '#10b981'};">
+                        <h3>Discrepancias / Fletes Extra</h3>
+                        <p class="stat-value" style="color: ${totalDiscrepancies > 0 ? '#ef4444' : '#10b981'};">$${totalDiscrepancies.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Diferencias entre esperado vs recibido</span>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding: 0 5px;">
+                        <h3 style="margin:0;"><i class="fas fa-coins" style="color:#10b981;"></i> Conciliación de Wallet y Billetera Digital</h3>
+                        <button class="btn btn-outline btn-sm" onclick="TuCompras.renderPanel()"><i class="fas fa-sync"></i> Actualizar</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Guía / Transp.</th>
+                                <th>Cliente</th>
+                                <th>Valor Venta</th>
+                                <th>Flete Est.</th>
+                                <th>Neto Esperado</th>
+                                <th>Neto Recibido</th>
+                                <th>Diferencia</th>
+                                <th>Estado Conciliación</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sales.map(s => {
+                                const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+                                const shippingCost = parseFloat(s.shipping_cost || 0);
+                                const netExp = Math.max(0, totalSale - shippingCost);
+                                const netRec = s.money_confirmed ? parseFloat(s.money_received_value !== undefined ? s.money_received_value : netExp) : 0;
+                                const diff = s.money_confirmed ? (netRec - netExp) : 0;
+
+                                let statusBadge = '';
+                                if (!s.money_confirmed) {
+                                    statusBadge = '<span class="badge bg-warning">🟡 Pendiente Cobro</span>';
+                                } else if (Math.abs(diff) < 1) {
+                                    statusBadge = '<span class="badge bg-success">🟢 Recibido OK</span>';
+                                } else {
+                                    statusBadge = `<span class="badge bg-danger">🔴 Diferencia ($${diff.toLocaleString('es-CO')})</span>`;
+                                }
+
+                                return `
+                                    <tr>
+                                        <td>${new Date(s.date).toLocaleDateString()}</td>
+                                        <td><strong>${s.carrier || '-'}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.tracking_number || '-'}</span></td>
+                                        <td><strong>${s.customer_name || 'N/A'}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.customer_phone || ''}</span></td>
+                                        <td>$${totalSale.toLocaleString('es-CO')}</td>
+                                        <td>$${shippingCost.toLocaleString('es-CO')}</td>
+                                        <td><strong style="color: var(--accent-vibrant);">$${netExp.toLocaleString('es-CO')}</strong></td>
+                                        <td><strong style="color: #10b981;">${s.money_confirmed ? '$' + netRec.toLocaleString('es-CO') : '-'}</strong></td>
+                                        <td><strong style="color: ${diff < 0 ? '#ef4444' : '#10b981'};">${s.money_confirmed ? (diff >= 0 ? '+' : '') + '$' + diff.toLocaleString('es-CO') : '-'}</strong></td>
+                                        <td>${statusBadge}</td>
+                                        <td>
+                                            <button class="btn btn-sm btn-outline" onclick="TuCompras.openStatusModal('${s.id}')">
+                                                <i class="fas ${s.money_confirmed ? 'fa-edit' : 'fa-check'}"></i> ${s.money_confirmed ? 'Editar' : 'Conciliar'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                            ${sales.length === 0 ? '<tr><td colspan="10" class="text-center">No hay ventas registradas para conciliar</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    },
+
     updateStats() {
-        const sales = this.getSales();
+        const sales = this.getSales() || [];
         const container = document.getElementById('tc-stats-container');
         if (!container) return;
 
-        // Financial Stats
-        const totalUtilitySales = sales.reduce((sum, s) => {
-            if (s.status === 'recibido') {
-                const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price) * i.qty), 0) : s.sale_price;
-                const totalCost = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.cost_price) * i.qty), 0) : s.cost_price;
-                const totalComm = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.commission_paid) * i.qty), 0) : s.commission_paid;
-                return sum + (totalSale - totalCost - totalComm - parseFloat(s.shipping_cost));
-            } else if (s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida' || s.status === 'devuelto') {
-                return sum - (parseFloat(s.shipping_loss) || 0);
-            }
-            return sum;
-        }, 0);
+        // Executive Financial Calculations
+        let grossSales = 0;
+        let totalCOGS = 0;
+        let totalShippingCostDelivered = 0;
+        let totalShippingLosses = 0;
+        let totalCommissions = 0;
 
-        const tcExpenses = Storage.get(STORAGE_KEYS.EXPENSES).filter(e => e.company === 'tucompras');
+        sales.forEach(s => {
+            const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+            const totalCost = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.cost_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.cost_price || 0);
+            const totalComm = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.commission_paid || 0);
+
+            if (s.status === 'recibido') {
+                grossSales += totalSale;
+                totalCOGS += totalCost;
+                totalShippingCostDelivered += parseFloat(s.shipping_cost || 0);
+                totalCommissions += totalComm;
+            } else if (s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida' || s.status === 'devuelto') {
+                totalShippingLosses += parseFloat(s.shipping_loss || 0);
+            }
+        });
+
+        const tcExpenses = (Storage.get(STORAGE_KEYS.EXPENSES) || []).filter(e => e.company === 'tucompras');
         const totalExpenses = tcExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-        const netUtility = totalUtilitySales - totalExpenses;
+        const netUtility = grossSales - totalCOGS - totalShippingCostDelivered - totalShippingLosses - totalCommissions - totalExpenses;
+        const netMarginRate = grossSales > 0 ? Math.round((netUtility / grossSales) * 100) : 0;
 
         const debtMillenio = sales
             .filter(s => s.status === 'recibido' && s.money_confirmed && !s.is_paid_to_inventory && s.inventory_source === 'millenio')
@@ -290,47 +513,206 @@ window.TuCompras = {
             .filter(s => s.status === 'recibido' && s.money_confirmed && !s.is_paid_to_inventory && s.inventory_source === 'vulcano')
             .reduce((sum, s) => sum + (s.items ? s.items.reduce((ss, i) => ss + (parseFloat(i.cost_price) * i.qty), 0) : s.cost_price), 0);
 
-        // Shipping Stats
-        const carriers = [...new Set(sales.filter(s => s.carrier).map(s => s.carrier))];
-        const shippingStats = carriers.map(c => {
-            const carrierSales = sales.filter(s => s.carrier === c);
-            const total = carrierSales.length;
-            const delivered = carrierSales.filter(s => s.status === 'recibido').length;
-            const returns = carrierSales.filter(s => s.status === 'devolucion_recibida' || s.status === 'proceso_devolucion').length;
-            const rate = total > 0 ? Math.round((delivered / total) * 100) : 0;
-            return { name: c, total, delivered, returns, rate };
+        // Product Breakdown Metrics (Pachas vs. Pistolas, etc.)
+        const products = Inventory.getProducts() || [];
+        const productStatsMap = {};
+
+        sales.forEach(s => {
+            const isDelivered = s.status === 'recibido';
+            const isReturn = s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida' || s.status === 'devuelto';
+            const items = s.items && s.items.length > 0 ? s.items : [{ product_id: s.product_id, qty: 1, sale_price: s.sale_price, cost_price: s.cost_price, commission_paid: s.commission_paid }];
+
+            items.forEach(item => {
+                const prod = products.find(p => p.id === item.product_id);
+                const pName = prod ? prod.name : (item.name || 'Producto Desconocido');
+                const pId = item.product_id || pName;
+
+                if (!productStatsMap[pId]) {
+                    productStatsMap[pId] = {
+                        name: pName,
+                        shippedQty: 0,
+                        deliveredQty: 0,
+                        returnedQty: 0,
+                        revenue: 0,
+                        cogs: 0,
+                        shippingLoss: 0,
+                        commissions: 0
+                    };
+                }
+
+                const qty = parseInt(item.qty) || 1;
+                productStatsMap[pId].shippedQty += qty;
+
+                if (isDelivered) {
+                    productStatsMap[pId].deliveredQty += qty;
+                    productStatsMap[pId].revenue += parseFloat(item.sale_price || 0) * qty;
+                    productStatsMap[pId].cogs += parseFloat(item.cost_price || 0) * qty;
+                    productStatsMap[pId].commissions += parseFloat(item.commission_paid || 0) * qty;
+                } else if (isReturn) {
+                    productStatsMap[pId].returnedQty += qty;
+                    productStatsMap[pId].shippingLoss += (parseFloat(s.shipping_loss || 0) / items.length);
+                }
+            });
         });
 
+        const productStatsList = Object.values(productStatsMap).map(p => {
+            const netMargin = p.revenue - p.cogs - p.shippingLoss - p.commissions;
+            const marginRate = p.revenue > 0 ? Math.round((netMargin / p.revenue) * 100) : 0;
+            const deliveryRate = p.shippedQty > 0 ? Math.round((p.deliveredQty / p.shippedQty) * 100) : 0;
+            return { ...p, netMargin, marginRate, deliveryRate };
+        }).sort((a, b) => b.revenue - a.revenue);
+
+        // Seller Breakdown Metrics (Cindy, Andrés, Web, etc.)
+        const sellers = this.getSellersList() || [];
+        const sellerStatsMap = {};
+
+        sales.forEach(s => {
+            const sId = s.seller_id || 'vendedor_general';
+            const sellerObj = sellers.find(sel => sel.id === sId);
+            const sellerName = sellerObj ? sellerObj.name : 'Vendedor General';
+
+            if (!sellerStatsMap[sId]) {
+                sellerStatsMap[sId] = {
+                    name: sellerName,
+                    totalSalesCount: 0,
+                    deliveredCount: 0,
+                    totalRevenue: 0,
+                    pendingCommission: 0,
+                    paidCommission: 0
+                };
+            }
+
+            const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+            const totalComm = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.commission_paid || 0);
+
+            sellerStatsMap[sId].totalSalesCount += 1;
+            if (s.status === 'recibido') {
+                sellerStatsMap[sId].deliveredCount += 1;
+                sellerStatsMap[sId].totalRevenue += totalSale;
+            }
+
+            if (s.is_commission_paid) {
+                sellerStatsMap[sId].paidCommission += totalComm;
+            } else {
+                sellerStatsMap[sId].pendingCommission += totalComm;
+            }
+        });
+
+        const sellerStatsList = Object.values(sellerStatsMap).sort((a, b) => b.totalRevenue - a.totalRevenue);
+
         container.innerHTML = `
-            <div class="stat-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.1), transparent); border-left: 4px solid var(--success);">
-                <h3>Utilidad Neta Total</h3>
-                <p class="stat-value" style="color:var(--success); font-size: 1.8rem;">$${netUtility.toLocaleString()}</p>
-                <span style="font-size:0.75rem; color:var(--text-secondary);">Cindy (50%): $${Math.max(0, netUtility / 2).toLocaleString()} | Andrés (50%): $${Math.max(0, netUtility / 2).toLocaleString()}</span>
-            </div>
-            <div class="stat-card" style="border-left: 4px solid var(--warning);">
-                <h3>Gastos TuCompras</h3>
-                <p class="stat-value text-warning" style="font-size: 1.8rem;">$${totalExpenses.toLocaleString()}</p>
-                <span style="font-size:0.75rem; color:var(--text-secondary);">Publicidad y varios</span>
-            </div>
-            <div class="stat-card">
-                <h3>Deuda MILLENIO</h3>
-                <p class="stat-value text-danger" style="font-size: 1.8rem;">$${debtMillenio.toLocaleString()}</p>
-                <span style="font-size:0.75rem; color:var(--text-secondary);">Pendiente liquidar</span>
-            </div>
-            <div class="stat-card">
-                <h3>Deuda VULCANO</h3>
-                <p class="stat-value text-danger" style="font-size: 1.8rem;">$${debtVulcano.toLocaleString()}</p>
-                <span style="font-size:0.75rem; color:var(--text-secondary);">Pendiente liquidar</span>
-            </div>
-            <div class="stat-card" style="background: rgba(16,185,129,0.05);">
-                <h3>Rendimiento Logística (${shippingStats.length} trans.)</h3>
-                <div style="font-size: 0.75rem; margin-top: 5px;">
-                    ${shippingStats.map(s => `
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
-                            <span>${s.name}:</span>
-                            <strong>${s.delivered}✅ / ${s.returns}❌ (${s.rate}%)</strong>
-                        </div>
-                    `).join('')}
+            <div style="margin-bottom: 1.5rem;">
+                <h3 style="margin: 0 0 1rem 0; font-size: 1rem; color: var(--text-secondary);"><i class="fas fa-chart-line" style="color: var(--accent);"></i> Dashboard Ejecutivo & Rentabilidad Neta Real</h3>
+                
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="stat-card" style="border-left: 4px solid #3b82f6;">
+                        <h3>Ventas Brutas</h3>
+                        <p class="stat-value" style="color: #3b82f6; font-size: 1.5rem;">$${grossSales.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Pedidos entregados</span>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #64748b;">
+                        <h3>Costo Mercancía (COGS)</h3>
+                        <p class="stat-value" style="color: #64748b; font-size: 1.5rem;">$${totalCOGS.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Costo de inventario</span>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #ef4444;">
+                        <h3>Fletes & Pérdidas Dev.</h3>
+                        <p class="stat-value" style="color: #ef4444; font-size: 1.5rem;">$${(totalShippingCostDelivered + totalShippingLosses).toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Fletes exitosos + fallidos</span>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #f59e0b;">
+                        <h3>Comisiones Vendedores</h3>
+                        <p class="stat-value" style="color: #f59e0b; font-size: 1.5rem;">$${totalCommissions.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Pagadas / Liquidadas</span>
+                    </div>
+                    <div class="stat-card" style="border-left: 4px solid #a855f7;">
+                        <h3>Gastos OPEX & Ads</h3>
+                        <p class="stat-value" style="color: #a855f7; font-size: 1.5rem;">$${totalExpenses.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Publicidad y varios</span>
+                    </div>
+                    <div class="stat-card" style="background: linear-gradient(135deg, rgba(16,185,129,0.12), transparent); border-left: 4px solid #10b981;">
+                        <h3>Utilidad Neta Real (${netMarginRate}%)</h3>
+                        <p class="stat-value" style="color: #10b981; font-size: 1.6rem;">$${netUtility.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.72rem; color: var(--text-secondary);">Cindy (50%): $${Math.max(0, netUtility / 2).toLocaleString('es-CO')} | Andrés: $${Math.max(0, netUtility / 2).toLocaleString('es-CO')}</span>
+                    </div>
+                </div>
+
+                <!-- Product Profitability Table -->
+                <div class="table-container" style="background: var(--bg-card); border-radius: 16px; padding: 1.25rem; margin-top: 1rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                        <h4 style="margin:0; color: var(--accent-vibrant); font-size: 0.95rem;"><i class="fas fa-boxes"></i> Comparativo de Rentabilidad Real por Producto (Pachas vs. Pistolas, etc.)</h4>
+                        <span class="badge bg-secondary" style="font-size: 0.75rem;">${productStatsList.length} Productos Evaluados</span>
+                    </div>
+                    <table class="data-table" style="font-size: 0.82rem;">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Despachados</th>
+                                <th>Efectividad Entregas</th>
+                                <th>Ingreso Bruto</th>
+                                <th>Costo (COGS)</th>
+                                <th>Fletes Dev.</th>
+                                <th>Comisiones</th>
+                                <th>Utilidad Neta Producto</th>
+                                <th>Margen %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${productStatsList.map(p => `
+                                <tr>
+                                    <td><strong>${p.name}</strong></td>
+                                    <td>${p.shippedQty} unids.</td>
+                                    <td>
+                                        <span class="badge ${p.deliveryRate >= 70 ? 'bg-success' : 'bg-warning'}">
+                                            ${p.deliveredQty}✅ / ${p.returnedQty}❌ (${p.deliveryRate}%)
+                                        </span>
+                                    </td>
+                                    <td>$${p.revenue.toLocaleString('es-CO')}</td>
+                                    <td>$${p.cogs.toLocaleString('es-CO')}</td>
+                                    <td><span style="color:#ef4444;">$${p.shippingLoss.toLocaleString('es-CO')}</span></td>
+                                    <td><span style="color:#f59e0b;">$${p.commissions.toLocaleString('es-CO')}</span></td>
+                                    <td><strong style="color: ${p.netMargin >= 0 ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">$${p.netMargin.toLocaleString('es-CO')} COP</strong></td>
+                                    <td><span class="badge ${p.marginRate >= 20 ? 'bg-success' : (p.marginRate > 0 ? 'bg-warning' : 'bg-danger')}">${p.marginRate}%</span></td>
+                                </tr>
+                            `).join('')}
+                            ${productStatsList.length === 0 ? '<tr><td colspan="9" class="text-center text-secondary">No hay datos suficientes de ventas para productos</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Seller Breakdown Table -->
+                <div class="table-container" style="background: var(--bg-card); border-radius: 16px; padding: 1.25rem; margin-top: 1rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 1rem;">
+                        <h4 style="margin:0; color: #f59e0b; font-size: 0.95rem;"><i class="fas fa-user-tag"></i> Rendimiento y Comisiones por Vendedor (Cindy, Andrés, Web, etc.)</h4>
+                        <span class="badge bg-secondary" style="font-size: 0.75rem;">${sellerStatsList.length} Vendedores</span>
+                    </div>
+                    <table class="data-table" style="font-size: 0.82rem;">
+                        <thead>
+                            <tr>
+                                <th>Vendedor</th>
+                                <th>Despachos Totales</th>
+                                <th>Entregas Exitosas</th>
+                                <th>Facturado Real</th>
+                                <th>Comisión Pendiente</th>
+                                <th>Comisión Pagada</th>
+                                <th>Comisión Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sellerStatsList.map(sel => `
+                                <tr>
+                                    <td><strong>${sel.name}</strong></td>
+                                    <td>${sel.totalSalesCount} pedidos</td>
+                                    <td><span class="badge bg-success">${sel.deliveredCount} entregas</span></td>
+                                    <td><strong style="color: var(--accent-vibrant);">$${sel.totalRevenue.toLocaleString('es-CO')} COP</strong></td>
+                                    <td><strong style="color: #f59e0b;">$${sel.pendingCommission.toLocaleString('es-CO')} COP</strong></td>
+                                    <td><strong style="color: #10b981;">$${sel.paidCommission.toLocaleString('es-CO')} COP</strong></td>
+                                    <td>$${(sel.pendingCommission + sel.paidCommission).toLocaleString('es-CO')} COP</td>
+                                </tr>
+                            `).join('')}
+                            ${sellerStatsList.length === 0 ? '<tr><td colspan="7" class="text-center text-secondary">No hay vendedores registrados</td></tr>' : ''}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         `;
@@ -338,7 +720,53 @@ window.TuCompras = {
 
     renderSalesView() {
         const container = document.getElementById('tucompras-main-content');
+        const isReturnView = this.activeStatus === 'proceso_devolucion' || this.activeStatus === 'devolucion_recibida';
+
+        let returnStatsHTML = '';
+        if (isReturnView) {
+            const allSales = this.getSales() || [];
+            const returnSales = allSales.filter(s => s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida' || s.status === 'devuelto');
+            const totalLoss = returnSales.reduce((sum, s) => sum + (parseFloat(s.shipping_loss) || 0), 0);
+            const pendingPhysical = returnSales.filter(s => s.physical_return_status !== 'received').length;
+            const receivedPhysical = returnSales.filter(s => s.physical_return_status === 'received').length;
+
+            const reasonCounts = {};
+            returnSales.forEach(s => {
+                if (s.return_reason_category) {
+                    reasonCounts[s.return_reason_category] = (reasonCounts[s.return_reason_category] || 0) + 1;
+                }
+            });
+            const topReasonKey = Object.keys(reasonCounts).sort((a, b) => reasonCounts[b] - reasonCounts[a])[0];
+            const topReasonLabel = topReasonKey && this.returnCategories[topReasonKey] ? this.returnCategories[topReasonKey] : 'Sin Categorizar';
+
+            returnStatsHTML = `
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #ef4444;">
+                        <h3>Pérdida Total Fletes Devueltos</h3>
+                        <p class="stat-value" style="color: #ef4444;">$${totalLoss.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Cargos por fletes fallidos</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #f59e0b;">
+                        <h3>En Camino (Pendientes Bodega)</h3>
+                        <p class="stat-value" style="color: #f59e0b;">${pendingPhysical} Paquetes</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Pendiente recepción física</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #10b981;">
+                        <h3>Recibidos Físicamente</h3>
+                        <p class="stat-value" style="color: #10b981;">${receivedPhysical} Paquetes</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Stock reingresado a bodega</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #3b82f6;">
+                        <h3>Principal Motivo</h3>
+                        <p class="stat-value" style="font-size: 1.1rem; color: var(--text-primary); margin-top: 5px;">${topReasonLabel}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Causa más frecuente</span>
+                    </div>
+                </div>
+            `;
+        }
+
         container.innerHTML = `
+            ${returnStatsHTML}
             <div class="table-container">
                 <table class="data-table">
                     <thead>
@@ -347,9 +775,9 @@ window.TuCompras = {
                             <th>Cliente / Logística</th>
                             <th>Productos</th>
                             <th>Vendedor</th>
-                            <th>Precio Venta</th>
-                            <th>Comisión</th>
-                            <th>Utilidad</th>
+                            <th>${isReturnView ? 'Causa / Observaciones' : 'Precio Venta'}</th>
+                            <th>${isReturnView ? 'Flete Perdido' : 'Comisión'}</th>
+                            <th>${isReturnView ? 'Estado Físico' : 'Utilidad'}</th>
                             <th>Estado Pago</th>
                             <th>Acciones</th>
                         </tr>
@@ -366,8 +794,10 @@ window.TuCompras = {
         const list = document.getElementById('tucompras-sales-list');
         if (!list) return;
 
+        const isReturnView = this.activeStatus === 'proceso_devolucion' || this.activeStatus === 'devolucion_recibida';
+
         if (sales.length === 0) {
-            list.innerHTML = '<tr><td colspan="8" class="text-center">No hay registros</td></tr>';
+            list.innerHTML = '<tr><td colspan="9" class="text-center">No hay registros</td></tr>';
             return;
         }
 
@@ -399,6 +829,17 @@ window.TuCompras = {
                 utility = -(parseFloat(s.shipping_loss) || 0);
             }
 
+            let col5 = `<strong>$${parseFloat(totalSaleValue).toLocaleString()}</strong>`;
+            let col6 = `<strong class="text-orange">$${parseFloat(totalCommValue).toLocaleString()}</strong>`;
+            let col7 = `<strong class="${utility >= 0 ? 'text-success' : 'text-danger'}">$${utility.toLocaleString()}</strong>`;
+
+            if (isReturnView) {
+                const causeLabel = s.return_reason_category && this.returnCategories[s.return_reason_category] ? this.returnCategories[s.return_reason_category] : 'Sin Causa';
+                col5 = `<strong style="font-size: 0.8rem; color: #f59e0b;">${causeLabel}</strong>${s.return_observations ? `<br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.return_observations}</span>` : ''}`;
+                col6 = `<strong class="text-danger">$${parseFloat(s.shipping_loss || 0).toLocaleString('es-CO')}</strong>`;
+                col7 = `<span class="badge ${s.physical_return_status === 'received' ? 'bg-success' : 'bg-warning'}">${s.physical_return_status === 'received' ? '📦 En Bodega' : '🚚 En Camino'}</span>`;
+            }
+
             return `
                 <tr class="${s.status === 'proceso_devolucion' ? 'highlight-return' : ''}">
                     <td data-label="Fecha"><span>${new Date(s.date).toLocaleDateString()}</span></td>
@@ -415,16 +856,20 @@ window.TuCompras = {
                     </td>
                     <td data-label="Productos"><span style="font-size: 0.8rem;">${productNames}</span></td>
                     <td data-label="Vendedor"><span>${seller}</span></td>
-                    <td data-label="Precio Venta"><strong>$${parseFloat(totalSaleValue).toLocaleString()}</strong></td>
-                    <td data-label="Comisión"><strong class="text-orange">$${parseFloat(totalCommValue).toLocaleString()}</strong></td>
-                    <td data-label="Utilidad"><strong class="${utility >= 0 ? 'text-success' : 'text-danger'}">$${utility.toLocaleString()}</strong></td>
+                    <td data-label="${isReturnView ? 'Causa' : 'Precio Venta'}">${col5}</td>
+                    <td data-label="${isReturnView ? 'Flete Perdido' : 'Comisión'}">${col6}</td>
+                    <td data-label="${isReturnView ? 'Estado Físico' : 'Utilidad'}">${col7}</td>
                     <td data-label="Estado Pago">
                         <span class="badge ${s.money_confirmed ? 'bg-success' : 'bg-secondary'}">
                             ${s.money_confirmed ? 'PAGADA' : 'PENDIENTE'}
                         </span>
                     </td>
                     <td data-label="Acciones" class="tc-table-actions">
-                        <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}" title="Cambiar Estado"><i class="fas fa-sync-alt"></i> Estado</button>
+                        ${isReturnView ? `
+                            <button class="btn btn-sm btn-warning" onclick="TuCompras.openReturnModal('${s.id}')" title="Gestionar Causa y Trámite"><i class="fas fa-undo-alt"></i> Devolución</button>
+                        ` : `
+                            <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}" title="Cambiar Estado"><i class="fas fa-sync-alt"></i> Estado</button>
+                        `}
                         <button class="btn btn-sm btn-outline tc-edit-btn" data-id="${s.id}" style="color: var(--accent); border-color: var(--accent);" title="Editar Venta"><i class="fas fa-edit"></i> Editar</button>
                         <button class="btn btn-sm btn-outline tc-delete-sale-btn" data-id="${s.id}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Eliminar Venta"><i class="fas fa-trash"></i></button>
                     </td>
@@ -1099,6 +1544,9 @@ window.TuCompras = {
         const shippingInput = document.querySelector('#tucompras-sale-form input[name="shipping_cost"]');
         if (shippingInput) shippingInput.value = sale.shipping_cost || 0;
 
+        const campaignSelect = document.getElementById('tc-campaign-select');
+        if (campaignSelect) campaignSelect.value = sale.campaign_name || '';
+
         const wizardTitle = document.getElementById('tc-wizard-title');
         if (wizardTitle) {
             wizardTitle.innerHTML = `<span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">1</span> Editando Venta #${sale.tracking_number || sale.id.substring(0,6)}`;
@@ -1400,6 +1848,9 @@ window.TuCompras = {
                 }
             }
 
+            const campaignSelect = document.getElementById('tc-campaign-select');
+            const campaign_name = formData && typeof formData.get === 'function' ? (formData.get('campaign_name') || '') : (campaignSelect ? campaignSelect.value : '');
+
             const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
 
             let sale;
@@ -1414,6 +1865,7 @@ window.TuCompras = {
                     carrier: carrier,
                     tracking_number: tracking_number,
                     shipping_cost: shipping_cost,
+                    campaign_name: campaign_name,
                     commission_paid: totalCommission,
                     items: this.cart
                 };
@@ -1432,6 +1884,7 @@ window.TuCompras = {
                     inventory_source: this.cart[0].inventory_source || 'millenio',
                     status: 'despachado',
                     shipping_cost: shipping_cost,
+                    campaign_name: campaign_name,
                     commission_paid: totalCommission,
                     items: this.cart,
                     money_confirmed: false,
@@ -1497,73 +1950,429 @@ window.TuCompras = {
 
     openStatusModal(saleId) {
         const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
         const modalBody = document.getElementById('tc-status-modal-body');
+        const accounts = (Storage.get(STORAGE_KEYS.ACCOUNTS) || []).filter(a => a.company === 'tucompras' || a.company === 'millenio' || a.company === 'vulcano');
+
+        const totalSale = sale.items ? sale.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(sale.sale_price || 0);
+        const netExp = Math.max(0, totalSale - parseFloat(sale.shipping_cost || 0));
 
         modalBody.innerHTML = `
             <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <p>Estado actual: <strong>${sale.status.toUpperCase()}</strong></p>
-                <div class="card" style="padding:10px; font-size: 0.8rem; background: rgba(0,0,0,0.1);">
+                <p style="margin:0;">Estado actual: <strong>${sale.status.toUpperCase()}</strong> ${sale.money_confirmed ? '<span class="badge bg-success">Dinero Confirmado</span>' : ''}</p>
+                <div class="card" style="padding:12px; font-size: 0.85rem; background: rgba(0,0,0,0.15); border-radius: 10px;">
                     <strong>Cliente:</strong> ${sale.customer_name}<br>
-                    <strong>Guía:</strong> ${sale.carrier} - ${sale.tracking_number}
+                    <strong>Guía:</strong> ${sale.carrier} - ${sale.tracking_number || 'Sin Guía'}<br>
+                    <strong>Valor Venta Total:</strong> $${totalSale.toLocaleString('es-CO')} COP
                 </div>
                 
                 ${sale.status === 'despachado' ? `
                     <button class="btn btn-success btn-block" onclick="TuCompras.updateStatus('${saleId}', 'recibido')">Confirmar ENTREGA</button>
-                    <button class="btn btn-warning btn-block" onclick="TuCompras.updateStatus('${saleId}', 'proceso_devolucion')">Venta DEVUELTA (En Camino)</button>
+                    <button class="btn btn-warning btn-block" onclick="TuCompras.openReturnModal('${saleId}')">Venta DEVUELTA (En Camino / Causa)</button>
                 ` : ''}
 
                 ${sale.status === 'proceso_devolucion' ? `
-                    <button class="btn btn-primary btn-block" onclick="TuCompras.updateStatus('${saleId}', 'devolucion_recibida')">Recibida físicamente (Reingresar Stock)</button>
+                    <button class="btn btn-warning btn-block" onclick="TuCompras.openReturnModal('${saleId}')"><i class="fas fa-undo-alt"></i> Gestionar Causa & Trámite Devolución</button>
+                    <button class="btn btn-primary btn-block" onclick="TuCompras.saveReturnManagement('${saleId}', true)"><i class="fas fa-boxes"></i> Confirmar Recibida físicamente en Bodega</button>
                 ` : ''}
 
-                ${sale.status === 'recibido' && !sale.money_confirmed ? `
-                    <div class="form-group">
-                        <label>Ingresar valor debitado real flete (Dropi):</label>
-                        <input type="number" id="tc-final-shipping" class="form-control" value="${sale.shipping_cost}">
+                ${(sale.status === 'recibido' || sale.money_confirmed || this.activeStatus === 'conciliacion') ? `
+                    <div style="border-top: 1px solid var(--border); padding-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem;">
+                        <h4 style="margin:0; color:#10b981;"><i class="fas fa-wallet"></i> Conciliación de Dinero en Wallet</h4>
+                        <div class="form-group" style="margin:0;">
+                            <label>Valor Debitado Real Flete ($ COP):</label>
+                            <input type="number" id="tc-final-shipping" class="form-control" value="${sale.shipping_cost || 0}">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Valor Neto Ingresado a la Billetera ($ COP):</label>
+                            <input type="number" id="tc-net-received" class="form-control" value="${sale.money_received_value !== undefined ? sale.money_received_value : netExp}" placeholder="${netExp}">
+                            <small class="text-secondary">Sugerido (Venta - Flete): $${netExp.toLocaleString('es-CO')} COP</small>
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label>Cuenta / Wallet de Destino:</label>
+                            <select id="tc-target-account" class="form-control">
+                                ${accounts.map(a => `<option value="${a.id}" ${a.id === 'wallet_tucompras' || a.id === sale.received_account_id ? 'selected' : ''}>${a.name} (${a.bankName || a.company})</option>`).join('')}
+                            </select>
+                        </div>
+                        <button class="btn btn-success btn-block" style="margin-top: 5px; font-weight: 700;" onclick="TuCompras.confirmMoney('${saleId}')">
+                            <i class="fas fa-check-circle"></i> ${sale.money_confirmed ? 'Actualizar Conciliación' : 'Confirmar e Ingresar a Wallet'}
+                        </button>
                     </div>
-                    <button class="btn btn-primary btn-block" onclick="TuCompras.confirmMoney('${saleId}')">Confirmar Dinero Ingresado</button>
+                ` : ''}
+
+                ${sale.status_history && sale.status_history.length > 0 ? `
+                    <div style="border-top: 1px solid var(--border); padding-top: 1rem; margin-top: 0.5rem;">
+                        <h4 style="margin: 0 0 0.8rem 0; font-size: 0.85rem; color: var(--text-secondary);"><i class="fas fa-history"></i> Historial de Auditoría de Estados</h4>
+                        <div style="display: flex; flex-direction: column; gap: 8px; max-height: 180px; overflow-y: auto; padding-right: 5px;">
+                            ${sale.status_history.map(h => `
+                                <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; font-size: 0.75rem;">
+                                    <div style="display: flex; justify-content: space-between; font-weight: 600; color: var(--text-primary);">
+                                        <span>${(h.previous_status || 'Inicio').toUpperCase()} ➔ ${(h.new_status || '').toUpperCase()}</span>
+                                        <span style="color: var(--text-secondary);">${new Date(h.changed_at).toLocaleString()}</span>
+                                    </div>
+                                    <div style="color: var(--text-secondary); margin-top: 3px;">Responsable: ${h.changed_by || 'Admin'} ${h.notes ? `| ${h.notes}` : ''}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
                 ` : ''}
             </div>
         `;
         document.getElementById('tc-status-modal').classList.add('show');
     },
 
+    openReturnModal(saleId) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        const modalBody = document.getElementById('tc-status-modal-body');
+        const accounts = (Storage.get(STORAGE_KEYS.ACCOUNTS) || []).filter(a => a.company === 'tucompras' || a.company === 'millenio' || a.company === 'vulcano');
+
+        modalBody.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 1.2rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 0.8rem;">
+                    <h3 style="margin:0; color: #f59e0b;"><i class="fas fa-undo-alt"></i> Gestión Integral de Devolución</h3>
+                    <span class="badge ${sale.physical_return_status === 'received' ? 'bg-success' : 'bg-warning'}">
+                        ${sale.physical_return_status === 'received' ? '📦 Recibido en Bodega' : '🚚 En Camino (Pendiente)'}
+                    </span>
+                </div>
+
+                <div class="card" style="padding:10px; font-size: 0.85rem; background: rgba(0,0,0,0.15); border-radius: 10px;">
+                    <strong>Cliente:</strong> ${sale.customer_name}<br>
+                    <strong>Guía:</strong> ${sale.carrier} - ${sale.tracking_number || 'Sin Guía'}
+                </div>
+
+                <!-- SECCIÓN 1: CAUSA DE DEVOLUCIÓN -->
+                <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                    <h4 style="margin:0; font-size: 0.9rem; color: var(--accent-vibrant);">1. Causa Estandarizada de Devolución</h4>
+                    <div class="form-group" style="margin:0;">
+                        <label>Categoría de Causa *</label>
+                        <select id="tc-return-reason" class="form-control">
+                            <option value="">-- Seleccionar Causa --</option>
+                            ${Object.entries(this.returnCategories).map(([key, label]) => `<option value="${key}" ${sale.return_reason_category === key ? 'selected' : ''}>${label}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Observaciones de Devolución</label>
+                        <textarea id="tc-return-obs" class="form-control" rows="2" placeholder="Detalles de llamadas, dirección o motivo del cliente...">${sale.return_observations || ''}</textarea>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN 2: DÉBITO DE FLETE & ASIENTO CONTABLE -->
+                <div style="display: flex; flex-direction: column; gap: 0.6rem; border-top: 1px solid var(--border); padding-top: 0.8rem;">
+                    <h4 style="margin:0; font-size: 0.9rem; color: #ef4444;">2. Cobro de Flete Devuelto & Asiento Contable</h4>
+                    <div class="form-group" style="margin:0;">
+                        <label>Valor Debitado por Flete Devuelto ($ COP):</label>
+                        <input type="number" id="tc-return-loss" class="form-control" value="${sale.shipping_loss || sale.shipping_cost || 0}">
+                    </div>
+                    <div class="form-group" style="margin:0;">
+                        <label>Cuenta de donde se debitó el flete:</label>
+                        <select id="tc-return-account" class="form-control">
+                            ${accounts.map(a => `<option value="${a.id}" ${a.id === 'wallet_tucompras' || a.id === sale.financial_loss_account_id ? 'selected' : ''}>${a.name} (${a.bankName || a.company})</option>`).join('')}
+                        </select>
+                    </div>
+                    <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem; cursor: pointer;">
+                        <input type="checkbox" id="tc-return-expense-check" checked>
+                        <span>Registrar gasto de flete perdido en Finanzas (Disminuye utilidad)</span>
+                    </label>
+                </div>
+
+                <!-- SECCIÓN 3: TRÁMITES Y BOTONES -->
+                <div style="display: flex; flex-direction: column; gap: 0.6rem; border-top: 1px solid var(--border); padding-top: 0.8rem;">
+                    <h4 style="margin:0; font-size: 0.9rem; color: var(--text-secondary);">3. Trámite del Producto Físico</h4>
+                    <button class="btn btn-warning btn-block" style="font-weight: 600;" onclick="TuCompras.saveReturnManagement('${saleId}', false)">
+                        <i class="fas fa-save"></i> Guardar Causa y Débito (Producto Sigue en Camino)
+                    </button>
+                    <button class="btn btn-success btn-block" style="font-weight: 700;" onclick="TuCompras.saveReturnManagement('${saleId}', true)">
+                        <i class="fas fa-boxes"></i> Confirmar Recepción Física en Bodega (Reingresar Stock)
+                    </button>
+                </div>
+            </div>
+        `;
+        document.getElementById('tc-status-modal').classList.add('show');
+    },
+
+    addAuditLog(sale, oldStatus, newStatus, notes = '') {
+        if (!sale.status_history) sale.status_history = [];
+        sale.status_history.push({
+            previous_status: oldStatus || 'despachado',
+            new_status: newStatus,
+            changed_at: new Date().toISOString(),
+            changed_by: 'Cindy / Andrés (Admin)',
+            notes: notes
+        });
+    },
+
+    async saveReturnManagement(saleId, confirmPhysicalArrival) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        const reasonVal = document.getElementById('tc-return-reason')?.value;
+        const obsVal = document.getElementById('tc-return-obs')?.value || '';
+        const lossVal = parseFloat(document.getElementById('tc-return-loss')?.value || 0);
+        const accountVal = document.getElementById('tc-return-account')?.value || 'wallet_tucompras';
+        const createExpense = document.getElementById('tc-return-expense-check')?.checked;
+
+        const oldStatus = sale.status;
+        sale.shipping_loss = lossVal;
+        sale.return_reason_category = reasonVal;
+        sale.return_observations = obsVal;
+        sale.financial_loss_debited_at = new Date().toISOString();
+        sale.financial_loss_account_id = accountVal;
+
+        if (confirmPhysicalArrival) {
+            if (sale.physical_return_status !== 'received') {
+                for (const item of (sale.items || [])) {
+                    const product = Inventory.getProducts().find(p => p.id === item.product_id);
+                    if (product) {
+                        if (sale.inventory_source === 'millenio') product.stockMillenio = (parseInt(product.stockMillenio) || 0) + item.qty;
+                        else product.stockVulcano = (parseInt(product.stockVulcano) || 0) + item.qty;
+                        await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
+                    }
+                }
+            }
+            sale.status = 'devolucion_recibida';
+            sale.physical_return_status = 'received';
+            sale.physical_returned_at = new Date().toISOString();
+        } else {
+            sale.status = 'proceso_devolucion';
+            sale.physical_return_status = 'pending';
+        }
+
+        this.addAuditLog(sale, oldStatus, sale.status, `Causa: ${this.returnCategories[reasonVal] || reasonVal} | Flete: $${lossVal.toLocaleString()}`);
+        await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, saleId, sale);
+
+        // Auto Expense Accounting Entry in Finanzas
+        if (createExpense && lossVal > 0) {
+            await Storage.addItem(STORAGE_KEYS.EXPENSES, {
+                company: 'tucompras',
+                category: 'Devoluciones (Cargos Flete)',
+                concept: `Cargo Flete por Devolución Guía #${sale.tracking_number || sale.id}`,
+                amount: lossVal,
+                date: new Date().toISOString(),
+                createdAt: new Date().toISOString(),
+                originAccount: accountVal,
+                notes: `Causa: ${this.returnCategories[reasonVal] || reasonVal} | Cliente: ${sale.customer_name}`
+            });
+        }
+
+        document.getElementById('tc-status-modal').classList.remove('show');
+        alert(`✅ Devolución de la venta #${sale.tracking_number || sale.id} registrada con éxito.`);
+        this.renderPanel();
+    },
+
     async updateStatus(id, newStatus) {
         const sale = this.getSales().find(s => s.id === id);
+        if (!sale) return;
 
         if (newStatus === 'proceso_devolucion') {
-            const loss = prompt('Ingrese valor debitado por flete devuelto:', sale.shipping_cost);
-            if (loss === null) return;
-            sale.shipping_loss = parseFloat(loss) || 0;
+            this.openReturnModal(id);
+            return;
         }
 
         if (newStatus === 'devolucion_recibida') {
-            for (const item of sale.items) {
-                const product = Inventory.getProducts().find(p => p.id === item.product_id);
-                if (product) {
-                    if (sale.inventory_source === 'millenio') product.stockMillenio += item.qty;
-                    else product.stockVulcano += item.qty;
-                    await Storage.updateItem(STORAGE_KEYS.PRODUCTS, product.id, product);
-                } else {
-                    console.warn('[TUCOMPRAS] Producto no encontrado para reingreso de stock:', item.product_id);
-                }
-            }
+            await this.saveReturnManagement(id, true);
+            return;
         }
 
+        const oldStatus = sale.status;
         sale.status = newStatus;
+        this.addAuditLog(sale, oldStatus, newStatus, 'Cambio manual de estado');
         await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
         document.getElementById('tc-status-modal').classList.remove('show');
         this.renderPanel();
     },
 
+    renderWithdrawalsView() {
+        const container = document.getElementById('tucompras-main-content');
+        if (!container) return;
+
+        const movements = Storage.get(STORAGE_KEYS.MOVEMENTS) || [];
+        const accounts = (Storage.get(STORAGE_KEYS.ACCOUNTS) || []).filter(a => a.company === 'tucompras' || a.company === 'millenio' || a.company === 'vulcano');
+        const withdrawals = movements.filter(m => m.type === 'withdrawal' && (m.company === 'tucompras' || m.concept?.includes('Retiro')));
+
+        const totalWithdrawals = withdrawals.reduce((sum, w) => sum + (parseFloat(w.amount) || 0), 0);
+        const cindyWithdrawals = withdrawals.filter(w => (w.notes || '').includes('Cindy') || (w.concept || '').includes('Cindy')).reduce((sum, w) => sum + (parseFloat(w.amount) || 0), 0);
+        const andresWithdrawals = withdrawals.filter(w => (w.notes || '').includes('Andrés') || (w.concept || '').includes('Andrés')).reduce((sum, w) => sum + (parseFloat(w.amount) || 0), 0);
+
+        container.innerHTML = `
+            <div style="margin-bottom: 1.5rem;">
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #a855f7;">
+                        <h3>Total Retiros de Utilidad</h3>
+                        <p class="stat-value" style="color: #a855f7;">$${totalWithdrawals.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Dividendos y retiros personales</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #ec4899;">
+                        <h3>Retirado por Cindy</h3>
+                        <p class="stat-value" style="color: #ec4899;">$${cindyWithdrawals.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Participación 50%</span>
+                    </div>
+                    <div class="stat-card" style="background: var(--bg-card); border-left: 4px solid #3b82f6;">
+                        <h3>Retirado por Andrés</h3>
+                        <p class="stat-value" style="color: #3b82f6;">$${andresWithdrawals.toLocaleString('es-CO')}</p>
+                        <span style="font-size: 0.75rem; color: var(--text-secondary);">Participación 50%</span>
+                    </div>
+                </div>
+
+                <div class="actions-row" style="margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin:0;"><i class="fas fa-hand-holding-usd" style="color:#a855f7;"></i> Registro de Retiro de Utilidades / Dividendos</h3>
+                    <button id="tc-add-withdrawal-btn" class="btn btn-primary" onclick="document.getElementById('tc-withdrawal-modal').classList.add('show')" style="background: #a855f7; border-color: #a855f7;">
+                        <i class="fas fa-plus"></i> Registrar Nuevo Retiro
+                    </button>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Beneficiario / Socio</th>
+                                <th>Monto Retirado ($ COP)</th>
+                                <th>Cuenta de Salida</th>
+                                <th>Motivo / Detalle</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${withdrawals.map(w => {
+                                const acc = accounts.find(a => a.id === w.originAccount)?.name || w.originAccount || 'Billetera TuCompras';
+                                return `
+                                    <tr>
+                                        <td>${new Date(w.date || w.createdAt).toLocaleDateString()}</td>
+                                        <td><span class="badge" style="background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3);">${w.notes ? w.notes.split('|')[0] : 'Socio'}</span></td>
+                                        <td><strong style="color: #a855f7;">$${parseFloat(w.amount).toLocaleString('es-CO')} COP</strong></td>
+                                        <td>${acc}</td>
+                                        <td>${w.concept || '-'}</td>
+                                        <td>
+                                            <button class="icon-btn" onclick="TuCompras.deleteWithdrawal('${w.id}')" style="color: #ef4444;" title="Eliminar Retiro"><i class="fas fa-trash"></i></button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                            ${withdrawals.length === 0 ? '<tr><td colspan="6" class="text-center text-secondary" style="padding: 2rem;">No hay retiros de utilidades registrados</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Add Withdrawal Modal -->
+            <div id="tc-withdrawal-modal" class="modal">
+                <div class="modal-content" style="max-width: 480px; border-radius: 20px;">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-hand-holding-usd" style="color: #a855f7;"></i> Registrar Retiro de Utilidades</h2>
+                        <span class="close-modal" onclick="document.getElementById('tc-withdrawal-modal').classList.remove('show')">&times;</span>
+                    </div>
+                    <div class="modal-body" style="padding: 1.5rem;">
+                        <form id="tc-withdrawal-form" onsubmit="event.preventDefault(); TuCompras.saveWithdrawal();">
+                            <div class="form-grid" style="display: flex; flex-direction: column; gap: 1.25rem;">
+                                <div class="form-group">
+                                    <label>Socio / Beneficiario *</label>
+                                    <select id="tc-with-partner" class="form-control" required>
+                                        <option value="Cindy (50%)">Cindy (50%)</option>
+                                        <option value="Andrés (50%)">Andrés (50%)</option>
+                                        <option value="Reinversión Negocio">Reinversión Negocio</option>
+                                        <option value="Pago Deuda">Pago Deuda</option>
+                                        <option value="Otro Destino">Otro Destino</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Monto Retirado ($ COP) *</label>
+                                    <input type="number" id="tc-with-amount" class="form-control" placeholder="0" required min="1">
+                                </div>
+                                <div class="form-group">
+                                    <label>Cuenta / Caja de Salida *</label>
+                                    <select id="tc-with-account" class="form-control" required>
+                                        ${accounts.map(a => `<option value="${a.id}">${a.name} (${a.bankName || a.company})</option>`).join('')}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Motivo / Detalle *</label>
+                                    <input type="text" id="tc-with-concept" class="form-control" placeholder="ej. Retiro de dividendos mes actual" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem; background: #a855f7; border-color: #a855f7; height: 48px; font-weight: 700;">
+                                Guardar Retiro de Utilidad
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    async saveWithdrawal() {
+        const partner = document.getElementById('tc-with-partner')?.value || 'Socio';
+        const amount = parseFloat(document.getElementById('tc-with-amount')?.value || 0);
+        const accountId = document.getElementById('tc-with-account')?.value || 'wallet_tucompras';
+        const concept = document.getElementById('tc-with-concept')?.value || 'Retiro de Utilidades';
+
+        if (amount <= 0) {
+            alert('Ingrese un monto válido para el retiro.');
+            return;
+        }
+
+        await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+            company: 'tucompras',
+            type: 'withdrawal',
+            originAccount: accountId,
+            amount: amount,
+            concept: concept,
+            date: new Date().toISOString(),
+            notes: `${partner} | ${concept}`
+        });
+
+        document.getElementById('tc-withdrawal-modal')?.classList.remove('show');
+        alert('✅ Retiro de utilidades registrado con éxito.');
+        this.renderPanel();
+    },
+
+    async deleteWithdrawal(id) {
+        if (!confirm('¿Seguro que deseas eliminar este registro de retiro?')) return;
+        await Storage.deleteItem(STORAGE_KEYS.MOVEMENTS, id);
+        this.renderPanel();
+    },
+
     async confirmMoney(id) {
-        const val = document.getElementById('tc-final-shipping')?.value;
         const sale = this.getSales().find(s => s.id === id);
-        sale.shipping_cost = parseFloat(val) || sale.shipping_cost;
+        if (!sale) return;
+
+        await this.ensureWalletAccount();
+
+        const fleteVal = parseFloat(document.getElementById('tc-final-shipping')?.value) || sale.shipping_cost || 0;
+        const netReceivedValInput = document.getElementById('tc-net-received')?.value;
+        const targetAccountId = document.getElementById('tc-target-account')?.value || 'wallet_tucompras';
+
+        const totalSale = sale.items ? sale.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(sale.sale_price || 0);
+        const netExpected = Math.max(0, totalSale - fleteVal);
+        const netReceived = netReceivedValInput !== undefined && netReceivedValInput !== '' ? parseFloat(netReceivedValInput) : netExpected;
+        const discrepancy = netReceived - netExpected;
+
+        sale.shipping_cost = fleteVal;
         sale.money_confirmed = true;
         sale.money_confirmed_at = new Date().toISOString();
+        sale.money_received_value = netReceived;
+        sale.received_account_id = targetAccountId;
+        sale.discrepancy_value = discrepancy;
+        sale.reconciliation_status = (Math.abs(discrepancy) < 1) ? 'reconciled' : 'discrepancy';
+
         await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
+
+        // Record Inflow Movement in Finances
+        await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+            company: 'tucompras',
+            type: 'inflow',
+            originAccount: 'dropi_carrier',
+            destinationAccount: targetAccountId,
+            amount: netReceived,
+            concept: `Ingreso Liquidación Venta TuCompras (${sale.tracking_number || sale.id})`,
+            date: new Date().toISOString(),
+            notes: `Cliente: ${sale.customer_name} | Venta: $${totalSale.toLocaleString()} | Flete: $${fleteVal.toLocaleString()}`
+        });
+
         document.getElementById('tc-status-modal').classList.remove('show');
+        alert(`✅ Dinero de venta #${sale.tracking_number || sale.id} conciliado e ingresado a la Wallet.`);
         this.renderPanel();
     },
 
