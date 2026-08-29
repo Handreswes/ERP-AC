@@ -333,20 +333,10 @@ window.Storage = {
             }
         }
 
-        // 1. CLOUD SYNC STRICT AWAIT (Fails if network/API errors occur)
+        // 1. CLOUD SYNC STRICT AWAIT WITH AUTOMATIC MISSING-COLUMN STRIPPING RETRY
         if (table && supabase) {
             console.log(`Syncing ${table} to Cloud...`);
-            const { error } = await supabase.from(table).insert(newItem);
-            
-            if (error) {
-                console.error(`Supabase Insert Error (${table}):`, error.message);
-                this.updateStatus(false);
-                if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
-                throw new Error(`Refusado por el Servidor (Nube): ${error.message}`);
-            } else {
-                console.log(`Supabase Sync Success (${table})`);
-                this.updateStatus(true);
-            }
+            await this.safeSupabaseWrite(table, 'insert', newItem);
         }
 
         // 2. UPDATE CACHE & LOCALSTORAGE ONLY ON SUCCESS
@@ -392,17 +382,9 @@ window.Storage = {
             updatedData.updatedAt = new Date().toISOString();
             const finalItem = { ...items[index], ...updatedData };
 
-            // Cloud Sync Await
+            // Cloud Sync Await with Automatic Missing-Column Retry
             if (table && supabase) {
-                const { error } = await supabase.from(table).update(updatedData).eq('id', id);
-                if (error) {
-                    console.error(`Supabase Update Error (${table}):`, error.message);
-                    this.updateStatus(false);
-                    if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
-                    throw new Error(`Refusado por el Servidor (Nube): ${error.message}`);
-                } else {
-                    this.updateStatus(true);
-                }
+                await this.safeSupabaseWrite(table, 'update', updatedData, id);
             }
 
             // Local Update
@@ -415,6 +397,57 @@ window.Storage = {
             }
         }
         return items;
+    },
+
+    /**
+     * Safe Supabase Write Helper: Retries writing by stripping unmapped cloud columns automatically if schema mismatch occurs
+     */
+    async safeSupabaseWrite(table, action, payload, id = null) {
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
+        if (!table || !supabase) return { success: true };
+
+        let currentPayload = { ...payload };
+        let maxRetries = 12;
+        let lastError = null;
+
+        while (maxRetries > 0) {
+            maxRetries--;
+            let res;
+            if (action === 'insert') {
+                res = await supabase.from(table).insert(currentPayload);
+            } else if (action === 'update') {
+                res = await supabase.from(table).update(currentPayload).eq('id', id);
+            }
+
+            if (!res || !res.error) {
+                console.log(`Supabase Sync Success (${table})`);
+                this.updateStatus(true);
+                return { success: true };
+            }
+
+            lastError = res.error;
+            const msg = res.error.message || '';
+
+            // Check if error is due to missing column in PostgREST schema cache
+            const match = msg.match(/Could not find the '([^']+)' column/i) || 
+                          msg.match(/column "([^"]+)" of relation ".*" does not exist/i) ||
+                          msg.match(/column "([^"]+)" does not exist/i);
+
+            if (match && match[1]) {
+                const missingCol = match[1];
+                console.warn(`[STORAGE] Stripping unmapped cloud column '${missingCol}' for table '${table}' and retrying...`);
+                delete currentPayload[missingCol];
+                continue; // Retry with cleaned payload
+            }
+
+            // If non-recoverable error, break loop
+            break;
+        }
+
+        console.error(`Supabase Write Error (${table}):`, lastError ? lastError.message : 'Unknown error');
+        this.updateStatus(false);
+        if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${lastError ? lastError.message : ''}`, 'error');
+        throw new Error(`Refusado por el Servidor (Nube): ${lastError ? lastError.message : 'Error desconocido'}`);
     },
 
     /**
