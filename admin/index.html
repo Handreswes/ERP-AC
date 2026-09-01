@@ -331,6 +331,11 @@
 
                     <h2 class="section-title" style="margin-top: 2.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border);">Alertas y Métricas Operativas</h2>
                     <div class="stats-grid" style="margin-top: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                        <div class="stat-card clickable" id="stat-recaudos" style="cursor:pointer; background: linear-gradient(135deg, rgba(16,185,129,0.15), transparent); border-left: 4px solid #10b981; border-color: rgba(16, 185, 129, 0.4);">
+                            <h3 id="stat-recaudos-title" style="color: #10b981;"><i class="fas fa-hand-holding-usd"></i> Recaudos Cartera</h3>
+                            <p class="stat-value text-success" style="color: #10b981;">$0.00</p>
+                            <span class="stat-label">Abonos y cobros de crédito recibidos</span>
+                        </div>
                         <div class="stat-card clickable" id="stat-stock" style="cursor:pointer;">
                             <h3 id="stat-stock-title">Stock Crítico</h3>
                             <p class="stat-value">0</p>
@@ -363,6 +368,10 @@
                                     <p id="millenio-sales-today-detail" class="detail-value text-success">$0.00</p>
                                 </div>
                                 <div class="detail-card">
+                                    <h4 id="millenio-recaudos-header">Recaudos Cartera</h4>
+                                    <p id="millenio-recaudos-today" class="detail-value text-success">$0.00</p>
+                                </div>
+                                <div class="detail-card">
                                     <h4 id="millenio-expenses-header">Gastos Hoy</h4>
                                     <p id="millenio-expenses-today" class="detail-value text-danger">$0.00</p>
                                 </div>
@@ -392,6 +401,10 @@
                                 <div class="detail-card">
                                     <h4 id="vulcano-sales-header">Ventas Hoy</h4>
                                     <p id="vulcano-sales-today-detail" class="detail-value text-success">$0.00</p>
+                                </div>
+                                <div class="detail-card">
+                                    <h4 id="vulcano-recaudos-header">Recaudos Cartera</h4>
+                                    <p id="vulcano-recaudos-today" class="detail-value text-success">$0.00</p>
                                 </div>
                                 <div class="detail-card">
                                     <h4 id="vulcano-expenses-header">Gastos Hoy</h4>
