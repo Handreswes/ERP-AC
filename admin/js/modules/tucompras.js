@@ -229,6 +229,10 @@ window.TuCompras = {
                                         <select id="tc-seller-select" name="seller_id" class="form-control" required></select>
                                     </div>
                                     <div class="form-group">
+                                        <label style="font-weight: 700; color: #38bdf8;"><i class="fas fa-hashtag"></i> ID de Orden Dropi (Dropi ID) *</label>
+                                        <input type="text" id="tc-dropi-order-id-input" name="dropi_order_id" class="form-control" placeholder="Ej. 245892 o ID Dropi">
+                                    </div>
+                                    <div class="form-group">
                                         <label>Transportadora</label>
                                         <select name="carrier" class="form-control">
                                             <option value="Interrapidisimo">Interrapidisimo</option>
@@ -430,6 +434,7 @@ window.TuCompras = {
                     <thead>
                         <tr>
                             <th>Fecha</th>
+                            <th>ID Dropi</th>
                             <th>Cliente / Logística</th>
                             <th>Productos</th>
                             <th>Vendedor</th>
@@ -1257,6 +1262,7 @@ window.TuCompras = {
 
             sales = sales.filter(s => {
                 const customer = (s.customer_name || '').toLowerCase();
+                const dropiId = (s.dropi_order_id || s.dropi_id || '').toLowerCase();
                 const phone = (s.customer_phone || '').toLowerCase();
                 const tracking = (s.tracking_number || '').toLowerCase();
                 const carrier = (s.carrier || '').toLowerCase();
@@ -1268,6 +1274,7 @@ window.TuCompras = {
                 }).join(' ');
 
                 return customer.includes(q) || 
+                       dropiId.includes(q) ||
                        phone.includes(q) || 
                        tracking.includes(q) || 
                        carrier.includes(q) || 
@@ -1284,7 +1291,7 @@ window.TuCompras = {
         const isReturnView = this.activeStatus === 'proceso_devolucion' || this.activeStatus === 'devolucion_recibida';
 
         if (sales.length === 0) {
-            list.innerHTML = '<tr><td colspan="9" class="text-center">No hay registros</td></tr>';
+            list.innerHTML = '<tr><td colspan="10" class="text-center">No hay registros</td></tr>';
             return;
         }
 
@@ -1330,6 +1337,11 @@ window.TuCompras = {
             return `
                 <tr class="${s.status === 'proceso_devolucion' ? 'highlight-return' : ''}">
                     <td data-label="Fecha"><span>${new Date(s.date).toLocaleDateString()}</span></td>
+                    <td data-label="ID Dropi">
+                        <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); font-weight: 700; font-size: 0.8rem;">
+                            <i class="fas fa-hashtag"></i> ${s.dropi_order_id || s.dropi_id || (s.id ? s.id.substring(0, 8) : 'Sin ID')}
+                        </span>
+                    </td>
                     <td data-label="Cliente">
                         <div style="font-size: 0.85rem;">
                             <strong>${customer}</strong><br>
@@ -2029,6 +2041,9 @@ window.TuCompras = {
         const searchInput = document.getElementById('tc-product-search');
         if (searchInput) searchInput.value = '';
 
+        const dropiIdInput = document.getElementById('tc-dropi-order-id-input');
+        if (dropiIdInput) dropiIdInput.value = '';
+
         // Default sale date to current local datetime
         const dateInput = document.getElementById('tc-sale-date-input');
         if (dateInput) {
@@ -2057,6 +2072,9 @@ window.TuCompras = {
 
         document.getElementById('tc-cust-name').value = sale.customer_name || '';
         document.getElementById('tc-cust-phone').value = sale.customer_phone || '';
+
+        const dropiInput = document.getElementById('tc-dropi-order-id-input');
+        if (dropiInput) dropiInput.value = sale.dropi_order_id || sale.dropi_id || '';
 
         const dateInput = document.getElementById('tc-sale-date-input');
         if (dateInput && sale.date) {
@@ -2397,6 +2415,9 @@ window.TuCompras = {
                 } catch(e) {}
             }
 
+            const dropiOrderIdInput = document.getElementById('tc-dropi-order-id-input');
+            const dropi_order_id = formData && typeof formData.get === 'function' ? (formData.get('dropi_order_id') || '') : (dropiOrderIdInput ? dropiOrderIdInput.value : '');
+
             const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
 
             let sale;
@@ -2406,6 +2427,7 @@ window.TuCompras = {
                     ...(existing || {}),
                     id: this.editingSaleId,
                     date: saleDate,
+                    dropi_order_id: (dropi_order_id || existing?.dropi_order_id || '').trim(),
                     customer_name: name,
                     customer_phone: phone,
                     seller_id: sellerId,
@@ -2423,6 +2445,7 @@ window.TuCompras = {
             } else {
                 sale = {
                     date: saleDate,
+                    dropi_order_id: dropi_order_id.trim(),
                     customer_name: name,
                     customer_phone: phone,
                     seller_id: sellerId,
