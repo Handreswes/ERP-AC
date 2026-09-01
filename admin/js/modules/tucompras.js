@@ -1,6 +1,10 @@
 // TUCOMPRAS Module
 window.TuCompras = {
+    activeMainTab: 'pedidos',
     activeStatus: 'despachado',
+    specialAlertFilter: null,
+    searchQuery: '',
+    monthFilter: new Date().toISOString().slice(0, 7),
     cart: [],
     selectedLiquidations: new Set(),
     activeStep: 1,
@@ -117,44 +121,32 @@ window.TuCompras = {
         }
 
         panel.innerHTML = `
-            <div class="panel-header">
+            <div class="panel-header" style="margin-bottom: 1rem;">
                 <h1>E-commerce TUCOMPRAS</h1>
             </div>
 
-            <div class="actions-block" style="margin-bottom: 1.5rem; background: var(--bg-card); padding: 1.5rem; border-radius: 14px; border: 1px solid var(--border);">
-                <div>
-                    <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Control de Pedidos y Ventas TuCompras</h3>
-                    <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Gestiona despachos, entregas, comisiones y liquidación de bodegas.</p>
-                </div>
-                <div>
-                    <button id="new-tucompras-sale-btn" class="btn btn-primary" style="font-weight: 600;">
-                        <i class="fas fa-plus"></i> Nueva Venta
-                    </button>
-                </div>
+            <!-- ARCHITECTURE: TOP 4 MAIN TABS -->
+            <div class="inventory-tabs" style="margin-bottom: 1.5rem; gap: 8px; flex-wrap: wrap;">
+                <button class="tab-btn ${this.activeMainTab === 'pedidos' ? 'active' : ''}" data-main-tab="pedidos" style="font-weight: 700;">
+                    <i class="fas fa-boxes"></i> 1. Gestión de Pedidos
+                </button>
+                <button class="tab-btn ${this.activeMainTab === 'vendedores' ? 'active' : ''}" data-main-tab="vendedores" style="font-weight: 700; border-color: #f59e0b; color: ${this.activeMainTab === 'vendedores' ? '#fff' : '#f59e0b'};">
+                    <i class="fas fa-user-tag"></i> 2. Vendedores & Comisiones
+                </button>
+                <button class="tab-btn ${this.activeMainTab === 'rentabilidad' ? 'active' : ''}" data-main-tab="rentabilidad" style="font-weight: 700; border-color: #10b981; color: ${this.activeMainTab === 'rentabilidad' ? '#fff' : '#10b981'};">
+                    <i class="fas fa-chart-pie"></i> 3. Rentabilidad por Producto
+                </button>
+                <button class="tab-btn ${this.activeMainTab === 'finanzas' ? 'active' : ''}" data-main-tab="finanzas" style="font-weight: 700; border-color: #a855f7; color: ${this.activeMainTab === 'finanzas' ? '#fff' : '#a855f7'};">
+                    <i class="fas fa-university"></i> 4. Wallet, Bodegas & Gastos
+                </button>
             </div>
 
             <div id="tc-alerts-container" style="margin-bottom: 1rem;">
                 <!-- Critical Alerts Banner loads here -->
             </div>
 
-            <div class="stats-grid" id="tc-stats-container">
-                <!-- Stats load here -->
-            </div>
-
-            <div class="inventory-tabs">
-                <button class="tab-btn ${this.activeStatus === 'despachado' ? 'active' : ''}" data-status="despachado">Despachados</button>
-                <button class="tab-btn ${this.activeStatus === 'recibido' ? 'active' : ''}" data-status="recibido">Entregados</button>
-                <button class="tab-btn ${this.activeStatus === 'proceso_devolucion' ? 'active' : ''}" data-status="proceso_devolucion">En Proceso Dev.</button>
-                <button class="tab-btn ${this.activeStatus === 'devolucion_recibida' ? 'active' : ''}" data-status="devolucion_recibida">Devueltos</button>
-                <button class="tab-btn ${this.activeStatus === 'liquidacion' ? 'active' : ''}" data-status="liquidacion" style="border: 1px solid var(--accent);">Liquidación Bodegas</button>
-                <button class="tab-btn ${this.activeStatus === 'conciliacion' ? 'active' : ''}" data-status="conciliacion" style="border: 1px solid #10b981; color: #10b981;"><i class="fas fa-coins"></i> Conciliación Wallet</button>
-                <button class="tab-btn ${this.activeStatus === 'retiros' ? 'active' : ''}" data-status="retiros" style="border: 1px solid #a855f7; color: #a855f7;"><i class="fas fa-hand-holding-usd"></i> Retiro Utilidades</button>
-                <button class="tab-btn ${this.activeStatus === 'importar_dropi' ? 'active' : ''}" data-status="importar_dropi" style="border: 1px solid var(--success);"><i class="fas fa-cloud-download-alt"></i> Importar Dropi</button>
-                <button class="tab-btn ${this.activeStatus === 'gastos' ? 'active' : ''}" data-status="gastos" style="border: 1px solid var(--warning);"><i class="fas fa-wallet"></i> Gastos TuCompras</button>
-            </div>
-
             <div id="tucompras-main-content">
-                <!-- Data will be loaded here -->
+                <!-- Main Tab Content loads here -->
             </div>
 
             <!-- New Sale Modal - WIZARD STYLE -->
@@ -310,22 +302,18 @@ window.TuCompras = {
             </div>
         `;
 
-        if (this.activeStatus === 'liquidacion') {
-            this.renderLiquidationView();
-        } else if (this.activeStatus === 'conciliacion') {
-            this.renderConciliationView();
-        } else if (this.activeStatus === 'retiros') {
-            this.renderWithdrawalsView();
-        } else if (this.activeStatus === 'importar_dropi') {
-            this.renderImportDropiView();
-        } else if (this.activeStatus === 'gastos') {
-            this.renderExpensesView();
-        } else {
-            this.renderSalesView();
+        this.renderCriticalAlerts();
+
+        if (this.activeMainTab === 'pedidos') {
+            this.renderOrdersTab();
+        } else if (this.activeMainTab === 'vendedores') {
+            this.renderSellerCommissionsView();
+        } else if (this.activeMainTab === 'rentabilidad') {
+            this.renderProductProfitabilityView();
+        } else if (this.activeMainTab === 'finanzas') {
+            this.renderFinancesTab();
         }
 
-        this.renderCriticalAlerts();
-        this.updateStats();
         this.setupEventListeners();
     },
 
@@ -364,23 +352,453 @@ window.TuCompras = {
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
                     ${uncollectedSales.length > 0 ? `
-                        <button class="btn btn-sm" onclick="TuCompras.activeStatus = 'recibido'; TuCompras.renderPanel();" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; font-size: 0.8rem;">
+                        <button class="btn btn-sm tc-alert-trigger" data-alert="uncollected" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">
                             🔴 ${uncollectedSales.length} Entregados sin cobro (>5 días)
                         </button>
                     ` : ''}
                     ${stuckReturns.length > 0 ? `
-                        <button class="btn btn-sm" onclick="TuCompras.activeStatus = 'proceso_devolucion'; TuCompras.renderPanel();" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 8px; font-size: 0.8rem;">
+                        <button class="btn btn-sm tc-alert-trigger" data-alert="stuck_returns" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid #f59e0b; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">
                             🟡 ${stuckReturns.length} Devoluciones retenidas (>10 días)
                         </button>
                     ` : ''}
                     ${discrepancySales.length > 0 ? `
-                        <button class="btn btn-sm" onclick="TuCompras.activeStatus = 'conciliacion'; TuCompras.renderPanel();" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; font-size: 0.8rem;">
+                        <button class="btn btn-sm tc-alert-trigger" data-alert="discrepancy" style="background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid #ef4444; border-radius: 8px; font-size: 0.8rem; cursor: pointer;">
                             🔴 ${discrepancySales.length} Discrepancias de dinero en Wallet
                         </button>
                     ` : ''}
                 </div>
             </div>
         `;
+    },
+
+    renderOrdersTab() {
+        const container = document.getElementById('tucompras-main-content');
+        if (!container) return;
+
+        container.innerHTML = `
+            <div class="actions-block" style="margin-bottom: 1.25rem; background: var(--bg-card); padding: 1.25rem 1.5rem; border-radius: 14px; border: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h3 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">📦 Control de Pedidos y Despachos TuCompras</h3>
+                    <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Filtra por estado, busca por cliente o guía y registra nuevos despachos.</p>
+                </div>
+                <div>
+                    <button id="new-tucompras-sale-btn" class="btn btn-primary" style="font-weight: 600;">
+                        <i class="fas fa-plus"></i> Nueva Venta
+                    </button>
+                </div>
+            </div>
+
+            <!-- SUB-STATUS TABS -->
+            <div class="inventory-tabs" style="margin-bottom: 1.25rem;">
+                <button class="tab-btn ${this.activeStatus === 'despachado' ? 'active' : ''}" data-status="despachado">Despachados</button>
+                <button class="tab-btn ${this.activeStatus === 'recibido' ? 'active' : ''}" data-status="recibido">Entregados</button>
+                <button class="tab-btn ${this.activeStatus === 'proceso_devolucion' ? 'active' : ''}" data-status="proceso_devolucion">En Proceso Dev.</button>
+                <button class="tab-btn ${this.activeStatus === 'devolucion_recibida' ? 'active' : ''}" data-status="devolucion_recibida">Devueltos</button>
+            </div>
+
+            <!-- BUSCADOR EN TIEMPO REAL -->
+            <div style="margin-bottom: 1rem; display: flex; gap: 10px; flex-wrap: wrap; align-items: center;">
+                <div style="flex: 1; min-width: 280px; position: relative;">
+                    <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                    <input type="text" id="tc-order-search" class="form-control" placeholder="🔍 Buscar por cliente, guía #, teléfono, vendedor, producto o ciudad..." value="${this.searchQuery || ''}" style="padding-left: 40px; height: 44px; border-radius: 12px; font-size: 0.9rem;">
+                </div>
+                ${this.searchQuery ? `
+                    <button class="btn btn-outline btn-sm" id="tc-clear-search-btn" style="border-radius: 10px; height: 44px;"><i class="fas fa-times"></i> Limpiar Búsqueda</button>
+                ` : ''}
+            </div>
+
+            ${this.specialAlertFilter === 'uncollected' ? `
+                <div style="background: rgba(239, 68, 68, 0.15); border: 1px solid #ef4444; padding: 10px 16px; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span style="color: #f87171; font-weight: 600;">
+                        <i class="fas fa-exclamation-circle"></i> Filtrando: 🔴 Pedidos entregados sin cobro (>5 días)
+                    </span>
+                    <button class="btn btn-outline btn-sm" id="tc-clear-alert-filter-btn" style="border-color: #ef4444; color: #f87171; border-radius: 8px;">Ver Todos los Entregados</button>
+                </div>
+            ` : ''}
+
+            ${this.specialAlertFilter === 'stuck_returns' ? `
+                <div style="background: rgba(245, 158, 11, 0.15); border: 1px solid #f59e0b; padding: 10px 16px; border-radius: 12px; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <span style="color: #fbbf24; font-weight: 600;">
+                        <i class="fas fa-exclamation-triangle"></i> Filtrando: 🟡 Devoluciones retenidas (>10 días)
+                    </span>
+                    <button class="btn btn-outline btn-sm" id="tc-clear-alert-filter-btn" style="border-color: #f59e0b; color: #fbbf24; border-radius: 8px;">Ver Todas las Devoluciones</button>
+                </div>
+            ` : ''}
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Cliente / Logística</th>
+                            <th>Productos</th>
+                            <th>Vendedor</th>
+                            <th>${this.activeStatus === 'proceso_devolucion' || this.activeStatus === 'devolucion_recibida' ? 'Causa / Observaciones' : 'Precio Venta'}</th>
+                            <th>${this.activeStatus === 'proceso_devolucion' || this.activeStatus === 'devolucion_recibida' ? 'Flete Perdido' : 'Comisión'}</th>
+                            <th>${this.activeStatus === 'proceso_devolucion' || this.activeStatus === 'devolucion_recibida' ? 'Estado Físico' : 'Utilidad'}</th>
+                            <th>Estado Pago</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tucompras-sales-list"></tbody>
+                </table>
+            </div>
+        `;
+
+        this.updateSalesList();
+
+        const searchInput = document.getElementById('tc-order-search');
+        if (searchInput) {
+            searchInput.oninput = (e) => {
+                this.searchQuery = e.target.value;
+                this.updateSalesList();
+            };
+        }
+
+        const clearSearchBtn = document.getElementById('tc-clear-search-btn');
+        if (clearSearchBtn) {
+            clearSearchBtn.onclick = () => {
+                this.searchQuery = '';
+                this.renderOrdersTab();
+            };
+        }
+
+        const clearAlertBtn = document.getElementById('tc-clear-alert-filter-btn');
+        if (clearAlertBtn) {
+            clearAlertBtn.onclick = () => {
+                this.specialAlertFilter = null;
+                this.renderOrdersTab();
+            };
+        }
+    },
+
+    renderSellerCommissionsView() {
+        const container = document.getElementById('tucompras-main-content');
+        if (!container) return;
+
+        const allSales = this.getSales() || [];
+        const month = this.monthFilter || new Date().toISOString().slice(0, 7);
+
+        let sales = allSales;
+        if (month !== 'all') {
+            sales = sales.filter(s => {
+                const d = s.date || s.createdAt;
+                return d && d.startsWith(month);
+            });
+        }
+
+        const sellers = this.getSellersList() || [];
+        const sellerStatsMap = {};
+
+        sales.forEach(s => {
+            const sId = s.seller_id || 'vendedor_general';
+            const sellerObj = sellers.find(sel => sel.id === sId);
+            const sellerName = sellerObj ? sellerObj.name : 'Vendedor General';
+
+            if (!sellerStatsMap[sId]) {
+                sellerStatsMap[sId] = {
+                    id: sId,
+                    name: sellerName,
+                    totalSalesCount: 0,
+                    deliveredCount: 0,
+                    totalRevenue: 0,
+                    pendingCommission: 0,
+                    paidCommission: 0
+                };
+            }
+
+            const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+            const totalComm = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.commission_paid || 0);
+
+            sellerStatsMap[sId].totalSalesCount += 1;
+            if (s.status === 'recibido') {
+                sellerStatsMap[sId].deliveredCount += 1;
+                sellerStatsMap[sId].totalRevenue += totalSale;
+            }
+
+            if (s.is_commission_paid) {
+                sellerStatsMap[sId].paidCommission += totalComm;
+            } else {
+                sellerStatsMap[sId].pendingCommission += totalComm;
+            }
+        });
+
+        const sellerStatsList = Object.values(sellerStatsMap).sort((a, b) => b.totalRevenue - a.totalRevenue);
+
+        container.innerHTML = `
+            <div style="background: var(--bg-card); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <h3 style="margin:0; color: #f59e0b;"><i class="fas fa-user-tag"></i> Liquidación de Rendimiento y Comisiones por Vendedor</h3>
+                        <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Filtra por mes para calcular y liquidar los pagos de fin de mes a Cindy, Luisa, Laura, etc.</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <label style="font-weight: 600; font-size: 0.9rem;">Período:</label>
+                        <input type="month" id="tc-seller-month-select" class="form-control" value="${month === 'all' ? '' : month}" style="max-width: 170px;">
+                        <button class="btn btn-outline btn-sm" id="tc-seller-all-months-btn" style="border-radius: 8px;">Ver Todo el Histórico</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Vendedor</th>
+                                <th>Despachos Totales</th>
+                                <th>Entregas Exitosas</th>
+                                <th>Facturado Real ($)</th>
+                                <th>Comisión Pendiente ($)</th>
+                                <th>Comisión Pagada ($)</th>
+                                <th>Comisión Total ($)</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${sellerStatsList.map(v => `
+                                <tr>
+                                    <td><strong>${v.name}</strong></td>
+                                    <td>${v.totalSalesCount} pedidos</td>
+                                    <td><span class="badge bg-success">${v.deliveredCount} entregados</span></td>
+                                    <td>$${v.totalRevenue.toLocaleString('es-CO')}</td>
+                                    <td><strong style="color: #f59e0b; font-size: 1rem;">$${v.pendingCommission.toLocaleString('es-CO')} COP</strong></td>
+                                    <td><span style="color: #10b981;">$${v.paidCommission.toLocaleString('es-CO')} COP</span></td>
+                                    <td><strong>$${(v.pendingCommission + v.paidCommission).toLocaleString('es-CO')} COP</strong></td>
+                                    <td>
+                                        ${v.pendingCommission > 0 ? `
+                                            <button class="btn btn-primary btn-sm tc-pay-seller-comm-btn" data-seller-id="${v.id}" style="border-radius: 8px;">
+                                                <i class="fas fa-hand-holding-usd"></i> Pagar Comisión
+                                            </button>
+                                        ` : '<span class="badge bg-success">Al Día</span>'}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                            ${sellerStatsList.length === 0 ? '<tr><td colspan="8" class="text-center text-secondary">No hay ventas registradas en el período seleccionado.</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        const monthSelect = document.getElementById('tc-seller-month-select');
+        if (monthSelect) {
+            monthSelect.onchange = (e) => {
+                this.monthFilter = e.target.value || 'all';
+                this.renderPanel();
+            };
+        }
+
+        const allMonthsBtn = document.getElementById('tc-seller-all-months-btn');
+        if (allMonthsBtn) {
+            allMonthsBtn.onclick = () => {
+                this.monthFilter = 'all';
+                this.renderPanel();
+            };
+        }
+    },
+
+    renderProductProfitabilityView() {
+        const container = document.getElementById('tucompras-main-content');
+        if (!container) return;
+
+        const allSales = this.getSales() || [];
+        const month = this.monthFilter || new Date().toISOString().slice(0, 7);
+
+        let sales = allSales;
+        if (month !== 'all') {
+            sales = sales.filter(s => {
+                const d = s.date || s.createdAt;
+                return d && d.startsWith(month);
+            });
+        }
+
+        const products = Inventory.getProducts() || [];
+        const productStatsMap = {};
+
+        sales.forEach(s => {
+            const isDelivered = s.status === 'recibido';
+            const isReturn = s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida' || s.status === 'devuelto';
+            const items = s.items && s.items.length > 0 ? s.items : [{ product_id: s.product_id, qty: 1, sale_price: s.sale_price, cost_price: s.cost_price, commission_paid: s.commission_paid }];
+
+            items.forEach(item => {
+                const prod = products.find(p => p.id === item.product_id);
+                const pName = prod ? prod.name : (item.name || 'Producto Desconocido');
+                const pId = item.product_id || pName;
+
+                if (!productStatsMap[pId]) {
+                    productStatsMap[pId] = {
+                        name: pName,
+                        shippedQty: 0,
+                        deliveredQty: 0,
+                        returnedQty: 0,
+                        revenue: 0,
+                        cogs: 0,
+                        shippingLoss: 0,
+                        commissions: 0
+                    };
+                }
+
+                const qty = parseInt(item.qty) || 1;
+                productStatsMap[pId].shippedQty += qty;
+
+                if (isDelivered) {
+                    productStatsMap[pId].deliveredQty += qty;
+                    productStatsMap[pId].revenue += parseFloat(item.sale_price || 0) * qty;
+                    productStatsMap[pId].cogs += parseFloat(item.cost_price || 0) * qty;
+                    productStatsMap[pId].commissions += parseFloat(item.commission_paid || 0) * qty;
+                } else if (isReturn) {
+                    productStatsMap[pId].returnedQty += qty;
+                    productStatsMap[pId].shippingLoss += (parseFloat(s.shipping_loss || 0) / items.length);
+                }
+            });
+        });
+
+        // FILTER OUT PRODUCTS WITH 0 MOVEMENTS! Only show products with shippedQty > 0
+        const productStatsList = Object.values(productStatsMap)
+            .filter(p => p.shippedQty > 0)
+            .map(p => {
+                const netMargin = p.revenue - p.cogs - p.shippingLoss - p.commissions;
+                const marginRate = p.revenue > 0 ? Math.round((netMargin / p.revenue) * 100) : 0;
+                const deliveryRate = p.shippedQty > 0 ? Math.round((p.deliveredQty / p.shippedQty) * 100) : 0;
+                return { ...p, netMargin, marginRate, deliveryRate };
+            }).sort((a, b) => b.revenue - a.revenue);
+
+        container.innerHTML = `
+            <div style="background: var(--bg-card); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                    <div>
+                        <h3 style="margin:0; color: #10b981;"><i class="fas fa-boxes"></i> Comparativo de Rentabilidad Real por Producto</h3>
+                        <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Analiza el margen neto real descontando costos, fletes de devolución y comisiones. Mostrando solo productos con ventas.</p>
+                    </div>
+                    <div style="display:flex; align-items:center; gap: 10px;">
+                        <label style="font-weight: 600; font-size: 0.9rem;">Período Evaluado:</label>
+                        <input type="month" id="tc-product-month-select" class="form-control" value="${month === 'all' ? '' : month}" style="max-width: 170px;">
+                        <button class="btn btn-outline btn-sm" id="tc-product-all-months-btn" style="border-radius: 8px;">Ver Todo el Histórico</button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Despachados</th>
+                                <th>Efectividad Entregas</th>
+                                <th>Ingreso Bruto</th>
+                                <th>Costo (COGS)</th>
+                                <th>Fletes Dev.</th>
+                                <th>Comisiones</th>
+                                <th>Utilidad Neta Producto</th>
+                                <th>Margen %</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${productStatsList.map(p => `
+                                <tr>
+                                    <td><strong>${p.name}</strong></td>
+                                    <td>${p.shippedQty} unids.</td>
+                                    <td>
+                                        <span class="badge ${p.deliveryRate >= 70 ? 'bg-success' : 'bg-warning'}">
+                                            ${p.deliveredQty}✅ / ${p.returnedQty}❌ (${p.deliveryRate}%)
+                                        </span>
+                                    </td>
+                                    <td>$${p.revenue.toLocaleString('es-CO')}</td>
+                                    <td>$${p.cogs.toLocaleString('es-CO')}</td>
+                                    <td><span style="color:#ef4444;">$${p.shippingLoss.toLocaleString('es-CO')}</span></td>
+                                    <td><span style="color:#f59e0b;">$${p.commissions.toLocaleString('es-CO')}</span></td>
+                                    <td><strong style="color: ${p.netMargin >= 0 ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">$${p.netMargin.toLocaleString('es-CO')} COP</strong></td>
+                                    <td><span class="badge ${p.marginRate >= 20 ? 'bg-success' : (p.marginRate > 0 ? 'bg-warning' : 'bg-danger')}">${p.marginRate}%</span></td>
+                                </tr>
+                            `).join('')}
+                            ${productStatsList.length === 0 ? '<tr><td colspan="9" class="text-center text-secondary">No hay productos con movimientos en el período seleccionado.</td></tr>' : ''}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+
+        const monthSelect = document.getElementById('tc-product-month-select');
+        if (monthSelect) {
+            monthSelect.onchange = (e) => {
+                this.monthFilter = e.target.value || 'all';
+                this.renderPanel();
+            };
+        }
+
+        const allMonthsBtn = document.getElementById('tc-product-all-months-btn');
+        if (allMonthsBtn) {
+            allMonthsBtn.onclick = () => {
+                this.monthFilter = 'all';
+                this.renderPanel();
+            };
+        }
+    },
+
+    renderFinancesTab() {
+        const container = document.getElementById('tucompras-main-content');
+        if (!container) return;
+
+        if (!['liquidacion', 'conciliacion', 'retiros', 'importar_dropi', 'gastos'].includes(this.activeStatus)) {
+            this.activeStatus = 'liquidacion';
+        }
+
+        container.innerHTML = `
+            <div class="inventory-tabs" style="margin-bottom: 1.5rem; gap: 8px; flex-wrap: wrap;">
+                <button class="tab-btn ${this.activeStatus === 'liquidacion' ? 'active' : ''}" data-status="liquidacion" style="border: 1px solid var(--accent);">Liquidación Bodegas</button>
+                <button class="tab-btn ${this.activeStatus === 'conciliacion' ? 'active' : ''}" data-status="conciliacion" style="border: 1px solid #10b981; color: #10b981;"><i class="fas fa-coins"></i> Conciliación Wallet</button>
+                <button class="tab-btn ${this.activeStatus === 'retiros' ? 'active' : ''}" data-status="retiros" style="border: 1px solid #a855f7; color: #a855f7;"><i class="fas fa-hand-holding-usd"></i> Retiro Utilidades</button>
+                <button class="tab-btn ${this.activeStatus === 'importar_dropi' ? 'active' : ''}" data-status="importar_dropi" style="border: 1px solid var(--success);"><i class="fas fa-cloud-download-alt"></i> Importar Dropi</button>
+                <button class="tab-btn ${this.activeStatus === 'gastos' ? 'active' : ''}" data-status="gastos" style="border: 1px solid var(--warning);"><i class="fas fa-wallet"></i> Gastos TuCompras</button>
+            </div>
+            <div id="tc-finances-subcontent"></div>
+        `;
+
+        if (this.activeStatus === 'liquidacion') {
+            this.renderLiquidationView();
+        } else if (this.activeStatus === 'conciliacion') {
+            this.renderConciliationView();
+        } else if (this.activeStatus === 'retiros') {
+            this.renderWithdrawalsView();
+        } else if (this.activeStatus === 'importar_dropi') {
+            this.renderImportDropiView();
+        } else if (this.activeStatus === 'gastos') {
+            this.renderExpensesView();
+        }
+    },
+
+    async paySellerCommissions(sellerId) {
+        const month = this.monthFilter || new Date().toISOString().slice(0, 7);
+        const sellers = this.getSellersList() || [];
+        const seller = sellers.find(s => s.id === sellerId);
+        const sellerName = seller ? seller.name : 'Vendedor';
+
+        const sales = (this.getSales() || []).filter(s => {
+            const matchesSeller = (s.seller_id || 'vendedor_general') === sellerId;
+            const matchesMonth = month === 'all' || (s.date && s.date.startsWith(month));
+            return matchesSeller && matchesMonth && !s.is_commission_paid;
+        });
+
+        if (sales.length === 0) {
+            alert('No hay comisiones pendientes por pagar para este vendedor en el período.');
+            return;
+        }
+
+        const totalToPay = sales.reduce((sum, s) => {
+            const comm = s.items ? s.items.reduce((ss, i) => ss + (parseFloat(i.commission_paid || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.commission_paid || 0);
+            return sum + comm;
+        }, 0);
+
+        if (!confirm(`¿Confirmas registrar el pago de $${totalToPay.toLocaleString('es-CO')} COP en comisiones a "${sellerName}" para el período (${month})?`)) {
+            return;
+        }
+
+        for (const sale of sales) {
+            sale.is_commission_paid = true;
+            sale.commission_paid_at = new Date().toISOString();
+            await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale.id, sale);
+        }
+
+        alert(`✅ Comisiones de "${sellerName}" marcadas como PAGADAS exitosamente.`);
+        this.renderPanel();
     },
 
     renderConciliationView() {
@@ -811,7 +1229,54 @@ window.TuCompras = {
     },
 
     updateSalesList() {
-        const sales = this.getSales().filter(s => s.status === this.activeStatus);
+        let sales = this.getSales().filter(s => s.status === this.activeStatus);
+
+        // Special Alert Filter
+        if (this.specialAlertFilter === 'uncollected') {
+            const now = new Date();
+            sales = sales.filter(s => {
+                if (s.status !== 'recibido' || s.money_confirmed === true) return false;
+                const refDate = s.money_confirmed_at || s.date;
+                const days = (now - new Date(refDate)) / (1000 * 60 * 60 * 24);
+                return days >= 5;
+            });
+        } else if (this.specialAlertFilter === 'stuck_returns') {
+            const now = new Date();
+            sales = sales.filter(s => {
+                if (s.status !== 'proceso_devolucion') return false;
+                const days = (now - new Date(s.date)) / (1000 * 60 * 60 * 24);
+                return days >= 10;
+            });
+        }
+
+        // Live Search Query Filter
+        if (this.searchQuery) {
+            const q = this.searchQuery.toLowerCase().trim();
+            const sellers = this.getSellersList() || [];
+            const products = Inventory.getProducts() || [];
+
+            sales = sales.filter(s => {
+                const customer = (s.customer_name || '').toLowerCase();
+                const phone = (s.customer_phone || '').toLowerCase();
+                const tracking = (s.tracking_number || '').toLowerCase();
+                const carrier = (s.carrier || '').toLowerCase();
+                const city = (s.customer_city || '').toLowerCase();
+                const sellerName = (sellers.find(sel => sel.id === s.seller_id)?.name || '').toLowerCase();
+                const itemNames = (s.items || []).map(i => {
+                    const pName = products.find(p => p.id === i.product_id)?.name || i.name || '';
+                    return pName.toLowerCase();
+                }).join(' ');
+
+                return customer.includes(q) || 
+                       phone.includes(q) || 
+                       tracking.includes(q) || 
+                       carrier.includes(q) || 
+                       city.includes(q) || 
+                       sellerName.includes(q) || 
+                       itemNames.includes(q);
+            });
+        }
+
         sales.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
         const list = document.getElementById('tucompras-sales-list');
         if (!list) return;
@@ -1015,6 +1480,40 @@ window.TuCompras = {
         if (!panel) return;
 
         panel.onclick = async (e) => {
+            const mainTabBtn = e.target.closest('[data-main-tab]');
+            if (mainTabBtn) {
+                this.activeMainTab = mainTabBtn.dataset.mainTab;
+                this.specialAlertFilter = null;
+                this.renderPanel();
+                return;
+            }
+
+            const alertBtn = e.target.closest('.tc-alert-trigger');
+            if (alertBtn) {
+                const alertType = alertBtn.dataset.alert;
+                if (alertType === 'uncollected') {
+                    this.activeMainTab = 'pedidos';
+                    this.activeStatus = 'recibido';
+                    this.specialAlertFilter = 'uncollected';
+                } else if (alertType === 'stuck_returns') {
+                    this.activeMainTab = 'pedidos';
+                    this.activeStatus = 'proceso_devolucion';
+                    this.specialAlertFilter = 'stuck_returns';
+                } else if (alertType === 'discrepancy') {
+                    this.activeMainTab = 'finanzas';
+                    this.activeStatus = 'conciliacion';
+                    this.specialAlertFilter = 'discrepancy';
+                }
+                this.renderPanel();
+                return;
+            }
+
+            const payCommBtn = e.target.closest('.tc-pay-seller-comm-btn');
+            if (payCommBtn) {
+                await this.paySellerCommissions(payCommBtn.dataset.sellerId);
+                return;
+            }
+
             const tabBtn = e.target.closest('.inventory-tabs .tab-btn');
             if (tabBtn && tabBtn.dataset.status) {
                 this.activeStatus = tabBtn.dataset.status;
