@@ -26,6 +26,23 @@ window.TuCompras = {
     async init() {
         await this.ensureWalletAccount();
         this.renderPanel();
+
+        // Escuchar sincronización en segundo plano de ventas de TuCompras
+        window.addEventListener('erp_table_updated_tucompras_sales', () => {
+            console.log('[TuCompras] Ventas actualizadas desde Supabase en segundo plano, refrescando UI...');
+            if (document.getElementById('tucompras-panel')) {
+                this.updateSalesList();
+            }
+        });
+
+        // Disparar sincronización inmediata de la tabla al cargar el módulo
+        if (window.Storage && window.Storage.syncTable) {
+            window.Storage.syncTable(window.STORAGE_KEYS.TUCOMPRAS_SALES).then(() => {
+                if (document.getElementById('tucompras-panel')) {
+                    this.updateSalesList();
+                }
+            }).catch(e => console.warn('[TuCompras] Error al sincronizar ventas:', e.message));
+        }
     },
 
     async ensureWalletAccount() {
@@ -210,7 +227,11 @@ window.TuCompras = {
                         <div id="tc-step-3" class="wizard-step" style="display: none;">
                             <form id="tucompras-sale-form" class="form-grid">
                                 <div class="logistics-section" style="display: flex; flex-direction: column; gap: 1.25rem;">
-                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">LOGÍSTICA</h4>
+                                    <h4 style="margin: 0 0 0.5rem 0; font-size: 0.9rem; color: var(--text-secondary);">LOGÍSTICA Y FECHA</h4>
+                                    <div class="form-group">
+                                        <label style="font-weight: 700; color: #4ade80;"><i class="fas fa-calendar-alt"></i> Fecha del Despacho / Venta *</label>
+                                        <input type="datetime-local" id="tc-sale-date-input" name="date" class="form-control" required>
+                                    </div>
                                     <div class="form-group">
                                         <label>Vendedor *</label>
                                         <select id="tc-seller-select" name="seller_id" class="form-control" required></select>
@@ -791,6 +812,7 @@ window.TuCompras = {
 
     updateSalesList() {
         const sales = this.getSales().filter(s => s.status === this.activeStatus);
+        sales.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
         const list = document.getElementById('tucompras-sales-list');
         if (!list) return;
 
@@ -1508,6 +1530,14 @@ window.TuCompras = {
         const searchInput = document.getElementById('tc-product-search');
         if (searchInput) searchInput.value = '';
 
+        // Default sale date to current local datetime
+        const dateInput = document.getElementById('tc-sale-date-input');
+        if (dateInput) {
+            const now = new Date();
+            const localIso = new Date(now.getTime() - (now.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+            dateInput.value = localIso;
+        }
+
         const wizardTitle = document.getElementById('tc-wizard-title');
         if (wizardTitle) {
             wizardTitle.innerHTML = `<span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">1</span> Información del Cliente`;
@@ -1528,6 +1558,15 @@ window.TuCompras = {
 
         document.getElementById('tc-cust-name').value = sale.customer_name || '';
         document.getElementById('tc-cust-phone').value = sale.customer_phone || '';
+
+        const dateInput = document.getElementById('tc-sale-date-input');
+        if (dateInput && sale.date) {
+            try {
+                const d = new Date(sale.date);
+                const localIso = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 16);
+                dateInput.value = localIso;
+            } catch(e) {}
+        }
 
         const citySelect = document.getElementById('tc-cust-city');
         if (citySelect && sale.customer_city) citySelect.value = sale.customer_city;
@@ -1851,6 +1890,14 @@ window.TuCompras = {
             const campaignSelect = document.getElementById('tc-campaign-select');
             const campaign_name = formData && typeof formData.get === 'function' ? (formData.get('campaign_name') || '') : (campaignSelect ? campaignSelect.value : '');
 
+            const dateInput = document.getElementById('tc-sale-date-input');
+            let saleDate = new Date().toISOString();
+            if (dateInput && dateInput.value) {
+                try {
+                    saleDate = new Date(dateInput.value).toISOString();
+                } catch(e) {}
+            }
+
             const totalCommission = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (i.qty || 1)), 0);
 
             let sale;
@@ -1859,6 +1906,7 @@ window.TuCompras = {
                 sale = {
                     ...(existing || {}),
                     id: this.editingSaleId,
+                    date: saleDate,
                     customer_name: name,
                     customer_phone: phone,
                     seller_id: sellerId,
@@ -1875,7 +1923,7 @@ window.TuCompras = {
                 alert('Venta actualizada con éxito.');
             } else {
                 sale = {
-                    date: new Date().toISOString(),
+                    date: saleDate,
                     customer_name: name,
                     customer_phone: phone,
                     seller_id: sellerId,
