@@ -34,6 +34,26 @@ window.Dashboard = {
                 if (id === 'stat-sales') this.showSalesDetail();
                 if (id === 'stat-stock') this.showCriticalStockDetail();
                 if (id === 'stat-credits-millenio' || id === 'stat-credits-vulcano') this.showCreditsDetail();
+                if (id === 'stat-opex') {
+                    const btn = document.querySelector('.nav-item[data-panel="finanzas"]');
+                    if (btn) {
+                        btn.click();
+                        setTimeout(() => {
+                            const el = document.getElementById('finance-expenses-list');
+                            if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }, 100);
+                    }
+                }
+                if (id === 'stat-recaudos' || id === 'stat-abonos') {
+                    const btn = document.querySelector('.nav-item[data-panel="consultas"]');
+                    if (btn) {
+                        btn.click();
+                        if (window.Consultas) {
+                            Consultas.activeTab = 'abonos_recibidos';
+                            Consultas.renderPanel();
+                        }
+                    }
+                }
                 if (id === 'stat-commissions') {
                     // Navigate to Vendedores settlements tab
                     const btn = document.querySelector('.nav-item[data-panel="vendedores"]');
@@ -94,8 +114,11 @@ window.Dashboard = {
         const salesHeader = document.getElementById('stat-sales-title');
         if (salesHeader) salesHeader.textContent = `Ventas ${rangeText}`;
 
+        this.updateElText('stat-recaudos-title', `<i class="fas fa-hand-holding-usd"></i> Recaudos Cartera (${rangeText})`);
+
         // Dynamic Millenio Headers
         this.updateElText('millenio-sales-header', `Ventas ${rangeText}`);
+        this.updateElText('millenio-recaudos-header', `Recaudos ${rangeText}`);
         this.updateElText('millenio-expenses-header', `Gastos ${rangeText}`);
         this.updateElText('millenio-cash-header', `Efectivo ${rangeText}`);
         this.updateElText('millenio-consignment-header', `Consignación ${rangeText}`);
@@ -103,6 +126,7 @@ window.Dashboard = {
 
         // Dynamic Vulcano Headers
         this.updateElText('vulcano-sales-header', `Ventas ${rangeText}`);
+        this.updateElText('vulcano-recaudos-header', `Recaudos ${rangeText}`);
         this.updateElText('vulcano-expenses-header', `Gastos ${rangeText}`);
         this.updateElText('vulcano-cash-header', `Efectivo ${rangeText}`);
         this.updateElText('vulcano-consignment-header', `Consignación ${rangeText}`);
@@ -242,6 +266,20 @@ window.Dashboard = {
             marginEl.className = `stat-value ${netMargin >= 10 ? 'text-success' : (netMargin > 0 ? 'text-warning' : 'text-danger')}`;
         }
 
+        // Recaudos de Cartera (Abonos de Clientes recibidos en el período)
+        const payments = Storage.get(STORAGE_KEYS.PAYMENTS) || [];
+        const filteredPayments = payments.filter(p => {
+            const pDate = new Date(p.date || p.createdAt);
+            return pDate >= startDate && pDate <= endDate;
+        });
+
+        const totalRecaudos = filteredPayments.reduce((sum, p) => sum + (parseFloat(p.amount || 0)), 0);
+        const recaudosMillenio = filteredPayments.filter(p => p.company === 'millenio').reduce((sum, p) => sum + (parseFloat(p.amount || 0)), 0);
+        const recaudosVulcano = filteredPayments.filter(p => p.company === 'vulcano').reduce((sum, p) => sum + (parseFloat(p.amount || 0)), 0);
+
+        const elRecaudos = document.querySelector('#stat-recaudos .stat-value');
+        if (elRecaudos) elRecaudos.textContent = `$${totalRecaudos.toLocaleString()}`;
+
         const elStock = document.querySelector('#stat-stock .stat-value');
         if (elStock) elStock.textContent = criticalCount;
 
@@ -253,6 +291,7 @@ window.Dashboard = {
 
         // Update UI - Millenio Details
         this.updateElText('millenio-sales-today-detail', `$${mSales.total.toLocaleString()}`);
+        this.updateElText('millenio-recaudos-today', `$${recaudosMillenio.toLocaleString()}`);
         this.updateElText('millenio-cash-today', `$${mSales.cash.toLocaleString()}`);
         this.updateElText('millenio-consignment-today', `$${mSales.consignment.toLocaleString()}`);
         this.updateElText('millenio-expenses-today', `$${mExpenses.toLocaleString()}`);
@@ -260,6 +299,7 @@ window.Dashboard = {
 
         // Update UI - Vulcano Details
         this.updateElText('vulcano-sales-today-detail', `$${vSales.total.toLocaleString()}`);
+        this.updateElText('vulcano-recaudos-today', `$${recaudosVulcano.toLocaleString()}`);
         this.updateElText('vulcano-cash-today', `$${vSales.cash.toLocaleString()}`);
         this.updateElText('vulcano-consignment-today', `$${vSales.consignment.toLocaleString()}`);
         this.updateElText('vulcano-expenses-today', `$${vExpenses.toLocaleString()}`);
@@ -280,8 +320,8 @@ window.Dashboard = {
         this.renderCreditsList('millenio-credits-today', mCredits);
         this.renderCreditsList('vulcano-credits-today', vCredits);
 
-        // Product Rotation
-        this.renderRotation(filteredSales, products);
+        // Product Rotation (Incluye Ventas POS + Ventas E-commerce TuCompras)
+        this.renderRotation(filteredSales, products, tcFiltered);
     },
 
     renderCharts(totalRevenue, totalOPEX, grossProfit, netProfit, tcFiltered, filteredSales, startDate, endDate) {
@@ -411,7 +451,7 @@ window.Dashboard = {
         });
     },
 
-    renderRotation(filteredSales, products) {
+    renderRotation(filteredSales, products, tcFiltered = []) {
         const rotationMap = {};
 
         // Initialize all active products with 0
@@ -419,18 +459,35 @@ window.Dashboard = {
             rotationMap[p.id] = { name: p.name, qty: 0 };
         });
 
-        // Sum quantities from filtered sales
+        // Sum quantities from filtered POS sales
         filteredSales.forEach(s => {
             if (s.items && Array.isArray(s.items)) {
                 s.items.forEach(item => {
-                    if (rotationMap[item.id]) {
-                        rotationMap[item.id].qty += (item.quantity || 0);
-                    } else {
-                        // In case product was deleted but exists in sales
-                        rotationMap[item.id] = { name: item.name, qty: item.quantity || 0 };
+                    const pId = item.id || item.product_id;
+                    if (rotationMap[pId]) {
+                        rotationMap[pId].qty += (parseInt(item.quantity || item.qty) || 0);
+                    } else if (pId) {
+                        rotationMap[pId] = { name: item.name, qty: parseInt(item.quantity || item.qty) || 0 };
                     }
                 });
             }
+        });
+
+        // Sum quantities from TuCompras sales
+        tcFiltered.forEach(s => {
+            const items = s.items && s.items.length > 0 ? s.items : [{ product_id: s.product_id, qty: 1, name: '' }];
+            items.forEach(item => {
+                const pId = item.product_id || item.id;
+                const pObj = products.find(p => p.id === pId);
+                const name = pObj ? pObj.name : (item.name || 'Producto TuCompras');
+                const qty = parseInt(item.qty || item.quantity) || 1;
+
+                if (pId && rotationMap[pId]) {
+                    rotationMap[pId].qty += qty;
+                } else if (pId) {
+                    rotationMap[pId] = { name: name, qty: qty };
+                }
+            });
         });
 
         const sorted = Object.values(rotationMap).sort((a, b) => b.qty - a.qty);
