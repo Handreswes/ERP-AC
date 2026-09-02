@@ -2754,6 +2754,70 @@ textarea:focus {
         word-break: break-word !important;
         display: inline-block !important;
     }
+
+    /* Floating Action Button (FAB) Mobile */
+    .mobile-fab {
+        position: fixed !important;
+        bottom: calc(var(--bottom-nav-height) + 12px) !important;
+        right: 18px !important;
+        width: 54px !important;
+        height: 54px !important;
+        border-radius: 50% !important;
+        background: linear-gradient(135deg, #ff8c00 0%, #ff4b4b 100%) !important;
+        color: white !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        font-size: 1.4rem !important;
+        box-shadow: 0 8px 20px rgba(255, 140, 0, 0.45) !important;
+        z-index: 1000 !important;
+        border: none !important;
+        cursor: pointer !important;
+        transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    }
+
+    .mobile-fab:active {
+        transform: scale(0.92) !important;
+    }
+
+    /* Touch Targets Comfort (44px min-height for inputs and primary buttons) */
+    .btn, button.btn, .form-control, select, input[type="text"], input[type="number"], input[type="datetime-local"] {
+        min-height: 44px !important;
+    }
+
+    .btn-sm {
+        min-height: 36px !important;
+        padding: 6px 12px !important;
+    }
+
+    /* Responsive Product Image Gallery Slots */
+    .image-gallery-grid {
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+        gap: 10px !important;
+    }
+
+    .image-slot {
+        height: 75px !important;
+        border-radius: 12px !important;
+    }
+
+    /* Keyboard-friendly Modals on Mobile */
+    .modal.show {
+        display: flex !important;
+        align-items: flex-end !important;
+        justify-content: center !important;
+        padding-bottom: env(safe-area-inset-bottom, 0px) !important;
+    }
+
+    .modal-content {
+        border-radius: 24px 24px 0 0 !important;
+        max-height: 88vh !important;
+        overflow-y: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 1.25rem 1rem !important;
+    }
 }
 
 @media (max-width: 480px) {
