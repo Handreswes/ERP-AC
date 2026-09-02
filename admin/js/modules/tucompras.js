@@ -251,6 +251,35 @@ window.TuCompras = {
                                          <input type="number" name="shipping_cost" class="form-control" required value="0">
                                      </div>
                                      <div class="form-group">
+                                         <label style="font-weight: 700; color: #a855f7;"><i class="fas fa-credit-card"></i> Método de Pago / Financiamiento *</label>
+                                         <select id="tc-payment-method-select" name="payment_method" class="form-control" required>
+                                             <option value="dropi_cod">🚚 Dropi / Contraentrega (COD)</option>
+                                             <option value="sistecredito">💳 Sistecrédito</option>
+                                             <option value="addi">⚡ ADDI</option>
+                                             <option value="transfer">🏦 Transferencia (Bancolombia/Nequi)</option>
+                                             <option value="cash">💵 Efectivo Local</option>
+                                         </select>
+                                     </div>
+
+                                     <div id="tc-credit-details-group" style="display: none; background: rgba(168, 85, 247, 0.08); border: 1px dashed rgba(168, 85, 247, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 0.5rem; flex-direction: column; gap: 10px;">
+                                         <h5 style="margin: 0; color: #c084fc; font-size: 0.85rem;"><i class="fas fa-file-invoice-dollar"></i> Datos de Crédito Financiero (Sistecrédito / ADDI)</h5>
+                                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                                             <div class="form-group" style="margin:0;">
+                                                 <label style="font-size: 0.75rem; color: var(--text-secondary);"># Aprobación / Crédito</label>
+                                                 <input type="text" id="tc-credit-approval-input" name="credit_approval_number" class="form-control" placeholder="Ej: STC-98421">
+                                             </div>
+                                             <div class="form-group" style="margin:0;">
+                                                 <label style="font-size: 0.75rem; color: var(--text-secondary);">Número de Cuotas</label>
+                                                 <input type="number" id="tc-credit-installments-input" name="credit_installments" class="form-control" placeholder="3, 6, 12..." min="1" value="3">
+                                             </div>
+                                             <div class="form-group" style="margin:0;">
+                                                 <label style="font-size: 0.75rem; color: #ef4444; font-weight: 700;">Comisión Plataforma ($)</label>
+                                                 <input type="number" id="tc-platform-commission-input" name="platform_commission" class="form-control" placeholder="0" value="0" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">
+                                             </div>
+                                         </div>
+                                     </div>
+
+                                     <div class="form-group">
                                          <label style="font-weight: 700; color: #38bdf8;"><i class="fab fa-facebook" style="color: #1877f2;"></i> Campaña de Origen (Meta Ads)</label>
                                          <select id="tc-campaign-select" name="campaign_name" class="form-control">
                                              <option value="">-- Sin campaña / Orgánico / Directo --</option>
@@ -274,8 +303,12 @@ window.TuCompras = {
                                             <span style="color: #38bdf8;">Costo Bodega (Mayorista):</span>
                                             <strong id="tc-total-cost-text" style="color: #38bdf8;">$0</strong>
                                         </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <span style="color: #ef4444;">Comisión Fintech (ADDI/Sistecrédito):</span>
+                                            <strong id="tc-total-platform-comm-text" style="color: #ef4444;">$0</strong>
+                                        </div>
                                         <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 8px;">
-                                            <span>Comisión:</span>
+                                            <span>Comisión Vendedor:</span>
                                             <strong id="tc-total-commission-text" style="color: var(--warning);">$0</strong>
                                         </div>
                                     </div>
@@ -746,7 +779,7 @@ window.TuCompras = {
         const container = document.getElementById('tucompras-main-content');
         if (!container) return;
 
-        if (!['liquidacion', 'conciliacion', 'retiros', 'importar_dropi', 'gastos'].includes(this.activeStatus)) {
+        if (!['liquidacion', 'conciliacion', 'creditos_fintech', 'retiros', 'importar_dropi', 'gastos'].includes(this.activeStatus)) {
             this.activeStatus = 'liquidacion';
         }
 
@@ -754,6 +787,7 @@ window.TuCompras = {
             <div class="inventory-tabs" style="margin-bottom: 1.5rem; gap: 8px; flex-wrap: wrap;">
                 <button class="tab-btn ${this.activeStatus === 'liquidacion' ? 'active' : ''}" data-status="liquidacion" style="border: 1px solid var(--accent);">Liquidación Bodegas</button>
                 <button class="tab-btn ${this.activeStatus === 'conciliacion' ? 'active' : ''}" data-status="conciliacion" style="border: 1px solid #10b981; color: #10b981;"><i class="fas fa-coins"></i> Conciliación Wallet</button>
+                <button class="tab-btn ${this.activeStatus === 'creditos_fintech' ? 'active' : ''}" data-status="creditos_fintech" style="border: 1px solid #c084fc; color: #c084fc;"><i class="fas fa-credit-card"></i> Créditos Sistecrédito / ADDI</button>
                 <button class="tab-btn ${this.activeStatus === 'retiros' ? 'active' : ''}" data-status="retiros" style="border: 1px solid #a855f7; color: #a855f7;"><i class="fas fa-hand-holding-usd"></i> Retiro Utilidades</button>
                 <button class="tab-btn ${this.activeStatus === 'importar_dropi' ? 'active' : ''}" data-status="importar_dropi" style="border: 1px solid var(--success);"><i class="fas fa-cloud-download-alt"></i> Importar Dropi</button>
                 <button class="tab-btn ${this.activeStatus === 'gastos' ? 'active' : ''}" data-status="gastos" style="border: 1px solid var(--warning);"><i class="fas fa-wallet"></i> Gastos TuCompras</button>
@@ -765,6 +799,8 @@ window.TuCompras = {
             this.renderLiquidationView();
         } else if (this.activeStatus === 'conciliacion') {
             this.renderConciliationView();
+        } else if (this.activeStatus === 'creditos_fintech') {
+            this.renderFintechCreditsView();
         } else if (this.activeStatus === 'retiros') {
             this.renderWithdrawalsView();
         } else if (this.activeStatus === 'importar_dropi') {
@@ -772,6 +808,182 @@ window.TuCompras = {
         } else if (this.activeStatus === 'gastos') {
             this.renderExpensesView();
         }
+    },
+
+    renderFintechCreditsView() {
+        const subcontent = document.getElementById('tc-finances-subcontent');
+        if (!subcontent) return;
+
+        const creditSales = this.getSales().filter(s => s.payment_method === 'sistecredito' || s.payment_method === 'addi');
+
+        let totalCreditSales = 0;
+        let totalCommissions = 0;
+        let totalPendingDisbursements = 0;
+        let totalConfirmedDisbursements = 0;
+
+        creditSales.forEach(s => {
+            const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+            const comm = parseFloat(s.platform_commission || 0);
+            const netAmount = totalSale - comm;
+
+            totalCreditSales += totalSale;
+            totalCommissions += comm;
+
+            if (s.money_confirmed) {
+                totalConfirmedDisbursements += netAmount;
+            } else {
+                totalPendingDisbursements += netAmount;
+            }
+        });
+
+        subcontent.innerHTML = `
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                    <div style="background: rgba(168, 85, 247, 0.08); border: 1px solid rgba(168, 85, 247, 0.2); padding: 1.25rem; border-radius: 14px;">
+                        <h4 style="margin: 0; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Total Ventas a Crédito</h4>
+                        <p style="font-size: 1.6rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #c084fc;">$${totalCreditSales.toLocaleString('es-CO')}</p>
+                        <small style="color: var(--text-secondary); font-size: 0.75rem;">Sistecrédito + ADDI</small>
+                    </div>
+                    <div style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2); padding: 1.25rem; border-radius: 14px;">
+                        <h4 style="margin: 0; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Comisiones Descontadas</h4>
+                        <p style="font-size: 1.6rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #ef4444;">$${totalCommissions.toLocaleString('es-CO')}</p>
+                        <small style="color: var(--text-secondary); font-size: 0.75rem;">Costo de Plataformas Fintech</small>
+                    </div>
+                    <div style="background: rgba(245, 158, 11, 0.08); border: 1px solid rgba(245, 158, 11, 0.2); padding: 1.25rem; border-radius: 14px;">
+                        <h4 style="margin: 0; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Por Cobrar (Pendiente Banco)</h4>
+                        <p style="font-size: 1.6rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #f59e0b;">$${totalPendingDisbursements.toLocaleString('es-CO')}</p>
+                        <small style="color: var(--text-secondary); font-size: 0.75rem;">Por desembolsar en tu cuenta</small>
+                    </div>
+                    <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); padding: 1.25rem; border-radius: 14px;">
+                        <h4 style="margin: 0; font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase;">Desembolsado en Banco</h4>
+                        <p style="font-size: 1.6rem; font-weight: 700; margin: 0.25rem 0 0 0; color: #10b981;">$${totalConfirmedDisbursements.toLocaleString('es-CO')}</p>
+                        <small style="color: var(--text-secondary); font-size: 0.75rem;">Ingresado a la cuenta bancaria</small>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-card); border-radius: 16px; padding: 1.5rem; border: 1px solid var(--border);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                        <div>
+                            <h3 style="margin: 0; color: #c084fc;"><i class="fas fa-credit-card"></i> Control de Créditos y Recaudos (Sistecrédito / ADDI)</h3>
+                            <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Gestión de desembolsos bancarios y cobro de cuotas presenciales en la tienda física.</p>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Plataforma</th>
+                                    <th># Aprobación</th>
+                                    <th>Cliente</th>
+                                    <th>Venta Bruta</th>
+                                    <th>Comisión Platform</th>
+                                    <th>Neto a Recibir</th>
+                                    <th>Estado Desembolso</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${creditSales.map(s => {
+                                    const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
+                                    const comm = parseFloat(s.platform_commission || 0);
+                                    const netAmount = totalSale - comm;
+                                    const isSiste = s.payment_method === 'sistecredito';
+
+                                    return `
+                                        <tr>
+                                            <td>${new Date(s.date).toLocaleDateString()}</td>
+                                            <td>
+                                                <span class="badge" style="background: ${isSiste ? 'rgba(168,85,247,0.15)' : 'rgba(236,72,153,0.15)'}; color: ${isSiste ? '#c084fc' : '#f472b6'}; font-weight: 700;">
+                                                    ${isSiste ? '💳 Sistecrédito' : '⚡ ADDI'}
+                                                </span>
+                                            </td>
+                                            <td><strong>${s.credit_approval_number || 'N/A'}</strong> (${s.credit_installments || 3} cuotas)</td>
+                                            <td><strong>${s.customer_name || 'Cliente'}</strong><br><small class="text-secondary">${s.customer_phone || ''}</small></td>
+                                            <td>$${totalSale.toLocaleString('es-CO')}</td>
+                                            <td><span style="color: #ef4444;">-$${comm.toLocaleString('es-CO')}</span></td>
+                                            <td><strong style="color: #38bdf8;">$${netAmount.toLocaleString('es-CO')}</strong></td>
+                                            <td>
+                                                <span class="badge ${s.money_confirmed ? 'bg-success' : 'bg-warning'}">
+                                                    ${s.money_confirmed ? '✅ DESEMBOLSADO' : '🟡 PENDIENTE BANCO'}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+                                                    ${!s.money_confirmed ? `
+                                                        <button class="btn btn-sm btn-success tc-confirm-disbursement-btn" data-id="${s.id}" style="border-radius: 8px;">
+                                                            <i class="fas fa-check-circle"></i> Confirmar Banco
+                                                        </button>
+                                                    ` : ''}
+                                                    <button class="btn btn-sm btn-outline tc-receive-local-cuota-btn" data-id="${s.id}" style="border-radius: 8px; color: #f59e0b; border-color: #f59e0b;">
+                                                        <i class="fas fa-hand-holding-usd"></i> Cobrar Cuota en Local
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                                ${creditSales.length === 0 ? '<tr><td colspan="9" class="text-center text-secondary" style="padding: 2rem;">No hay ventas registradas con Sistecrédito o ADDI todavía.</td></tr>' : ''}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    async confirmFintechDisbursement(saleId) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        const totalSale = sale.items ? sale.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(sale.sale_price || 0);
+        const comm = parseFloat(sale.platform_commission || 0);
+        const netAmount = totalSale - comm;
+        const platformName = sale.payment_method === 'sistecredito' ? 'Sistecrédito' : 'ADDI';
+
+        if (!confirm(`¿Confirmar desembolso bancario de ${platformName}?\n\nMonto Neto: $${netAmount.toLocaleString('es-CO')} COP\nCliente: ${sale.customer_name}\n\nEsto marcará el pago como recibido en la cuenta bancaria.`)) {
+            return;
+        }
+
+        sale.money_confirmed = true;
+        sale.money_confirmed_at = new Date().toISOString();
+        await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, sale.id, sale);
+
+        alert(`¡Éxito! Desembolso de ${platformName} por $${netAmount.toLocaleString('es-CO')} confirmado.`);
+        this.renderFinancesTab();
+    },
+
+    async receiveLocalCuotaPayment(saleId) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        const platformName = sale.payment_method === 'sistecredito' ? 'Sistecrédito' : 'ADDI';
+        const amountStr = prompt(`Registrar cobro de cuota presencial en el local para:\nCliente: "${sale.customer_name}"\nPlataforma: ${platformName} (Crédito ${sale.credit_approval_number || ''})\n\nIngrese el monto cobrado en efectivo/Nequi ($):`, "50000");
+        if (!amountStr) return;
+
+        const amount = parseFloat(amountStr.replace(/\./g, '').replace(/[^0-9]/g, ''));
+        if (isNaN(amount) || amount <= 0) {
+            alert('Por favor ingrese un valor válido.');
+            return;
+        }
+
+        const coChoice = prompt(`¿En qué caja física de tienda se recibió el dinero?\nEscriba 'M' para Millenio o 'V' para Vulcano:`, "M").toUpperCase();
+        const targetCo = coChoice === 'V' ? 'vulcano' : 'millenio';
+
+        // Record Inflow Movement in Cash Register
+        const movement = {
+            date: new Date().toISOString(),
+            company: targetCo,
+            type: 'inflow',
+            amount: amount,
+            concept: `Recaudo Cuota ${platformName} - Cliente ${sale.customer_name} (#${sale.credit_approval_number || sale.id.substring(0,6)})`,
+            method: 'cash'
+        };
+
+        await Storage.addItem(STORAGE_KEYS.MOVEMENTS, movement);
+        alert(`¡Éxito! Se registraron $${amount.toLocaleString('es-CO')} COP en la caja de ${targetCo.toUpperCase()} por pago de cuota de ${sale.customer_name}.`);
+        this.renderFinancesTab();
     },
 
     async paySellerCommissions(sellerId) {
@@ -1582,6 +1794,18 @@ window.TuCompras = {
                 return;
             }
 
+            const confirmDisbBtn = e.target.closest('.tc-confirm-disbursement-btn');
+            if (confirmDisbBtn) {
+                this.confirmFintechDisbursement(confirmDisbBtn.dataset.id);
+                return;
+            }
+
+            const receiveLocalCuotaBtn = e.target.closest('.tc-receive-local-cuota-btn');
+            if (receiveLocalCuotaBtn) {
+                this.receiveLocalCuotaPayment(receiveLocalCuotaBtn.dataset.id);
+                return;
+            }
+
             if (e.target.id === 'tc-batch-pay-btn') {
                 this.processBatchPayment();
                 return;
@@ -1704,6 +1928,24 @@ window.TuCompras = {
         };
 
         panel.onchange = (e) => {
+            if (e.target.id === 'tc-payment-method-select') {
+                const val = e.target.value;
+                const group = document.getElementById('tc-credit-details-group');
+                const commInput = document.getElementById('tc-platform-commission-input');
+                if (group) group.style.display = (val === 'sistecredito' || val === 'addi') ? 'flex' : 'none';
+
+                if (val === 'sistecredito' || val === 'addi') {
+                    const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0);
+                    const pct = val === 'sistecredito' ? 0.10 : 0.08;
+                    if (commInput && (!commInput.value || commInput.value === '0')) {
+                        commInput.value = Math.round(totalSale * pct);
+                    }
+                } else if (commInput) {
+                    commInput.value = '0';
+                }
+                this.updateCartUI();
+                return;
+            }
             if (e.target.id === 'tc-filter-hide-imported') {
                 this.hideImported = e.target.checked;
                 this.renderPanel();
@@ -2056,6 +2298,18 @@ window.TuCompras = {
             dateInput.value = localIso;
         }
 
+        // Reset payment & credit fields
+        const payMethodSelect = document.getElementById('tc-payment-method-select');
+        if (payMethodSelect) payMethodSelect.value = 'dropi_cod';
+        const creditGroup = document.getElementById('tc-credit-details-group');
+        if (creditGroup) creditGroup.style.display = 'none';
+        const creditApprovalInput = document.getElementById('tc-credit-approval-input');
+        if (creditApprovalInput) creditApprovalInput.value = '';
+        const creditInstallmentsInput = document.getElementById('tc-credit-installments-input');
+        if (creditInstallmentsInput) creditInstallmentsInput.value = '3';
+        const platformCommissionInput = document.getElementById('tc-platform-commission-input');
+        if (platformCommissionInput) platformCommissionInput.value = '0';
+
         const wizardTitle = document.getElementById('tc-wizard-title');
         if (wizardTitle) {
             wizardTitle.innerHTML = `<span class="step-indicator" style="background: var(--accent); color: white; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 0.9rem;">1</span> Información del Cliente`;
@@ -2106,6 +2360,22 @@ window.TuCompras = {
 
         const campaignSelect = document.getElementById('tc-campaign-select');
         if (campaignSelect) campaignSelect.value = sale.campaign_name || '';
+
+        // Payment & Credit Fields
+        const pMethodSelect = document.getElementById('tc-payment-method-select');
+        if (pMethodSelect) {
+            pMethodSelect.value = sale.payment_method || 'dropi_cod';
+            const cGroup = document.getElementById('tc-credit-details-group');
+            if (cGroup) {
+                cGroup.style.display = (sale.payment_method === 'sistecredito' || sale.payment_method === 'addi') ? 'flex' : 'none';
+            }
+        }
+        const cApprInput = document.getElementById('tc-credit-approval-input');
+        if (cApprInput) cApprInput.value = sale.credit_approval_number || '';
+        const cInstInput = document.getElementById('tc-credit-installments-input');
+        if (cInstInput) cInstInput.value = sale.credit_installments || 3;
+        const pCommInput = document.getElementById('tc-platform-commission-input');
+        if (pCommInput) pCommInput.value = sale.platform_commission || 0;
 
         const wizardTitle = document.getElementById('tc-wizard-title');
         if (wizardTitle) {
@@ -2293,7 +2563,7 @@ window.TuCompras = {
                         <strong style="color: var(--text-primary); font-size: 0.85rem;">${i.name}</strong>
                         <button type="button" class="tc-remove-item icon-btn" data-id="${i.product_id}" style="width:22px; height:22px; font-size: 0.7rem; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); border-radius: 50%; cursor: pointer;">&times;</button>
                     </div>
-                    <div style="display: grid; grid-template-columns: 0.9fr 1.3fr 1.3fr 1.3fr; gap: 6px; align-items: center;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 8px; align-items: center;">
                         <div class="form-group" style="margin:0;">
                             <label style="font-size: 0.65rem; color: var(--text-secondary);">Cant.</label>
                             <input type="number" min="1" value="${i.qty}" onchange="TuCompras.updateCartValue('${i.product_id}', 'qty', this.value)" style="width: 100%; height: 28px; font-size: 0.8rem; font-weight: 700; text-align: center; border-radius: 6px; border: 1px solid var(--accent); background: var(--bg-body); color: var(--accent-vibrant);">
@@ -2317,12 +2587,18 @@ window.TuCompras = {
         const totalCost = this.cart.reduce((sum, i) => sum + (parseFloat(i.cost_price || 0) * i.qty), 0);
         const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0);
         const totalComm = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * i.qty), 0);
+
+        const platformCommInput = document.getElementById('tc-platform-commission-input');
+        const platformComm = parseFloat(platformCommInput ? platformCommInput.value : 0) || 0;
         
         const elTotalSale = document.getElementById('tc-total-sale-text');
         if (elTotalSale) elTotalSale.textContent = `$${totalSale.toLocaleString()}`;
         
         const elTotalCost = document.getElementById('tc-total-cost-text');
         if (elTotalCost) elTotalCost.textContent = `$${totalCost.toLocaleString()}`;
+
+        const elTotalPlatformComm = document.getElementById('tc-total-platform-comm-text');
+        if (elTotalPlatformComm) elTotalPlatformComm.textContent = `$${platformComm.toLocaleString()}`;
 
         const elTotalComm = document.getElementById('tc-total-commission-text');
         if (elTotalComm) elTotalComm.textContent = `$${totalComm.toLocaleString()}`;
@@ -2435,6 +2711,17 @@ window.TuCompras = {
                     saleDate = new Date(dateInput.value).toISOString();
                 } catch(e) {}
             }
+            const payMethodSelect = document.getElementById('tc-payment-method-select');
+            const payment_method = formData && typeof formData.get === 'function' ? (formData.get('payment_method') || 'dropi_cod') : (payMethodSelect ? payMethodSelect.value : 'dropi_cod');
+
+            const creditApprovalInput = document.getElementById('tc-credit-approval-input');
+            const credit_approval_number = formData && typeof formData.get === 'function' ? (formData.get('credit_approval_number') || '') : (creditApprovalInput ? creditApprovalInput.value : '');
+
+            const creditInstallmentsInput = document.getElementById('tc-credit-installments-input');
+            const credit_installments = parseInt(formData && typeof formData.get === 'function' ? (formData.get('credit_installments') || 3) : (creditInstallmentsInput ? creditInstallmentsInput.value : 3)) || 3;
+
+            const platformCommissionInput = document.getElementById('tc-platform-commission-input');
+            const platform_commission = parseFloat(formData && typeof formData.get === 'function' ? (formData.get('platform_commission') || 0) : (platformCommissionInput ? platformCommissionInput.value : 0)) || 0;
 
             const dropiOrderIdInput = document.getElementById('tc-dropi-order-id-input');
             const dropi_order_id = formData && typeof formData.get === 'function' ? (formData.get('dropi_order_id') || '') : (dropiOrderIdInput ? dropiOrderIdInput.value : '');
@@ -2456,6 +2743,10 @@ window.TuCompras = {
                     tracking_number: tracking_number,
                     shipping_cost: shipping_cost,
                     campaign_name: campaign_name,
+                    payment_method: payment_method,
+                    credit_approval_number: credit_approval_number,
+                    credit_installments: credit_installments,
+                    platform_commission: platform_commission,
                     commission_paid: totalCommission,
                     items: this.cart
                 };
@@ -2476,6 +2767,10 @@ window.TuCompras = {
                     status: 'despachado',
                     shipping_cost: shipping_cost,
                     campaign_name: campaign_name,
+                    payment_method: payment_method,
+                    credit_approval_number: credit_approval_number,
+                    credit_installments: credit_installments,
+                    platform_commission: platform_commission,
                     commission_paid: totalCommission,
                     items: this.cart,
                     money_confirmed: false,
