@@ -159,6 +159,24 @@ function initNavigation() {
         }
     });
 
+    const fabBtn = document.getElementById('mobile-fab-btn');
+    if (fabBtn) {
+        fabBtn.onclick = () => {
+            const activePanel = localStorage.getItem('erp_active_panel') || 'dashboard';
+            if (activePanel === 'tucompras' && window.TuCompras) {
+                window.TuCompras.openNewSaleModal();
+            } else if (activePanel === 'inventory' && window.Inventory) {
+                const addBtn = document.getElementById('add-product-btn');
+                if (addBtn) addBtn.click();
+            } else if (activePanel === 'crm' && window.CRM) {
+                const addClientBtn = document.getElementById('add-client-btn');
+                if (addClientBtn) addClientBtn.click();
+            } else if (window.TuCompras) {
+                window.TuCompras.openNewSaleModal();
+            }
+        };
+    }
+
     window.addEventListener('hashchange', () => {
         const panelName = window.location.hash.replace('#', '');
         if (panelName && panelName !== localStorage.getItem('erp_active_panel')) {
