@@ -1585,12 +1585,39 @@ window.TuCompras = {
                         ` : `
                             <button class="btn btn-sm btn-outline tc-update-btn" data-id="${s.id}" title="Cambiar Estado"><i class="fas fa-sync-alt"></i> Estado</button>
                         `}
+                        <button class="btn btn-sm btn-outline tc-whatsapp-btn" data-id="${s.id}" style="color: #25d366; border-color: rgba(37,211,102,0.4);" title="Enviar por WhatsApp"><i class="fab fa-whatsapp"></i></button>
                         <button class="btn btn-sm btn-outline tc-edit-btn" data-id="${s.id}" style="color: var(--accent); border-color: var(--accent);" title="Editar Venta"><i class="fas fa-edit"></i> Editar</button>
                         <button class="btn btn-sm btn-outline tc-delete-sale-btn" data-id="${s.id}" style="color: #ef4444; border-color: rgba(239,68,68,0.3);" title="Eliminar Venta"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
             `;
         }).join('');
+    },
+
+    sendWhatsAppReceipt(saleId) {
+        const sale = this.getSales().find(s => s.id === saleId);
+        if (!sale) return;
+
+        const phone = String(sale.customer_phone || '').replace(/[^0-9]/g, '');
+        if (!phone) {
+            alert('El pedido no tiene número de teléfono registrado.');
+            return;
+        }
+
+        const cleanPhone = phone.startsWith('57') ? phone : `57${phone}`;
+        const totalSale = sale.items ? sale.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(sale.sale_price || 0);
+
+        let itemsText = "";
+        if (sale.items && sale.items.length > 0) {
+            itemsText = sale.items.map(i => `• ${i.name} (${i.qty}x)`).join('\n');
+        } else {
+            itemsText = `• Producto TuCompras`;
+        }
+
+        const text = `Hola ${sale.customer_name || 'Cliente'}, ¡saludos de TuCompras Col! 🛍️\n\nConfirmamos tu pedido #${sale.dropi_order_id || sale.tracking_number || sale.id.substring(0,6)}:\n${itemsText}\n\n*Total a pagar:* $${totalSale.toLocaleString('es-CO')} COP\n*Estado:* ${sale.status ? sale.status.toUpperCase() : 'DESPACHADO'}\n${sale.tracking_number ? `*Guía ${sale.carrier || ''}:* ${sale.tracking_number}` : ''}\n\n¡Gracias por tu preferencia!`;
+
+        const url = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(text)}`;
+        window.open(url, '_blank');
     },
 
     getSellersList() {
@@ -1779,6 +1806,12 @@ window.TuCompras = {
             const updateBtn = e.target.closest('.tc-update-btn');
             if (updateBtn) {
                 this.openStatusModal(updateBtn.dataset.id);
+                return;
+            }
+
+            const waBtn = e.target.closest('.tc-whatsapp-btn');
+            if (waBtn) {
+                this.sendWhatsAppReceipt(waBtn.dataset.id);
                 return;
             }
 
