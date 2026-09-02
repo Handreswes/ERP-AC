@@ -157,6 +157,7 @@ window.Dashboard = {
         const pendingCreditsVulcano = clients.reduce((sum, c) => sum + (c.balanceVulcano || 0), 0);
 
         // Millenio Breakdown
+        // Millenio Breakdown
         const mSales = filteredSales.reduce((acc, s) => {
             const val = s.totalM || 0;
             acc.total += val;
@@ -167,13 +168,13 @@ window.Dashboard = {
         }, { total: 0, cash: 0, credit: 0, consignment: 0 });
 
         let mExpenses = expenses.filter(e => {
-            const d = new Date(e.createdAt);
+            const d = new Date(e.date || e.createdAt);
             return d >= startDate && d <= endDate && e.company === 'millenio';
         }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
         // Add manual outflows (salidas) to expenses
         mExpenses += movements.filter(m => {
-            const d = new Date(m.date);
+            const d = new Date(m.date || m.createdAt);
             return d >= startDate && d <= endDate && m.company === 'millenio' && m.type === 'outflow';
         }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
 
@@ -188,13 +189,13 @@ window.Dashboard = {
         }, { total: 0, cash: 0, credit: 0, consignment: 0 });
 
         let vExpenses = expenses.filter(e => {
-            const d = new Date(e.createdAt);
+            const d = new Date(e.date || e.createdAt);
             return d >= startDate && d <= endDate && e.company === 'vulcano';
         }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
         // Add manual outflows (salidas) to expenses
         vExpenses += movements.filter(m => {
-            const d = new Date(m.date);
+            const d = new Date(m.date || m.createdAt);
             return d >= startDate && d <= endDate && m.company === 'vulcano' && m.type === 'outflow';
         }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
 
@@ -207,8 +208,37 @@ window.Dashboard = {
         ).reduce((sum, s) => sum + (parseFloat(s.commission_paid) || 0), 0);
 
         const tcFiltered = tcSales.filter(s => {
-            const d = new Date(s.date);
+            const d = new Date(s.date || s.createdAt);
             return d >= startDate && d <= endDate;
+        });
+
+        // Add TuCompras sales to Millenio and Vulcano summaries by inventory source
+        tcFiltered.forEach(s => {
+            if (s.status === 'despachado' || s.status === 'recibido') {
+                if (s.items && Array.isArray(s.items)) {
+                    s.items.forEach(i => {
+                        const itemSource = i.inventory_source || s.inventory_source || 'millenio';
+                        const itemVal = (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1));
+                        if (itemSource === 'vulcano') {
+                            vSales.total += itemVal;
+                            if (s.status === 'recibido') vSales.consignment += itemVal;
+                        } else {
+                            mSales.total += itemVal;
+                            if (s.status === 'recibido') mSales.consignment += itemVal;
+                        }
+                    });
+                } else {
+                    const itemSource = s.inventory_source || 'millenio';
+                    const val = parseFloat(s.sale_price || 0);
+                    if (itemSource === 'vulcano') {
+                        vSales.total += val;
+                        if (s.status === 'recibido') vSales.consignment += val;
+                    } else {
+                        mSales.total += val;
+                        if (s.status === 'recibido') mSales.consignment += val;
+                    }
+                }
+            }
         });
 
         const tcRevenue = tcFiltered.reduce((sum, s) => {
@@ -232,20 +262,30 @@ window.Dashboard = {
         }, 0);
 
         let tcExpenses = expenses.filter(e => {
-            const d = new Date(e.createdAt);
+            const d = new Date(e.date || e.createdAt);
             return d >= startDate && d <= endDate && e.company === 'tucompras';
         }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
 
         tcExpenses += movements.filter(m => {
-            const d = new Date(m.date);
+            const d = new Date(m.date || m.createdAt);
             return d >= startDate && d <= endDate && m.company === 'tucompras' && m.type === 'outflow';
+        }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
+
+        let genExpenses = expenses.filter(e => {
+            const d = new Date(e.date || e.createdAt);
+            return d >= startDate && d <= endDate && (e.company === 'multinegocio' || !e.company);
+        }).reduce((sum, e) => sum + parseFloat(e.amount || 0), 0);
+
+        genExpenses += movements.filter(m => {
+            const d = new Date(m.date || m.createdAt);
+            return d >= startDate && d <= endDate && (m.company === 'multinegocio' || !m.company) && m.type === 'outflow';
         }).reduce((sum, m) => sum + parseFloat(m.amount || 0), 0);
 
         // MASTER FINANCIAL CALCULATIONS
         const totalRevenue = totalFilteredPOS + tcRevenue;
         const totalCOGS = posCOGS + tcCogsAndExpenses;
         const grossProfit = totalRevenue - totalCOGS;
-        const totalOPEX = mExpenses + vExpenses + tcExpenses;
+        const totalOPEX = mExpenses + vExpenses + tcExpenses + genExpenses;
         const netProfit = grossProfit - totalOPEX;
         const netMargin = totalRevenue > 0 ? ((netProfit / totalRevenue) * 100).toFixed(1) : 0;
 
@@ -518,7 +558,7 @@ window.Dashboard = {
 
     updateElText(id, text) {
         const el = document.getElementById(id);
-        if (el) el.textContent = text;
+        if (el) el.innerHTML = text;
     },
 
     renderCreditsList(id, credits) {
