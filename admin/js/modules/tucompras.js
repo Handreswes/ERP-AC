@@ -270,6 +270,10 @@ window.TuCompras = {
                                             <span>Subtotal Venta:</span>
                                             <strong id="tc-total-sale-text" style="color: var(--accent-vibrant);">$0</strong>
                                         </div>
+                                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                            <span style="color: #38bdf8;">Costo Bodega (Mayorista):</span>
+                                            <strong id="tc-total-cost-text" style="color: #38bdf8;">$0</strong>
+                                        </div>
                                         <div style="display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 8px;">
                                             <span>Comisión:</span>
                                             <strong id="tc-total-commission-text" style="color: var(--warning);">$0</strong>
@@ -2227,7 +2231,10 @@ window.TuCompras = {
                         ${stockV > 0 ? `<span class="badge bg-orange" style="font-size: 0.6rem; padding: 2px 5px;" title="Stock Vulcano">V: ${stockV}</span>` : ''}
                     </div>
                     <div style="margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 4px;">
-                        <span style="font-size: 0.9rem; font-weight: 700; color: var(--accent-vibrant);">$${parseFloat(p.priceFinal || p.priceInternet || 0).toLocaleString()}</span>
+                        <div>
+                            <span style="font-size: 0.85rem; font-weight: 700; color: var(--accent-vibrant);">$${parseFloat(p.priceFinal || p.priceInternet || 0).toLocaleString()}</span>
+                            <br><span style="font-size: 0.7rem; color: #38bdf8; font-weight: 600;">Mayorista: $${parseFloat(p.priceWholesale || p.priceMayorista || p.costPrice || p.cost || 0).toLocaleString()}</span>
+                        </div>
                         <button class="btn btn-sm ${qtyInCart > 0 ? 'btn-success' : 'btn-primary'} tc-add-btn" data-id="${p.id}" style="height: 32px; padding: 0 12px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 4px;">
                             <i class="fas ${qtyInCart > 0 ? 'fa-plus' : 'fa-cart-plus'}"></i> ${qtyInCart > 0 ? 'Agregar +1' : 'Agregar'}
                         </button>
@@ -2249,6 +2256,8 @@ window.TuCompras = {
         else if (stockM > 0) source = 'millenio';
         else if (product.company === 'vulcano') source = 'vulcano';
 
+        const wholesaleCost = parseFloat(product.priceWholesale || product.priceMayorista || product.costPrice || product.cost || 0);
+
         const existing = this.cart.find(i => i.product_id === productId);
         if (existing) {
             existing.qty++;
@@ -2257,9 +2266,9 @@ window.TuCompras = {
                 product_id: productId,
                 name: product.name,
                 qty: 1,
-                cost_price: product.priceWholesale || product.cost || 0,
-                sale_price: product.priceFinal || product.priceInternet || 0,
-                commission_paid: product.commissionBase || 0,
+                cost_price: wholesaleCost,
+                sale_price: parseFloat(product.priceFinal || product.priceInternet || 0),
+                commission_paid: parseFloat(product.commissionBase || 0),
                 inventory_source: source
             });
         }
@@ -2284,10 +2293,14 @@ window.TuCompras = {
                         <strong style="color: var(--text-primary); font-size: 0.85rem;">${i.name}</strong>
                         <button type="button" class="tc-remove-item icon-btn" data-id="${i.product_id}" style="width:22px; height:22px; font-size: 0.7rem; background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); border-radius: 50%; cursor: pointer;">&times;</button>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; align-items: center;">
+                    <div style="display: grid; grid-template-columns: 0.9fr 1.3fr 1.3fr 1.3fr; gap: 6px; align-items: center;">
                         <div class="form-group" style="margin:0;">
-                            <label style="font-size: 0.65rem; color: var(--text-secondary);">Cantidad</label>
+                            <label style="font-size: 0.65rem; color: var(--text-secondary);">Cant.</label>
                             <input type="number" min="1" value="${i.qty}" onchange="TuCompras.updateCartValue('${i.product_id}', 'qty', this.value)" style="width: 100%; height: 28px; font-size: 0.8rem; font-weight: 700; text-align: center; border-radius: 6px; border: 1px solid var(--accent); background: var(--bg-body); color: var(--accent-vibrant);">
+                        </div>
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-size: 0.65rem; color: #38bdf8; font-weight: 700;">Costo Bodega ($)</label>
+                            <input type="number" value="${i.cost_price}" onchange="TuCompras.updateCartValue('${i.product_id}', 'cost_price', this.value)" title="Costo editable por negociaciones, ofertas o promociones especiales" style="width: 100%; height: 28px; font-size: 0.8rem; font-weight: 600; border-radius: 6px; border: 1px solid rgba(56,189,248,0.4); background: rgba(56,189,248,0.08); color: #38bdf8;">
                         </div>
                         <div class="form-group" style="margin:0;">
                             <label style="font-size: 0.65rem; color: var(--text-secondary);">P. Venta ($)</label>
@@ -2301,10 +2314,18 @@ window.TuCompras = {
                 </div>
             `).join('');
 
-        const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price) * i.qty), 0);
-        const totalComm = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid) * i.qty), 0);
-        document.getElementById('tc-total-sale-text').textContent = `$${totalSale.toLocaleString()}`;
-        document.getElementById('tc-total-commission-text').textContent = `$${totalComm.toLocaleString()}`;
+        const totalCost = this.cart.reduce((sum, i) => sum + (parseFloat(i.cost_price || 0) * i.qty), 0);
+        const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0);
+        const totalComm = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * i.qty), 0);
+        
+        const elTotalSale = document.getElementById('tc-total-sale-text');
+        if (elTotalSale) elTotalSale.textContent = `$${totalSale.toLocaleString()}`;
+        
+        const elTotalCost = document.getElementById('tc-total-cost-text');
+        if (elTotalCost) elTotalCost.textContent = `$${totalCost.toLocaleString()}`;
+
+        const elTotalComm = document.getElementById('tc-total-commission-text');
+        if (elTotalComm) elTotalComm.textContent = `$${totalComm.toLocaleString()}`;
     },
 
     updateCartValue(productId, field, value) {
