@@ -789,9 +789,14 @@ window.Inventory = {
 
                         const notes = prompt(`¿Alguna nota o número de factura?`, 'Entrada Manual');
 
-                        // Update stock
+                        // Update stock & auto-activate if stock > 0
                         if (targetCompany === 'millenio') product.stockMillenio = (parseInt(product.stockMillenio) || 0) + qty;
                         else product.stockVulcano = (parseInt(product.stockVulcano) || 0) + qty;
+
+                        const totalNow = (parseInt(product.stockMillenio) || 0) + (parseInt(product.stockVulcano) || 0);
+                        if (totalNow > 0) {
+                            product.active = true;
+                        }
 
                         await this.updateProduct(product.id, product);
                         await this.recordStockEntry(product.id, product.name, qty, targetCompany, 'Entrada Directa', notes);
@@ -1209,6 +1214,25 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
             const cleanCurrency = (val) => parseFloat(String(val).replace(/\./g, "").replace(/[^0-9-]/g, "")) || 0;
 
             const formData = new FormData(form);
+            const stockM = parseInt(formData.get('stockMillenio')) || 0;
+            const stockV = parseInt(formData.get('stockVulcano')) || 0;
+            const totalStock = stockM + stockV;
+            const formActive = formData.get('active') === 'true';
+
+            // Auto-activar cuando el producto recibe stock y sale del Limbo (stock > 0)
+            let isProductActive = false;
+            if (totalStock > 0) {
+                const existing = this.editingId ? this.getProducts().find(p => p.id === this.editingId) : null;
+                const previousStock = existing ? ((parseInt(existing.stockMillenio) || 0) + (parseInt(existing.stockVulcano) || 0)) : 0;
+                if (previousStock <= 0 || !existing) {
+                    isProductActive = true; // Auto activar al salir del Limbo
+                } else {
+                    isProductActive = formActive;
+                }
+            } else {
+                isProductActive = false; // Sin stock siempre pasa al Limbo (Inactivo)
+            }
+
             const product = {
                 id: this.editingId || '',
                 name: formData.get('name'),
@@ -1220,10 +1244,10 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                 priceFinal: cleanCurrency(formData.get('priceFinal')),
                 pricePrevious: cleanCurrency(formData.get('pricePrevious')),
                 commissionBase: cleanCurrency(formData.get('commissionBase')),
-                stockMillenio: parseInt(formData.get('stockMillenio')) || 0,
-                stockVulcano: parseInt(formData.get('stockVulcano')) || 0,
+                stockMillenio: stockM,
+                stockVulcano: stockV,
                 company: formData.get('company'),
-                active: ((parseInt(formData.get('stockMillenio')) || 0) + (parseInt(formData.get('stockVulcano')) || 0)) > 0 ? (formData.get('active') === 'true') : false,
+                active: isProductActive,
                 image: Array.from(document.querySelectorAll('.image-base64'))
                     .map(input => input.value)
                     .filter(val => val && val.startsWith('data:image')),
@@ -1243,7 +1267,6 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
             }
 
             // If stock is 0, user won't see it in 'stock' tab. Auto-switch to 'limbo'.
-            const totalStock = product.stockMillenio + product.stockVulcano;
             if (totalStock <= 0) {
                 this.activeTab = 'limbo';
             } else {
