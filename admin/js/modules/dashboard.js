@@ -250,13 +250,14 @@ window.Dashboard = {
         }, 0);
 
         const tcCogsAndExpenses = tcFiltered.reduce((sum, s) => {
+            const platformComm = parseFloat(s.platform_commission || 0);
             if (s.status === 'recibido') {
                 const totalCost = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.cost_price || 0) * i.qty), 0) : parseFloat(s.cost_price || 0);
                 const totalComm = s.items ? s.items.reduce((sumItem, i) => sumItem + (parseFloat(i.commission_paid || 0) * i.qty), 0) : parseFloat(s.commission_paid || 0);
-                return sum + totalCost + totalComm + parseFloat(s.shipping_cost || 0);
+                return sum + totalCost + totalComm + parseFloat(s.shipping_cost || 0) + platformComm;
             }
             if (s.status === 'devuelto' || s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida') {
-                return sum + (parseFloat(s.shipping_loss || 0));
+                return sum + (parseFloat(s.shipping_loss || 0) + platformComm);
             }
             return sum;
         }, 0);
