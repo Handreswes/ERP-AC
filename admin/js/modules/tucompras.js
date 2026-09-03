@@ -263,18 +263,22 @@ window.TuCompras = {
 
                                      <div id="tc-credit-details-group" style="display: none; background: rgba(168, 85, 247, 0.08); border: 1px dashed rgba(168, 85, 247, 0.4); padding: 12px; border-radius: 12px; margin-bottom: 0.5rem; flex-direction: column; gap: 10px;">
                                          <h5 style="margin: 0; color: #c084fc; font-size: 0.85rem;"><i class="fas fa-file-invoice-dollar"></i> Datos de Crédito Financiero (Sistecrédito / ADDI)</h5>
-                                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px;">
+                                         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(125px, 1fr)); gap: 10px;">
                                              <div class="form-group" style="margin:0;">
                                                  <label style="font-size: 0.75rem; color: var(--text-secondary);"># Aprobación / Crédito</label>
-                                                 <input type="text" id="tc-credit-approval-input" name="credit_approval_number" class="form-control" placeholder="Ej: STC-98421">
+                                                 <input type="text" id="tc-credit-approval-input" name="credit_approval_number" class="form-control" placeholder="Ej: 71633327">
                                              </div>
                                              <div class="form-group" style="margin:0;">
-                                                 <label style="font-size: 0.75rem; color: var(--text-secondary);">Número de Cuotas</label>
-                                                 <input type="number" id="tc-credit-installments-input" name="credit_installments" class="form-control" placeholder="3, 6, 12..." min="1" value="3">
+                                                 <label style="font-size: 0.75rem; color: #38bdf8; font-weight: 700;">Monto Crédito ($)</label>
+                                                 <input type="number" id="tc-credit-amount-input" name="credit_amount" class="form-control" placeholder="0" style="border-color: rgba(56, 189, 248, 0.4); color: #38bdf8; font-weight: 700;">
                                              </div>
                                              <div class="form-group" style="margin:0;">
-                                                 <label style="font-size: 0.75rem; color: #ef4444; font-weight: 700;">Comisión Plataforma ($)</label>
-                                                 <input type="number" id="tc-platform-commission-input" name="platform_commission" class="form-control" placeholder="0" value="0" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171;">
+                                                 <label style="font-size: 0.75rem; color: #f59e0b; font-weight: 700;">Comisión (%)</label>
+                                                 <input type="number" step="0.1" min="0" max="100" id="tc-platform-commission-pct-input" name="platform_commission_pct" class="form-control" placeholder="2.3" value="2.3" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; font-weight: 700;">
+                                             </div>
+                                             <div class="form-group" style="margin:0;">
+                                                 <label style="font-size: 0.75rem; color: #ef4444; font-weight: 700;">Comisión Cobrada ($)</label>
+                                                 <input type="number" id="tc-platform-commission-input" name="platform_commission" class="form-control" placeholder="0" value="0" style="border-color: rgba(239, 68, 68, 0.4); color: #f87171; font-weight: 700;">
                                              </div>
                                          </div>
                                      </div>
@@ -1960,23 +1964,30 @@ window.TuCompras = {
             // --- End Dropi Import click handlers ---
         };
 
+        panel.oninput = (e) => {
+            if (e.target.id === 'tc-credit-amount-input') {
+                delete e.target.dataset.autoPrefilled;
+                this.recalculatePlatformCommission('amount_change');
+            } else if (e.target.id === 'tc-platform-commission-pct-input') {
+                this.recalculatePlatformCommission('pct_change');
+            } else if (e.target.id === 'tc-platform-commission-input') {
+                this.recalculatePlatformCommission('val_input');
+            }
+        };
+
         panel.onchange = (e) => {
             if (e.target.id === 'tc-payment-method-select') {
                 const val = e.target.value;
                 const group = document.getElementById('tc-credit-details-group');
-                const commInput = document.getElementById('tc-platform-commission-input');
+                const pctInput = document.getElementById('tc-platform-commission-pct-input');
                 if (group) group.style.display = (val === 'sistecredito' || val === 'addi') ? 'flex' : 'none';
 
-                if (val === 'sistecredito' || val === 'addi') {
-                    const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0);
-                    const pct = val === 'sistecredito' ? 0.10 : 0.08;
-                    if (commInput && (!commInput.value || commInput.value === '0')) {
-                        commInput.value = Math.round(totalSale * pct);
-                    }
-                } else if (commInput) {
-                    commInput.value = '0';
+                if (val === 'sistecredito') {
+                    if (pctInput) pctInput.value = '2.3';
+                } else if (val === 'addi') {
+                    if (pctInput) pctInput.value = '8.0';
                 }
-                this.updateCartUI();
+                this.recalculatePlatformCommission('auto');
                 return;
             }
             if (e.target.id === 'tc-filter-hide-imported') {
@@ -2294,6 +2305,49 @@ window.TuCompras = {
         this.renderPanel();
     },
 
+    recalculatePlatformCommission(triggeredBy = 'auto') {
+        const paySelect = document.getElementById('tc-payment-method-select');
+        const val = paySelect ? paySelect.value : 'dropi_cod';
+        if (val !== 'sistecredito' && val !== 'addi') {
+            const commInput = document.getElementById('tc-platform-commission-input');
+            if (commInput) commInput.value = '0';
+            const elTotalPlatformComm = document.getElementById('tc-total-platform-comm-text');
+            if (elTotalPlatformComm) elTotalPlatformComm.textContent = '$0';
+            return;
+        }
+
+        const creditAmountInput = document.getElementById('tc-credit-amount-input');
+        const commPctInput = document.getElementById('tc-platform-commission-pct-input');
+        const commValInput = document.getElementById('tc-platform-commission-input');
+
+        const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0);
+        
+        let creditAmt = parseFloat(creditAmountInput ? creditAmountInput.value : 0);
+        if (isNaN(creditAmt) || creditAmt <= 0) {
+            creditAmt = totalSale;
+            if (creditAmountInput) creditAmountInput.value = totalSale;
+        }
+
+        const pct = parseFloat(commPctInput ? commPctInput.value : 0) || 0;
+        let calculatedVal = 0;
+
+        if (triggeredBy === 'val_input' && commValInput) {
+            calculatedVal = parseFloat(commValInput.value) || 0;
+            if (creditAmt > 0 && commPctInput) {
+                const calculatedPct = ((calculatedVal / creditAmt) * 100).toFixed(2);
+                commPctInput.value = calculatedPct;
+            }
+        } else {
+            calculatedVal = Math.round(creditAmt * (pct / 100));
+            if (commValInput) commValInput.value = calculatedVal;
+        }
+
+        const elTotalPlatformComm = document.getElementById('tc-total-platform-comm-text');
+        if (elTotalPlatformComm) {
+            elTotalPlatformComm.textContent = `$${calculatedVal.toLocaleString('es-CO')}`;
+        }
+    },
+
     openNewSaleModal() {
         this.editingSaleId = null;
         this.cart = [];
@@ -2338,8 +2392,13 @@ window.TuCompras = {
         if (creditGroup) creditGroup.style.display = 'none';
         const creditApprovalInput = document.getElementById('tc-credit-approval-input');
         if (creditApprovalInput) creditApprovalInput.value = '';
-        const creditInstallmentsInput = document.getElementById('tc-credit-installments-input');
-        if (creditInstallmentsInput) creditInstallmentsInput.value = '3';
+        const creditAmountInput = document.getElementById('tc-credit-amount-input');
+        if (creditAmountInput) {
+            creditAmountInput.value = '0';
+            delete creditAmountInput.dataset.autoPrefilled;
+        }
+        const platformPctInput = document.getElementById('tc-platform-commission-pct-input');
+        if (platformPctInput) platformPctInput.value = '2.3';
         const platformCommissionInput = document.getElementById('tc-platform-commission-input');
         if (platformCommissionInput) platformCommissionInput.value = '0';
 
@@ -2405,10 +2464,20 @@ window.TuCompras = {
         }
         const cApprInput = document.getElementById('tc-credit-approval-input');
         if (cApprInput) cApprInput.value = sale.credit_approval_number || '';
-        const cInstInput = document.getElementById('tc-credit-installments-input');
-        if (cInstInput) cInstInput.value = sale.credit_installments || 3;
+
+        const cAmtInput = document.getElementById('tc-credit-amount-input');
+        if (cAmtInput) {
+            cAmtInput.value = sale.credit_amount !== undefined ? sale.credit_amount : (sale.sale_price || 0);
+            delete cAmtInput.dataset.autoPrefilled;
+        }
+
+        const pPctInput = document.getElementById('tc-platform-commission-pct-input');
+        if (pPctInput) pPctInput.value = sale.platform_commission_pct !== undefined ? sale.platform_commission_pct : (sale.payment_method === 'addi' ? 8.0 : 2.3);
+
         const pCommInput = document.getElementById('tc-platform-commission-input');
         if (pCommInput) pCommInput.value = sale.platform_commission || 0;
+
+        this.recalculatePlatformCommission('val_input');
 
         const wizardTitle = document.getElementById('tc-wizard-title');
         if (wizardTitle) {
@@ -2621,17 +2690,21 @@ window.TuCompras = {
         const totalSale = this.cart.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * i.qty), 0);
         const totalComm = this.cart.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * i.qty), 0);
 
-        const platformCommInput = document.getElementById('tc-platform-commission-input');
-        const platformComm = parseFloat(platformCommInput ? platformCommInput.value : 0) || 0;
-        
+        const creditAmountInput = document.getElementById('tc-credit-amount-input');
+        if (creditAmountInput) {
+            if (!creditAmountInput.value || creditAmountInput.dataset.autoPrefilled === 'true' || parseFloat(creditAmountInput.value) === 0) {
+                creditAmountInput.value = totalSale;
+                creditAmountInput.dataset.autoPrefilled = 'true';
+            }
+        }
+
+        this.recalculatePlatformCommission('auto');
+
         const elTotalSale = document.getElementById('tc-total-sale-text');
         if (elTotalSale) elTotalSale.textContent = `$${totalSale.toLocaleString()}`;
         
         const elTotalCost = document.getElementById('tc-total-cost-text');
         if (elTotalCost) elTotalCost.textContent = `$${totalCost.toLocaleString()}`;
-
-        const elTotalPlatformComm = document.getElementById('tc-total-platform-comm-text');
-        if (elTotalPlatformComm) elTotalPlatformComm.textContent = `$${platformComm.toLocaleString()}`;
 
         const elTotalComm = document.getElementById('tc-total-commission-text');
         if (elTotalComm) elTotalComm.textContent = `$${totalComm.toLocaleString()}`;
@@ -2750,8 +2823,11 @@ window.TuCompras = {
             const creditApprovalInput = document.getElementById('tc-credit-approval-input');
             const credit_approval_number = formData && typeof formData.get === 'function' ? (formData.get('credit_approval_number') || '') : (creditApprovalInput ? creditApprovalInput.value : '');
 
-            const creditInstallmentsInput = document.getElementById('tc-credit-installments-input');
-            const credit_installments = parseInt(formData && typeof formData.get === 'function' ? (formData.get('credit_installments') || 3) : (creditInstallmentsInput ? creditInstallmentsInput.value : 3)) || 3;
+            const creditAmountInput = document.getElementById('tc-credit-amount-input');
+            const credit_amount = parseFloat(formData && typeof formData.get === 'function' ? (formData.get('credit_amount') || 0) : (creditAmountInput ? creditAmountInput.value : 0)) || 0;
+
+            const platformPctInput = document.getElementById('tc-platform-commission-pct-input');
+            const platform_commission_pct = parseFloat(formData && typeof formData.get === 'function' ? (formData.get('platform_commission_pct') || 0) : (platformPctInput ? platformPctInput.value : 0)) || 0;
 
             const platformCommissionInput = document.getElementById('tc-platform-commission-input');
             const platform_commission = parseFloat(formData && typeof formData.get === 'function' ? (formData.get('platform_commission') || 0) : (platformCommissionInput ? platformCommissionInput.value : 0)) || 0;
@@ -2778,7 +2854,8 @@ window.TuCompras = {
                     campaign_name: campaign_name,
                     payment_method: payment_method,
                     credit_approval_number: credit_approval_number,
-                    credit_installments: credit_installments,
+                    credit_amount: credit_amount,
+                    platform_commission_pct: platform_commission_pct,
                     platform_commission: platform_commission,
                     commission_paid: totalCommission,
                     items: this.cart
@@ -2802,7 +2879,8 @@ window.TuCompras = {
                     campaign_name: campaign_name,
                     payment_method: payment_method,
                     credit_approval_number: credit_approval_number,
-                    credit_installments: credit_installments,
+                    credit_amount: credit_amount,
+                    platform_commission_pct: platform_commission_pct,
                     platform_commission: platform_commission,
                     commission_paid: totalCommission,
                     items: this.cart,
