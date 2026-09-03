@@ -1148,25 +1148,29 @@ window.TuCompras = {
         let totalShippingCostDelivered = 0;
         let totalShippingLosses = 0;
         let totalCommissions = 0;
+        let totalPlatformCommissions = 0;
 
         sales.forEach(s => {
             const totalSale = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.sale_price || 0);
             const totalCost = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.cost_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.cost_price || 0);
             const totalComm = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.commission_paid || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(s.commission_paid || 0);
+            const platformComm = parseFloat(s.platform_commission || 0);
 
             if (s.status === 'recibido') {
                 grossSales += totalSale;
                 totalCOGS += totalCost;
                 totalShippingCostDelivered += parseFloat(s.shipping_cost || 0);
                 totalCommissions += totalComm;
+                totalPlatformCommissions += platformComm;
             } else if (s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida' || s.status === 'devuelto') {
                 totalShippingLosses += parseFloat(s.shipping_loss || 0);
+                totalPlatformCommissions += platformComm;
             }
         });
 
         const tcExpenses = (Storage.get(STORAGE_KEYS.EXPENSES) || []).filter(e => e.company === 'tucompras');
         const totalExpenses = tcExpenses.reduce((sum, e) => sum + (parseFloat(e.amount) || 0), 0);
-        const netUtility = grossSales - totalCOGS - totalShippingCostDelivered - totalShippingLosses - totalCommissions - totalExpenses;
+        const netUtility = grossSales - totalCOGS - totalShippingCostDelivered - totalShippingLosses - totalCommissions - totalPlatformCommissions - totalExpenses;
         const netMarginRate = grossSales > 0 ? Math.round((netUtility / grossSales) * 100) : 0;
 
         const debtMillenio = sales
@@ -1200,27 +1204,31 @@ window.TuCompras = {
                         revenue: 0,
                         cogs: 0,
                         shippingLoss: 0,
-                        commissions: 0
+                        commissions: 0,
+                        platformCommissions: 0
                     };
                 }
 
                 const qty = parseInt(item.qty) || 1;
                 productStatsMap[pId].shippedQty += qty;
+                const itemPlatformComm = (parseFloat(s.platform_commission || 0) / items.length);
 
                 if (isDelivered) {
                     productStatsMap[pId].deliveredQty += qty;
                     productStatsMap[pId].revenue += parseFloat(item.sale_price || 0) * qty;
                     productStatsMap[pId].cogs += parseFloat(item.cost_price || 0) * qty;
                     productStatsMap[pId].commissions += parseFloat(item.commission_paid || 0) * qty;
+                    productStatsMap[pId].platformCommissions += itemPlatformComm;
                 } else if (isReturn) {
                     productStatsMap[pId].returnedQty += qty;
                     productStatsMap[pId].shippingLoss += (parseFloat(s.shipping_loss || 0) / items.length);
+                    productStatsMap[pId].platformCommissions += itemPlatformComm;
                 }
             });
         });
 
         const productStatsList = Object.values(productStatsMap).map(p => {
-            const netMargin = p.revenue - p.cogs - p.shippingLoss - p.commissions;
+            const netMargin = p.revenue - p.cogs - p.shippingLoss - p.commissions - p.platformCommissions;
             const marginRate = p.revenue > 0 ? Math.round((netMargin / p.revenue) * 100) : 0;
             const deliveryRate = p.shippedQty > 0 ? Math.round((p.deliveredQty / p.shippedQty) * 100) : 0;
             return { ...p, netMargin, marginRate, deliveryRate };
@@ -1537,10 +1545,11 @@ window.TuCompras = {
             const totalCommValue = s.items ? s.items.reduce((sum, i) => sum + (parseFloat(i.commission_paid) * i.qty), 0) : s.commission_paid;
 
             let utility = 0;
+            const platformComm = parseFloat(s.platform_commission || 0);
             if (s.status === 'recibido') {
-                utility = totalSaleValue - totalCostValue - totalCommValue - parseFloat(s.shipping_cost);
+                utility = totalSaleValue - totalCostValue - totalCommValue - parseFloat(s.shipping_cost || 0) - platformComm;
             } else if (s.status === 'proceso_devolucion' || s.status === 'devolucion_recibida') {
-                utility = -(parseFloat(s.shipping_loss) || 0);
+                utility = -(parseFloat(s.shipping_loss || 0) + platformComm);
             }
 
             let col5 = `<strong>$${parseFloat(totalSaleValue).toLocaleString()}</strong>`;
