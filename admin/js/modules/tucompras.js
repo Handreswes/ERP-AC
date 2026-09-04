@@ -1852,6 +1852,12 @@ window.TuCompras = {
                 return;
             }
 
+            const confirmMoneyActionBtn = e.target.closest('.tc-confirm-money-action-btn');
+            if (confirmMoneyActionBtn) {
+                this.confirmMoney(confirmMoneyActionBtn.dataset.id);
+                return;
+            }
+
             if (e.target.id === 'tc-batch-pay-btn') {
                 this.processBatchPayment();
                 return;
@@ -2954,10 +2960,11 @@ window.TuCompras = {
         }
     },
 
-    openStatusModal(saleId) {
+    async openStatusModal(saleId) {
         const sale = this.getSales().find(s => s.id === saleId);
         if (!sale) return;
 
+        await this.ensureWalletAccount();
         const modalBody = document.getElementById('tc-status-modal-body');
         const accounts = (Storage.get(STORAGE_KEYS.ACCOUNTS) || []).filter(a => a.company === 'tucompras' || a.company === 'millenio' || a.company === 'vulcano');
 
@@ -3001,7 +3008,7 @@ window.TuCompras = {
                                 ${accounts.map(a => `<option value="${a.id}" ${a.id === 'wallet_tucompras' || a.id === sale.received_account_id ? 'selected' : ''}>${a.name} (${a.bankName || a.company})</option>`).join('')}
                             </select>
                         </div>
-                        <button class="btn btn-success btn-block" style="margin-top: 5px; font-weight: 700;" onclick="TuCompras.confirmMoney('${saleId}')">
+                        <button id="tc-confirm-money-btn" class="btn btn-success btn-block tc-confirm-money-action-btn" data-id="${saleId}" style="margin-top: 5px; font-weight: 700;" onclick="TuCompras.confirmMoney('${saleId}')">
                             <i class="fas fa-check-circle"></i> ${sale.money_confirmed ? 'Actualizar Conciliación' : 'Confirmar e Ingresar a Wallet'}
                         </button>
                     </div>
@@ -3341,45 +3348,74 @@ window.TuCompras = {
     },
 
     async confirmMoney(id) {
-        const sale = this.getSales().find(s => s.id === id);
-        if (!sale) return;
+        if (this.isSubmittingConfirm) return;
+        const confirmBtn = document.getElementById('tc-confirm-money-btn') || document.querySelector('.tc-confirm-money-action-btn');
+        const origText = confirmBtn ? confirmBtn.innerHTML : '';
 
-        await this.ensureWalletAccount();
+        try {
+            this.isSubmittingConfirm = true;
+            if (confirmBtn) {
+                confirmBtn.disabled = true;
+                confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conciliando e Ingresando...';
+            }
 
-        const fleteVal = parseFloat(document.getElementById('tc-final-shipping')?.value) || sale.shipping_cost || 0;
-        const netReceivedValInput = document.getElementById('tc-net-received')?.value;
-        const targetAccountId = document.getElementById('tc-target-account')?.value || 'wallet_tucompras';
+            const sale = this.getSales().find(s => s.id === id);
+            if (!sale) {
+                alert('❌ No se encontró la venta seleccionada en la base de datos.');
+                return;
+            }
 
-        const totalSale = sale.items ? sale.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(sale.sale_price || 0);
-        const netExpected = Math.max(0, totalSale - fleteVal);
-        const netReceived = netReceivedValInput !== undefined && netReceivedValInput !== '' ? parseFloat(netReceivedValInput) : netExpected;
-        const discrepancy = netReceived - netExpected;
+            await this.ensureWalletAccount();
 
-        sale.shipping_cost = fleteVal;
-        sale.money_confirmed = true;
-        sale.money_confirmed_at = new Date().toISOString();
-        sale.money_received_value = netReceived;
-        sale.received_account_id = targetAccountId;
-        sale.discrepancy_value = discrepancy;
-        sale.reconciliation_status = (Math.abs(discrepancy) < 1) ? 'reconciled' : 'discrepancy';
+            const fleteInput = document.getElementById('tc-final-shipping');
+            const fleteVal = fleteInput ? (parseFloat(fleteInput.value) || 0) : (parseFloat(sale.shipping_cost) || 0);
 
-        await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
+            const netReceivedValInput = document.getElementById('tc-net-received')?.value;
+            const targetAccountSelect = document.getElementById('tc-target-account');
+            const targetAccountId = targetAccountSelect ? targetAccountSelect.value : 'wallet_tucompras';
 
-        // Record Inflow Movement in Finances
-        await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
-            company: 'tucompras',
-            type: 'inflow',
-            originAccount: 'dropi_carrier',
-            destinationAccount: targetAccountId,
-            amount: netReceived,
-            concept: `Ingreso Liquidación Venta TuCompras (${sale.tracking_number || sale.id})`,
-            date: new Date().toISOString(),
-            notes: `Cliente: ${sale.customer_name} | Venta: $${totalSale.toLocaleString()} | Flete: $${fleteVal.toLocaleString()}`
-        });
+            const totalSale = sale.items ? sale.items.reduce((sum, i) => sum + (parseFloat(i.sale_price || 0) * (parseInt(i.qty) || 1)), 0) : parseFloat(sale.sale_price || 0);
+            const netExpected = Math.max(0, totalSale - fleteVal);
+            const netReceived = netReceivedValInput !== undefined && netReceivedValInput !== '' ? parseFloat(netReceivedValInput) : netExpected;
+            const discrepancy = netReceived - netExpected;
 
-        document.getElementById('tc-status-modal').classList.remove('show');
-        alert(`✅ Dinero de venta #${sale.tracking_number || sale.id} conciliado e ingresado a la Wallet.`);
-        this.renderPanel();
+            sale.shipping_cost = fleteVal;
+            sale.money_confirmed = true;
+            sale.money_confirmed_at = new Date().toISOString();
+            sale.money_received_value = netReceived;
+            sale.received_account_id = targetAccountId;
+            sale.discrepancy_value = discrepancy;
+            sale.reconciliation_status = (Math.abs(discrepancy) < 1) ? 'reconciled' : 'discrepancy';
+
+            await Storage.updateItem(STORAGE_KEYS.TUCOMPRAS_SALES, id, sale);
+
+            // Record Inflow Movement in Finances
+            await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+                company: 'tucompras',
+                type: 'inflow',
+                originAccount: 'dropi_carrier',
+                destinationAccount: targetAccountId,
+                amount: netReceived,
+                concept: `Ingreso Liquidación Venta TuCompras (${sale.tracking_number || sale.id})`,
+                date: new Date().toISOString(),
+                notes: `Cliente: ${sale.customer_name || ''} | Venta: $${totalSale.toLocaleString('es-CO')} | Flete: $${fleteVal.toLocaleString('es-CO')}`
+            });
+
+            const modal = document.getElementById('tc-status-modal');
+            if (modal) modal.classList.remove('show');
+
+            alert(`✅ Dinero de venta #${sale.tracking_number || sale.id} conciliado e ingresado a la Wallet.`);
+            this.renderPanel();
+        } catch (err) {
+            console.error('[TUCOMPRAS] Error al conciliar dinero:', err);
+            alert('❌ Error al conciliar dinero: ' + err.message);
+        } finally {
+            this.isSubmittingConfirm = false;
+            if (confirmBtn) {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = origText;
+            }
+        }
     },
 
     renderExpensesView() {
