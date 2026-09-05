@@ -409,7 +409,7 @@ window.Storage = {
         if (!table || !supabase) return { success: true };
 
         let currentPayload = { ...payload };
-        let maxRetries = 12;
+        let maxRetries = 35;
         let lastError = null;
 
         while (maxRetries > 0) {
@@ -431,9 +431,9 @@ window.Storage = {
             const msg = res.error.message || '';
 
             // Check if error is due to missing column in PostgREST schema cache
-            const match = msg.match(/Could not find the '([^']+)' column/i) || 
-                          msg.match(/column "([^"]+)" of relation ".*" does not exist/i) ||
-                          msg.match(/column "([^"]+)" does not exist/i);
+            const match = msg.match(/Could not find the ['"]([^'"]+)['"] column/i) || 
+                          msg.match(/column ["']([^"']+)["'] of relation ".*" does not exist/i) ||
+                          msg.match(/column ["']([^"']+)["'] does not exist/i);
 
             if (match && match[1]) {
                 const missingCol = match[1];
