@@ -71,10 +71,22 @@ window.Agent = {
         const messagesContainer = document.getElementById('ai-chat-messages');
         const setKeyLink = document.getElementById('chat-set-key-link');
 
+        const updateBubbleVisibility = () => {
+            const container = document.getElementById('ai-chat-container');
+            if (windowEl && windowEl.classList.contains('active')) {
+                if (bubble) bubble.style.display = 'none';
+                if (container) container.classList.add('active-window');
+            } else {
+                if (bubble) bubble.style.display = 'flex';
+                if (container) container.classList.remove('active-window');
+            }
+        };
+
         if (bubble) {
             bubble.onclick = (e) => {
                 e.stopPropagation();
                 windowEl.classList.toggle('active');
+                updateBubbleVisibility();
                 if (windowEl.classList.contains('active')) {
                     input.focus();
                 }
@@ -85,6 +97,7 @@ window.Agent = {
             closeBtn.onclick = (e) => {
                 e.stopPropagation();
                 windowEl.classList.remove('active');
+                updateBubbleVisibility();
             };
         }
 
@@ -92,6 +105,7 @@ window.Agent = {
         document.addEventListener('click', (e) => {
             if (windowEl && windowEl.classList.contains('active') && !e.target.closest('#ai-chat-container')) {
                 windowEl.classList.remove('active');
+                updateBubbleVisibility();
             }
         });
 
@@ -278,10 +292,10 @@ window.Agent = {
         const chips = document.createElement('div');
         chips.className = 'quick-chips';
         chips.innerHTML = `
-            <button class="chip-btn" data-query="¿Cuánto llevo vendido en Millenio este mes?">📊 Ventas Millenio Mes</button>
-            <button class="chip-btn" data-query="¿Cuánto llevo vendido en Vulcano este mes?">📈 Ventas Vulcano Mes</button>
+            <button class="chip-btn" data-query="Informe completo de ventas Millenio">📊 Informe Millenio Mes</button>
+            <button class="chip-btn" data-query="Reporte de deudores y cartera">💳 Reporte Cartera</button>
+            <button class="chip-btn" data-query="Productos más vendidos de Millenio">🏆 Top Productos</button>
             <button class="chip-btn" data-query="Resumen de ventas de hoy">💰 Resumen Hoy</button>
-            <button class="chip-btn" data-query="¿Qué productos tienen bajo stock?">⚠️ Bajo Stock</button>
         `;
         container.appendChild(chips);
     },
@@ -316,14 +330,55 @@ window.Agent = {
         // 3. Local rule-based matchers for queries
         const ctx = this.getContextData();
 
-        // Match Millenio Month
-        if (cleaned.includes('millenio') && (cleaned.includes('mes') || cleaned.includes('junio'))) {
-            this.sendBotMessage(`Llevas vendido en Millenio este mes (${ctx.month}) un total de $${ctx.mSalesMonth.toLocaleString('es-CO')} COP.`);
+        // Match Millenio Complete Report
+        if (cleaned.includes('millenio') && (cleaned.includes('informe') || cleaned.includes('resumen') || cleaned.includes('reporte') || cleaned.includes('ventas') || cleaned.includes('mes') || cleaned.includes('septiembre'))) {
+            const grandTotal = ctx.mSalesMonth + ctx.tcMillenioTotal;
+            let topClientsHtml = '';
+            (ctx.topClientsMillenioList || []).slice(0, 3).forEach(([cname, cval]) => {
+                topClientsHtml += `• ${cname}: $${cval.toLocaleString('es-CO')} COP<br>`;
+            });
+
+            const html = `
+                <div style="padding: 2px 0;">
+                    <strong style="color: #38bdf8; font-size: 0.95rem;">📊 Informe de Ventas Millenio (${ctx.month}):</strong>
+                    <hr style="margin: 6px 0; border-color: rgba(255,255,255,0.15); border-style: solid;">
+                    <strong>1. Ventas Mayoristas (POS):</strong><br>
+                    • Total: <strong style="color: #4ade80;">$${ctx.mSalesMonth.toLocaleString('es-CO')} COP</strong> (${ctx.mSalesCount} ventas)<br>
+                    • Crédito: $${(ctx.mMethods?.credit || 0).toLocaleString('es-CO')} COP<br>
+                    • Efectivo: $${(ctx.mMethods?.cash || 0).toLocaleString('es-CO')} COP<br>
+                    • Transferencias: $${(ctx.mMethods?.transfer || 0).toLocaleString('es-CO')} COP<br><br>
+                    <strong>2. Ventas TuCompras (Dropi):</strong><br>
+                    • Total Cobrado: $${ctx.tcMillenioTotal.toLocaleString('es-CO')} COP (${ctx.tcMillenioCount} guías)<br><br>
+                    <strong>💰 GRAN TOTAL FACTURADO:</strong><br>
+                    <span style="font-size: 1.15rem; font-weight: 800; color: #4ade80;">$${grandTotal.toLocaleString('es-CO')} COP</span>
+                    ${topClientsHtml ? `<br><br><strong>Top Clientes Mayoristas:</strong><br>${topClientsHtml}` : ''}
+                </div>
+            `;
+            this.sendBotMessage(html, true);
+            return;
+        }
+
+        // Match Top Selling Products
+        if (cleaned.includes('top') || cleaned.includes('mas vendido') || cleaned.includes('más vendido') || cleaned.includes('mejores producto')) {
+            if (!ctx.topProductsMillenioList || ctx.topProductsMillenioList.length === 0) {
+                this.sendBotMessage("No se registran ventas de productos este mes.");
+            } else {
+                let prodsHtml = '';
+                ctx.topProductsMillenioList.forEach(([pname, pdata], idx) => {
+                    prodsHtml += `${idx + 1}. <strong>${pname}</strong>: ${pdata.qty} unds | <span style="color:#4ade80;">$${pdata.total.toLocaleString('es-CO')}</span><br>`;
+                });
+                const html = `
+                    <strong>🏆 Top Productos Más Vendidos (Millenio):</strong><br>
+                    <hr style="margin: 6px 0; border-color: rgba(255,255,255,0.15); border-style: solid;">
+                    ${prodsHtml}
+                `;
+                this.sendBotMessage(html, true);
+            }
             return;
         }
         
         // Match Vulcano Month
-        if (cleaned.includes('vulcano') && (cleaned.includes('mes') || cleaned.includes('junio'))) {
+        if (cleaned.includes('vulcano') && (cleaned.includes('mes') || cleaned.includes('ventas') || cleaned.includes('informe'))) {
             this.sendBotMessage(`Llevas vendido en Vulcano este mes (${ctx.month}) un total de $${ctx.vSalesMonth.toLocaleString('es-CO')} COP.`);
             return;
         }
@@ -347,7 +402,7 @@ window.Agent = {
         }
 
         // Match Low Stock
-        if (cleaned.includes('stock') || cleaned.includes('bajo') || cleaned.includes('critico') || cleaned.includes('inventario')) {
+        if (cleaned.includes('stock') || cleaned.includes('bajo') || cleaned.includes('critico') || cleaned.includes('crítico') || cleaned.includes('inventario')) {
             if (ctx.criticalStockCount === 0) {
                 this.sendBotMessage("¡Excelente! Todos tus productos tienen stock saludable (mayor o igual a 5 unidades).");
             } else {
@@ -363,13 +418,21 @@ window.Agent = {
             return;
         }
 
-        // Match Debt/Credits
-        if (cleaned.includes('credito') || cleaned.includes('deuda') || cleaned.includes('deudores') || cleaned.includes('cobrar')) {
+        // Match Debt/Credits & Cartera Report
+        if (cleaned.includes('credito') || cleaned.includes('crédito') || cleaned.includes('deuda') || cleaned.includes('deudores') || cleaned.includes('cobrar') || cleaned.includes('cartera')) {
+            let debtorsHtml = '';
+            (ctx.topDebtors || []).forEach(c => {
+                const tot = (c.balanceMillenio || 0) + (c.balanceVulcano || 0);
+                debtorsHtml += `• <strong>${c.name}</strong>: $${tot.toLocaleString('es-CO')} COP <span style="font-size:0.75rem; opacity:0.8;">(M: $${(c.balanceMillenio||0).toLocaleString()} / V: $${(c.balanceVulcano||0).toLocaleString()})</span><br>`;
+            });
+
             const html = `
-                <strong>Créditos Pendientes por Cobrar:</strong><br>
+                <strong>💳 Reporte de Cartera y Deudores:</strong><br>
+                <hr style="margin: 5px 0; border-color: rgba(255,255,255,0.15); border-style: solid;">
                 • <strong>Millenio:</strong> $${ctx.pendingCreditsMillenio.toLocaleString('es-CO')} COP<br>
                 • <strong>Vulcano:</strong> $${ctx.pendingCreditsVulcano.toLocaleString('es-CO')} COP<br>
-                • <strong>Total Cartera:</strong> $${(ctx.pendingCreditsMillenio + ctx.pendingCreditsVulcano).toLocaleString('es-CO')} COP
+                • <strong>TOTAL POR COBRAR:</strong> <strong style="color:#f87171;">$${(ctx.pendingCreditsMillenio + ctx.pendingCreditsVulcano).toLocaleString('es-CO')} COP</strong><br><br>
+                ${debtorsHtml ? `<strong>Principales Deudores:</strong><br>${debtorsHtml}` : '<em>No hay deudores activos en este momento.</em>'}
             `;
             this.sendBotMessage(html, true);
             return;
@@ -899,6 +962,7 @@ Utiliza negritas y formato de texto limpio en español.`;
 
     getContextData() {
         const sales = Storage.get(STORAGE_KEYS.SALES) || [];
+        const tucomprasSales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
         const products = Storage.get(STORAGE_KEYS.PRODUCTS) || [];
         const clients = Storage.get(STORAGE_KEYS.CLIENTS) || [];
         const expenses = Storage.get(STORAGE_KEYS.EXPENSES) || [];
@@ -914,24 +978,73 @@ Utiliza negritas y formato de texto limpio en español.`;
         const endToday = new Date();
         endToday.setHours(23, 59, 59, 999);
 
-        // Filter Sales
-        const mSalesMonth = sales.filter(s => {
-            const d = new Date(s.date);
+        // Filter Sales for current month
+        const monthSales = sales.filter(s => {
+            const d = new Date(s.date || s.createdAt);
             return d >= firstDayMonth && d <= endDayMonth;
-        }).reduce((sum, s) => sum + (s.totalM || 0), 0);
+        });
 
-        const vSalesMonth = sales.filter(s => {
-            const d = new Date(s.date);
-            return d >= firstDayMonth && d <= endDayMonth;
-        }).reduce((sum, s) => sum + (s.totalV || 0), 0);
+        const mSalesMonthList = monthSales.filter(s => (s.totalM || 0) > 0 || s.company === 'millenio');
+        const mSalesMonth = mSalesMonthList.reduce((sum, s) => sum + (s.totalM || (s.company === 'millenio' ? (s.total || 0) : 0)), 0);
+        const vSalesMonth = monthSales.reduce((sum, s) => sum + (s.totalV || (s.company === 'vulcano' ? (s.total || 0) : 0)), 0);
+
+        // Payment Methods Breakdown for Millenio
+        const mMethods = { credit: 0, cash: 0, transfer: 0 };
+        const mClientsMap = {};
+        const mProductsMap = {};
+
+        mSalesMonthList.forEach(s => {
+            const val = s.totalM || (s.company === 'millenio' ? (s.total || 0) : 0);
+            const m = s.method || 'cash';
+            if (m === 'split' && s.paymentDetails) {
+                const pd = s.paymentDetails;
+                mMethods.cash += parseFloat(pd.cashM || 0);
+                mMethods.transfer += parseFloat(pd.transferM || 0);
+                mMethods.credit += parseFloat(pd.creditM || 0);
+            } else {
+                if (m === 'credit') mMethods.credit += val;
+                else if (m === 'transfer') mMethods.transfer += val;
+                else mMethods.cash += val;
+            }
+
+            const cName = s.clientName || 'Cliente General';
+            mClientsMap[cName] = (mClientsMap[cName] || 0) + val;
+
+            (s.items || []).forEach(it => {
+                const pname = it.name || 'Producto';
+                const qty = parseInt(it.quantity || 1);
+                const price = parseFloat(it.price || 0);
+                if (!mProductsMap[pname]) mProductsMap[pname] = { qty: 0, total: 0 };
+                mProductsMap[pname].qty += qty;
+                mProductsMap[pname].total += price * qty;
+            });
+        });
+
+        // TuCompras Millenio Sales
+        const monthTcSales = tucomprasSales.filter(ts => {
+            const d = new Date(ts.date || ts.created_at || ts.order_date);
+            const source = ts.inventory_source || 'millenio';
+            return d >= firstDayMonth && d <= endDayMonth && source === 'millenio';
+        });
+
+        let tcMillenioTotal = 0;
+        monthTcSales.forEach(ts => {
+            let items = ts.items || [];
+            if (typeof items === 'string') {
+                try { items = JSON.parse(items); } catch(e) { items = []; }
+            }
+            (items || []).forEach(it => {
+                tcMillenioTotal += (parseFloat(it.sale_price || 0) * parseInt(it.qty || 1));
+            });
+        });
 
         const mSalesToday = sales.filter(s => {
-            const d = new Date(s.date);
+            const d = new Date(s.date || s.createdAt);
             return d >= startToday && d <= endToday;
         }).reduce((sum, s) => sum + (s.totalM || 0), 0);
 
         const vSalesToday = sales.filter(s => {
-            const d = new Date(s.date);
+            const d = new Date(s.date || s.createdAt);
             return d >= startToday && d <= endToday;
         }).reduce((sum, s) => sum + (s.totalV || 0), 0);
 
@@ -958,9 +1071,20 @@ Utiliza negritas y formato de texto limpio en español.`;
         const pendingCreditsMillenio = clients.reduce((sum, c) => sum + (c.balanceMillenio || 0), 0);
         const pendingCreditsVulcano = clients.reduce((sum, c) => sum + (c.balanceVulcano || 0), 0);
 
+        const topDebtors = clients.filter(c => ((c.balanceMillenio || 0) + (c.balanceVulcano || 0)) > 0)
+            .sort((a, b) => ((b.balanceMillenio || 0) + (b.balanceVulcano || 0)) - ((a.balanceMillenio || 0) + (a.balanceVulcano || 0)))
+            .slice(0, 5);
+
+        const topClientsMillenioList = Object.entries(mClientsMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+        const topProductsMillenioList = Object.entries(mProductsMap).sort((a, b) => b[1].total - a[1].total).slice(0, 5);
+
         return {
             month: now.toLocaleString('es-ES', { month: 'long', year: 'numeric' }),
             mSalesMonth,
+            mSalesCount: mSalesMonthList.length,
+            mMethods,
+            tcMillenioTotal,
+            tcMillenioCount: monthTcSales.length,
             vSalesMonth,
             mSalesToday,
             vSalesToday,
@@ -969,7 +1093,10 @@ Utiliza negritas y formato de texto limpio en español.`;
             criticalStockCount: criticalStock.length,
             criticalStockList: criticalStock.slice(0, 10),
             pendingCreditsMillenio,
-            pendingCreditsVulcano
+            pendingCreditsVulcano,
+            topDebtors,
+            topClientsMillenioList,
+            topProductsMillenioList
         };
     }
 };
