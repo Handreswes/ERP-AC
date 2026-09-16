@@ -76,6 +76,7 @@ window.Inventory = {
                     <p style="margin: 4px 0 0 0; color: var(--text-secondary); font-size: 0.85rem;">Controla el stock disponible, productos en tránsito y depuración de inventario.</p>
                 </div>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button id="consult-product-sales-btn" class="btn btn-outline" style="color: #38bdf8; border-color: #38bdf8; font-weight: 600;"><i class="fas fa-history"></i> Historial de Ventas</button>
                     <button id="cleanup-products-btn" class="btn btn-outline" style="color: #ef4444; border-color: #ef4444; font-weight: 600;"><i class="fas fa-broom"></i> Depurar Fantasmas</button>
                     <button id="add-product-btn" class="btn btn-primary" style="font-weight: 600;"><i class="fas fa-plus"></i> Nuevo Producto</button>
                 </div>
@@ -668,6 +669,7 @@ window.Inventory = {
                     </span>
                 </td>
                 <td class="table-actions" data-label="Acciones">
+                    <button class="icon-btn sales-history-btn" data-id="${p.id}" data-name="${(p.name || '').replace(/"/g, '&quot;')}" title="Ver Historial de Ventas" style="color: #38bdf8;"><i class="fas fa-history"></i></button>
                     <button class="icon-btn receive-btn" data-id="${p.id}" title="Recibir Mercancía (Sumar)" style="color: var(--success);"><i class="fas fa-plus"></i></button>
                     <button class="icon-btn edit-btn" data-id="${p.id}"><i class="fas fa-edit"></i></button>
                     <button class="icon-btn delete-btn" data-id="${p.id}"><i class="fas fa-trash"></i></button>
@@ -681,6 +683,11 @@ window.Inventory = {
         if (!panel) return;
 
         panel.addEventListener('click', async (e) => {
+            if (e.target.closest('#consult-product-sales-btn')) {
+                this.showProductSalesHistoryModal('');
+                return;
+            }
+
             // 1. Main Tabs (Stock vs Transit)
             const tabBtn = e.target.closest('.tab-btn');
             if (tabBtn) {
@@ -701,6 +708,11 @@ window.Inventory = {
             const actionBtn = e.target.closest('.icon-btn');
             if (actionBtn) {
                 const id = actionBtn.dataset.id;
+                if (actionBtn.classList.contains('sales-history-btn')) {
+                    const prodName = actionBtn.dataset.name || '';
+                    this.showProductSalesHistoryModal(prodName);
+                    return;
+                }
                 if (actionBtn.classList.contains('edit-btn')) {
                     this.editingId = id;
                     const product = this.getProducts().find(p => p.id === id);
@@ -1504,6 +1516,156 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-save"></i> GUARDAR PROGRESO DE IMPORTACIÓN';
         }
+    },
+
+    createSalesHistoryModal() {
+        if (document.getElementById('product-sales-modal')) return;
+        const modal = document.createElement('div');
+        modal.id = 'product-sales-modal';
+        modal.className = 'modal';
+        modal.innerHTML = `
+            <div class="modal-content" style="max-width: 950px; border-radius: 20px; padding: 1.5rem;">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
+                    <h2 style="margin: 0; font-size: 1.25rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
+                        <i class="fas fa-history" style="color: #38bdf8;"></i> Historial de Ventas por Producto
+                    </h2>
+                    <span class="close-modal" onclick="document.getElementById('product-sales-modal').classList.remove('show')" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div style="position: relative; margin-bottom: 1.25rem;">
+                        <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
+                        <input type="text" id="sales-history-search" class="form-control" placeholder="Escriba el nombre del producto (Ej: pistola, 3/4, careta, pulidora...)" style="padding-left: 40px !important; height: 44px; border-radius: 12px; font-size: 0.95rem;">
+                    </div>
+
+                    <div id="sales-history-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;"></div>
+
+                    <div class="table-container" style="max-height: 420px; overflow-y: auto;">
+                        <table class="data-table" style="font-size: 0.85rem;">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cliente / Teléfono</th>
+                                    <th>Producto Vendido</th>
+                                    <th class="text-right">Cant</th>
+                                    <th class="text-right">Precio Unit.</th>
+                                    <th class="text-right">Total</th>
+                                    <th>Empresa</th>
+                                    <th>Remisión / Notas</th>
+                                </tr>
+                            </thead>
+                            <tbody id="sales-history-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const searchInput = document.getElementById('sales-history-search');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                this.renderSalesHistoryResults(e.target.value);
+            });
+        }
+    },
+
+    showProductSalesHistoryModal(initialSearch = '') {
+        this.createSalesHistoryModal();
+        const modal = document.getElementById('product-sales-modal');
+        const searchInput = document.getElementById('sales-history-search');
+        if (searchInput) {
+            searchInput.value = initialSearch;
+        }
+        if (modal) modal.classList.add('show');
+        this.renderSalesHistoryResults(initialSearch);
+    },
+
+    renderSalesHistoryResults(query = '') {
+        const tbody = document.getElementById('sales-history-tbody');
+        const statsEl = document.getElementById('sales-history-stats');
+        if (!tbody) return;
+
+        const sales1 = Storage.get(STORAGE_KEYS.SALES) || [];
+        const sales2 = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
+        
+        const salesMap = new Map();
+        [...sales1, ...sales2].forEach(s => {
+            if (s && s.id) salesMap.set(s.id, s);
+        });
+        const allSales = Array.from(salesMap.values());
+        allSales.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
+
+        const q = query.toLowerCase().trim();
+        let totalQty = 0;
+        let totalRevenue = 0;
+        let countSales = 0;
+        let rowsHtml = '';
+
+        allSales.forEach(s => {
+            let items = s.items || s.sale_items || [];
+            if (typeof items === 'string') {
+                try { items = JSON.parse(items); } catch(e) { items = []; }
+            }
+
+            const clientName = s.clientName || s.customer_name || s.client_name || 'Cliente Ocasional';
+            const clientPhone = s.clientPhone || s.customer_phone || s.phone || '';
+            const dateStr = (s.date || s.createdAt || '').substring(0, 10);
+            const remission = s.remissionNumber || s.remission_number || '-';
+            const notes = s.notes || s.observations || '';
+            const company = (s.company || 'millenio').toUpperCase();
+
+            items.forEach(it => {
+                const prodName = (it.name || it.product_name || '').trim();
+                if (!q || prodName.toLowerCase().includes(q) || (it.product_id && it.product_id === q)) {
+                    const qty = parseInt(it.quantity || it.qty || 0);
+                    const price = parseFloat(it.price || it.price_unit || it.unit_price || 0);
+                    const subtotal = parseFloat(it.total || it.subtotal || (qty * price));
+
+                    totalQty += qty;
+                    totalRevenue += subtotal;
+                    countSales++;
+
+                    rowsHtml += `
+                        <tr>
+                            <td><small class="text-secondary">${dateStr}</small></td>
+                            <td><strong>${clientName}</strong> ${clientPhone ? `<br><small style="color:var(--accent);">${clientPhone}</small>` : ''}</td>
+                            <td><strong style="color: var(--text-primary);">${prodName}</strong></td>
+                            <td class="text-right"><span class="badge bg-blue" style="font-size:0.8rem; font-weight:700;">${qty}</span></td>
+                            <td class="text-right">$${price.toLocaleString()}</td>
+                            <td class="text-right"><strong style="color:var(--success);">$${subtotal.toLocaleString()}</strong></td>
+                            <td><span class="badge ${company === 'VULCANO' ? 'bg-orange' : 'bg-blue'}">${company}</span></td>
+                            <td><small>${remission !== '-' ? `<b>${remission}</b>` : ''} ${notes ? `<br><i>${notes}</i>` : ''}</small></td>
+                        </tr>
+                    `;
+                }
+            });
+        });
+
+        if (statsEl) {
+            statsEl.innerHTML = `
+                <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 12px; border-radius: 12px;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Filtro Actual</span>
+                    <h4 style="margin:2px 0 0 0; color:#38bdf8; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q ? `"${q}"` : 'Todos los Productos'}</h4>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 12px;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Total Unidades Vendidas</span>
+                    <h4 style="margin:2px 0 0 0; color:var(--success); font-size:1.1rem; font-weight:800;">${totalQty.toLocaleString()} unids</h4>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 12px;">
+                    <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Total Recaudado</span>
+                    <h4 style="margin:2px 0 0 0; color:var(--warning); font-size:1.1rem; font-weight:800;">$${totalRevenue.toLocaleString()}</h4>
+                </div>
+            `;
+        }
+
+        if (!rowsHtml) {
+            tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 2rem; color: var(--text-secondary);">No se encontraron ventas para el filtro "${q}"</td></tr>`;
+        } else {
+            tbody.innerHTML = rowsHtml;
+        }
     }
 };
+
+window.showProductSalesHistoryModal = (query) => Inventory.showProductSalesHistoryModal(query);
 
