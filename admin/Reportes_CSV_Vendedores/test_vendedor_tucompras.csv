@@ -1,0 +1,7 @@
+﻿ERP AC - Detalle de Ventas: test vendedor tucompras,,,,,,,,,,,,,
+Total Registros: 3,,,,,,,,,,,,,
+Vendedor,Canal,ID Venta / Orden,Fecha,Cliente,Teléfono Cliente,Estado Envío,Transportadora,Número Guía,Valor Venta ($),Entregado / Confirmado,Estado Comisión,Comisión Liquidable / A Pagar ($),Comisión Pendiente ($)
+test vendedor tucompras,Tu Compras,TC-92863391,2026-06-12,juan perez,3185159017,despachado,transarmenia ,N/A,158000,No,PENDIENTE (En Despacho / Tránsito),0,10000
+test vendedor tucompras,Tu Compras,TC-TEST-001,2026-06-16,[PRUEBA] Juan Perez (Recibida),3015551122,recibido,Servientrega,TC-HOY-001,338000,Sí,LIQUIDABLE (A Pagar Hoy),30000,0
+test vendedor tucompras,Tu Compras,TC-TEST-002,2026-06-16,[PRUEBA] Maria Gomez (Devolucion),3124445566,devolucion_recibida,Envía,TC-HOY-002,189000,No,CANCELADA (Devolución),0,0
+TOTAL LIQUIDABLE (PAGAR HOY),,,,,,,,,,,,,
