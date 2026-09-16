@@ -80,6 +80,26 @@ window.CRM = {
                     </button>
                 </div>
             </div>
+
+            <!-- Bolsillo de Recuperación de Cartera Millenio Card -->
+            <div id="recovery-pool-card" style="margin-bottom: 1.5rem; background: linear-gradient(135deg, rgba(37, 99, 235, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%); border: 1.5px solid rgba(37, 99, 235, 0.25); border-radius: 14px; padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; box-shadow: 0 4px 12px rgba(0,0,0,0.03);">
+                <div style="display: flex; align-items: center; gap: 1.25rem;">
+                    <div style="width: 52px; height: 52px; border-radius: 14px; background: rgba(37, 99, 235, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #2563eb;">
+                        <i class="fas fa-piggy-bank"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.8rem; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px; color: var(--text-secondary);">Bolsillo de Recuperación de Cartera (Millenio)</div>
+                        <div id="recovery-pool-balance" style="font-size: 1.7rem; font-weight: 800; color: #10b981; margin-top: 2px;">$0 COP</div>
+                        <div style="font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px;">Fondo exclusivo de sobreprecios Millenio para sanear deudas de clientes morosos incobrables.</div>
+                    </div>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" style="background: #2563eb; border-color: #2563eb; font-weight: 600; display: flex; align-items: center; gap: 8px; border-radius: 10px; padding: 0.75rem 1.25rem; font-size: 0.9rem;" onclick="window.CRM.openRecoveryPoolModal();">
+                        <i class="fas fa-hand-holding-heart"></i> Aplicar Saneamiento de Cartera
+                    </button>
+                </div>
+            </div>
+
             <div style="position: relative; max-width: 500px; width: 100%; margin-bottom: 1.5rem;">
                 <i class="fas fa-search" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem;"></i>
                 <input type="text" id="crm-search" class="form-control" placeholder="Buscar clientes..." style="padding-left: 45px !important; border-radius: 15px; border: 2px solid var(--border); transition: all 0.3s;" onfocus="this.style.borderColor='var(--accent)'; this.style.boxShadow='0 0 0 4px rgba(37,99,235,0.1)';" onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';">
@@ -156,6 +176,45 @@ window.CRM = {
                     </div>
                 </div>
             </div>
+
+            <!-- Recovery Pool Saneamiento Modal -->
+            <div id="recovery-pool-modal" class="modal">
+                <div class="modal-content" style="max-width: 520px;">
+                    <div class="modal-header">
+                        <h2>Saneamiento con Bolsillo Millenio</h2>
+                        <span class="close-modal" onclick="this.closest('.modal').classList.remove('show')">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div style="background: rgba(37,99,235,0.08); border-radius: 10px; padding: 12px 16px; margin-bottom: 1.25rem; font-size: 0.85rem;">
+                            <strong>Fondo Disponible:</strong> <span id="modal-recovery-pool-available" style="font-weight: 700; color: #10b981; font-size: 1.1rem; margin-left: 6px;">$0 COP</span>
+                        </div>
+                        <form id="recovery-pool-form">
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="font-weight: 600;">Seleccionar Cliente Incobrable (Millenio)</label>
+                                <select id="recovery-client-select" class="form-control" style="margin-top: 4px;" required>
+                                    <option value="">-- Cargar deudores de Millenio --</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="font-weight: 600;">Monto de Deuda Actual Millenio</label>
+                                <input type="text" id="recovery-client-debt" class="form-control" readonly style="background: rgba(0,0,0,0.1); font-weight: 700; color: var(--danger);" value="$0 COP">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1rem;">
+                                <label style="font-weight: 600;">Monto a Sanear / Amortizar ($)</label>
+                                <input type="text" id="recovery-amount-input" class="form-control currency-input" placeholder="0" required style="font-size: 1.1rem; font-weight: 700;">
+                            </div>
+                            <div class="form-group" style="margin-bottom: 1.5rem;">
+                                <label style="font-weight: 600;">Nota / Justificación</label>
+                                <input type="text" id="recovery-notes-input" class="form-control" placeholder="Ej: Cliente inactivo > 6 meses - Saneamiento Cartera Muerta">
+                            </div>
+                            <button type="button" id="save-recovery-writeoff-btn" class="btn btn-primary btn-block" style="padding: 0.9rem; font-size: 1rem; font-weight: 700; background: #2563eb; border-color: #2563eb;" onclick="window.CRM.handleApplyRecoveryWriteoff();">
+                                Confirmar Saneamiento de Cartera
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Statement Modal -->
             <div id="statement-modal" class="modal">
                 <div class="modal-content" style="max-width: 500px;">
@@ -172,6 +231,7 @@ window.CRM = {
 
         this.editingId = null;
         this.updateClientList();
+        this.updateRecoveryPoolUI();
     },
 
     updateClientList(filter = '') {
@@ -669,8 +729,14 @@ window.CRM = {
             dateRangeStr = `Últimos ${periodDays} días (${startDate.toLocaleDateString('es-CO')} - ${now.toLocaleDateString('es-CO')})`;
         }
 
-        // Get all Sales for this client
-        const allSales = Storage.get(STORAGE_KEYS.SALES).filter(s => s.clientId === clientId && s.method === 'credit');
+        // Get all Sales for this client (including credit and split payment credit balances)
+        const allSales = Storage.get(STORAGE_KEYS.SALES).filter(s => {
+            if (s.clientId !== clientId) return false;
+            if (s.method === 'credit' || s.method === 'split') return true;
+            if (s.paymentDetails && ((parseFloat(s.paymentDetails.creditM) || 0) + (parseFloat(s.paymentDetails.creditV) || 0)) > 0) return true;
+            if (s.creditAmount && parseFloat(s.creditAmount) > 0) return true;
+            return false;
+        });
         
         // Get all Payments for this client
         const allPayments = Storage.get(STORAGE_KEYS.PAYMENTS).filter(p => p.clientId === clientId);
@@ -682,13 +748,28 @@ window.CRM = {
 
         // Process Sales (Charges)
         allSales.forEach(s => {
-            const date = new Date(s.date);
-            const amt = parseFloat(s.total) || 0;
-            if (date >= startDate) {
+            const date = new Date(s.date || s.createdAt);
+            let amt = 0;
+            if (s.method === 'credit') {
+                amt = parseFloat(s.total) || 0;
+            } else if (s.paymentDetails) {
+                amt = (parseFloat(s.paymentDetails.creditM) || 0) + (parseFloat(s.paymentDetails.creditV) || 0);
+                if (amt === 0 && (s.method === 'credit' || s.method === 'split')) {
+                    amt = parseFloat(s.total) || 0;
+                }
+            } else if (s.creditAmount) {
+                amt = parseFloat(s.creditAmount) || 0;
+            } else {
+                amt = parseFloat(s.total) || 0;
+            }
+
+            if (amt > 0 && date >= startDate) {
+                const companyStr = s.company === 'vulcano' ? 'Vulcano' : 'Millenio';
+                const methodTag = s.method === 'split' ? ' (Pago Dividido)' : '';
                 movimientos.push({
-                    date: s.date,
+                    date: s.date || s.createdAt,
                     type: `Compra (Remisión POS)`,
-                    description: `${s.items ? s.items.map(i => `${i.qty || i.quantity || 1}x ${i.name}`).join(', ') : 'Sin productos'} | Facturado: ${s.company === 'vulcano' ? 'Vulcano' : 'Millenio'}`,
+                    description: `${s.items ? s.items.map(i => `${i.qty || i.quantity || 1}x ${i.name}`).join(', ') : 'Sin productos'} | Facturado: ${companyStr}${methodTag}`,
                     amount: amt,
                     isCharge: true
                 });
@@ -883,6 +964,148 @@ window.CRM = {
         } finally {
             btn.disabled = false;
             btn.innerHTML = 'Registrar Devolución';
+        }
+    },
+
+    getRecoveryPoolBalance() {
+        const movements = Storage.get(STORAGE_KEYS.MOVEMENTS) || [];
+        let balance = 0;
+        movements.forEach(m => {
+            if (m.company === 'millenio') {
+                if (m.type === 'recovery_credit' || (m.concept && m.concept.includes('Aporte Bolsillo'))) {
+                    balance += parseFloat(m.amount || 0);
+                } else if (m.type === 'recovery_writeoff' || (m.concept && m.concept.includes('Saneamiento Cartera'))) {
+                    balance -= parseFloat(m.amount || 0);
+                }
+            }
+        });
+        return Math.max(0, balance);
+    },
+
+    updateRecoveryPoolUI() {
+        const balance = this.getRecoveryPoolBalance();
+        const balEl = document.getElementById('recovery-pool-balance');
+        if (balEl) balEl.textContent = `$${balance.toLocaleString('es-CO')} COP`;
+
+        const modalBalEl = document.getElementById('modal-recovery-pool-available');
+        if (modalBalEl) modalBalEl.textContent = `$${balance.toLocaleString('es-CO')} COP`;
+    },
+
+    openRecoveryPoolModal() {
+        const balance = this.getRecoveryPoolBalance();
+        this.updateRecoveryPoolUI();
+
+        const select = document.getElementById('recovery-client-select');
+        const clients = this.getClients().filter(c => (parseFloat(c.balanceMillenio) || 0) > 0);
+
+        if (select) {
+            if (clients.length === 0) {
+                select.innerHTML = '<option value="">No hay clientes con deuda activa en Millenio</option>';
+            } else {
+                select.innerHTML = '<option value="">Seleccione cliente para sanear cartera...</option>' +
+                    clients.map(c => `<option value="${c.id}">${c.name} (Deuda M: $${(parseFloat(c.balanceMillenio)||0).toLocaleString('es-CO')})</option>`).join('');
+            }
+
+            select.onchange = () => {
+                const cId = select.value;
+                const client = clients.find(c => c.id === cId);
+                const debtInput = document.getElementById('recovery-client-debt');
+                const amtInput = document.getElementById('recovery-amount-input');
+                if (client) {
+                    const debtM = parseFloat(client.balanceMillenio) || 0;
+                    if (debtInput) debtInput.value = `$${debtM.toLocaleString('es-CO')} COP`;
+                    const suggested = Math.min(debtM, balance);
+                    if (amtInput) amtInput.value = parseInt(suggested).toLocaleString('de-DE');
+                } else {
+                    if (debtInput) debtInput.value = '$0 COP';
+                    if (amtInput) amtInput.value = '';
+                }
+            };
+        }
+
+        const amtInput = document.getElementById('recovery-amount-input');
+        if (amtInput) {
+            amtInput.oninput = (e) => {
+                let val = e.target.value.replace(/\D/g, "");
+                if (val) {
+                    e.target.value = parseInt(val).toLocaleString('de-DE');
+                }
+            };
+        }
+
+        document.getElementById('recovery-pool-modal').classList.add('show');
+    },
+
+    async handleApplyRecoveryWriteoff() {
+        const btn = document.getElementById('save-recovery-writeoff-btn');
+        if (!btn) return;
+
+        try {
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO SANEAMIENTO...';
+
+            const poolBalance = this.getRecoveryPoolBalance();
+            const clientId = document.getElementById('recovery-client-select').value;
+            const amtRaw = document.getElementById('recovery-amount-input').value;
+            const amount = parseFloat(amtRaw.replace(/\./g, '').replace(/,/g, '')) || 0;
+            const notes = document.getElementById('recovery-notes-input').value || 'Saneamiento Cartera Incobrable Millenio';
+
+            if (!clientId) throw new Error('Debe seleccionar un cliente de la lista.');
+            if (amount <= 0) throw new Error('Ingrese un monto válido a sanear.');
+            if (amount > poolBalance) throw new Error(`El monto ($${amount.toLocaleString('es-CO')}) supera el fondo disponible en el Bolsillo ($${poolBalance.toLocaleString('es-CO')}).`);
+
+            const client = Storage.getById(STORAGE_KEYS.CLIENTS, clientId);
+            if (!client) throw new Error('Cliente no encontrado.');
+
+            const currentDebt = parseFloat(client.balanceMillenio) || 0;
+            if (amount > currentDebt) throw new Error(`El monto a sanear ($${amount.toLocaleString('es-CO')}) excede la deuda de Millenio del cliente ($${currentDebt.toLocaleString('es-CO')}).`);
+
+            const newDebtM = Math.max(0, currentDebt - amount);
+
+            // 1. Update Client Balance
+            await Storage.updateItem(STORAGE_KEYS.CLIENTS, clientId, {
+                balanceMillenio: newDebtM
+            });
+
+            // 2. Log Movement Writeoff
+            await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+                company: 'millenio',
+                type: 'recovery_writeoff',
+                originAccount: 'millenio_recovery_pool',
+                destinationAccount: 'client_debt',
+                amount: amount,
+                concept: 'Saneamiento Cartera Incobrable Millenio',
+                notes: `Saneamiento de cartera Millenio aplicado a ${client.name}. ${notes}`.trim(),
+                date: new Date().toISOString()
+            });
+
+            // 3. Log Payment Record
+            await Storage.addItem(STORAGE_KEYS.PAYMENTS, {
+                clientId: clientId,
+                clientName: client.name,
+                company: 'millenio',
+                amount: amount,
+                method: 'recovery_pool',
+                accountId: null,
+                notes: `Saneamiento con Bolsillo de Cartera Millenio: ${notes}`.trim(),
+                date: new Date().toISOString()
+            });
+
+            window.ERP_LOG(`Saneamiento de $${amount.toLocaleString('es-CO')} aplicado exitosamente a ${client.name}`, 'success');
+            document.getElementById('recovery-pool-form').reset();
+            document.getElementById('recovery-pool-modal').classList.remove('show');
+
+            this.updateClientList();
+            this.updateRecoveryPoolUI();
+            if (window.Finances && window.Finances.updateDebtUI) window.Finances.updateDebtUI();
+
+            alert(`✅ Saneamiento aplicado con éxito.\n\nSe dedujeron $${amount.toLocaleString('es-CO')} COP de la cartera de "${client.name}" utilizando el Fondo del Bolsillo de Recuperación.`);
+        } catch (err) {
+            window.ERP_LOG('Error Saneamiento: ' + err.message, 'error');
+            alert('❌ Error: ' + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = 'Confirmar Saneamiento de Cartera';
         }
     }
 };
