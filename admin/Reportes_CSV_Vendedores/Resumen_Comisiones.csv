@@ -1,0 +1,12 @@
+﻿ERP AC - Liquidación Oficial de Comisiones por Vendedor,,,,,,,,
+Regla Oficial: Se liquida comisión en pedidos ENTREGADOS (status='recibido'). Devoluciones = $0. En despacho = Pendiente.,,,,,,,,
+Vendedor,Total Ventas Registradas,Venta Total ($),Ventas Liquidadas (Entregadas),COMISIÓN A PAGAR HOY ($),Ventas Pendientes (En Despacho),Comisión Pendiente ($),Devoluciones,Comisión Devoluciones ($)
+CIND FAJARDO,138,22956004,92,375000,41,130000,5,0
+Dropshipper,2,1350000,2,0,0,0,0,0
+Laura Caycedo,8,2112000,7,105000,0,0,1,0
+Luisa Narvaez,16,5470000,13,215000,3,55000,0,0
+Sin Vendedor Asignado,10,31475441,10,0,0,0,0,0
+andres23124,176,151412000,176,0,0,0,0,0
+test vendedor tucompras,3,685000,1,30000,1,10000,1,0
+tucompras90,275,204844002,274,0,1,0,0,0
+TOTAL GENERAL,,,,,,,,0
