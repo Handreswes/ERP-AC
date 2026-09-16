@@ -62,6 +62,37 @@ window.TuCompras = {
                 company: 'tucompras'
             });
         }
+        // Ensure Fintech accounts exist for Addi & Sistecrédito pending disbursements
+        if (!accounts.find(a => a.id === 'fintech_addi')) {
+            await Storage.addItem(STORAGE_KEYS.ACCOUNTS, {
+                id: 'fintech_addi',
+                name: 'Addi (Por Consignar / Por Cobrar)',
+                bankName: 'Fintech Credit',
+                accountNumber: 'ADDI-TC',
+                balance: 0,
+                company: 'tucompras'
+            });
+        }
+        if (!accounts.find(a => a.id === 'fintech_sistecredito')) {
+            await Storage.addItem(STORAGE_KEYS.ACCOUNTS, {
+                id: 'fintech_sistecredito',
+                name: 'Sistecrédito (Por Consignar / Por Cobrar)',
+                bankName: 'Fintech Credit',
+                accountNumber: 'SISTECREDITO-TC',
+                balance: 0,
+                company: 'tucompras'
+            });
+        }
+        if (!accounts.find(a => a.id === 'fintech_pasarela')) {
+            await Storage.addItem(STORAGE_KEYS.ACCOUNTS, {
+                id: 'fintech_pasarela',
+                name: 'Fintech / Pasarela (Por Consignar)',
+                bankName: 'Fintech Credit',
+                accountNumber: 'PASARELA-TC',
+                balance: 0,
+                company: 'tucompras'
+            });
+        }
     },
 
     getSales() {
@@ -205,7 +236,7 @@ window.TuCompras = {
                                     <div class="filter-group" style="display: flex; gap: 5px; background: var(--bg-card); padding: 5px; border-radius: 12px; border: 1px solid var(--border);">
                                         <button class="tab-btn btn-sm tc-filter-btn active" data-filter="all">Todas</button>
                                         <button class="tab-btn btn-sm tc-filter-btn" data-filter="millenio">Millenio</button>
-                                        <button class="tab-btn btn-sm tc-filter-btn" data-filter="vulcano">Vulcano</button>
+                                        <button class="tab-btn btn-sm tc-filter-btn" data-filter="vulcano">🔥 Vulcano</button>
                                     </div>
                                 </div>
 
@@ -2588,7 +2619,7 @@ window.TuCompras = {
         if (this.activeCompanyFilter !== 'all') {
             products = products.filter(p => {
                 if (this.activeCompanyFilter === 'millenio') return (parseInt(p.stockMillenio) || 0) > 0 || p.company === 'millenio';
-                if (this.activeCompanyFilter === 'vulcano') return (parseInt(p.stockVulcano) || 0) > 0 || p.company === 'vulcano';
+                if (this.activeCompanyFilter === 'vulcano') return (parseInt(p.stockVulcano) || 0) > 0 || p.company === 'vulcano' || (p.name && p.name.toLowerCase().includes('vulcano'));
                 return true;
             });
         }
@@ -2598,7 +2629,20 @@ window.TuCompras = {
             return;
         }
 
-        grid.innerHTML = products.map(p => {
+        let bannerHtml = '';
+        if (this.activeCompanyFilter === 'vulcano') {
+            bannerHtml = `
+                <div style="grid-column: 1 / -1; background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); border: 1px solid #6366f1; border-radius: 14px; padding: 12px 16px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 12px rgba(99,102,241,0.2); margin-bottom: 5px;">
+                    <img src="assets/logo_vulcano.jpeg" onerror="this.src='images/logo_vulcano.jpeg'" style="height: 52px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); object-fit: contain; background: white; padding: 2px;">
+                    <div>
+                        <h4 style="margin: 0; color: #fbbf24; font-size: 0.95rem; font-weight: 800; letter-spacing: 0.5px;">⚡ LÍNEA DE PRODUCTOS VULCANO ⚡</h4>
+                        <p style="margin: 3px 0 0 0; color: #e2e8f0; font-size: 0.78rem; font-weight: 500;">Herramientas y tecnología de alta durabilidad, máxima resistencia y rendimiento profesional de primera calidad.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        grid.innerHTML = bannerHtml + products.map(p => {
             const stockM = parseInt(p.stockMillenio) || 0;
             const stockV = parseInt(p.stockVulcano) || 0;
             const totalStock = stockM + stockV;
@@ -3007,6 +3051,10 @@ window.TuCompras = {
                             <select id="tc-target-account" class="form-control">
                                 ${accounts.map(a => `<option value="${a.id}" ${a.id === 'wallet_tucompras' || a.id === sale.received_account_id ? 'selected' : ''}>${a.name} (${a.bankName || a.company})</option>`).join('')}
                             </select>
+                            <div style="background: rgba(59, 130, 246, 0.12); border: 1px solid #3b82f644; border-radius: 8px; padding: 8px 10px; font-size: 0.76rem; color: var(--text-primary); margin-top: 6px; line-height: 1.4;">
+                                💡 <strong>¿Pago efectuado por Fintech (Addi / Sistecrédito)?</strong><br>
+                                Si el comprador pagó por Addi o Sistecrédito y aún no han consignado a tu banco, selecciona <strong>Addi (Por Consignar)</strong> o <strong>Sistecrédito (Por Consignar)</strong>. Esto registrará la cuenta por cobrar a la Fintech y dejará la venta 100% conciliada.
+                            </div>
                         </div>
                         <button id="tc-confirm-money-btn" class="btn btn-success btn-block tc-confirm-money-action-btn" data-id="${saleId}" style="margin-top: 5px; font-weight: 700;" onclick="TuCompras.confirmMoney('${saleId}')">
                             <i class="fas fa-check-circle"></i> ${sale.money_confirmed ? 'Actualizar Conciliación' : 'Confirmar e Ingresar a Wallet'}
