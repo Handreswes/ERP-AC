@@ -1,0 +1,20 @@
+﻿ERP AC - Detalle de Ventas: Luisa Narvaez,,,,,,,,,,,,,
+Total Registros: 16,,,,,,,,,,,,,
+Vendedor,Canal,ID Venta / Orden,Fecha,Cliente,Teléfono Cliente,Estado Envío,Transportadora,Número Guía,Valor Venta ($),Entregado / Confirmado,Estado Comisión,Comisión Liquidable / A Pagar ($),Comisión Pendiente ($)
+Luisa Narvaez,Tu Compras,9f0e600e-1fb7-4f25-a9be-7b2693137cc4,2026-08-20,LUIS JESUS ANTOLINEZ,3229030313,recibido,Interrapidisimo,240058205096,269000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,38ae2a20-fc58-4169-83c3-8a2f745b302a,2026-08-06,LUIS OJEDA,3016518016,recibido,Envía,954101511234,340000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,bfbc7cd0-5f64-458c-bd89-267bfcda29b8,2026-08-06,CARLOS COLLADO,3106649176,recibido,Envía,954101510678,340000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,75af4ac4-f155-41be-bf97-01ca03fec84b,2026-08-20,MINALDO PEREZ PASTRANA,3107025478,recibido,Interrapidisimo,240058486253,179000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,d6239a6e-724f-4202-9f88-835d57829c94,2026-08-26,ALEXANDER TURRIAGO,3105879536,recibido,Interrapidisimo,240058851436,340000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,d3bcf60e-2ca2-4055-aedc-96cb44d928e5,2026-08-26,GREYDIS PAOLA GONZALES MORALES,3016967765,despachado,Coordinadora,36396463302,550000,No,PENDIENTE (En Despacho / Tránsito),0,25000
+Luisa Narvaez,Tu Compras,aa98e3cb-30af-4e83-aaac-55bed9ab2414,2026-08-26,WILSON FAJARDO SAENZ,3196568713,recibido,Coordinadora,36396464149,320000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,ed08f3dc-4188-4ce1-bc35-b43371f35858,2026-08-26,OSCAR EDUARDO QUINTERO HOLGUIN,3217721378,recibido,Interrapidisimo, 240058981134,649000,Sí,LIQUIDABLE (A Pagar Hoy),25000,0
+Luisa Narvaez,Tu Compras,6321a8fb-8524-4e3a-ba5d-0ba73c003bb7,2026-08-27,CARLOS ALBERTO CAMERO,3214388545,recibido,Envía,954101515137,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,0a1451fd-e234-4e7c-b366-521b794fd3f0,2026-08-28,BRAYAN ALEXANDER MENESES,3126645320,recibido,Interrapidisimo,240059316634,340000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,1a353fc1-107a-4828-a9b7-3a19e76759fa,2026-08-29,WILLIAM VALDES,3173731108,despachado,Interrapidisimo,240059696625,249000,No,PENDIENTE (En Despacho / Tránsito),0,15000
+Luisa Narvaez,Tu Compras,ed6447c3-8989-4eab-b1bf-725da9bf3955,2026-08-28,OSWALDO ANTONIO BARON PAEZ,3116133099,recibido,Envía,954101516656,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,484dd53e-973c-4e85-a977-63de18d3ee09,2026-08-29,SEBASTIAN CAMBINDO,3236327150,recibido,Envía,954101517981,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,096e4d79-b381-4df1-b8b5-1a1d424e8da6,2026-08-31,WILLIAM RAMOS,3158091003,despachado,Interrapidisimo,240059925101,249000,No,PENDIENTE (En Despacho / Tránsito),0,15000
+Luisa Narvaez,Tu Compras,88401c15-e829-4d8f-8dfb-19a8a890566a,2026-08-29,JUAN CARLO OLIVEROS,3223843859,recibido,Envía,954101518612,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Luisa Narvaez,Tu Compras,eb13a85e-0747-44f7-8603-43ebe5a432ab,2026-08-13,JUAN IGNACIO MARTINEZ,3182016873,recibido,Interrapidisimo,240059018850,649000,Sí,LIQUIDABLE (A Pagar Hoy),25000,0
+TOTAL LIQUIDABLE (PAGAR HOY),,,,,,,,,,,,,
