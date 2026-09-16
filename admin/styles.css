@@ -2166,6 +2166,11 @@ textarea:focus {
     font-family: inherit;
 }
 
+#ai-chat-container.active-window #ai-chat-bubble,
+#ai-chat-window.active ~ #ai-chat-bubble {
+    display: none !important;
+}
+
 #ai-chat-bubble {
     width: 60px;
     height: 60px;
