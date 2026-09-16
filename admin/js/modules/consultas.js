@@ -51,8 +51,11 @@ window.Consultas = {
 
         const panel = document.getElementById('consultas-panel');
         panel.innerHTML = `
-            <div class="panel-header">
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                 <h1><i class="fas fa-search" style="color: var(--accent);"></i> Consultas e Historial</h1>
+                <button class="btn btn-outline-info" id="consult-kardex-btn" onclick="window.showProductSalesHistoryModal('')" style="border-radius: 12px; font-weight: 600; padding: 0.6rem 1.2rem; background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8;">
+                    <i class="fas fa-boxes"></i> 📦 Historial y Kárdex por Producto
+                </button>
             </div>
 
             <!-- Tab Bar -->
