@@ -1,0 +1,6 @@
+﻿ERP AC - Detalle de Ventas: Dropshipper,,,,,,,,,,,,,
+Total Registros: 2,,,,,,,,,,,,,
+Vendedor,Canal,ID Venta / Orden,Fecha,Cliente,Teléfono Cliente,Estado Envío,Transportadora,Número Guía,Valor Venta ($),Entregado / Confirmado,Estado Comisión,Comisión Liquidable / A Pagar ($),Comisión Pendiente ($)
+Dropshipper,Tu Compras,7b5cd76e-53db-448b-a001-cc1ddb9f3d62,2026-08-06,JHON JAIRO ALZATE,3104023128,recibido,Interrapidisimo,240058546517,450000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Dropshipper,Tu Compras,8e8fba8b-b70f-45f8-97b8-32e896f23f48,2026-08-14,Información solo visible para el Dropshipper,123,recibido,Interrapidisimo,240059083057,900000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+TOTAL LIQUIDABLE (PAGAR HOY),,,,,,,,,,,,,
