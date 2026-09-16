@@ -802,15 +802,14 @@ window.Inventory = {
                         const notes = prompt(`¿Alguna nota o número de factura?`, 'Entrada Manual');
 
                         // Update stock & auto-activate if stock > 0
-                        if (targetCompany === 'millenio') product.stockMillenio = (parseInt(product.stockMillenio) || 0) + qty;
-                        else product.stockVulcano = (parseInt(product.stockVulcano) || 0) + qty;
+                        const newStockM = targetCompany === 'millenio' ? ((parseInt(product.stockMillenio) || 0) + qty) : (parseInt(product.stockMillenio) || 0);
+                        const newStockV = targetCompany === 'vulcano' ? ((parseInt(product.stockVulcano) || 0) + qty) : (parseInt(product.stockVulcano) || 0);
 
-                        const totalNow = (parseInt(product.stockMillenio) || 0) + (parseInt(product.stockVulcano) || 0);
-                        if (totalNow > 0) {
-                            product.active = true;
-                        }
-
-                        await this.updateProduct(product.id, product);
+                        await this.updateProduct(product.id, {
+                            stockMillenio: newStockM,
+                            stockVulcano: newStockV,
+                            active: (newStockM + newStockV) > 0
+                        });
                         await this.recordStockEntry(product.id, product.name, qty, targetCompany, 'Entrada Directa', notes);
 
                         alert(`¡Éxito! Se sumaron ${qty} unidades a ${product.name} (${targetCompany}). Total ahora: ${targetCompany === 'millenio' ? product.stockMillenio : product.stockVulcano}`);
