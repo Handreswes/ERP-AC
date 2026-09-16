@@ -658,9 +658,10 @@
                         <div class="form-group">
                             <label>Tipo de Movimiento</label>
                             <select name="type" id="movement-type" required>
-                                <option value="outflow">Salida de Dinero (Gasto/Pago)</option>
-                                <option value="transfer">Consignación (Efectivo -> Banco)</option>
+                                <option value="transfer">🏦 Consignación / Entrega a Matriz (Efectivo -> Banco / Dueños)</option>
+                                <option value="outflow">💸 Salida de Dinero (Gasto Operativo / Proveedores)</option>
                             </select>
+                            <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 4px;">ℹ️ Las consignaciones reducen la caja y aumentan el banco <strong>sin registrarse como gasto</strong>.</span>
                         </div>
                         <div class="form-group">
                             <label>Empresa</label>
