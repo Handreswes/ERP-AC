@@ -414,11 +414,24 @@ window.Storage = {
 
         while (maxRetries > 0) {
             maxRetries--;
-            let res;
-            if (action === 'insert') {
-                res = await supabase.from(table).insert(currentPayload);
-            } else if (action === 'update') {
-                res = await supabase.from(table).update(currentPayload).eq('id', id);
+            let res = null;
+            try {
+                if (action === 'insert') {
+                    res = await supabase.from(table).insert(currentPayload);
+                } else if (action === 'update') {
+                    res = await supabase.from(table).update(currentPayload).eq('id', id);
+                }
+            } catch (netErr) {
+                console.warn(`[STORAGE] Network exception on table '${table}' (retries left: ${maxRetries}):`, netErr);
+                lastError = netErr;
+                if ((35 - maxRetries) < 3) {
+                    await new Promise(r => setTimeout(r, 400));
+                    continue; // Retry on transient network error
+                }
+                // Fallback: If network is down or fetch error occurs, mark offline status and proceed with local cache
+                this.updateStatus(false);
+                if (window.ERP_LOG) window.ERP_LOG(`Nube Offline (${table}): ${netErr.message || 'Sin conexión'}`, 'warning');
+                return { success: false, offline: true, error: netErr };
             }
 
             if (!res || !res.error) {
@@ -462,14 +475,18 @@ window.Storage = {
         
         // Cloud Sync Await
         if (table && supabase) {
-            const { error } = await supabase.from(table).delete().eq('id', id);
-            if (error) {
-                console.error(`Supabase Delete Error (${table}):`, error.message);
+            try {
+                const { error } = await supabase.from(table).delete().eq('id', id);
+                if (error) {
+                    console.error(`Supabase Delete Error (${table}):`, error.message);
+                    this.updateStatus(false);
+                    if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
+                } else {
+                    this.updateStatus(true);
+                }
+            } catch (netErr) {
+                console.warn(`[STORAGE] Network Delete Error (${table}):`, netErr);
                 this.updateStatus(false);
-                if (window.ERP_LOG) window.ERP_LOG(`Error Nube (${table}): ${error.message}`, 'error');
-                throw new Error(`Refusado por el Servidor (Nube): ${error.message}`);
-            } else {
-                this.updateStatus(true);
             }
         }
 
