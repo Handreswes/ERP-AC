@@ -1,0 +1,12 @@
+﻿ERP AC - Detalle de Ventas: Laura Caycedo,,,,,,,,,,,,,
+Total Registros: 8,,,,,,,,,,,,,
+Vendedor,Canal,ID Venta / Orden,Fecha,Cliente,Teléfono Cliente,Estado Envío,Transportadora,Número Guía,Valor Venta ($),Entregado / Confirmado,Estado Comisión,Comisión Liquidable / A Pagar ($),Comisión Pendiente ($)
+Laura Caycedo,Tu Compras,10eea031-7fe9-46da-a623-c756d466a40d,2026-08-05,ORLADO OVALLE,3204757546,devolucion_recibida,Envía,954101510483,259000,No,CANCELADA (Devolución),0,0
+Laura Caycedo,Tu Compras,053ac07c-be43-4507-b203-452d8aa81fe5,2026-08-20,JAIME URIBE,3212039630,recibido,Interrapidisimo,240058200697,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Laura Caycedo,Tu Compras,dcc40b0e-8c6d-4c72-9006-7f8be697cd6e,2026-08-20,VICTOR MUÑOZ,3233461577,recibido,Envía,954101508852,259000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Laura Caycedo,Tu Compras,2750a35e-1e83-45c9-a092-68d61f5e8942,2026-08-20,YEISON SERNA,240058284794,recibido,Interrapidisimo,240058284794,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Laura Caycedo,Tu Compras,9e8fb4a3-426c-4c85-8bd5-5317e57967f7,2026-08-20,DAVE MENDOZA,3046465917,recibido,Interrapidisimo,240058654234,349000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Laura Caycedo,Tu Compras,25aa8023-f645-4eb9-9594-1c98d168d26b,2026-08-20,JAINER ESPINOSA MONTOYA,3118057988,recibido,Interrapidisimo, 240058654163,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Laura Caycedo,Tu Compras,4e6873b6-b61a-4208-8b3f-2bd9d7cf6719,2026-08-26,JOSE BENICIO FELIX RODRIGUEZ,3112723568,recibido,Interrapidisimo,240058939769,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+Laura Caycedo,Tu Compras,e6f9dc27-02f0-4fab-82b0-c1eefd494172,2026-08-26,JHON GONZALEZ,3108278604,recibido,Interrapidisimo,240058912751,249000,Sí,LIQUIDABLE (A Pagar Hoy),15000,0
+TOTAL LIQUIDABLE (PAGAR HOY),,,,,,,,,,,,,
