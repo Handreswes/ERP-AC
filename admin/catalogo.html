@@ -104,6 +104,107 @@
             transform: scale(1.02);
         }
 
+        /* Brand Tabs & Banner */
+        .brand-tabs-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .brand-tab-btn {
+            background: #ffffff;
+            border: 2px solid var(--border);
+            color: var(--text);
+            padding: 9px 18px;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .brand-tab-btn:hover {
+            border-color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+        }
+
+        .brand-tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);
+        }
+
+        .brand-tab-btn.vulcano-tab.active {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            border-color: #6366f1;
+            color: #fbbf24;
+            box-shadow: 0 6px 18px rgba(99, 102, 241, 0.35);
+        }
+
+        .vulcano-banner-box {
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #312e81 100%);
+            border: 2px solid #6366f1;
+            border-radius: 20px;
+            padding: 1.8rem 1.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .vulcano-banner-logo {
+            max-height: 80px;
+            border-radius: 12px;
+            background: white;
+            padding: 6px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            border: 2px solid rgba(255,255,255,0.3);
+            object-fit: contain;
+        }
+
+        .vulcano-banner-title {
+            color: #fbbf24;
+            font-size: 1.35rem;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .vulcano-banner-slogan {
+            color: #f3f4f6;
+            font-size: 0.98rem;
+            font-weight: 500;
+            max-width: 720px;
+            line-height: 1.5;
+            margin: 0;
+            background: rgba(255,255,255,0.07);
+            padding: 10px 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
         /* Catalog Layout */
         .header {
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -703,6 +804,12 @@
                 <i class="fas fa-search" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 0.85rem;"></i>
                 <input type="text" id="search-input" placeholder="Buscar productos..." class="filter-select" oninput="applyFilters()" style="padding-left: 35px; width: 180px; box-sizing: border-box;">
             </div>
+            <!-- Company / Brand Selector -->
+            <select id="select-company" class="filter-select" onchange="applyFilters()">
+                <option value="all">Todas las Marcas</option>
+                <option value="vulcano">🔥 Productos Vulcano</option>
+                <option value="millenio">🏢 Productos Millenio</option>
+            </select>
             <!-- Price type selector -->
             <select id="select-price-type" class="filter-select" onchange="applyFilters()">
                 <option value="internet">Precios Venta Internet</option>
@@ -780,6 +887,30 @@
 
     <!-- Catalog Container -->
     <div class="container">
+        <!-- Brand Tabs Selector -->
+        <div class="brand-tabs-container">
+            <button class="brand-tab-btn active" id="tab-btn-all" onclick="setCompanyFilter('all')">
+                <i class="fas fa-boxes-stacked"></i> Todos los Productos
+            </button>
+            <button class="brand-tab-btn vulcano-tab" id="tab-btn-vulcano" onclick="setCompanyFilter('vulcano')">
+                <img src="images/logo_vulcano.jpeg" onerror="this.src='assets/logo_vulcano.jpeg'" style="height: 22px; border-radius: 4px; object-fit: contain;"> ⚡ Productos Vulcano
+            </button>
+            <button class="brand-tab-btn" id="tab-btn-millenio" onclick="setCompanyFilter('millenio')">
+                <i class="fas fa-building"></i> Productos Millenio
+            </button>
+        </div>
+
+        <!-- Vulcano Brand Header Banner (Shown when Vulcano tab is active) -->
+        <div id="vulcano-brand-banner" class="vulcano-banner-box" style="display: none;">
+            <img src="images/logo_vulcano.jpeg" onerror="this.src='assets/logo_vulcano.jpeg'" alt="Logo Vulcano" class="vulcano-banner-logo">
+            <div class="vulcano-banner-title">
+                ⚡ LÍNEA DE PRODUCTOS VULCANO ⚡
+            </div>
+            <p class="vulcano-banner-slogan">
+                "Herramientas y tecnología de alta durabilidad, máxima resistencia y rendimiento profesional de primera calidad."
+            </p>
+        </div>
+
         <div class="catalog-grid" id="catalog-grid">
             <!-- Rendered dynamically -->
         </div>
@@ -943,6 +1074,10 @@
                         priceSelect.value = urlPrice;
                     }
                 }
+                const compSelect = document.getElementById('select-company');
+                if (compSelect && urlCompany) {
+                    compSelect.value = urlCompany;
+                }
                 applyFilters();
             } catch (sErr) {
                 console.error("Supabase fallback failed:", sErr);
@@ -986,13 +1121,17 @@
                     allProducts = processRawProducts(products);
                     updateCategoryDropdown();
                     const priceSelect = document.getElementById('select-price-type');
-                if (priceSelect) {
-                    if (isPriceLocked) {
-                        priceSelect.style.display = 'none';
-                    } else {
-                        priceSelect.value = urlPrice;
+                    if (priceSelect) {
+                        if (isPriceLocked) {
+                            priceSelect.style.display = 'none';
+                        } else {
+                            priceSelect.value = urlPrice;
+                        }
                     }
-                }
+                    const compSelect = document.getElementById('select-company');
+                    if (compSelect && urlCompany) {
+                        compSelect.value = urlCompany;
+                    }
                     applyFilters();
                     hideLoadingScreen();
 
@@ -1016,6 +1155,12 @@
             }
         }
 
+        function setCompanyFilter(company) {
+            const companySelect = document.getElementById('select-company');
+            if (companySelect) companySelect.value = company;
+            applyFilters();
+        }
+
         // Filter and Render Logic
         function applyFilters() {
             const priceSelect = document.getElementById('select-price-type');
@@ -1027,11 +1172,30 @@
             }
             const searchTerm = document.getElementById('search-input').value.toLowerCase().trim();
             const activeCategory = document.getElementById('select-category').value;
+            const companySelect = document.getElementById('select-company');
+            const selectedCompany = companySelect ? companySelect.value : urlCompany;
 
-            // 1. Base filter based on URL query parameters (Locked for the customer)
+            // 1. Base filter based on brand/company selector
             let filtered = allProducts;
-            if (urlCompany !== 'all') {
-                filtered = allProducts.filter(p => p.company === 'both' || p.company === urlCompany);
+            if (selectedCompany === 'vulcano') {
+                filtered = allProducts.filter(p => p.company === 'vulcano' || p.company === 'both' || (parseInt(p.stockVulcano) || 0) > 0 || (p.name && p.name.toLowerCase().includes('vulcano')));
+            } else if (selectedCompany === 'millenio') {
+                filtered = allProducts.filter(p => p.company === 'millenio' || p.company === 'both' || (parseInt(p.stockMillenio) || 0) > 0);
+            }
+
+            // Update Tab button active states
+            ['all', 'vulcano', 'millenio'].forEach(c => {
+                const btn = document.getElementById(`tab-btn-${c}`);
+                if (btn) {
+                    if (c === selectedCompany) btn.classList.add('active');
+                    else btn.classList.remove('active');
+                }
+            });
+
+            // Toggle Vulcano brand banner
+            const vulcanoBanner = document.getElementById('vulcano-brand-banner');
+            if (vulcanoBanner) {
+                vulcanoBanner.style.display = (selectedCompany === 'vulcano') ? 'flex' : 'none';
             }
 
             // 2. Customer interactive filters (Categories and Search)
