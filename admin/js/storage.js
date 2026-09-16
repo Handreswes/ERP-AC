@@ -366,17 +366,16 @@ window.Storage = {
         const index = items.findIndex(item => item.id === id);
 
         if (index !== -1) {
-            // Auto-Limbo Trigger: Any product with stock <= 0 MUST be deactivated automatically
+            // Auto-Limbo Trigger: Any product with stock <= 0 MUST be deactivated automatically, and stock > 0 MUST be activated
             if (key === STORAGE_KEYS.PRODUCTS) {
                 const existing = items[index];
-                const oldStock = (parseInt(existing.stockMillenio) || 0) + (parseInt(existing.stockVulcano) || 0);
                 const newStockM = updatedData.stockMillenio !== undefined ? (parseInt(updatedData.stockMillenio) || 0) : (parseInt(existing.stockMillenio) || 0);
                 const newStockV = updatedData.stockVulcano !== undefined ? (parseInt(updatedData.stockVulcano) || 0) : (parseInt(existing.stockVulcano) || 0);
                 const newStock = newStockM + newStockV;
 
                 if (newStock <= 0) {
                     updatedData.active = false;
-                } else if (newStock > 0 && oldStock <= 0 && updatedData.active === undefined) {
+                } else if (newStock > 0) {
                     updatedData.active = true;
                 }
             }
