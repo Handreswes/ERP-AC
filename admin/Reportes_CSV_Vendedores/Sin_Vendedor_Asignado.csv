@@ -1,0 +1,14 @@
+﻿ERP AC - Detalle de Ventas: Sin Vendedor Asignado,,,,,,,,,,,,,
+Total Registros: 10,,,,,,,,,,,,,
+Vendedor,Canal,ID Venta / Orden,Fecha,Cliente,Teléfono Cliente,Estado Envío,Transportadora,Número Guía,Valor Venta ($),Entregado / Confirmado,Estado Comisión,Comisión Liquidable / A Pagar ($),Comisión Pendiente ($)
+Sin Vendedor Asignado,Mayorista,ae8338dd,2026-03-18,Andres Caycedo,N/A,completed,N/A,N/A,220,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,fa7d7739,2026-03-19,cindy,N/A,completed,N/A,N/A,110,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,b8e0a5bd,2026-03-25,Andres Caycedo,N/A,shipped,transprensa ,0000000,111,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,c5eb2c38,2026-04-29,Yen Fenderson  Acevedo,N/A,completed,N/A,N/A,2970000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,fa9fa128,2026-05-05,Andres loboa Ibague,N/A,completed,N/A,N/A,550000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,a1624917,2026-05-06,Andres loboa Ibague,N/A,completed,N/A,N/A,165000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,6b1a64ae,2026-05-09,Andres loboa Ibague,N/A,completed,N/A,N/A,110000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,5f7c0ee9,2026-05-16,Cristian Marin ,N/A,completed,N/A,N/A,17410000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,336aed64,2026-05-16,Carlos Soriano ,N/A,completed,N/A,N/A,1080000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+Sin Vendedor Asignado,Mayorista,6400f7e9,2026-05-21,Julio Cortes ,N/A,completed,N/A,N/A,9190000,Sí,LIQUIDABLE (A Pagar Hoy),0,0
+TOTAL LIQUIDABLE (PAGAR HOY),,,,,,,,,,,,,
