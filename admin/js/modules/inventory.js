@@ -1524,38 +1524,77 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
         modal.id = 'product-sales-modal';
         modal.className = 'modal';
         modal.innerHTML = `
-            <div class="modal-content" style="max-width: 950px; border-radius: 20px; padding: 1.5rem;">
+            <div class="modal-content" style="max-width: 1000px; border-radius: 20px; padding: 1.5rem; background: var(--bg-card); color: var(--text-primary);">
                 <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem;">
                     <h2 style="margin: 0; font-size: 1.25rem; color: var(--text-primary); display: flex; align-items: center; gap: 10px;">
-                        <i class="fas fa-history" style="color: #38bdf8;"></i> Historial de Ventas por Producto
+                        <i class="fas fa-boxes" style="color: #38bdf8;"></i> Historial Completo y Kárdex del Producto
                     </h2>
                     <span class="close-modal" onclick="document.getElementById('product-sales-modal').classList.remove('show')" style="cursor: pointer; font-size: 1.5rem;">&times;</span>
                 </div>
                 <div class="modal-body">
-                    <div style="position: relative; margin-bottom: 1.25rem;">
+                    <div style="position: relative; margin-bottom: 1rem;">
                         <i class="fas fa-search" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-secondary);"></i>
-                        <input type="text" id="sales-history-search" class="form-control" placeholder="Escriba el nombre del producto (Ej: pistola, 3/4, careta, pulidora...)" style="padding-left: 40px !important; height: 44px; border-radius: 12px; font-size: 0.95rem;">
+                        <input type="text" id="sales-history-search" class="form-control" placeholder="Escriba el nombre del producto (Ej: pistola 3/4, motosierra, pulidora...)" style="padding-left: 40px !important; height: 44px; border-radius: 12px; font-size: 0.95rem;">
                     </div>
 
-                    <div id="sales-history-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.25rem;"></div>
+                    <!-- Sub-Tabs Header -->
+                    <div style="display: flex; gap: 8px; margin-bottom: 1.25rem; border-bottom: 1px solid var(--border); padding-bottom: 8px; flex-wrap: wrap;">
+                        <button class="btn btn-sm btn-primary kardex-tab-btn active" id="modal-tab-sales" onclick="window.switchProductModalTab('sales')" style="border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-shopping-cart"></i> Ventas y Despachos
+                        </button>
+                        <button class="btn btn-sm btn-outline-info kardex-tab-btn" id="modal-tab-entries" onclick="window.switchProductModalTab('entries')" style="border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-arrow-down"></i> Ingresos al Inventario
+                        </button>
+                        <button class="btn btn-sm btn-outline-success kardex-tab-btn" id="modal-tab-kardex" onclick="window.switchProductModalTab('kardex')" style="border-radius: 8px; font-weight: 600;">
+                            <i class="fas fa-balance-scale"></i> Resumen & Balance Kárdex
+                        </button>
+                    </div>
 
-                    <div class="table-container" style="max-height: 420px; overflow-y: auto;">
-                        <table class="data-table" style="font-size: 0.85rem;">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Cliente / Teléfono</th>
-                                    <th>Producto Vendido</th>
-                                    <th class="text-right">Cant</th>
-                                    <th class="text-right">Precio Unit.</th>
-                                    <th class="text-right">Total</th>
-                                    <th>Empresa</th>
-                                    <th>Remisión / Notas</th>
-                                </tr>
-                            </thead>
-                            <tbody id="sales-history-tbody">
-                            </tbody>
-                        </table>
+                    <div id="sales-history-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.85rem; margin-bottom: 1.25rem;"></div>
+
+                    <!-- TAB 1: VENTAS -->
+                    <div id="modal-view-sales" class="modal-tab-view">
+                        <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Cliente / Teléfono</th>
+                                        <th>Producto Vendido</th>
+                                        <th class="text-right">Cant</th>
+                                        <th class="text-right">Precio Unit.</th>
+                                        <th class="text-right">Total</th>
+                                        <th>Empresa</th>
+                                        <th>Remisión / Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sales-history-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: ENTRADAS DE INVENTARIO -->
+                    <div id="modal-view-entries" class="modal-tab-view" style="display: none;">
+                        <div class="table-container" style="max-height: 400px; overflow-y: auto;">
+                            <table class="data-table" style="font-size: 0.85rem;">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha Ingreso</th>
+                                        <th>Producto</th>
+                                        <th class="text-right">Cantidad Ingresada</th>
+                                        <th>Empresa</th>
+                                        <th>Origen / Concepto</th>
+                                        <th>Notas / Factura</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="entries-history-tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: RESUMEN KARDEX -->
+                    <div id="modal-view-kardex" class="modal-tab-view" style="display: none;">
+                        <div id="kardex-summary-container" style="font-size: 0.9rem;"></div>
                     </div>
                 </div>
             </div>
@@ -1568,6 +1607,21 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                 this.renderSalesHistoryResults(e.target.value);
             });
         }
+
+        window.switchProductModalTab = (tabName) => {
+            ['sales', 'entries', 'kardex'].forEach(t => {
+                const btn = document.getElementById(`modal-tab-${t}`);
+                const view = document.getElementById(`modal-view-${t}`);
+                if (btn) {
+                    if (t === tabName) {
+                        btn.className = `btn btn-sm btn-primary kardex-tab-btn active`;
+                    } else {
+                        btn.className = `btn btn-sm btn-outline-info kardex-tab-btn`;
+                    }
+                }
+                if (view) view.style.display = t === tabName ? 'block' : 'none';
+            });
+        };
     },
 
     showProductSalesHistoryModal(initialSearch = '') {
@@ -1582,25 +1636,26 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
     },
 
     renderSalesHistoryResults(query = '') {
-        const tbody = document.getElementById('sales-history-tbody');
+        const tbodySales = document.getElementById('sales-history-tbody');
+        const tbodyEntries = document.getElementById('entries-history-tbody');
+        const kardexContainer = document.getElementById('kardex-summary-container');
         const statsEl = document.getElementById('sales-history-stats');
-        if (!tbody) return;
+        if (!tbodySales || !tbodyEntries) return;
 
+        const q = query.toLowerCase().trim();
+
+        // 1. FETCH SALES (POS & DROP/TUCOMPRAS)
         const sales1 = Storage.get(STORAGE_KEYS.SALES) || [];
         const sales2 = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
-        
         const salesMap = new Map();
-        [...sales1, ...sales2].forEach(s => {
-            if (s && s.id) salesMap.set(s.id, s);
-        });
+        [...sales1, ...sales2].forEach(s => { if (s && s.id) salesMap.set(s.id, s); });
         const allSales = Array.from(salesMap.values());
         allSales.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
 
-        const q = query.toLowerCase().trim();
-        let totalQty = 0;
+        let totalQtySold = 0;
         let totalRevenue = 0;
         let countSales = 0;
-        let rowsHtml = '';
+        let salesRowsHtml = '';
 
         allSales.forEach(s => {
             let items = s.items || s.sale_items || [];
@@ -1622,11 +1677,11 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
                     const price = parseFloat(it.price || it.price_unit || it.unit_price || 0);
                     const subtotal = parseFloat(it.total || it.subtotal || (qty * price));
 
-                    totalQty += qty;
+                    totalQtySold += qty;
                     totalRevenue += subtotal;
                     countSales++;
 
-                    rowsHtml += `
+                    salesRowsHtml += `
                         <tr>
                             <td><small class="text-secondary">${dateStr}</small></td>
                             <td><strong>${clientName}</strong> ${clientPhone ? `<br><small style="color:var(--accent);">${clientPhone}</small>` : ''}</td>
@@ -1642,28 +1697,112 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
             });
         });
 
+        // 2. FETCH INVENTORY ENTRIES (STOCK_ENTRIES)
+        const stockEntries = Storage.get(STORAGE_KEYS.STOCK_ENTRIES) || [];
+        stockEntries.sort((a, b) => new Date(b.date || b.createdAt || 0) - new Date(a.date || a.createdAt || 0));
+
+        let totalQtyEntered = 0;
+        let countEntries = 0;
+        let entriesRowsHtml = '';
+
+        stockEntries.forEach(entry => {
+            const prodName = (entry.productName || entry.product_name || '').trim();
+            const pid = entry.productId || entry.product_id || '';
+            if (!q || prodName.toLowerCase().includes(q) || pid === q) {
+                const qty = parseInt(entry.quantity || entry.qty || 0);
+                const dateStr = (entry.date || entry.createdAt || '').substring(0, 10);
+                const company = (entry.company || 'millenio').toUpperCase();
+                const source = entry.source || 'Entrada Directa';
+                const notes = entry.notes || '-';
+
+                totalQtyEntered += qty;
+                countEntries++;
+
+                entriesRowsHtml += `
+                    <tr>
+                        <td><small class="text-secondary">${dateStr}</small></td>
+                        <td><strong style="color: var(--text-primary);">${prodName}</strong></td>
+                        <td class="text-right"><span class="badge bg-green" style="font-size:0.85rem; font-weight:700; color: #10b981;">+${qty}</span></td>
+                        <td><span class="badge ${company === 'VULCANO' ? 'bg-orange' : 'bg-blue'}">${company}</span></td>
+                        <td><strong>${source}</strong></td>
+                        <td><small><i>${notes}</i></small></td>
+                    </tr>
+                `;
+            }
+        });
+
+        // 3. FETCH PRODUCTS MATCHING QUERY & COMPUTE KARDEX
+        const products = Storage.get(STORAGE_KEYS.PRODUCTS) || [];
+        const matchedProducts = products.filter(p => !q || (p.name || '').toLowerCase().includes(q) || p.id === q);
+        let kardexHtml = '';
+
+        if (matchedProducts.length > 0) {
+            kardexHtml = matchedProducts.map(p => {
+                const stockM = parseInt(p.stockMillenio) || 0;
+                const stockV = parseInt(p.stockVulcano) || 0;
+                const currentStock = stockM + stockV;
+                const creationDate = p.createdAt ? (p.createdAt).substring(0, 10) : 'Al inicio de operaciones';
+
+                return `
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem; margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                            <div>
+                                <h3 style="margin: 0; font-size: 1.1rem; color: var(--accent);">${p.name}</h3>
+                                <small style="color: var(--text-secondary);">Ref: ${p.ref || 'Sin Ref'} | Categoría: ${p.category || 'General'} | Registrado: ${creationDate}</small>
+                            </div>
+                            <span class="badge ${p.active !== false ? 'bg-green' : 'bg-red'}" style="font-size: 0.8rem;">${p.active !== false ? 'ACTIVO EN SISTEMA' : 'INACTIVO'}</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; text-align: center;">
+                            <div style="background: rgba(16, 185, 129, 0.08); padding: 10px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.2);">
+                                <small style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Ingresos a Inventario</small>
+                                <h4 style="margin: 3px 0 0 0; color: #10b981; font-size: 1.1rem; font-weight: 800;">+${totalQtyEntered} unids</h4>
+                            </div>
+                            <div style="background: rgba(59, 130, 246, 0.08); padding: 10px; border-radius: 10px; border: 1px solid rgba(59, 130, 246, 0.2);">
+                                <small style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Ventas Despachadas</small>
+                                <h4 style="margin: 3px 0 0 0; color: #3b82f6; font-size: 1.1rem; font-weight: 800;">${totalQtySold} unids</h4>
+                            </div>
+                            <div style="background: rgba(245, 158, 11, 0.08); padding: 10px; border-radius: 10px; border: 1px solid rgba(245, 158, 11, 0.2);">
+                                <small style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Stock Actual Físico</small>
+                                <h4 style="margin: 3px 0 0 0; color: #f59e0b; font-size: 1.1rem; font-weight: 800;">${currentStock} unids</h4>
+                                <small style="font-size: 0.72rem; color: var(--text-secondary);">Millenio: ${stockM} | Vulcano: ${stockV}</small>
+                            </div>
+                            <div style="background: rgba(168, 85, 247, 0.08); padding: 10px; border-radius: 10px; border: 1px solid rgba(168, 85, 247, 0.2);">
+                                <small style="color: var(--text-secondary); text-transform: uppercase; font-size: 0.7rem; font-weight: 700;">Recaudación Venta</small>
+                                <h4 style="margin: 3px 0 0 0; color: #a855f7; font-size: 1.1rem; font-weight: 800;">$${totalRevenue.toLocaleString()}</h4>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        } else {
+            kardexHtml = `<div style="text-align: center; padding: 2rem; color: var(--text-secondary);">No se encontraron productos registrados que coincidan con "${q}"</div>`;
+        }
+        if (kardexContainer) kardexContainer.innerHTML = kardexHtml;
+
+        // 4. STATS HEADER
         if (statsEl) {
             statsEl.innerHTML = `
-                <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 12px; border-radius: 12px;">
-                    <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Filtro Actual</span>
-                    <h4 style="margin:2px 0 0 0; color:#38bdf8; font-size:1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q ? `"${q}"` : 'Todos los Productos'}</h4>
+                <div style="background: rgba(56, 189, 248, 0.1); border: 1px solid rgba(56, 189, 248, 0.2); padding: 10px 14px; border-radius: 12px;">
+                    <span style="font-size:0.7rem; color:var(--text-secondary); font-weight:700; text-transform:uppercase;">Filtro Actual</span>
+                    <h4 style="margin:2px 0 0 0; color:#38bdf8; font-size:0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${q ? `"${q}"` : 'Todos los Productos'}</h4>
                 </div>
-                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 12px; border-radius: 12px;">
-                    <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Total Unidades Vendidas</span>
-                    <h4 style="margin:2px 0 0 0; color:var(--success); font-size:1.1rem; font-weight:800;">${totalQty.toLocaleString()} unids</h4>
+                <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.2); padding: 10px 14px; border-radius: 12px;">
+                    <span style="font-size:0.7rem; color:var(--text-secondary); font-weight:700; text-transform:uppercase;">Ingresos a Inventario</span>
+                    <h4 style="margin:2px 0 0 0; color:#10b981; font-size:1.05rem; font-weight:800;">+${totalQtyEntered.toLocaleString()} unids</h4>
                 </div>
-                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 12px; border-radius: 12px;">
-                    <span style="font-size:0.75rem; color:var(--text-secondary); font-weight:600; text-transform:uppercase;">Total Recaudado</span>
-                    <h4 style="margin:2px 0 0 0; color:var(--warning); font-size:1.1rem; font-weight:800;">$${totalRevenue.toLocaleString()}</h4>
+                <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.2); padding: 10px 14px; border-radius: 12px;">
+                    <span style="font-size:0.7rem; color:var(--text-secondary); font-weight:700; text-transform:uppercase;">Ventas Realizadas</span>
+                    <h4 style="margin:2px 0 0 0; color:#3b82f6; font-size:1.05rem; font-weight:800;">${totalQtySold.toLocaleString()} unids</h4>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.2); padding: 10px 14px; border-radius: 12px;">
+                    <span style="font-size:0.7rem; color:var(--text-secondary); font-weight:700; text-transform:uppercase;">Total Recaudado</span>
+                    <h4 style="margin:2px 0 0 0; color:var(--warning); font-size:1.05rem; font-weight:800;">$${totalRevenue.toLocaleString()}</h4>
                 </div>
             `;
         }
 
-        if (!rowsHtml) {
-            tbody.innerHTML = `<tr><td colspan="8" class="text-center" style="padding: 2rem; color: var(--text-secondary);">No se encontraron ventas para el filtro "${q}"</td></tr>`;
-        } else {
-            tbody.innerHTML = rowsHtml;
-        }
+        tbodySales.innerHTML = salesRowsHtml || `<tr><td colspan="8" class="text-center" style="padding: 2rem; color: var(--text-secondary);">No se encontraron ventas para el filtro "${q}"</td></tr>`;
+        tbodyEntries.innerHTML = entriesRowsHtml || `<tr><td colspan="6" class="text-center" style="padding: 2rem; color: var(--text-secondary);">No se encontraron ingresos a inventario para el filtro "${q}"</td></tr>`;
     }
 };
 
