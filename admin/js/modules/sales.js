@@ -915,6 +915,7 @@ window.Sales = {
 
             let totalM = 0;
             let totalV = 0;
+            let totalOverpriceM = 0;
 
             // Procesar ítems del carrito contra el clon de inventario
             for (const item of this.cart) {
@@ -937,6 +938,12 @@ window.Sales = {
                 if (targetCompany === 'millenio') {
                     pClone.stockMillenio = (parseInt(pClone.stockMillenio) || 0) - item.quantity;
                     totalM += itemTotal;
+
+                    // Exclusivo Millenio: calcular sobreprecio para Bolsillo de Cartera
+                    const basePrice = pClone.priceWholesale || pClone.cost || 0;
+                    if (item.price > basePrice && basePrice > 0) {
+                        totalOverpriceM += (item.price - basePrice) * item.quantity;
+                    }
                 } else {
                     pClone.stockVulcano = (parseInt(pClone.stockVulcano) || 0) - item.quantity;
                     totalV += itemTotal;
@@ -1017,6 +1024,20 @@ window.Sales = {
             } else {
                 await Storage.addItem(STORAGE_KEYS.SALES, sale);
                 window.ERP_LOG('Venta registrada en la nube', 'success');
+            }
+
+            // 1.5 REGISTRAR SOBREPRECIO EN BOLSILLO DE CARTERA MILLENIO
+            if (totalOverpriceM > 0) {
+                await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
+                    company: 'millenio',
+                    type: 'recovery_credit',
+                    originAccount: 'overprice',
+                    destinationAccount: 'millenio_recovery_pool',
+                    amount: totalOverpriceM,
+                    concept: 'Aporte Bolsillo Cartera Millenio (Excedente Venta)',
+                    notes: `Excedente remisión ${remNumber} - Cliente: ${this.selectedClient.name}`,
+                    date: new Date().toISOString()
+                });
             }
 
             // 2. COMMIT INVENTORY (Dependent Data)
