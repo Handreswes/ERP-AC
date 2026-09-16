@@ -425,7 +425,7 @@ window.Consultas = {
         container.innerHTML = `
             <!-- Filters -->
             <div class="search-filter-row" style="margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
-                <input type="text" id="q-local-search" class="form-control" placeholder="Buscar por cliente o remisión..." style="max-width: 280px;">
+                <input type="text" id="q-local-search" class="form-control" placeholder="🔍 Buscar por cliente, producto o remisión..." style="max-width: 320px;">
                 <input type="month" id="q-local-month" class="form-control" style="max-width: 160px;">
                 <select id="q-local-method" class="form-control" style="max-width: 170px;">
                     <option value="all">Todos los métodos</option>
@@ -473,7 +473,10 @@ window.Consultas = {
             if (q) rows = rows.filter(s => {
                 const rem = (s.remissionNumber || '').toLowerCase();
                 const client = (s.clientName || '').toLowerCase();
-                return rem.includes(q) || client.includes(q);
+                const seller = (s.sellerName || '').toLowerCase();
+                const notes = (s.notes || '').toLowerCase();
+                const itemsStr = (s.items ? s.items.map(i => i.name || i.product_name || '').join(' ') : '').toLowerCase();
+                return rem.includes(q) || client.includes(q) || itemsStr.includes(q) || seller.includes(q) || notes.includes(q);
             });
             if (m) rows = rows.filter(s => s.date && s.date.startsWith(m));
             if (me !== 'all') rows = rows.filter(s => s.method === me);
