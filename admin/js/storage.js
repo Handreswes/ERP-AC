@@ -104,9 +104,13 @@ window.Storage = {
             window.STORAGE_KEYS.SALES,
             window.STORAGE_KEYS.CLIENTS,
             window.STORAGE_KEYS.ACCOUNTS,
+            window.STORAGE_KEYS.PAYMENTS,
+            window.STORAGE_KEYS.STOCK_ENTRIES,
             window.STORAGE_KEYS.SELLERS,
             window.STORAGE_KEYS.TUCOMPRAS_SALES,
-            window.STORAGE_KEYS.TUCOMPRAS_CUSTOMERS
+            window.STORAGE_KEYS.TUCOMPRAS_CUSTOMERS,
+            window.STORAGE_KEYS.EXPENSES,
+            window.STORAGE_KEYS.MOVEMENTS
         ];
         for (const key of criticalKeys) {
             try {
