@@ -4,15 +4,19 @@ window.CRM = {
         this.renderPanel();
         this.setupEventListeners();
 
-        // Listen to cloud updates for clients and refresh the UI list in real time
+        // Listen to cloud updates for clients, payments, sales and refresh the UI list in real time
         if (this._handleCloudUpdate) {
             window.removeEventListener('erp_table_updated_clients', this._handleCloudUpdate);
+            window.removeEventListener('erp_table_updated_payments', this._handleCloudUpdate);
+            window.removeEventListener('erp_table_updated_sales', this._handleCloudUpdate);
         }
         this._handleCloudUpdate = () => {
             const searchInput = document.getElementById('crm-search');
             this.updateClientList(searchInput ? searchInput.value : '');
         };
         window.addEventListener('erp_table_updated_clients', this._handleCloudUpdate);
+        window.addEventListener('erp_table_updated_payments', this._handleCloudUpdate);
+        window.addEventListener('erp_table_updated_sales', this._handleCloudUpdate);
     },
 
     getClients() {
@@ -26,12 +30,16 @@ window.CRM = {
         if (btn) btn.disabled = true;
 
         try {
-            window.ERP_LOG('Iniciando sincronización manual de cartera...');
-            await Storage.syncTable(STORAGE_KEYS.CLIENTS);
-            window.ERP_LOG('Sincronización de clientes completada', 'success');
+            window.ERP_LOG('Iniciando sincronización manual de cartera y abonos...');
+            await Promise.all([
+                Storage.syncTable(STORAGE_KEYS.CLIENTS),
+                Storage.syncTable(STORAGE_KEYS.PAYMENTS),
+                Storage.syncTable(STORAGE_KEYS.SALES)
+            ]);
+            window.ERP_LOG('Sincronización de cartera completada', 'success');
             const searchInput = document.getElementById('crm-search');
             this.updateClientList(searchInput ? searchInput.value : '');
-            alert('✅ Sincronización con la nube completada con éxito.');
+            alert('✅ Sincronización de cartera y abonos completada con éxito.');
         } catch (e) {
             window.ERP_LOG('Error de sincronización: ' + e.message, 'error');
             alert('❌ Error al sincronizar: ' + e.message);
@@ -517,13 +525,12 @@ window.CRM = {
                     const clientId = tgt.dataset.client;
                     const periodDays = document.getElementById('statement-period').value;
                     const btn = tgt;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> SINCRONIZANDO Y PROCESANDO...';
                     btn.disabled = true;
-                    setTimeout(() => {
-                        this.buildAccountStatement(clientId, periodDays);
+                    this.buildAccountStatement(clientId, periodDays).finally(() => {
                         btn.innerHTML = '<i class="fas fa-file-pdf"></i> Construir y Previsualizar PDF';
                         btn.disabled = false;
-                    }, 500); // UI breathing room
+                    });
                     return;
                 }
 
@@ -710,7 +717,18 @@ window.CRM = {
         }
     },
 
-    buildAccountStatement(clientId, periodDays) {
+    async buildAccountStatement(clientId, periodDays) {
+        // Ensure fresh cloud sync for Sales, Payments and Clients before building statement
+        try {
+            await Promise.all([
+                Storage.syncTable(STORAGE_KEYS.SALES),
+                Storage.syncTable(STORAGE_KEYS.PAYMENTS),
+                Storage.syncTable(STORAGE_KEYS.CLIENTS)
+            ]);
+        } catch(e) {
+            console.warn("Cloud sync before statement preview:", e.message);
+        }
+
         const client = this.getClients().find(c => c.id === clientId);
         if (!client) return;
 
