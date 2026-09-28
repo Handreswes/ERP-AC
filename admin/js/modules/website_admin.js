@@ -35,7 +35,32 @@ window.WebsiteAdmin = {
                     wholesale_text: 'En TuCompras Col somos importadores y distribuidores directos. Potencia tu negocio con nuestro catálogo mayorista, precios competitivos y envíos prioritarios a toda Colombia.',
                     wholesale_bg_image: 'https://images.unsplash.com/photo-1581092160562-40aa08e78837',
                     privacy_policy_text: 'Política estándar de privacidad...',
-                    refund_policy_text: 'Política estándar de reembolsos...',
+                    refund_policy_text: `<p>En <strong>TuCompras</strong>, nos comprometemos a respaldar la calidad de los productos que adquiere con nosotros. Si presenta algún inconveniente, nuestro proceso de garantía se gestiona bajo los siguientes puntos:</p>
+
+<ol style="padding-left: 1.25rem; margin-top: 1rem; margin-bottom: 1.5rem;">
+  <li style="margin-bottom: 1.25rem;">
+    <strong>1. Revisión Técnica Inicial (En caso de daño o falla)</strong><br>
+    Si el producto presenta una falla, buscaremos un técnico o centro de servicio autorizado en la ciudad donde se encuentre ubicado para realizar una revisión.<br><br>
+    En caso de que no exista un centro técnico en la zona, o si no se logra un acuerdo con los centros de reparación locales, se procederá con la devolución física del producto.
+  </li>
+  <li style="margin-bottom: 1.25rem;">
+    <strong>2. Logística y Envío</strong><br>
+    Para la devolución física, le indicaremos la empresa transportadora que debe utilizar y el procedimiento correspondiente.<br><br>
+    <em><strong>Nota importante:</strong> Los tiempos de traslado dependen directamente de las empresas transportadoras y de la distancia, por lo que las fechas de entrega están sujetas a su operación logística.</em>
+  </li>
+  <li style="margin-bottom: 1.25rem;">
+    <strong>3. Diagnóstico y Solución</strong><br>
+    Tan pronto el producto llegue a nuestras instalaciones, será evaluado por nuestro equipo. Según el caso, se procederá de la siguiente manera:
+    <ul style="padding-left: 1.25rem; margin-top: 0.5rem; list-style-type: disc;">
+      <li style="margin-bottom: 0.5rem;"><strong>Reparación:</strong> Si el producto aplica para reparación, se arreglará y se enviará de regreso a su dirección.</li>
+      <li style="margin-bottom: 0.5rem;"><strong>Cambio por producto nuevo:</strong> Si el caso lo amerita y la garantía es aprobada, el artículo será reemplazado por uno nuevo para su reenvío.</li>
+    </ul>
+  </li>
+  <li style="margin-bottom: 1.25rem;">
+    <strong>4. Costos de Envío</strong><br>
+    Todos los costos de transporte (tanto del envío de regreso como el nuevo despacho) serán asumidos por nosotros, siempre y cuando la garantía sea aprobada y aplique según los términos.
+  </li>
+</ol>`,
                     meta_title: 'TuCompras Col | Herramientas y Hogar con Envíos en Colombia',
                     meta_description: 'Distribuidora líder en herramientas de ferretería, protección y hogar. Más de 1.300 productos entregados en 2025. Pago contra entrega en toda Colombia.',
                     meta_pixel_id: '',
