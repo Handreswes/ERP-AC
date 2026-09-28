@@ -242,7 +242,7 @@ window.WebsiteAdmin = {
                         <h3 style="margin-bottom:1rem;"><i class="fas fa-gavel"></i> Legal</h3>
                         <label>Privacidad</label>
                         <textarea id="wa-privacy" class="form-control" style="height:100px;" onchange="WebsiteAdmin.updateSetting('privacy_policy_text', this.value)"></textarea>
-                        <label>Reembolsos</label>
+                        <label>Garantía y Devoluciones</label>
                         <textarea id="wa-refunds" class="form-control" style="height:100px;" onchange="WebsiteAdmin.updateSetting('refund_policy_text', this.value)"></textarea>
                     </div>
                 </div>
