@@ -418,8 +418,11 @@ function showView(viewId, productId = null) {
         const prompt = document.getElementById('guest-register-prompt');
         if (prompt) prompt.style.display = currentUser ? 'none' : 'block';
     }
-    if (viewId === 'privacy' || viewId === 'refunds') {
+    if (viewId === 'privacy' || viewId === 'refunds' || viewId === 'vulcano') {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    if (viewId === 'vulcano') {
+        renderVulcanoProducts();
     }
     if (viewId === 'account') {
         renderAccountView();
@@ -447,6 +450,8 @@ function handleRouting() {
         showView('privacy');
     } else if (view === 'refunds') {
         showView('refunds');
+    } else if (view === 'vulcano') {
+        showView('vulcano');
     } else if (view === 'success' || urlParams.get('status') === 'success') {
         showView('success');
     } else {
@@ -629,40 +634,66 @@ function renderProducts(items) {
     }
 
     filtered.forEach(p => {
-        const card = document.createElement('div');
-        card.className = 'glass product-card animate';
-        const img = (Array.isArray(p.image) ? p.image[0] : (p.image || p.imageUrl)) || 'https://via.placeholder.com/300';
-        
-        const finalPrice = p.priceFinal || p.priceInternet || 0;
-        const price = finalPrice.toLocaleString();
-        
-        const hasPromo = p.pricePrevious && parseFloat(p.pricePrevious) > parseFloat(finalPrice);
-        const discountPct = hasPromo ? Math.round(((parseFloat(p.pricePrevious) - parseFloat(finalPrice)) / parseFloat(p.pricePrevious)) * 100) : 0;
+        productGrid.appendChild(createProductCardElement(p));
+    });
+}
 
-        card.innerHTML = `
-            <div class="product-img" onclick="window.location.hash = '#product?id=${p.id}'" style="position: relative;">
-                ${discountPct > 0 ? `<span class="promo-badge" style="position: absolute; top: 12px; left: 12px; background: #ef4444; color: white; padding: 5px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); z-index: 5; text-transform: uppercase; letter-spacing: 0.5px; animation: pulse-promo 2s infinite;">-${discountPct}% DTO</span>` : ''}
-                <img src="${img}" alt="${p.name}">
-                <div class="product-overlay"><span>Ver Detalles</span></div>
-            </div>
-            <div class="product-info">
-                <div class="product-details">
-                    <h3>${p.name}</h3>
-                    <p class="product-category">${p.category || 'General'}</p>
-                    <div class="product-price-container" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <span class="product-price">$${price}</span>
-                        ${hasPromo ? `<s class="price-previous" style="color: #94a3b8; font-size: 0.95rem; font-weight: 600; text-decoration: line-through;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
-                    </div>
+function createProductCardElement(p) {
+    const card = document.createElement('div');
+    card.className = 'glass product-card animate';
+    const img = (Array.isArray(p.image) ? p.image[0] : (p.image || p.imageUrl)) || 'https://via.placeholder.com/300';
+    
+    const finalPrice = p.priceFinal || p.priceInternet || 0;
+    const price = finalPrice.toLocaleString();
+    
+    const hasPromo = p.pricePrevious && parseFloat(p.pricePrevious) > parseFloat(finalPrice);
+    const discountPct = hasPromo ? Math.round(((parseFloat(p.pricePrevious) - parseFloat(finalPrice)) / parseFloat(p.pricePrevious)) * 100) : 0;
+
+    card.innerHTML = `
+        <div class="product-img" onclick="window.location.hash = '#product?id=${p.id}'" style="position: relative;">
+            ${discountPct > 0 ? `<span class="promo-badge" style="position: absolute; top: 12px; left: 12px; background: #ef4444; color: white; padding: 5px 12px; border-radius: 50px; font-size: 0.72rem; font-weight: 800; box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3); z-index: 5; text-transform: uppercase; letter-spacing: 0.5px; animation: pulse-promo 2s infinite;">-${discountPct}% DTO</span>` : ''}
+            <img src="${img}" alt="${p.name}">
+            <div class="product-overlay"><span>Ver Detalles</span></div>
+        </div>
+        <div class="product-info">
+            <div class="product-details">
+                <h3>${p.name}</h3>
+                <p class="product-category">${p.category || 'General'}</p>
+                <div class="product-price-container" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+                    <span class="product-price">$${price}</span>
+                    ${hasPromo ? `<s class="price-previous" style="color: #94a3b8; font-size: 0.95rem; font-weight: 600; text-decoration: line-through;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
                 </div>
-                <div class="product-actions">
-                    <button class="btn btn-primary btn-quick-buy" onclick="quickBuy('${p.id}')">Compra Rápida</button>
-                    <button class="btn btn-outline btn-add-cart" onclick="addToCart('${p.id}')" title="Añadir al carrito">
-                        <i class="fas fa-cart-plus"></i>
-                    </button>
-                </div>
             </div>
-        `;
-        productGrid.appendChild(card);
+            <div class="product-actions">
+                <button class="btn btn-primary btn-quick-buy" onclick="quickBuy('${p.id}')">Compra Rápida</button>
+                <button class="btn btn-outline btn-add-cart" onclick="addToCart('${p.id}')" title="Añadir al carrito">
+                    <i class="fas fa-cart-plus"></i>
+                </button>
+            </div>
+        </div>
+    `;
+    return card;
+}
+
+function renderVulcanoProducts() {
+    const grid = document.getElementById('vulcano-product-grid');
+    if (!grid) return;
+    grid.innerHTML = '';
+
+    const vulcanoList = products.filter(p => {
+        const isVCompany = p.company === 'vulcano';
+        const hasVStock = (parseInt(p.stockVulcano) || 0) > 0;
+        const nameLower = (p.name || '').toLowerCase();
+        const brandLower = (p.brand || '').toLowerCase();
+        const catLower = (p.category || '').toLowerCase();
+        return isVCompany || hasVStock || nameLower.includes('vulcano') || brandLower.includes('vulcano') || catLower.includes('vulcano');
+    });
+
+    // If specific Vulcano filter has results, show them; otherwise show all products so grid is never empty
+    const displayList = vulcanoList.length > 0 ? vulcanoList : products;
+
+    displayList.forEach(p => {
+        grid.appendChild(createProductCardElement(p));
     });
 }
 
