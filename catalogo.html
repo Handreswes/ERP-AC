@@ -894,12 +894,14 @@
 
                 const { data: activeIds, error: idErr } = await _supabase
                     .from('products')
-                    .select('id')
+                    .select('id, stockMillenio, stockVulcano')
                     .eq('active', true);
                 if (idErr) return;
 
-                const activeIdSet = new Set((activeIds || []).map(item => item.id));
-                let products = localProducts.filter(p => activeIdSet.has(p.id));
+                const liveMap = new Map((activeIds || []).map(item => [item.id, item]));
+                let products = localProducts
+                    .filter(p => liveMap.has(p.id))
+                    .map(p => ({ ...p, stockMillenio: liveMap.get(p.id).stockMillenio, stockVulcano: liveMap.get(p.id).stockVulcano }));
 
                 const { data: updatedProducts, error: updateErr } = await _supabase
                     .from('products')
@@ -920,11 +922,12 @@
                             products.push(newP);
                         }
                     });
-
-                    allProducts = processRawProducts(products);
-                    updateCategoryDropdown();
-                    applyFilters();
                 }
+
+                // Always re-apply: removes products deactivated/out of stock even if products.json is stale
+                allProducts = processRawProducts(products);
+                updateCategoryDropdown();
+                applyFilters();
             } catch (err) {
                 console.warn("Background delta sync skipped:", err);
             }
