@@ -491,15 +491,18 @@ async function fetchProducts() {
                     }
                 });
 
-                // Get active IDs to handle deletions/deactivations (tiny query, ~10KB)
-                const { data: activeIds, error: idErr } = await _supabase
+                // Get active IDs & live stock to handle deletions/deactivations and live inventory
+                const { data: activeProducts, error: idErr } = await _supabase
                     .from('products')
-                    .select('id')
+                    .select('id, stockMillenio, stockVulcano')
                     .eq('active', true);
                 if (idErr) throw idErr;
 
-                const activeIdSet = new Set((activeIds || []).map(item => item.id));
-                data = data.filter(p => activeIdSet.has(p.id));
+                const liveStockMap = new Map((activeProducts || []).map(item => [item.id, item]));
+                data = data.filter(p => liveStockMap.has(p.id)).map(p => {
+                    const live = liveStockMap.get(p.id);
+                    return { ...p, stockMillenio: live.stockMillenio, stockVulcano: live.stockVulcano };
+                });
 
                 // Get only products updated after our latest local product (only downloads what changed)
                 const { data: updatedProducts, error: updateErr } = await _supabase
