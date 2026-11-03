@@ -87,19 +87,27 @@ window.Storage = {
                 await this.syncCriticalTables();
                 // Check migration once in background
                 this.migrateLocalToCloud();
+                // Initialize real-time WebSocket listeners
+                this.initRealtime();
             }, 500); // 500ms delay to prioritize UI load
 
-            // Periodic background sync every 60 seconds, ONLY if tab is active (saves ~85% Disk IO on Supabase)
+            // Periodic background sync every 30 minutes, ONLY if tab is active (saves Disk IO on Supabase)
+            const SYNC_INTERVAL_MS = 30 * 60 * 1000; // 30 minutes
             setInterval(async () => {
                 if (typeof document !== 'undefined' && document.hidden) return; // Skip if tab is hidden/minimized
                 await this.syncCriticalTables();
-            }, 60000);
+            }, SYNC_INTERVAL_MS);
 
-            // Instant sync on tab focus
+            // Sync on tab focus with a cooldown (minimum 15 minutes between focus syncs)
+            let lastFocusSync = Date.now();
             if (typeof document !== 'undefined') {
                 document.addEventListener('visibilitychange', () => {
                     if (!document.hidden) {
-                        this.syncCriticalTables();
+                        const now = Date.now();
+                        if (now - lastFocusSync >= 15 * 60 * 1000) {
+                            lastFocusSync = now;
+                            this.syncCriticalTables();
+                        }
                     }
                 });
             }
@@ -132,6 +140,88 @@ window.Storage = {
     },
 
     /**
+     * Supabase Realtime Listener (Instant multi-user sync with ZERO Disk IO)
+     */
+    initRealtime() {
+        const supabase = window.supabaseAdminClient || window.supabaseClient;
+        if (!supabase || typeof supabase.channel !== 'function') return;
+
+        try {
+            console.log('--- STORAGE: INITIALIZING REALTIME LISTENERS ---');
+            const channel = supabase.channel('erp_live_sync');
+
+            const tablesToWatch = [
+                { table: 'sales', key: window.STORAGE_KEYS.SALES },
+                { table: 'payments', key: window.STORAGE_KEYS.PAYMENTS },
+                { table: 'clients', key: window.STORAGE_KEYS.CLIENTS },
+                { table: 'products', key: window.STORAGE_KEYS.PRODUCTS },
+                { table: 'accounts', key: window.STORAGE_KEYS.ACCOUNTS },
+                { table: 'expenses', key: window.STORAGE_KEYS.EXPENSES },
+                { table: 'movements', key: window.STORAGE_KEYS.MOVEMENTS },
+                { table: 'orders', key: 'orders' }
+            ];
+
+            tablesToWatch.forEach(({ table, key }) => {
+                channel.on('postgres_changes', { event: '*', schema: 'public', table: table }, (payload) => {
+                    console.log(`[Realtime Event] ${table}:`, payload.eventType, payload.new || payload.old);
+                    this.handleRealtimeEvent(table, key, payload);
+                });
+            });
+
+            channel.subscribe((status, err) => {
+                if (status === 'SUBSCRIBED') {
+                    console.log('✅ Supabase Realtime: Conectado y escuchando cambios en vivo');
+                } else if (err) {
+                    console.warn('Realtime subscription issue:', status, err);
+                }
+            });
+        } catch (e) {
+            console.warn('Could not initialize Realtime:', e);
+        }
+    },
+
+    handleRealtimeEvent(table, key, payload) {
+        if (!key) return;
+
+        // If it's orders, update logistics badge directly
+        if (table === 'orders') {
+            if (window.updateLogisticsBadge) window.updateLogisticsBadge();
+            return;
+        }
+
+        const items = this.cache[key] || [];
+        const storageKey = `erp_${key}`;
+
+        if (payload.eventType === 'INSERT' && payload.new) {
+            const newItem = payload.new;
+            if (!items.some(i => i.id === newItem.id)) {
+                items.unshift(newItem);
+                this.cache[key] = items;
+                try { localStorage.setItem(storageKey, JSON.stringify(items)); } catch(e){}
+                window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: [newItem] }));
+            }
+        } else if (payload.eventType === 'UPDATE' && payload.new) {
+            const updatedItem = payload.new;
+            const idx = items.findIndex(i => i.id === updatedItem.id);
+            if (idx !== -1) {
+                items[idx] = { ...items[idx], ...updatedItem };
+            } else {
+                items.unshift(updatedItem);
+            }
+            this.cache[key] = items;
+            try { localStorage.setItem(storageKey, JSON.stringify(items)); } catch(e){}
+            window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: [updatedItem] }));
+        } else if (payload.eventType === 'DELETE' && payload.old) {
+            const deletedId = payload.old.id;
+            if (deletedId) {
+                this.cache[key] = items.filter(i => i.id !== deletedId);
+                try { localStorage.setItem(storageKey, JSON.stringify(this.cache[key])); } catch(e){}
+                window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: [] }));
+            }
+        }
+    },
+
+    /**
      * Delta Sync: Fetches only new/modified records from Supabase since the last local update
      */
     async syncTable(key) {
@@ -146,7 +236,9 @@ window.Storage = {
         const isFullSyncTable = key === STORAGE_KEYS.CLIENTS || 
                                 key === STORAGE_KEYS.ACCOUNTS || 
                                 key === STORAGE_KEYS.SELLERS ||
-                                key === STORAGE_KEYS.PRODUCTS;
+                                key === STORAGE_KEYS.PRODUCTS ||
+                                key === STORAGE_KEYS.PAYMENTS ||
+                                key === STORAGE_KEYS.SALES;
 
         // Find the latest timestamp from local data (only if not doing a full sync)
         let latestTimestamp = null;
