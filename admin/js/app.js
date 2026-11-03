@@ -105,7 +105,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => {
         if (window.updateLogisticsBadge) {
             window.updateLogisticsBadge();
-            setInterval(window.updateLogisticsBadge, 30000); // Poll every 30 seconds
+            setInterval(window.updateLogisticsBadge, 30 * 60 * 1000); // Poll every 30 minutes
         }
     }, 1000);
 });
@@ -271,6 +271,7 @@ window.clearAllSystemData = async function () {
 // Logistics Badge Update Logic
 window.updateLogisticsBadge = async function() {
     try {
+        if (typeof document !== 'undefined' && document.hidden) return;
         if (!window.supabaseClient || !window.Storage) return;
 
         // 1. POS sales pending shipment
@@ -318,3 +319,21 @@ window.updateLogisticsBadge = async function() {
         console.error('Error updating logistics badge:', e);
     }
 };
+
+// Manual Cloud Sync Trigger (with spinning icon)
+window.manualSyncTrigger = async function(btn) {
+    if (!window.Storage || !window.Storage.syncCriticalTables) return;
+    const icon = btn ? btn.querySelector('i') : null;
+    if (icon) icon.classList.add('fa-spin');
+    try {
+        await window.Storage.syncCriticalTables();
+        if (window.updateLogisticsBadge) window.updateLogisticsBadge();
+        if (window.ERP_LOG) window.ERP_LOG('✅ Sincronización con la nube completada', 'success');
+    } catch (err) {
+        console.warn('Manual sync failed:', err);
+        if (window.ERP_LOG) window.ERP_LOG('Error al sincronizar: ' + err.message, 'warning');
+    } finally {
+        if (icon) setTimeout(() => icon.classList.remove('fa-spin'), 600);
+    }
+};
+
