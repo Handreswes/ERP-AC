@@ -67,7 +67,7 @@ try {
     $tiktokXml += "    <title>TuCompras Col</title>`n"
     $tiktokXml += "    <link>https://tucomprascol.com</link>`n"
     $tiktokXml += "    <description>Distribuidora lider en herramientas y hogar en Colombia</description>`n"
-    
+    $cleanProducts = @()
     foreach ($p in $products) {
         $price = $p.priceFinal
         if (!$price -or $price -le 0) { $price = $p.priceInternet }
@@ -192,6 +192,27 @@ try {
         $tiktokXml += "      <brand>$brand</brand>`n"
         $tiktokXml += "      <category>Hardware &gt; Tools</category>`n"
         $tiktokXml += "    </item>`n"
+
+        $cleanProducts += [PSCustomObject]@{
+            id             = $p.id
+            name           = $p.name
+            category       = $p.category
+            description    = $p.description
+            provider       = $p.provider
+            cost           = $p.cost
+            priceWholesale = $wPrice
+            priceFinal     = $price
+            commissionBase = $p.commissionBase
+            stockMillenio  = $stockM
+            stockVulcano   = $stockV
+            company        = $p.company
+            active         = $p.active
+            image          = @($imgUrl)
+            ref            = $p.ref
+            createdAt      = $p.createdAt
+            updatedAt      = $p.updatedAt
+            warranty       = $p.warranty
+        }
     }
     
     $googleXml += "  </channel>`n"
@@ -207,12 +228,17 @@ try {
     [System.IO.File]::WriteAllText($googleXmlPath, $googleXml, $utf8NoBom)
     [System.IO.File]::WriteAllText($wholesaleXmlPath, $wholesaleXml, $utf8NoBom)
     [System.IO.File]::WriteAllText($tiktokXmlPath, $tiktokXml, $utf8NoBom)
-    Write-Host "Product Feeds generated successfully (including wholesale_feed.xml)!" -ForegroundColor Green
+    
+    $productsJsonPath = Join-Path $sourceDir "products.json"
+    $cleanProductsJson = $cleanProducts | ConvertTo-Json -Depth 5
+    [System.IO.File]::WriteAllText($productsJsonPath, $cleanProductsJson, $utf8NoBom)
+    
+    Write-Host "Product Feeds and fresh products.json generated successfully ($($cleanProducts.Count) products)!" -ForegroundColor Green
 } catch {
     Write-Host "Warning: Failed to generate Product Feeds: $($_.Exception.Message)" -ForegroundColor Yellow
 }
 
-$files = Get-ChildItem -Path $sourceDir -File -Recurse
+$files = Get-ChildItem -Path $sourceDir -File -Recurse | Where-Object { $_.FullName -notmatch '\\\.git' -and $_.FullName -notmatch '\\\.github' }
 
 foreach ($file in $files) {
     $relativePath = $file.FullName.Substring($sourceDir.Length).TrimStart("\").Replace("\", "/")
