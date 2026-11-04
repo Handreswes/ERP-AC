@@ -36,28 +36,40 @@ window.Finances = {
 
         const panel = document.getElementById('finances-panel');
         panel.innerHTML = `
-            <div class="panel-header">
-                <h1>Finanzas y Estados de Cuenta</h1>
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                <div>
+                    <h1 style="margin: 0;">Finanzas y Estados de Cuenta</h1>
+                    <p class="text-secondary" style="font-size: 0.85rem; margin-top: 4px;">Control de cajas, bancos, gastos programados y salidas de dinero.</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button id="add-general-expense-btn" class="btn btn-danger btn-sm" style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-minus-circle"></i> Registrar Gasto / Salida
+                    </button>
+                    <button id="add-general-transfer-btn" class="btn btn-outline btn-sm" style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-university"></i> Consignación
+                    </button>
+                </div>
             </div>
-
 
             <div id="finance-content" style="display: block;">
                 <div class="stats-grid">
                     <div class="stat-card clickable-account" data-id="cash-millenio" style="cursor:pointer;" title="Clic para ver historial de efectivo">
                         <h3>Efectivo Millenio</h3>
                         <p id="cash-millenio" class="stat-value">$0.00</p>
-                        <button class="btn btn-outline btn-sm movement-btn" data-company="millenio" data-type="outflow">Nueva Salida</button>
-                        <button class="btn btn-outline btn-sm movement-btn" data-company="millenio" data-type="transfer">Consignar</button>
-                        <button class="btn btn-secondary btn-sm reconcile-btn" data-company="millenio">Cerrar Caja</button>
-                    </div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                            <button class="btn btn-outline btn-sm movement-btn" data-company="millenio" data-type="outflow">Nueva Salida</button>
+                            <button class="btn btn-outline btn-sm movement-btn" data-company="millenio" data-type="transfer">Consignar</button>
+                            <button class="btn btn-secondary btn-sm reconcile-btn" data-company="millenio">Cerrar Caja</button>
+                        </div>
                     </div>
                     <div class="stat-card clickable-account" data-id="cash-vulcano" style="cursor:pointer;" title="Clic para ver historial de efectivo">
                         <h3>Efectivo Vulcano</h3>
                         <p id="cash-vulcano" class="stat-value">$0.00</p>
-                        <button class="btn btn-outline btn-sm movement-btn" data-company="vulcano" data-type="outflow">Nueva Salida</button>
-                        <button class="btn btn-outline btn-sm movement-btn" data-company="vulcano" data-type="transfer">Consignar</button>
-                        <button class="btn btn-secondary btn-sm reconcile-btn" data-company="vulcano">Cerrar Caja</button>
-                    </div>
+                        <div style="display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px;">
+                            <button class="btn btn-outline btn-sm movement-btn" data-company="vulcano" data-type="outflow">Nueva Salida</button>
+                            <button class="btn btn-outline btn-sm movement-btn" data-company="vulcano" data-type="transfer">Consignar</button>
+                            <button class="btn btn-secondary btn-sm reconcile-btn" data-company="vulcano">Cerrar Caja</button>
+                        </div>
                     </div>
                     <div class="stat-card">
                         <h3>Cuentas Bancarias</h3>
@@ -74,9 +86,14 @@ window.Finances = {
                     </div>
                 </div>
 
-                <div class="panel-header" style="margin-top: 2rem;">
-                    <h2>Pagos Programados (Gastos Fijos)</h2>
-                    <button id="add-recurring-btn" class="btn btn-outline btn-sm">Programar Nuevo</button>
+                <div class="panel-header" style="margin-top: 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h2 style="margin: 0;">Pagos Programados (Gastos Fijos)</h2>
+                        <p class="text-secondary" style="font-size: 0.85rem; margin-top: 4px;">Gastos fijos mensuales que se pagan recurrentemente (arriendo, servicios, etc.).</p>
+                    </div>
+                    <button id="add-recurring-btn" class="btn btn-primary btn-sm" style="display: flex; align-items: center; gap: 6px;">
+                        <i class="fas fa-calendar-plus"></i> Programar Nuevo Gasto
+                    </button>
                 </div>
                 <div class="stats-grid" id="recurring-list" style="grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));">
                     <!-- Dynamic recurring items -->
@@ -114,6 +131,9 @@ window.Finances = {
                         <p class="text-secondary" style="font-size: 0.85rem; margin-top: 4px;">Registro visible en tiempo real de todos los gastos y salidas de dinero.</p>
                     </div>
                     <div style="display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap;">
+                        <button id="add-expense-table-btn" class="btn btn-danger btn-sm" style="display: flex; align-items: center; gap: 6px;">
+                            <i class="fas fa-plus"></i> Registrar Gasto
+                        </button>
                         <select id="expense-company-filter" class="form-control" style="width: auto;">
                             <option value="all">Todas las Empresas</option>
                             <option value="millenio">🔵 Millenio</option>
@@ -184,22 +204,23 @@ window.Finances = {
                             </div>
                             <button type="button" id="save-account-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Agregar Cuenta</button>
                         </form>
-                    <hr style="margin: 1.5rem 0;">
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Empresa</th>
-                                    <th>Banco</th>
-                                    <th>Nro Cuenta</th>
-                                    <th>Tipo</th>
-                                    <th>Nombre Personalizado</th>
-                                    <th>Saldo</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody id="accounts-list"></tbody>
-                        </table>
+                        <hr style="margin: 1.5rem 0;">
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>Empresa</th>
+                                        <th>Banco</th>
+                                        <th>Nro Cuenta</th>
+                                        <th>Tipo</th>
+                                        <th>Nombre Personalizado</th>
+                                        <th>Saldo</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="accounts-list"></tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -226,27 +247,24 @@ window.Finances = {
                                 <input type="date" id="history-to" class="form-control" style="width: 100%;">
                             </div>
 
-                            <button id="filter-history-btn" class="btn btn-primary btn-block">
-                                <i class="fas fa-filter"></i> Filtrar rResultados
-                            </button>
-
-                            <hr style="border: 0; border-top: 1px solid var(--border); margin: 0.5rem 0;">
-
-                            <button id="export-history-btn" class="btn btn-outline btn-block">
-                                <i class="fas fa-file-export"></i> Descargar CSV
+                            <button id="filter-history-btn" class="btn btn-outline btn-sm btn-block" style="margin-top: 0.5rem;">
+                                <i class="fas fa-filter"></i> Filtrar Rango
                             </button>
 
                             <div style="margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border);">
-                                <label style="display:block; font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.25rem;">Balance Periodo:</label>
-                                <h3 id="history-total" style="margin:0; font-size: 1.4rem;">$0</h3>
+                                <label style="display:block; font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 4px;">Saldo Acumulado:</label>
+                                <h3 id="history-total" style="font-size: 1.4rem; color: var(--accent); margin:0">$0.00</h3>
+                                <button id="export-history-btn" class="btn btn-secondary btn-sm btn-block" style="margin-top: 1rem;">
+                                    <i class="fas fa-file-excel"></i> Exportar CSV
+                                </button>
                             </div>
                         </div>
 
-                        <!-- Main Area: Table (approx 15cm / Flexible) -->
+                        <!-- Main Table -->
                         <div class="history-main" style="flex: 1; display: flex; flex-direction: column; overflow: hidden; background: rgba(0,0,0,0.05); border-radius: var(--radius); border: 1px solid var(--border);">
                             <div class="table-container" style="flex: 1; margin: 0; border: none; border-radius: 0; overflow-y: auto;">
-                                <table class="data-table">
-                                    <thead style="position: sticky; top: 0; z-index: 10;">
+                                <table class="data-table" style="font-size: 0.85rem;">
+                                    <thead style="position: sticky; top: 0; background: var(--secondary); z-index: 10;">
                                         <tr>
                                             <th style="width: 100px;">Fecha</th>
                                             <th style="width: 110px;">Tipo</th>
@@ -272,28 +290,30 @@ window.Finances = {
                     </div>
                     <div class="modal-body">
                         <form id="recurring-form">
-                            <div class="form-grid">
+                            <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="form-group">
                                     <label>Empresa</label>
-                                    <select name="company" required>
+                                    <select name="company" class="form-control" required>
                                         <option value="millenio">Millenio</option>
                                         <option value="vulcano">Vulcano</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Concepto</label>
-                                    <input type="text" name="concept" placeholder="Ej: Arriendo Local" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>Monto</label>
-                                    <input type="text" name="amount" class="currency-input" placeholder="0" required>
-                                </div>
-                                <div class="form-group">
                                     <label>Día de Pago (1-31)</label>
-                                    <input type="number" name="dueDay" min="1" max="31" required>
+                                    <input type="number" name="dueDay" class="form-control" min="1" max="31" placeholder="Ej: 15" required>
+                                </div>
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label>Concepto / Detalle del Gasto</label>
+                                    <input type="text" name="concept" class="form-control" placeholder="Ej: Arriendo Local Comercial" required>
+                                </div>
+                                <div class="form-group" style="grid-column: span 2;">
+                                    <label>Monto a Pagar ($)</label>
+                                    <input type="text" name="amount" class="form-control currency-input" placeholder="0" required>
                                 </div>
                             </div>
-                            <button type="button" id="save-recurring-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1rem;">Guardar Programación</button>
+                            <button type="button" id="save-recurring-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 0.9rem; font-weight: 600;">
+                                <i class="fas fa-save"></i> Guardar Programación
+                            </button>
                         </form>
                     </div>
                 </div>
@@ -331,6 +351,7 @@ window.Finances = {
         this.updateBalancesUI();
         this.updateDebtUI();
         this.updateRecurringList();
+        this.updateExpensesList();
         this.renderChart();
     },
 
@@ -620,11 +641,42 @@ window.Finances = {
         document.addEventListener('click', async (e) => {
             // Close Modals
             if (e.target.classList.contains('close-modal')) {
-                e.target.closest('.modal').classList.remove('show');
+                const modal = e.target.closest('.modal');
+                if (modal) modal.classList.remove('show');
                 return;
             }
 
-            // Movement Buttons (Salida / Consignación)
+            // General Expense Buttons (Registrar Gasto / Salida)
+            if (e.target.closest('#add-general-expense-btn') || e.target.closest('#add-expense-table-btn')) {
+                const moveModal = document.getElementById('movement-modal');
+                const moveType = document.getElementById('movement-type');
+                const moveCompany = document.getElementById('movement-company');
+                if (moveModal && moveType && moveCompany) {
+                    moveType.value = 'outflow';
+                    moveCompany.value = 'millenio';
+                    if (moveType.onchange) moveType.onchange();
+                    this.updateMoveAccountOptions();
+                    moveModal.classList.add('show');
+                }
+                return;
+            }
+
+            // General Transfer Button (Consignación)
+            if (e.target.closest('#add-general-transfer-btn')) {
+                const moveModal = document.getElementById('movement-modal');
+                const moveType = document.getElementById('movement-type');
+                const moveCompany = document.getElementById('movement-company');
+                if (moveModal && moveType && moveCompany) {
+                    moveType.value = 'transfer';
+                    moveCompany.value = 'millenio';
+                    if (moveType.onchange) moveType.onchange();
+                    this.updateMoveAccountOptions();
+                    moveModal.classList.add('show');
+                }
+                return;
+            }
+
+            // Movement Buttons (Salida / Consignación from company cards)
             const movementBtn = e.target.closest('.movement-btn');
             if (movementBtn) {
                 const { company, type } = movementBtn.dataset;
@@ -639,9 +691,12 @@ window.Finances = {
                     // Setup internal modal logic (these don't change on re-render)
                     moveType.onchange = () => {
                         const isTransfer = moveType.value === 'transfer';
-                        document.getElementById('origin-account-group').style.display = isTransfer ? 'none' : 'block';
-                        document.getElementById('destination-account-group').style.display = isTransfer ? 'block' : 'none';
-                        document.getElementById('transit-group').style.display = isTransfer ? 'none' : 'flex';
+                        const origGrp = document.getElementById('origin-account-group');
+                        const destGrp = document.getElementById('destination-account-group');
+                        const tranGrp = document.getElementById('transit-group');
+                        if (origGrp) origGrp.style.display = isTransfer ? 'none' : 'block';
+                        if (destGrp) destGrp.style.display = isTransfer ? 'block' : 'none';
+                        if (tranGrp) tranGrp.style.display = isTransfer ? 'none' : 'flex';
                         this.updateMoveAccountOptions();
                     };
                     moveCompany.onchange = () => this.updateMoveAccountOptions();
@@ -652,15 +707,36 @@ window.Finances = {
                 return;
             }
 
-            // Other Action Buttons
-            if (e.target.id === 'manage-accounts-btn') {
-                const modal = document.getElementById('account-modal');
-                if (modal) modal.classList.add('show');
+            // Reconcile Buttons (Cerrar Caja)
+            const reconcileBtn = e.target.closest('.reconcile-btn');
+            if (reconcileBtn) {
+                const company = reconcileBtn.dataset.company || 'millenio';
+                const recModal = document.getElementById('reconcile-modal');
+                const recComp = document.getElementById('reconcile-company');
+                const recSys = document.getElementById('reconcile-system-balance');
+                const recPhys = document.getElementById('reconcile-physical-input');
+                const recDiff = document.getElementById('reconcile-diff-value');
+                const recDiffLabel = document.getElementById('reconcile-diff-label');
+
+                if (recModal && recComp && recSys) {
+                    const balances = this.getBalances();
+                    const sysBal = (balances[company] && balances[company].cash) || 0;
+                    recComp.value = company;
+                    recSys.value = `$${sysBal.toLocaleString('de-DE')}`;
+                    if (recPhys) recPhys.value = '';
+                    if (recDiff) {
+                        recDiff.textContent = '$0';
+                        recDiff.style.color = 'inherit';
+                    }
+                    if (recDiffLabel) recDiffLabel.textContent = 'Diferencia (Sobrante/Faltante)';
+                    recModal.classList.add('show');
+                }
                 return;
             }
 
-            if (e.target.id === 'add-expense-btn') {
-                const modal = document.getElementById('expense-modal');
+            // Other Action Buttons
+            if (e.target.closest('#manage-accounts-btn')) {
+                const modal = document.getElementById('account-modal');
                 if (modal) modal.classList.add('show');
                 return;
             }
@@ -677,8 +753,10 @@ window.Finances = {
             const waBtn = e.target.closest('.whatsapp-btn');
             if (waBtn) {
                 const client = CRM.getClients().find(c => c.id === waBtn.dataset.id);
-                const text = `Hola ${client.name}, tu estado de cuenta actual en ERP AC es:\nMillenio: $${(client.balanceMillenio || 0).toLocaleString()}\nVulcano: $${(client.balanceVulcano || 0).toLocaleString()}\nTotal: $${((client.balanceMillenio || 0) + (client.balanceVulcano || 0)).toLocaleString()}`;
-                window.open(`https://wa.me/${client.phone}/?text=${encodeURIComponent(text)}`, '_blank');
+                if (client) {
+                    const text = `Hola ${client.name}, tu estado de cuenta actual en ERP AC es:\nMillenio: $${(client.balanceMillenio || 0).toLocaleString()}\nVulcano: $${(client.balanceVulcano || 0).toLocaleString()}\nTotal: $${((client.balanceMillenio || 0) + (client.balanceVulcano || 0)).toLocaleString()}`;
+                    window.open(`https://wa.me/${client.phone}/?text=${encodeURIComponent(text)}`, '_blank');
+                }
                 return;
             }
 
@@ -691,31 +769,37 @@ window.Finances = {
             }
 
             const accClick = e.target.closest('.clickable-account');
-            if (accClick) {
+            if (accClick && !e.target.closest('button')) {
                 this.showAccountHistory(accClick.dataset.id);
                 return;
             }
 
-            if (e.target.id === 'filter-history-btn') {
+            if (e.target.closest('#filter-history-btn')) {
                 const id = document.getElementById('history-account-id').value;
                 this.showAccountHistory(id);
                 return;
             }
 
-            if (e.target.id === 'export-history-btn') {
+            if (e.target.closest('#export-history-btn')) {
                 this.exportToCSV();
                 return;
             }
 
-            if (e.target.id === 'add-recurring-btn') {
+            // Programar Nuevo Gasto Fijo Button
+            const addRecBtn = e.target.closest('#add-recurring-btn');
+            if (addRecBtn) {
                 const modal = document.getElementById('recurring-modal');
-                if (modal) modal.classList.add('show');
+                if (modal) {
+                    const form = document.getElementById('recurring-form');
+                    if (form) form.reset();
+                    modal.classList.add('show');
+                }
                 return;
             }
 
             const delRecBtn = e.target.closest('.delete-recurring-btn');
             if (delRecBtn) {
-                if (confirm('¿Eliminar esta programación?')) {
+                if (confirm('¿Eliminar esta programación de gasto fijo?')) {
                     await Storage.deleteItem(STORAGE_KEYS.RECURRING_EXPENSES, delRecBtn.dataset.id);
                     this.updateRecurringList();
                 }
@@ -742,15 +826,23 @@ window.Finances = {
             const payRecBtn = e.target.closest('.pay-recurring-btn');
             if (payRecBtn) {
                 const item = Storage.getById(STORAGE_KEYS.RECURRING_EXPENSES, payRecBtn.dataset.id);
-                const movementBtn = document.querySelector(`.movement-btn[data-company="${item.company}"][data-type="outflow"]`);
-                if (movementBtn) {
-                    movementBtn.click();
-                    setTimeout(() => {
-                        const amountInput = document.getElementById('movement-amount-input');
-                        const notesInput = document.querySelector('#movement-form [name="notes"]');
-                        if (amountInput) amountInput.value = parseFloat(item.amount).toLocaleString('de-DE');
-                        if (notesInput) notesInput.value = `Pago Programado: ${item.concept}`;
-                    }, 100);
+                if (item) {
+                    const moveModal = document.getElementById('movement-modal');
+                    const moveType = document.getElementById('movement-type');
+                    const moveCompany = document.getElementById('movement-company');
+                    if (moveModal && moveType && moveCompany) {
+                        moveType.value = 'outflow';
+                        moveCompany.value = item.company || 'millenio';
+                        if (moveType.onchange) moveType.onchange();
+                        this.updateMoveAccountOptions();
+                        moveModal.classList.add('show');
+                        setTimeout(() => {
+                            const amountInput = document.getElementById('movement-amount-input');
+                            const notesInput = document.querySelector('#movement-form [name="notes"]');
+                            if (amountInput) amountInput.value = parseFloat(item.amount).toLocaleString('de-DE');
+                            if (notesInput) notesInput.value = `Pago Programado: ${item.concept}`;
+                        }, 100);
+                    }
                 }
                 return;
             }
@@ -758,13 +850,10 @@ window.Finances = {
 
         // 2. Manual Save Buttons (V66 Protection)
         document.addEventListener('click', async (e) => {
-            const tgt = e.target;
-            if (tgt.id === 'save-movement-manual-btn') this.handleSaveMovement();
-            if (tgt.id === 'save-account-manual-btn') this.handleSaveAccount();
-            if (tgt.id === 'save-recurring-manual-btn') this.handleSaveRecurring();
-            if (tgt.id === 'save-reconcile-manual-btn') this.handleSaveReconcile();
-
-            // We could also do others like account, recurring, etc. if needed
+            if (e.target.closest('#save-movement-manual-btn')) this.handleSaveMovement();
+            if (e.target.closest('#save-account-manual-btn')) this.handleSaveAccount();
+            if (e.target.closest('#save-recurring-manual-btn')) this.handleSaveRecurring();
+            if (e.target.closest('#save-reconcile-manual-btn')) this.handleSaveReconcile();
         });
 
         // 3. Delegated Inputs (Formatting, Search)
@@ -783,10 +872,34 @@ window.Finances = {
                 return;
             }
 
+            if (e.target.id === 'reconcile-physical-input') {
+                const company = document.getElementById('reconcile-company')?.value || 'millenio';
+                const balances = this.getBalances();
+                const system = (balances[company] && balances[company].cash) || 0;
+                const raw = e.target.value.replace(/\D/g, "");
+                const physical = parseFloat(raw) || 0;
+                const diff = physical - system;
+                const diffVal = document.getElementById('reconcile-diff-value');
+                const diffLabel = document.getElementById('reconcile-diff-label');
+                if (diffVal) {
+                    diffVal.textContent = `$${Math.abs(diff).toLocaleString('de-DE')}`;
+                    if (diff > 0) {
+                        diffVal.style.color = '#10b981';
+                        if (diffLabel) diffLabel.textContent = 'Sobrante de Caja';
+                    } else if (diff < 0) {
+                        diffVal.style.color = '#ef4444';
+                        if (diffLabel) diffLabel.textContent = 'Faltante de Caja';
+                    } else {
+                        diffVal.style.color = 'inherit';
+                        if (diffLabel) diffLabel.textContent = 'Caja Cuadrada Exacta';
+                    }
+                }
+            }
+
             if (e.target.id === 'movement-amount-input' || e.target.classList.contains('currency-input')) {
                 let value = e.target.value.replace(/\D/g, "");
                 if (value) {
-                    e.target.value = parseInt(value).toLocaleString('de-DE');
+                    e.target.value = parseInt(value, 10).toLocaleString('de-DE');
                 }
             }
         });
@@ -864,21 +977,61 @@ window.Finances = {
         const form = document.getElementById('recurring-form');
         const btn = document.getElementById('save-recurring-manual-btn');
         if (!form || !btn) return;
+
+        const formData = new FormData(form);
+        const data = Object.fromEntries(formData.entries());
+
+        const concept = (data.concept || '').trim();
+        const rawAmount = String(data.amount || '').replace(/\D/g, '');
+        const amount = parseFloat(rawAmount) || 0;
+        const dueDay = parseInt(data.dueDay, 10);
+        const company = data.company || 'millenio';
+
+        if (!concept) {
+            alert('⚠️ Por favor ingresa el concepto del gasto programado.');
+            const input = form.querySelector('[name="concept"]');
+            if (input) input.focus();
+            return;
+        }
+
+        if (amount <= 0) {
+            alert('⚠️ Por favor ingresa un monto válido mayor a 0.');
+            const input = form.querySelector('[name="amount"]');
+            if (input) input.focus();
+            return;
+        }
+
+        if (isNaN(dueDay) || dueDay < 1 || dueDay > 31) {
+            alert('⚠️ Por favor ingresa un día de pago válido (entre 1 y 31).');
+            const input = form.querySelector('[name="dueDay"]');
+            if (input) input.focus();
+            return;
+        }
+
         try {
             btn.disabled = true;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> PROCESANDO...';
-            const data = Object.fromEntries(new FormData(form));
-            data.amount = parseFloat(data.amount.replace(/\./g, '')) || 0;
-            await Storage.addItem(STORAGE_KEYS.RECURRING_EXPENSES, data);
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+            const payload = {
+                company: company,
+                concept: concept,
+                amount: amount,
+                dueDay: dueDay
+            };
+
+            await Storage.addItem(STORAGE_KEYS.RECURRING_EXPENSES, payload);
             form.reset();
-            form.closest('.modal').classList.remove('show');
+            const modal = form.closest('.modal');
+            if (modal) modal.classList.remove('show');
             this.updateRecurringList();
-            alert('✅ Programación guardada.');
+            alert('✅ Programación de gasto fijo guardada con éxito.');
         } catch (err) {
-            window.ERP_LOG('Error Gasto Fijo: ' + err.message, 'error');
+            console.error('Error Gasto Fijo:', err);
+            if (window.ERP_LOG) window.ERP_LOG('Error Gasto Fijo: ' + err.message, 'error');
+            alert('❌ Error al guardar la programación: ' + (err.message || 'Error desconocido'));
         } finally {
             btn.disabled = false;
-            btn.innerHTML = 'Guardar Programación';
+            btn.innerHTML = '<i class="fas fa-save"></i> Guardar Programación';
         }
     },
 
