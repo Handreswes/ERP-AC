@@ -285,30 +285,43 @@ window.Finances = {
             <div id="recurring-modal" class="modal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h2>Programar Gasto Fijo</h2>
+                        <h2 id="recurring-modal-title">Programar Gasto Mensual (Fijo o Variable)</h2>
                         <span class="close-modal">&times;</span>
                     </div>
                     <div class="modal-body">
                         <form id="recurring-form">
+                            <input type="hidden" name="id" id="recurring-edit-id">
                             <div class="form-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                                 <div class="form-group">
                                     <label>Empresa</label>
-                                    <select name="company" class="form-control" required>
+                                    <select name="company" id="recurring-company-select" class="form-control" required>
                                         <option value="millenio">Millenio</option>
                                         <option value="vulcano">Vulcano</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
-                                    <label>Día de Pago (1-31)</label>
-                                    <input type="number" name="dueDay" class="form-control" min="1" max="31" placeholder="Ej: 15" required>
+                                    <label>Día Límite de Pago (1-31)</label>
+                                    <input type="number" name="dueDay" id="recurring-dueday-input" class="form-control" min="1" max="31" placeholder="Ej: 15" required>
                                 </div>
                                 <div class="form-group" style="grid-column: span 2;">
-                                    <label>Concepto / Detalle del Gasto</label>
-                                    <input type="text" name="concept" class="form-control" placeholder="Ej: Arriendo Local Comercial" required>
+                                    <label>Concepto / Nombre del Gasto</label>
+                                    <input type="text" name="concept" id="recurring-concept-input" class="form-control" placeholder="Ej: Factura de Energía (EPM), Agua, Arriendo, Internet..." required>
+                                </div>
+                                <div class="form-group" style="grid-column: span 2; background: rgba(59,130,246,0.08); padding: 0.85rem 1rem; border-radius: 8px; border: 1px solid rgba(59,130,246,0.25);">
+                                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--accent); margin: 0;">
+                                        <input type="checkbox" name="isVariable" id="recurring-is-variable" style="width: 18px; height: 18px; cursor: pointer;">
+                                        <span>⚡ Es de valor variable cada mes (Servicios públicos, energía, agua, etc.)</span>
+                                    </label>
+                                    <span style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 4px;">
+                                        Al marcar esta opción, no necesitas un monto fijo. Podrás digitar el valor exacto de la factura del mes al presionar "Pagar Ahora".
+                                    </span>
                                 </div>
                                 <div class="form-group" style="grid-column: span 2;">
-                                    <label>Monto a Pagar ($)</label>
-                                    <input type="text" name="amount" class="form-control currency-input" placeholder="0" required>
+                                    <label id="recurring-amount-label">Monto Estimado o Fijo ($)</label>
+                                    <input type="text" name="amount" id="recurring-amount-input" class="form-control currency-input" placeholder="0">
+                                    <span id="recurring-amount-hint" style="font-size: 0.75rem; color: var(--text-secondary); display: block; margin-top: 4px;">
+                                        Si es valor fijo (ej: arriendo) digita el valor exacto. Si es variable (servicios públicos), puedes dejar $0 o un promedio de referencia.
+                                    </span>
                                 </div>
                             </div>
                             <button type="button" id="save-recurring-manual-btn" class="btn btn-primary btn-block" style="margin-top: 1.5rem; padding: 0.9rem; font-weight: 600;">
@@ -789,10 +802,42 @@ window.Finances = {
             const addRecBtn = e.target.closest('#add-recurring-btn');
             if (addRecBtn) {
                 const modal = document.getElementById('recurring-modal');
-                if (modal) {
+                const form = document.getElementById('recurring-form');
+                const editId = document.getElementById('recurring-edit-id');
+                const modalTitle = document.getElementById('recurring-modal-title');
+                if (form) form.reset();
+                if (editId) editId.value = '';
+                if (modalTitle) modalTitle.textContent = 'Programar Gasto Mensual (Fijo o Variable)';
+                if (modal) modal.classList.add('show');
+                return;
+            }
+
+            // Editar Gasto Programado Button
+            const editRecBtn = e.target.closest('.edit-recurring-btn');
+            if (editRecBtn) {
+                const item = Storage.getById(STORAGE_KEYS.RECURRING_EXPENSES, editRecBtn.dataset.id);
+                if (item) {
+                    const modal = document.getElementById('recurring-modal');
                     const form = document.getElementById('recurring-form');
+                    const editId = document.getElementById('recurring-edit-id');
+                    const compSelect = document.getElementById('recurring-company-select');
+                    const dayInput = document.getElementById('recurring-dueday-input');
+                    const conceptInput = document.getElementById('recurring-concept-input');
+                    const amountInput = document.getElementById('recurring-amount-input');
+                    const isVarCheck = document.getElementById('recurring-is-variable');
+                    const modalTitle = document.getElementById('recurring-modal-title');
+
                     if (form) form.reset();
-                    modal.classList.add('show');
+                    if (modalTitle) modalTitle.textContent = 'Editar Gasto Programado';
+                    if (editId) editId.value = item.id;
+                    if (compSelect) compSelect.value = item.company || 'millenio';
+                    if (dayInput) dayInput.value = item.dueDay || '';
+                    const isVar = item.isVariable || (item.concept && item.concept.includes('[VARIABLE]')) || parseFloat(item.amount || 0) === 0;
+                    if (isVarCheck) isVarCheck.checked = !!isVar;
+                    if (conceptInput) conceptInput.value = (item.concept || '').replace(/\[VARIABLE\]/g, '').trim();
+                    const amt = parseFloat(item.amount || 0);
+                    if (amountInput) amountInput.value = amt > 0 ? amt.toLocaleString('de-DE') : '';
+                    if (modal) modal.classList.add('show');
                 }
                 return;
             }
@@ -839,8 +884,20 @@ window.Finances = {
                         setTimeout(() => {
                             const amountInput = document.getElementById('movement-amount-input');
                             const notesInput = document.querySelector('#movement-form [name="notes"]');
-                            if (amountInput) amountInput.value = parseFloat(item.amount).toLocaleString('de-DE');
-                            if (notesInput) notesInput.value = `Pago Programado: ${item.concept}`;
+                            const cleanConcept = (item.concept || '').replace(/\[VARIABLE\]/g, '').trim();
+                            const isVar = item.isVariable || (item.concept && item.concept.includes('[VARIABLE]')) || parseFloat(item.amount || 0) === 0;
+                            const amt = parseFloat(item.amount || 0);
+
+                            if (amountInput) {
+                                amountInput.value = amt > 0 ? amt.toLocaleString('de-DE') : '';
+                                amountInput.placeholder = isVar ? 'Ingresa el valor de la factura de este mes' : '0';
+                                amountInput.focus();
+                                if (amt > 0) amountInput.select();
+                            }
+                            if (notesInput) {
+                                const currentMonthName = new Date().toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+                                notesInput.value = `Pago Programado: ${cleanConcept} (${currentMonthName})`;
+                            }
                         }, 100);
                     }
                 }
@@ -981,22 +1038,17 @@ window.Finances = {
         const formData = new FormData(form);
         const data = Object.fromEntries(formData.entries());
 
-        const concept = (data.concept || '').trim();
+        const editId = (data.id || '').trim();
+        let concept = (data.concept || '').trim();
         const rawAmount = String(data.amount || '').replace(/\D/g, '');
         const amount = parseFloat(rawAmount) || 0;
         const dueDay = parseInt(data.dueDay, 10);
         const company = data.company || 'millenio';
+        const isVariable = form.querySelector('[name="isVariable"]')?.checked || false;
 
         if (!concept) {
-            alert('⚠️ Por favor ingresa el concepto del gasto programado.');
+            alert('⚠️ Por favor ingresa el concepto o nombre del gasto.');
             const input = form.querySelector('[name="concept"]');
-            if (input) input.focus();
-            return;
-        }
-
-        if (amount <= 0) {
-            alert('⚠️ Por favor ingresa un monto válido mayor a 0.');
-            const input = form.querySelector('[name="amount"]');
             if (input) input.focus();
             return;
         }
@@ -1006,6 +1058,19 @@ window.Finances = {
             const input = form.querySelector('[name="dueDay"]');
             if (input) input.focus();
             return;
+        }
+
+        if (!isVariable && amount <= 0) {
+            alert('⚠️ Para gastos fijos de valor exacto, ingresa un monto mayor a 0.\n\nSi es un gasto como servicios públicos cuyo valor cambia cada mes, marca la casilla "Es de valor variable cada mes".');
+            const input = form.querySelector('[name="amount"]');
+            if (input) input.focus();
+            return;
+        }
+
+        // Clean any previous tag before appending tag if variable
+        concept = concept.replace(/\[VARIABLE\]/g, '').trim();
+        if (isVariable) {
+            concept = `${concept} [VARIABLE]`;
         }
 
         try {
@@ -1019,12 +1084,17 @@ window.Finances = {
                 dueDay: dueDay
             };
 
-            await Storage.addItem(STORAGE_KEYS.RECURRING_EXPENSES, payload);
+            if (editId) {
+                await Storage.updateItem(STORAGE_KEYS.RECURRING_EXPENSES, editId, payload);
+            } else {
+                await Storage.addItem(STORAGE_KEYS.RECURRING_EXPENSES, payload);
+            }
+
             form.reset();
             const modal = form.closest('.modal');
             if (modal) modal.classList.remove('show');
             this.updateRecurringList();
-            alert('✅ Programación de gasto fijo guardada con éxito.');
+            alert(editId ? '✅ Programación de gasto actualizada con éxito.' : '✅ Programación de gasto guardada con éxito.');
         } catch (err) {
             console.error('Error Gasto Fijo:', err);
             if (window.ERP_LOG) window.ERP_LOG('Error Gasto Fijo: ' + err.message, 'error');
@@ -1197,6 +1267,131 @@ window.Finances = {
         totalEl.className = total >= 0 ? 'text-success' : 'text-danger';
 
         modal.classList.add('show');
+    },
+
+    updateMoveAccountOptions() {
+        // ... previous implementation ...
+    },
+
+    renderChart() {
+        const canvas = document.getElementById('pl-chart');
+        if (!canvas) return;
+
+        const sales = Storage.get(STORAGE_KEYS.SALES);
+        const payments = Storage.get(STORAGE_KEYS.PAYMENTS);
+        const movements = Storage.get(STORAGE_KEYS.MOVEMENTS);
+
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+        let income = 0;
+        let expenses = 0;
+
+        // 1. Sales (Historical & New)
+        sales.forEach(s => {
+            if (new Date(s.date) >= startOfMonth) {
+                income += (s.total || s.totalM || 0) + (s.totalV || 0);
+            }
+        });
+
+        // 2. Payments
+        payments.forEach(p => {
+            if (new Date(p.date) >= startOfMonth) income += parseFloat(p.amount);
+        });
+
+        // 3. Outflows (Expenses)
+        movements.filter(m => m.type === 'outflow').forEach(m => {
+            if (new Date(m.date || m.createdAt) >= startOfMonth) expenses += parseFloat(m.amount);
+        });
+
+        // Legacy expenses if any
+        Storage.get(STORAGE_KEYS.EXPENSES).forEach(e => {
+            if (new Date(e.createdAt) >= startOfMonth) expenses += parseFloat(e.amount);
+        });
+
+        // Destroy old chart if exists to avoid hover issues
+        if (window.myPLChart) window.myPLChart.destroy();
+
+        const ctx = canvas.getContext('2d');
+        window.myPLChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ingresos', 'Egresos'],
+                datasets: [{
+                    data: [income, expenses],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderWidth: 0,
+                    cutout: '70%'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: '#94a3b8', boxWidth: 12, usePointStyle: true } }
+                }
+            }
+        });
+    },
+
+    updateRecurringList() {
+        const list = document.getElementById('recurring-list');
+        if (!list) return;
+
+        const recurring = Storage.get(STORAGE_KEYS.RECURRING_EXPENSES);
+        const today = new Date().getDate();
+
+        list.innerHTML = recurring.map(item => {
+            const isDue = Math.abs(item.dueDay - today) <= 2;
+            const isVariable = item.isVariable || (item.concept && item.concept.includes('[VARIABLE]')) || parseFloat(item.amount || 0) === 0;
+            const cleanConcept = (item.concept || '').replace(/\[VARIABLE\]/g, '').trim();
+            const amountNum = parseFloat(item.amount || 0);
+
+            let amountBadge = '';
+            if (isVariable) {
+                if (amountNum > 0) {
+                    amountBadge = `<div style="text-align: right;">
+                        <span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.72rem; margin-bottom: 2px; display: inline-block;">⚡ Monto Variable</span>
+                        <div class="text-danger" style="font-weight: 700; font-size: 0.95rem;">~$${amountNum.toLocaleString('de-DE')} (Ref)</div>
+                    </div>`;
+                } else {
+                    amountBadge = `<div style="text-align: right;">
+                        <span class="badge" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.3); font-size: 0.72rem; display: inline-block;">⚡ Monto Variable</span>
+                        <div class="text-secondary" style="font-size: 0.8rem; margin-top: 2px;">Factura Mensual</div>
+                    </div>`;
+                }
+            } else {
+                amountBadge = `<strong class="text-danger" style="font-size: 1.1rem;">$${amountNum.toLocaleString('de-DE')}</strong>`;
+            }
+
+            return `
+                <div class="stat-card" style="border-left: 4px solid ${isDue ? '#ef4444' : (isVariable ? '#0ea5e9' : '#2563eb')}">
+                    <div style="display:flex; justify-content:space-between; align-items:start; gap: 8px;">
+                        <div>
+                            <h4 style="margin:0; font-size: 1rem;">${cleanConcept}</h4>
+                            <span class="badge ${item.company === 'millenio' ? 'bg-blue' : 'bg-orange'}" style="margin-top: 4px; display: inline-block;">${item.company}</span>
+                        </div>
+                        ${amountBadge}
+                    </div>
+                    <p style="font-size: 0.85rem; margin: 10px 0 6px 0; color: var(--text-secondary);">
+                        <i class="far fa-calendar-alt"></i> Día límite de pago: <strong style="color: var(--text-primary);">${item.dueDay}</strong> de cada mes
+                    </p>
+                    <div style="display:flex; gap: 6px; margin-top: 12px;">
+                        <button class="btn btn-primary btn-sm pay-recurring-btn" data-id="${item.id}" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                            <i class="fas fa-hand-holding-usd"></i> Pagar Ahora
+                        </button>
+                        <button class="btn btn-outline btn-sm edit-recurring-btn" data-id="${item.id}" title="Editar programación">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-outline btn-sm delete-recurring-btn" data-id="${item.id}" title="Eliminar programación" style="color: var(--danger);">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        if (recurring.length === 0) list.innerHTML = '<p class="text-secondary" style="grid-column: 1/-1; text-align:center;">No hay gastos programados</p>';
     },
 
     updateMoveAccountOptions() {
