@@ -58,7 +58,18 @@ window.Sales = {
 
     async updateRemissionInput() {
         const remInput = document.getElementById('remision-number-input');
-        if (!remInput || remInput.dataset.userEdited === "true") return;
+        if (!remInput) return;
+
+        // Si estamos en modo edición de una venta existente, PRESERVAR estrictamente el consecutivo original
+        if (this.editingSaleId) {
+            if (this.editingSale?.remissionNumber) {
+                remInput.value = this.editingSale.remissionNumber;
+                remInput.dataset.userEdited = "true";
+            }
+            return;
+        }
+
+        if (remInput.dataset.userEdited === "true") return;
 
         // 1. Calculate from local storage cache
         let nextRem = this.calculateNextRemission();
@@ -221,7 +232,7 @@ window.Sales = {
                             </div>
                             <div id="remision-number-wrapper">
                                 <label style="font-size: 0.75rem;">N° Consecutivo</label>
-                                <input type="text" id="remision-number-input" class="form-control" style="padding: 6px; font-size: 0.9rem;" data-user-edited="false">
+                                <input type="text" id="remision-number-input" class="form-control" style="padding: 6px; font-size: 0.9rem;" value="${this.editingSaleId && this.editingSale?.remissionNumber ? this.editingSale.remissionNumber : ''}" data-user-edited="${this.editingSaleId ? 'true' : 'false'}">
                             </div>
                         </div>
 
@@ -958,7 +969,10 @@ window.Sales = {
 
             const deliveryType = document.getElementById('pos-delivery-type')?.value || 'pickup';
             const remissionNumberInput = document.getElementById('remision-number-input');
-            const remNumber = remissionNumberInput?.value || `REM-${Date.now()}`;
+            // Si estamos editando, asegurar que no se sobreescriba con un nuevo consecutivo a menos que el usuario lo haya cambiado intencionalmente
+            const remNumber = (this.editingSaleId && this.editingSale?.remissionNumber && (!remissionNumberInput?.value || remissionNumberInput?.value === this.editingSale.remissionNumber))
+                ? this.editingSale.remissionNumber
+                : (remissionNumberInput?.value || (this.editingSaleId && this.editingSale?.remissionNumber ? this.editingSale.remissionNumber : `REM-${Date.now()}`));
             const generateRemision = document.getElementById('generate-remision-chk')?.checked;
             const notes = document.getElementById('pos-sale-notes')?.value || '';
 
@@ -996,7 +1010,7 @@ window.Sales = {
                 clientId: this.selectedClient.id,
                 clientName: this.selectedClient.name,
                 clientPhone: this.selectedClient.phone || '',
-                sellerName: Auth.currentUser?.name || "Caja Mostrador",
+                sellerName: (this.editingSaleId && this.editingSale?.sellerName) ? this.editingSale.sellerName : (Auth.currentUser?.name || "Caja Mostrador"),
                 items: this.cart.map(item => ({
                     id: item.id,
                     name: item.name,
@@ -1026,8 +1040,8 @@ window.Sales = {
                 window.ERP_LOG('Venta registrada en la nube', 'success');
             }
 
-            // 1.5 REGISTRAR SOBREPRECIO EN BOLSILLO DE CARTERA MILLENIO
-            if (totalOverpriceM > 0) {
+            // 1.5 REGISTRAR SOBREPRECIO EN BOLSILLO DE CARTERA MILLENIO (Solo para ventas nuevas, no duplicar en edición)
+            if (!this.editingSaleId && totalOverpriceM > 0) {
                 await Storage.addItem(STORAGE_KEYS.MOVEMENTS, {
                     company: 'millenio',
                     type: 'recovery_credit',
@@ -1052,42 +1066,80 @@ window.Sales = {
             // 3. COMMIT CREDIT DEBT IF APPLICABLE
             if (this.editingSaleId && this.editingSale) {
                 const oldSale = this.editingSale;
-                
-                // Revertir deuda del cliente original si tuvo porción a crédito
+                const oldClientId = oldSale.clientId;
+                const newClientId = this.selectedClient.id;
+
                 const oldCreditM = oldSale.paymentDetails ? parseFloat(oldSale.paymentDetails.creditM || 0) : (oldSale.method === 'credit' ? parseFloat(oldSale.totalM || 0) : 0);
                 const oldCreditV = oldSale.paymentDetails ? parseFloat(oldSale.paymentDetails.creditV || 0) : (oldSale.method === 'credit' ? parseFloat(oldSale.totalV || 0) : 0);
 
-                if ((oldCreditM > 0 || oldCreditV > 0) && oldSale.clientId) {
-                    const oldClient = Storage.getById(STORAGE_KEYS.CLIENTS, oldSale.clientId);
-                    if (oldClient) {
-                        const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, oldClient.id, ['balanceMillenio', 'balanceVulcano']);
-                        const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(oldClient.balanceMillenio) || 0);
-                        const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(oldClient.balanceVulcano) || 0);
+                if (oldClientId === newClientId) {
+                    // MISMO CLIENTE: Ajustar únicamente por la diferencia neta (delta) entre la venta editada y la original.
+                    // Esto protege y mantiene intactos todos los abonos/pagos que el cliente haya realizado.
+                    const deltaCreditM = creditM - oldCreditM;
+                    const deltaCreditV = creditV - oldCreditV;
 
-                        const newBalM = Math.max(0, currentBalM - oldCreditM);
-                        const newBalV = Math.max(0, currentBalV - oldCreditV);
-                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, oldClient.id, {
+                    if (deltaCreditM !== 0 || deltaCreditV !== 0) {
+                        const client = Storage.getById(STORAGE_KEYS.CLIENTS, newClientId);
+                        if (client) {
+                            const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, client.id, ['balanceMillenio', 'balanceVulcano']);
+                            const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(client.balanceMillenio) || 0);
+                            const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(client.balanceVulcano) || 0);
+
+                            const newBalM = Math.max(0, currentBalM + deltaCreditM);
+                            const newBalV = Math.max(0, currentBalV + deltaCreditV);
+
+                            await Storage.updateItem(STORAGE_KEYS.CLIENTS, client.id, {
+                                balanceMillenio: newBalM,
+                                balanceVulcano: newBalV
+                            });
+                        }
+                    }
+                } else {
+                    // CAMBIO DE CLIENTE: Revertir la porción a crédito del cliente anterior y cargar al nuevo cliente
+                    if ((oldCreditM > 0 || oldCreditV > 0) && oldClientId) {
+                        const oldClient = Storage.getById(STORAGE_KEYS.CLIENTS, oldClientId);
+                        if (oldClient) {
+                            const latestOld = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, oldClient.id, ['balanceMillenio', 'balanceVulcano']);
+                            const curOldM = latestOld ? parseFloat(latestOld.balanceMillenio || 0) : (parseFloat(oldClient.balanceMillenio) || 0);
+                            const curOldV = latestOld ? parseFloat(latestOld.balanceVulcano || 0) : (parseFloat(oldClient.balanceVulcano) || 0);
+
+                            await Storage.updateItem(STORAGE_KEYS.CLIENTS, oldClient.id, {
+                                balanceMillenio: Math.max(0, curOldM - oldCreditM),
+                                balanceVulcano: Math.max(0, curOldV - oldCreditV)
+                            });
+                        }
+                    }
+
+                    if (creditM > 0 || creditV > 0) {
+                        const newClient = Storage.getById(STORAGE_KEYS.CLIENTS, newClientId);
+                        if (newClient) {
+                            const latestNew = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, newClient.id, ['balanceMillenio', 'balanceVulcano']);
+                            const curNewM = latestNew ? parseFloat(latestNew.balanceMillenio || 0) : (parseFloat(newClient.balanceMillenio) || 0);
+                            const curNewV = latestNew ? parseFloat(latestNew.balanceVulcano || 0) : (parseFloat(newClient.balanceVulcano) || 0);
+
+                            await Storage.updateItem(STORAGE_KEYS.CLIENTS, newClient.id, {
+                                balanceMillenio: curNewM + creditM,
+                                balanceVulcano: curNewV + creditV
+                            });
+                        }
+                    }
+                }
+            } else {
+                // VENTA NUEVA: Cargar crédito al cliente
+                if (creditM > 0 || creditV > 0) {
+                    const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
+                    if (c) {
+                        const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, c.id, ['balanceMillenio', 'balanceVulcano']);
+                        const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(c.balanceMillenio) || 0);
+                        const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(c.balanceVulcano) || 0);
+
+                        const newBalM = currentBalM + creditM;
+                        const newBalV = currentBalV + creditV;
+                        await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
                             balanceMillenio: newBalM,
                             balanceVulcano: newBalV
                         });
                     }
-                }
-            }
-
-            // Sumar nueva deuda al cliente
-            if (creditM > 0 || creditV > 0) {
-                const c = Storage.getById(STORAGE_KEYS.CLIENTS, this.selectedClient.id);
-                if (c) {
-                    const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, c.id, ['balanceMillenio', 'balanceVulcano']);
-                    const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(c.balanceMillenio) || 0);
-                    const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(c.balanceVulcano) || 0);
-
-                    const newBalM = currentBalM + creditM;
-                    const newBalV = currentBalV + creditV;
-                    await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
-                        balanceMillenio: newBalM,
-                        balanceVulcano: newBalV
-                    });
                 }
             }
 
