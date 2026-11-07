@@ -787,12 +787,12 @@ window.Consultas = {
             window.Sales.cart = sale.items.map(item => {
                 const prod = Storage.getById(STORAGE_KEYS.PRODUCTS, item.id);
                 return {
+                    ...(prod || {}),
                     id: item.id,
                     name: item.name,
                     price: parseFloat(item.price) || 0,
                     quantity: parseInt(item.quantity) || 1,
-                    manualPrice: true,
-                    ...(prod || {})
+                    manualPrice: true
                 };
             });
 
@@ -839,6 +839,11 @@ window.Consultas = {
             const remInput = document.getElementById('remision-number-input');
             if (remInput) {
                 remInput.value = sale.remissionNumber || '';
+                remInput.dataset.userEdited = "true";
+            }
+            const remChk = document.getElementById('generate-remision-chk');
+            if (remChk && sale.remissionNumber) {
+                remChk.checked = true;
             }
 
             window.ERP_LOG(`Venta ${sale.remissionNumber} cargada en POS para edición.`);
