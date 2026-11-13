@@ -193,11 +193,11 @@ window.TuComprasCRM = {
     renderListItems(customers) {
         return customers.map(c => `
             <tr>
-                <td><strong>${c.name}</strong></td>
-                <td>${c.phone}</td>
-                <td>${c.city || '-'}, ${c.dept || '-'}</td>
-                <td>${c.address || '-'}</td>
-                <td>${c.created_at ? new Date(c.created_at).toLocaleDateString() : 'N/A'}</td>
+                <td data-label="Nombre"><strong>${c.name}</strong></td>
+                <td data-label="Teléfono">${c.phone}</td>
+                <td data-label="Ubicación">${c.city || '-'}, ${c.dept || '-'}</td>
+                <td data-label="Dirección">${c.address || '-'}</td>
+                <td data-label="Último Pedido">${c.created_at ? new Date(c.created_at).toLocaleDateString() : 'N/A'}</td>
             </tr>
         `).join('') || '<tr><td colspan="5" class="text-center">No hay clientes registrados</td></tr>';
     },
