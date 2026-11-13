@@ -111,7 +111,7 @@ window.CategoriesModule = {
         if (!list) return;
 
         list.innerHTML = '';
-        this.categories.forEach(cat => {
+        this.categories.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true })).forEach(cat => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td data-label="Categoría"><strong>${cat.name}</strong></td>
