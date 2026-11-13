@@ -48,8 +48,48 @@ window.Storage = {
     isConnected: false,
 
     /**
-     * Initial Load: Fetches all data from Supabase into memory
+     * Deterministic sorter for entities and transactions across the ERP.
+     * Prevents list jumping caused by Supabase/PostgreSQL heap rewrites.
      */
+    sortCollection(key, items) {
+        if (!Array.isArray(items) || items.length <= 1) return items || [];
+        const strCompare = (a, b) => (a || '').toString().localeCompare((b || '').toString(), 'es', { sensitivity: 'base', numeric: true });
+        const dateCompareDesc = (a, b) => {
+            const dateA = new Date(a || 0).getTime();
+            const dateB = new Date(b || 0).getTime();
+            return (isNaN(dateB) ? 0 : dateB) - (isNaN(dateA) ? 0 : dateA);
+        };
+
+        switch (key) {
+            case STORAGE_KEYS.PRODUCTS:
+                return [...items].sort((a, b) => strCompare(a.name, b.name));
+            case STORAGE_KEYS.CLIENTS:
+                return [...items].sort((a, b) => strCompare(a.name, b.name));
+            case STORAGE_KEYS.SELLERS:
+                return [...items].sort((a, b) => strCompare(a.name, b.name));
+            case STORAGE_KEYS.TUCOMPRAS_CUSTOMERS:
+                return [...items].sort((a, b) => strCompare(a.name, b.name));
+            case STORAGE_KEYS.USERS:
+                return [...items].sort((a, b) => strCompare(a.username || a.name, b.username || b.name));
+            case STORAGE_KEYS.ACCOUNTS:
+                return [...items].sort((a, b) => {
+                    const c = strCompare(a.company, b.company);
+                    return c !== 0 ? c : strCompare(a.name, b.name);
+                });
+            case STORAGE_KEYS.SALES:
+            case STORAGE_KEYS.TUCOMPRAS_SALES:
+            case STORAGE_KEYS.PAYMENTS:
+            case STORAGE_KEYS.EXPENSES:
+            case STORAGE_KEYS.STOCK_ENTRIES:
+            case STORAGE_KEYS.TRANSIT_ORDERS:
+            case STORAGE_KEYS.MOVEMENTS:
+            case STORAGE_KEYS.CASH_CLOSINGS:
+                return [...items].sort((a, b) => dateCompareDesc(a.date || a.createdAt, b.date || b.createdAt));
+            default:
+                return items;
+        }
+    },
+
     /**
      * Initial Load: Loads local cache first (instant) and syncs critical tables in background
      */
@@ -69,7 +109,7 @@ window.Storage = {
             
             if (localData && localData !== 'undefined' && localData !== 'null') {
                 try {
-                    this.cache[key] = JSON.parse(localData);
+                    this.cache[key] = this.sortCollection(key, JSON.parse(localData));
                 } catch (e) {
                     console.warn(`Corruption in ${key}, resetting local cache.`);
                     localStorage.removeItem(storageKey);
@@ -196,8 +236,9 @@ window.Storage = {
             const newItem = payload.new;
             if (!items.some(i => i.id === newItem.id)) {
                 items.unshift(newItem);
-                this.cache[key] = items;
-                try { localStorage.setItem(storageKey, JSON.stringify(items)); } catch(e){}
+                const sorted = this.sortCollection(key, items);
+                this.cache[key] = sorted;
+                try { localStorage.setItem(storageKey, JSON.stringify(sorted)); } catch(e){}
                 window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: [newItem] }));
             }
         } else if (payload.eventType === 'UPDATE' && payload.new) {
@@ -208,8 +249,9 @@ window.Storage = {
             } else {
                 items.unshift(updatedItem);
             }
-            this.cache[key] = items;
-            try { localStorage.setItem(storageKey, JSON.stringify(items)); } catch(e){}
+            const sorted = this.sortCollection(key, items);
+            this.cache[key] = sorted;
+            try { localStorage.setItem(storageKey, JSON.stringify(sorted)); } catch(e){}
             window.dispatchEvent(new CustomEvent(`erp_table_updated_${key}`, { detail: [updatedItem] }));
         } else if (payload.eventType === 'DELETE' && payload.old) {
             const deletedId = payload.old.id;
@@ -255,6 +297,13 @@ window.Storage = {
 
         try {
             let query = supabase.from(table).select('*').limit(1000);
+
+            // Deterministic ordering directly from database to avoid PostgreSQL heap/MVCC shuffle
+            if (key === STORAGE_KEYS.PRODUCTS || key === STORAGE_KEYS.CLIENTS || key === STORAGE_KEYS.SELLERS || key === STORAGE_KEYS.TUCOMPRAS_CUSTOMERS) {
+                query = query.order('name', { ascending: true });
+            } else if (key === STORAGE_KEYS.SALES || key === STORAGE_KEYS.PAYMENTS || key === STORAGE_KEYS.EXPENSES || key === STORAGE_KEYS.STOCK_ENTRIES || key === STORAGE_KEYS.TRANSIT_ORDERS || key === STORAGE_KEYS.MOVEMENTS) {
+                query = query.order('date', { ascending: false });
+            }
 
             // If we have a local latest timestamp, perform a delta sync query
             if (latestTimestamp) {
@@ -306,6 +355,9 @@ window.Storage = {
                             }
                         });
                     }
+
+                    // Sort final items deterministically before committing to cache and localStorage
+                    finalItems = this.sortCollection(key, finalItems);
 
                     // Update cache and localStorage
                     this.cache[key] = finalItems;
@@ -377,9 +429,10 @@ window.Storage = {
     },
 
     save(key, data) {
-        this.cache[key] = data;
+        const sorted = this.sortCollection(key, data);
+        this.cache[key] = sorted;
         try {
-            localStorage.setItem(`erp_${key}`, JSON.stringify(data));
+            localStorage.setItem(`erp_${key}`, JSON.stringify(sorted));
         } catch (e) {
             console.warn(`LocalStorage Full: Could not save ${key} locally.`);
         }
@@ -451,6 +504,7 @@ window.Storage = {
         // Always update memory first
         if (!this.cache[key]) this.cache[key] = [];
         this.cache[key].unshift(newItem);
+        this.cache[key] = this.sortCollection(key, this.cache[key]);
         
         // Try persisting to LocalStorage, but don't fail if it's full
         try {
@@ -496,9 +550,9 @@ window.Storage = {
 
             // Local Update
             items[index] = finalItem;
-            this.cache[key] = items;
+            this.cache[key] = this.sortCollection(key, items);
             try {
-                localStorage.setItem(`erp_${key}`, JSON.stringify(items));
+                localStorage.setItem(`erp_${key}`, JSON.stringify(this.cache[key]));
             } catch (e) {
                 console.warn(`LocalStorage Full: Could not update ${key} locally.`);
             }
