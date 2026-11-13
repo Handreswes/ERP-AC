@@ -505,7 +505,7 @@ window.Finances = {
                     <td data-label="Tipo">${acc.accountType === 'savings' ? 'Ahorros' : 'Corriente'}</td>
                     <td data-label="Nombre">${acc.name}</td>
                     <td data-label="Saldo"><strong>$${(balances[acc.company].banks[acc.id]?.balance || 0).toLocaleString()}</strong></td>
-                    <td class="table-actions"><button class="icon-btn delete-account-btn" data-id="${acc.id}"><i class="fas fa-trash"></i></button></td>
+                    <td data-label="Acciones" class="table-actions"><button class="icon-btn delete-account-btn" data-id="${acc.id}"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
@@ -554,7 +554,7 @@ window.Finances = {
                         <td data-label="Millenio" class="text-danger">$${(c.balanceMillenio || 0).toLocaleString()}</td>
                         <td data-label="Vulcano" class="text-danger">$${(c.balanceVulcano || 0).toLocaleString()}</td>
                         <td data-label="Total"><strong>$${total.toLocaleString()}</strong></td>
-                        <td class="table-actions">
+                        <td data-label="Acciones" class="table-actions">
                             <button class="icon-btn abono-btn" data-id="${c.id}" title="Registrar Abono"><i class="fas fa-hand-holding-usd"></i></button>
                             <button class="icon-btn whatsapp-btn" data-id="${c.id}" title="Enviar por WhatsApp"><i class="fab fa-whatsapp"></i></button>
                         </td>
