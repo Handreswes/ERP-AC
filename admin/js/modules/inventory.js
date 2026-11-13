@@ -115,7 +115,7 @@ window.Inventory = {
                                 <th>Categoría</th>
                                  <th>Stock Millenio</th>
                                  <th>Stock Vulcano</th>
-                                 <th>Precio Internet/Final</th>
+                                 <th>Precio Mayorista</th>
                                  <th>Estado</th>
                                  <th>Acciones</th>
                             </tr>
@@ -657,10 +657,10 @@ window.Inventory = {
                 <td data-label="Categoría"><span>${p.category || '-'}</span></td>
                 <td data-label="Stock Millenio"><span class="stock-badge ${p.stockMillenio < 5 ? 'low-stock' : ''}">${p.stockMillenio}</span></td>
                 <td data-label="Stock Vulcano"><span class="stock-badge ${p.stockVulcano < 5 ? 'low-stock' : ''}">${p.stockVulcano}</span></td>
-                <td data-label="Precio">
+                <td data-label="Precio Mayorista">
                     <div>
-                        <strong>$${(parseFloat(p.priceInternet) || parseFloat(p.priceFinal) || 0).toLocaleString()}</strong>
-                        ${p.pricePrevious && parseFloat(p.pricePrevious) > (parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0) ? `<s style="color: var(--text-secondary); font-size: 0.72rem; display: block;">$${parseFloat(p.pricePrevious).toLocaleString()}</s>` : ''}
+                        <strong>$${(parseFloat(p.priceWholesale) || 0).toLocaleString()}</strong>
+                        ${(p.priceFinal || p.priceInternet) ? `<span style="color: var(--text-secondary); font-size: 0.72rem; display: block;" title="Precio Internet / Final">Final: $${(parseFloat(p.priceFinal) || parseFloat(p.priceInternet) || 0).toLocaleString()}</span>` : ''}
                     </div>
                 </td>
                 <td data-label="Estado">
