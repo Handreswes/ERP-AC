@@ -114,9 +114,9 @@ window.CategoriesModule = {
         this.categories.forEach(cat => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td><strong>${cat.name}</strong></td>
-                <td><code style="font-size:0.75rem; color:var(--text-secondary);">${cat.id}</code></td>
-                <td>
+                <td data-label="Categoría"><strong>${cat.name}</strong></td>
+                <td data-label="ID / Slug"><code style="font-size:0.75rem; color:var(--text-secondary);">${cat.id}</code></td>
+                <td data-label="Acciones" class="table-actions">
                     <button class="btn btn-outline btn-sm" onclick="CategoriesModule.deleteCategory('${cat.id}')" style="color:var(--danger); border-color:rgba(239,68,68,0.2);">
                         <i class="fas fa-trash"></i>
                     </button>
