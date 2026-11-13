@@ -606,14 +606,14 @@ window.Vendedores = {
 
                 return `
                                 <tr>
-                                    <td>${c.start_date} al ${c.end_date || 'Indefinida'}</td>
-                                    <td>${c.goal_value} (${c.goal_type})</td>
-                                    <td>
+                                    <td data-label="Período">${c.start_date} al ${c.end_date || 'Indefinida'}</td>
+                                    <td data-label="Meta">${c.goal_value} (${c.goal_type})</td>
+                                    <td data-label="Estado">
                                         <span class="badge ${isActive ? 'bg-success' : 'bg-secondary'}">
                                             ${isActive ? 'Activa' : (isEnded ? 'Cerrada' : 'Expirada')}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Acciones" class="table-actions">
                                         ${isActive ? `<button class="btn btn-sm btn-outline-danger" id="btn-end-campaign" data-id="${c.id}">Finalizar</button>` : ''}
                                     </td>
                                 </tr>
