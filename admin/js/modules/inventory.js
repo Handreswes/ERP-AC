@@ -448,11 +448,11 @@ window.Inventory = {
 
         list.innerHTML = entries.map(e => `
             <tr>
-                <td>${new Date(e.date).toLocaleString()}</td>
-                <td><strong>${e.productName}</strong></td>
-                <td><span class="badge ${e.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${e.company}</span></td>
-                <td class="text-right"><strong style="color: var(--success);">+${e.quantity}</strong></td>
-                <td><small>${e.source || 'Entrada Manual'} ${e.notes ? `(${e.notes})` : ''}</small></td>
+                <td data-label="Fecha">${new Date(e.date).toLocaleString()}</td>
+                <td data-label="Producto"><strong>${e.productName}</strong></td>
+                <td data-label="Empresa"><span class="badge ${e.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${e.company}</span></td>
+                <td data-label="Cantidad" class="text-right"><strong style="color: var(--success);">+${e.quantity}</strong></td>
+                <td data-label="Origen / Nota"><small>${e.source || 'Entrada Manual'} ${e.notes ? `(${e.notes})` : ''}</small></td>
             </tr>
         `).join('');
 
@@ -474,14 +474,14 @@ window.Inventory = {
 
             return `
             <tr>
-                <td>${new Date(o.date).toLocaleDateString()}<br><span class="badge ${o.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${o.company}</span></td>
-                <td><strong>${o.concept}</strong></td>
-                <td class="text-right"><strong>$${fobTotal.toLocaleString('es-CO')}</strong></td>
-                <td class="text-right" style="color:#10b981;"><strong>+$${logisticsTotal.toLocaleString('es-CO')}</strong></td>
-                <td class="text-right"><strong style="color:var(--text);">$${netTotal.toLocaleString('es-CO')}</strong></td>
-                <td><span class="badge" style="background: #f59e0b22; color: #f59e0b;">En Proceso</span></td>
-                <td>
-                    <div style="display:flex; gap:5px; justify-content:center;">
+                <td data-label="Fecha / Empresa">${new Date(o.date).toLocaleDateString()}<br><span class="badge ${o.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${o.company}</span></td>
+                <td data-label="Proveedor / Concepto"><strong>${o.concept}</strong></td>
+                <td data-label="Total FOB" class="text-right"><strong>$${fobTotal.toLocaleString('es-CO')}</strong></td>
+                <td data-label="Logística" class="text-right" style="color:#10b981;"><strong>+$${logisticsTotal.toLocaleString('es-CO')}</strong></td>
+                <td data-label="Total Neto" class="text-right"><strong style="color:var(--text);">$${netTotal.toLocaleString('es-CO')}</strong></td>
+                <td data-label="Estado"><span class="badge" style="background: #f59e0b22; color: #f59e0b;">En Proceso</span></td>
+                <td data-label="Acciones" class="table-actions">
+                    <div style="display:flex; gap:5px; justify-content:flex-end;">
                         <button class="btn btn-outline btn-sm edit-transit-btn" data-id="${o.id}">
                             <i class="fas fa-edit"></i>
                         </button>
@@ -1389,13 +1389,13 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
         const tbody = document.getElementById('transit-items-list');
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td><input type="text" class="transit-item-ref" placeholder="Ej: REF-01" value="${item ? item.ref : ''}"></td>
-            <td><input type="text" class="transit-item-name" placeholder="Ej: Producto..." required value="${item ? item.name : ''}"></td>
-            <td><input type="number" class="transit-item-qty" value="${item ? item.qty : 1}" min="1" oninput="window.Inventory.calculateTransitTotals()"></td>
-            <td><input type="text" class="transit-item-fob" placeholder="0" inputmode="numeric" value="${item ? (item.unitFob || 0).toLocaleString('es-CO') : ''}" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals()"></td>
-            <td class="transit-item-total-fob text-right" style="font-weight:bold;">$0</td>
-            <td class="transit-item-net-cost text-right" style="font-weight:bold; color:#10b981;">$0</td>
-            <td><button type="button" class="btn btn-sm btn-outline text-danger" onclick="window.Inventory.removeTransitItemRow(this)"><i class="fas fa-trash"></i></button></td>
+            <td data-label="Ref"><input type="text" class="transit-item-ref form-control" placeholder="Ej: REF-01" value="${item ? item.ref : ''}"></td>
+            <td data-label="Producto"><input type="text" class="transit-item-name form-control" placeholder="Ej: Producto..." required value="${item ? item.name : ''}"></td>
+            <td data-label="Cantidad"><input type="number" class="transit-item-qty form-control" value="${item ? item.qty : 1}" min="1" oninput="window.Inventory.calculateTransitTotals()"></td>
+            <td data-label="FOB Unitario"><input type="text" class="transit-item-fob form-control" placeholder="0" inputmode="numeric" value="${item ? (item.unitFob || 0).toLocaleString('es-CO') : ''}" oninput="window.Inventory.formatNumberInput(this); window.Inventory.calculateTransitTotals()"></td>
+            <td data-label="Total FOB" class="transit-item-total-fob text-right" style="font-weight:bold;">$0</td>
+            <td data-label="Costo Neto" class="transit-item-net-cost text-right" style="font-weight:bold; color:#10b981;">$0</td>
+            <td data-label="Acciones" class="table-actions"><button type="button" class="btn btn-sm btn-outline text-danger" onclick="window.Inventory.removeTransitItemRow(this)"><i class="fas fa-trash"></i></button></td>
         `;
         tbody.appendChild(tr);
         this.calculateTransitTotals();
@@ -1682,14 +1682,14 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
 
                     salesRowsHtml += `
                         <tr>
-                            <td><small class="text-secondary">${dateStr}</small></td>
-                            <td><strong>${clientName}</strong> ${clientPhone ? `<br><small style="color:var(--accent);">${clientPhone}</small>` : ''}</td>
-                            <td><strong style="color: var(--text-primary);">${prodName}</strong></td>
-                            <td class="text-right"><span class="badge bg-blue" style="font-size:0.8rem; font-weight:700;">${qty}</span></td>
-                            <td class="text-right">$${price.toLocaleString()}</td>
-                            <td class="text-right"><strong style="color:var(--success);">$${subtotal.toLocaleString()}</strong></td>
-                            <td><span class="badge ${company === 'VULCANO' ? 'bg-orange' : 'bg-blue'}">${company}</span></td>
-                            <td><small>${remission !== '-' ? `<b>${remission}</b>` : ''} ${notes ? `<br><i>${notes}</i>` : ''}</small></td>
+                            <td data-label="Fecha"><small class="text-secondary">${dateStr}</small></td>
+                            <td data-label="Cliente"><strong>${clientName}</strong> ${clientPhone ? `<br><small style="color:var(--accent);">${clientPhone}</small>` : ''}</td>
+                            <td data-label="Producto"><strong style="color: var(--text-primary);">${prodName}</strong></td>
+                            <td data-label="Cantidad" class="text-right"><span class="badge bg-blue" style="font-size:0.8rem; font-weight:700;">${qty}</span></td>
+                            <td data-label="Precio" class="text-right">$${price.toLocaleString()}</td>
+                            <td data-label="Subtotal" class="text-right"><strong style="color:var(--success);">$${subtotal.toLocaleString()}</strong></td>
+                            <td data-label="Empresa"><span class="badge ${company === 'VULCANO' ? 'bg-orange' : 'bg-blue'}">${company}</span></td>
+                            <td data-label="Remisión / Nota"><small>${remission !== '-' ? `<b>${remission}</b>` : ''} ${notes ? `<br><i>${notes}</i>` : ''}</small></td>
                         </tr>
                     `;
                 }
@@ -1719,12 +1719,12 @@ Solo devuelve el listado técnico de especificaciones línea por línea en ese f
 
                 entriesRowsHtml += `
                     <tr>
-                        <td><small class="text-secondary">${dateStr}</small></td>
-                        <td><strong style="color: var(--text-primary);">${prodName}</strong></td>
-                        <td class="text-right"><span class="badge bg-green" style="font-size:0.85rem; font-weight:700; color: #10b981;">+${qty}</span></td>
-                        <td><span class="badge ${company === 'VULCANO' ? 'bg-orange' : 'bg-blue'}">${company}</span></td>
-                        <td><strong>${source}</strong></td>
-                        <td><small><i>${notes}</i></small></td>
+                        <td data-label="Fecha"><small class="text-secondary">${dateStr}</small></td>
+                        <td data-label="Producto"><strong style="color: var(--text-primary);">${prodName}</strong></td>
+                        <td data-label="Cantidad" class="text-right"><span class="badge bg-green" style="font-size:0.85rem; font-weight:700; color: #10b981;">+${qty}</span></td>
+                        <td data-label="Empresa"><span class="badge ${company === 'VULCANO' ? 'bg-orange' : 'bg-blue'}">${company}</span></td>
+                        <td data-label="Origen"><strong>${source}</strong></td>
+                        <td data-label="Notas"><small><i>${notes}</i></small></td>
                     </tr>
                 `;
             }
