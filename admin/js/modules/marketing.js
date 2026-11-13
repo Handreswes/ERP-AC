@@ -422,11 +422,11 @@ window.Marketing = {
                         ${logs.length === 0 ? '<tr><td colspan="5" class="text-center">Aún no se han enviado conversiones. Al registrar despachos en TuCompras aparecerán aquí.</td></tr>' : 
                             logs.map(l => `
                                 <tr>
-                                    <td>${new Date(l.timestamp).toLocaleString()}</td>
-                                    <td><span class="badge bg-blue">${l.eventName}</span></td>
-                                    <td>${l.customerName}</td>
-                                    <td><strong>$${parseFloat(l.value || 0).toLocaleString()} COP</strong></td>
-                                    <td><span class="badge ${l.status.includes('200') ? 'bg-success' : 'bg-danger'}">${l.status}</span></td>
+                                    <td data-label="Fecha">${new Date(l.timestamp).toLocaleString()}</td>
+                                    <td data-label="Evento"><span class="badge bg-blue">${l.eventName}</span></td>
+                                    <td data-label="Cliente">${l.customerName}</td>
+                                    <td data-label="Valor"><strong>$${parseFloat(l.value || 0).toLocaleString()} COP</strong></td>
+                                    <td data-label="Respuesta"><span class="badge ${l.status.includes('200') ? 'bg-success' : 'bg-danger'}">${l.status}</span></td>
                                 </tr>
                             `).join('')
                         }
@@ -497,13 +497,13 @@ window.Marketing = {
 
             return `
                 <tr>
-                    <td><strong>${r.name}</strong></td>
-                    <td><span class="badge bg-blue" style="font-size: 0.85rem; padding: 4px 10px;">${r.salesCount} Ventas TuCompras</span></td>
-                    <td><strong style="color: #4ade80;">$${r.revenue.toLocaleString('es-CO')} COP</strong></td>
-                    <td>$${r.spend.toLocaleString('es-CO')} COP</td>
-                    <td><strong style="color: ${cac > 0 && cac <= 30000 ? '#4ade80' : '#f87171'};">$${cac.toLocaleString('es-CO')} COP</strong></td>
-                    <td><strong style="color: ${isProfitable ? '#4ade80' : '#fbbf24'}; font-size: 1rem;">${roas}x</strong></td>
-                    <td>
+                    <td data-label="Campaña Meta"><strong>${r.name}</strong></td>
+                    <td data-label="Ventas TuCompras"><span class="badge bg-blue" style="font-size: 0.85rem; padding: 4px 10px;">${r.salesCount} Ventas</span></td>
+                    <td data-label="Facturación Total"><strong style="color: #4ade80;">$${r.revenue.toLocaleString('es-CO')} COP</strong></td>
+                    <td data-label="Inversión Meta">$${r.spend.toLocaleString('es-CO')} COP</td>
+                    <td data-label="CAC Real"><strong style="color: ${cac > 0 && cac <= 30000 ? '#4ade80' : '#f87171'};">$${cac.toLocaleString('es-CO')} COP</strong></td>
+                    <td data-label="ROAS Real"><strong style="color: ${isProfitable ? '#4ade80' : '#fbbf24'}; font-size: 1rem;">${roas}x</strong></td>
+                    <td data-label="Evaluación">
                         <span class="badge ${isProfitable ? 'bg-success' : 'bg-orange'}" style="padding: 6px 10px;">
                             ${isProfitable ? '🔥 Altamente Rentable' : '⚠️ Revisar / Optimizar'}
                         </span>
@@ -573,14 +573,14 @@ window.Marketing = {
 
             return `
                 <tr>
-                    <td><strong>${c.name}</strong><br><small class="text-secondary">ID: ${c.id}</small></td>
-                    <td><small>${c.objective || 'N/A'}</small></td>
-                    <td>${statusBadge}</td>
-                    <td><strong>$${spend.toLocaleString()} COP</strong></td>
-                    <td>${impressions.toLocaleString()}</td>
-                    <td>${clicks.toLocaleString()}</td>
-                    <td>$${cpc.toFixed(2)} COP</td>
-                    <td>
+                    <td data-label="Nombre Campaña"><strong>${c.name}</strong><br><small class="text-secondary">ID: ${c.id}</small></td>
+                    <td data-label="Objetivo"><small>${c.objective || 'N/A'}</small></td>
+                    <td data-label="Estado">${statusBadge}</td>
+                    <td data-label="Inversión"><strong>$${spend.toLocaleString()} COP</strong></td>
+                    <td data-label="Impresiones">${impressions.toLocaleString()}</td>
+                    <td data-label="Clics">${clicks.toLocaleString()}</td>
+                    <td data-label="CPC Prom.">$${cpc.toFixed(2)} COP</td>
+                    <td data-label="Acciones" class="table-actions">
                         <button class="btn btn-sm btn-outline" onclick="Marketing.toggleCampaign('${c.id}', '${isPaused ? 'ACTIVE' : 'PAUSED'}')">
                             <i class="fas ${isPaused ? 'fa-play' : 'fa-pause'}"></i> ${isPaused ? 'Activar' : 'Pausar'}
                         </button>
@@ -733,11 +733,11 @@ window.Marketing = {
 
             tbody.innerHTML = data.map(n => `
                 <tr>
-                    <td>${new Date(n.createdAt).toLocaleString()}</td>
-                    <td><small>${n.customer_id || 'Global'}</small></td>
-                    <td><strong>${n.title}</strong></td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${n.message}</td>
-                    <td><span class="badge ${n.is_read ? 'bg-success' : 'bg-warning'}">${n.is_read ? 'Leída' : 'Pendiente'}</span></td>
+                    <td data-label="Fecha">${new Date(n.createdAt).toLocaleString()}</td>
+                    <td data-label="Cliente"><small>${n.customer_id || 'Global'}</small></td>
+                    <td data-label="Título"><strong>${n.title}</strong></td>
+                    <td data-label="Mensaje" style="max-width: 250px; word-break: break-word;">${n.message}</td>
+                    <td data-label="Estado"><span class="badge ${n.is_read ? 'bg-success' : 'bg-warning'}">${n.is_read ? 'Leída' : 'Pendiente'}</span></td>
                 </tr>
             `).join('');
         }
