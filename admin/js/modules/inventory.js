@@ -601,6 +601,9 @@ window.Inventory = {
             filtered = filtered.filter(p => (parseFloat(p.stockMillenio) || 0) + (parseFloat(p.stockVulcano) || 0) <= 0);
         }
 
+        // Guarantee persistent alphabetical order by product name across all edits & cloud updates
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true }));
+
         // Calculate Totals based on current filters
         let totalQty = 0;
         let totalCostValue = 0;
