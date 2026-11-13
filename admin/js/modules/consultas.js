@@ -214,12 +214,12 @@ window.Consultas = {
             const productNames = s.items ? s.items.map(i => `${i.qty}x ${i.name}`).join(', ') : (s.product_name || '—');
             return `
                 <tr>
-                    <td>${dateStr}</td>
-                    <td>${s.customer_name || '—'}</td>
-                    <td style="font-size: 0.8rem; color: var(--text-secondary);">${productNames}</td>
-                    <td>${s.carrier || '—'}</td>
-                    <td>${s.tracking_number ? `<a href="${this.getTrackingUrl(s.carrier, s.tracking_number)}" target="_blank" style="color: var(--accent);">${s.tracking_number}</a>` : '—'}</td>
-                    <td class="text-right"><strong>$${cost.toLocaleString()}</strong></td>
+                    <td data-label="Fecha">${dateStr}</td>
+                    <td data-label="Cliente">${s.customer_name || '—'}</td>
+                    <td data-label="Productos" style="font-size: 0.8rem; color: var(--text-secondary); word-break: break-word;">${productNames}</td>
+                    <td data-label="Transportadora">${s.carrier || '—'}</td>
+                    <td data-label="Guía">${s.tracking_number ? `<a href="${this.getTrackingUrl(s.carrier, s.tracking_number)}" target="_blank" style="color: var(--accent);">${s.tracking_number}</a>` : '—'}</td>
+                    <td data-label="Costo" class="text-right"><strong>$${cost.toLocaleString()}</strong></td>
                 </tr>
             `;
         }).join('');
@@ -297,12 +297,12 @@ window.Consultas = {
             const productNames = s.items ? s.items.map(i => `${i.qty}x ${i.name}`).join(', ') : (s.product_name || '—');
             return `
                 <tr>
-                    <td>${paidAt}</td>
-                    <td>${moneyAt}</td>
-                    <td><strong>${seller ? seller.name : 'Desconocido'}</strong></td>
-                    <td>${s.customer_name || '—'}</td>
-                    <td style="font-size: 0.8rem; color: var(--text-secondary);">${productNames}</td>
-                    <td class="text-right"><strong style="color: #10b981;">$${commission.toLocaleString()}</strong></td>
+                    <td data-label="Fecha Pago">${paidAt}</td>
+                    <td data-label="Fecha Cobro">${moneyAt}</td>
+                    <td data-label="Vendedor"><strong>${seller ? seller.name : 'Desconocido'}</strong></td>
+                    <td data-label="Cliente">${s.customer_name || '—'}</td>
+                    <td data-label="Productos" style="font-size: 0.8rem; color: var(--text-secondary); word-break: break-word;">${productNames}</td>
+                    <td data-label="Comisión" class="text-right"><strong style="color: #10b981;">$${commission.toLocaleString()}</strong></td>
                 </tr>
             `;
         }).join('');
@@ -407,14 +407,14 @@ window.Consultas = {
             const color = statusColor[s.status] || '#888';
             return `
                 <tr>
-                    <td>${s.date ? new Date(s.date).toLocaleDateString() : '—'}</td>
-                    <td>${s.customer_name || '—'}</td>
-                    <td style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${productNames}">${productNames}</td>
-                    <td>${s.carrier || '—'}</td>
-                    <td>${trackingUrl ? `<a href="${trackingUrl}" target="_blank" style="color:var(--accent);">${s.tracking_number}</a>` : (s.tracking_number || '—')}</td>
-                    <td><span class="badge" style="background: ${color}22; color: ${color};">${statusLabel[s.status] || s.status}</span></td>
-                    <td class="text-right"><strong>$${saleTotal.toLocaleString()}</strong></td>
-                    <td class="text-right" style="color: var(--warning);">$${commission.toLocaleString()}</td>
+                    <td data-label="Fecha">${s.date ? new Date(s.date).toLocaleDateString() : '—'}</td>
+                    <td data-label="Cliente">${s.customer_name || '—'}</td>
+                    <td data-label="Productos" style="max-width: 250px; word-break: break-word; overflow-wrap: break-word;" title="${productNames}">${productNames}</td>
+                    <td data-label="Transportadora">${s.carrier || '—'}</td>
+                    <td data-label="Guía">${trackingUrl ? `<a href="${trackingUrl}" target="_blank" style="color:var(--accent);">${s.tracking_number}</a>` : (s.tracking_number || '—')}</td>
+                    <td data-label="Estado"><span class="badge" style="background: ${color}22; color: ${color};">${statusLabel[s.status] || s.status}</span></td>
+                    <td data-label="Total Venta" class="text-right"><strong>$${saleTotal.toLocaleString()}</strong></td>
+                    <td data-label="Comisión" class="text-right" style="color: var(--warning);">$${commission.toLocaleString()}</td>
                 </tr>
             `;
         }).join('');
@@ -515,14 +515,14 @@ window.Consultas = {
 
             return `
                 <tr>
-                    <td>${s.date ? new Date(s.date).toLocaleString('es-CO', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—'}</td>
-                    <td><strong>${remNumber}</strong></td>
-                    <td>${s.clientName || 'Cliente de Mostrador'}</td>
-                    <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${productNames}">${productNames}</td>
-                    <td>${methodLabel}</td>
-                    <td>${s.sellerName || 'Caja'}</td>
-                    <td class="text-right"><strong>$${total.toLocaleString()}</strong></td>
-                    <td class="text-center" style="white-space: nowrap;">
+                    <td data-label="Fecha">${s.date ? new Date(s.date).toLocaleString('es-CO', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '—'}</td>
+                    <td data-label="Remisión"><strong>${remNumber}</strong></td>
+                    <td data-label="Cliente">${s.clientName || 'Cliente de Mostrador'}</td>
+                    <td data-label="Productos" style="max-width: 250px; word-break: break-word; overflow-wrap: break-word;" title="${productNames}">${productNames}</td>
+                    <td data-label="Método">${methodLabel}</td>
+                    <td data-label="Vendedor">${s.sellerName || 'Caja'}</td>
+                    <td data-label="Total" class="text-right"><strong>$${total.toLocaleString()}</strong></td>
+                    <td data-label="Acciones" class="table-actions text-center">
                         <button class="btn btn-sm btn-primary btn-reprint-pdf" data-sale="${safeSale}" data-rem="${remNumber}">
                             <i class="fas fa-file-pdf"></i> Ver
                         </button>
@@ -689,13 +689,13 @@ window.Consultas = {
             
             return `
                 <tr>
-                    <td>${dateStr}</td>
-                    <td><strong>${p.clientName || '—'}</strong></td>
-                    <td><span class="badge ${p.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${p.company.toUpperCase()}</span></td>
-                    <td>${methodLabel}</td>
-                    <td><span style="font-size: 0.8rem; color: var(--text-secondary);">${p.notes || '—'}</span></td>
-                    <td class="text-right" style="color: var(--success);"><strong>$${amt.toLocaleString()}</strong></td>
-                    <td class="text-center">
+                    <td data-label="Fecha">${dateStr}</td>
+                    <td data-label="Cliente"><strong>${p.clientName || '—'}</strong></td>
+                    <td data-label="Empresa"><span class="badge ${p.company === 'millenio' ? 'bg-blue' : 'bg-orange'}">${p.company.toUpperCase()}</span></td>
+                    <td data-label="Método">${methodLabel}</td>
+                    <td data-label="Notas"><span style="font-size: 0.8rem; color: var(--text-secondary); word-break: break-word;">${p.notes || '—'}</span></td>
+                    <td data-label="Monto" class="text-right" style="color: var(--success);"><strong>$${amt.toLocaleString()}</strong></td>
+                    <td data-label="Acciones" class="table-actions text-center">
                         ${Auth.isAdmin() ? `
                         <button class="btn btn-sm btn-danger btn-delete-payment" data-id="${p.id}" style="background:var(--danger); border-color:var(--danger); color:white;">
                             <i class="fas fa-trash"></i> Anular
@@ -721,10 +721,14 @@ window.Consultas = {
                 for (const item of sale.items) {
                     const p = Storage.getById(STORAGE_KEYS.PRODUCTS, item.id);
                     if (p) {
-                        if (sale.company === 'millenio') {
-                            p.stockMillenio = (p.stockMillenio || 0) + (item.quantity || 1);
+                        let targetCompany = p.company || 'millenio';
+                        if (targetCompany === 'both') {
+                            targetCompany = sale.company || 'millenio';
+                        }
+                        if (targetCompany === 'millenio') {
+                            p.stockMillenio = (parseInt(p.stockMillenio) || 0) + (parseInt(item.quantity) || 1);
                         } else {
-                            p.stockVulcano = (p.stockVulcano || 0) + (item.quantity || 1);
+                            p.stockVulcano = (parseInt(p.stockVulcano) || 0) + (parseInt(item.quantity) || 1);
                         }
                         await Storage.updateItem(STORAGE_KEYS.PRODUCTS, p.id, {
                             stockMillenio: p.stockMillenio,
@@ -734,16 +738,19 @@ window.Consultas = {
                 }
             }
 
-            // 2. Restar saldo al cliente
-            if (sale.method === 'credit' && sale.clientId) {
+            // 2. Restar saldo al cliente (Soporta ventas a crédito y ventas combinadas split)
+            const creditM = sale.paymentDetails ? parseFloat(sale.paymentDetails.creditM || 0) : (sale.method === 'credit' ? parseFloat(sale.totalM || 0) : 0);
+            const creditV = sale.paymentDetails ? parseFloat(sale.paymentDetails.creditV || 0) : (sale.method === 'credit' ? parseFloat(sale.totalV || 0) : 0);
+
+            if ((creditM > 0 || creditV > 0) && sale.clientId) {
                 const c = Storage.getById(STORAGE_KEYS.CLIENTS, sale.clientId);
                 if (c) {
                     const latest = await Storage.getLatestFields(STORAGE_KEYS.CLIENTS, c.id, ['balanceMillenio', 'balanceVulcano']);
                     const currentBalM = latest ? parseFloat(latest.balanceMillenio || 0) : (parseFloat(c.balanceMillenio) || 0);
                     const currentBalV = latest ? parseFloat(latest.balanceVulcano || 0) : (parseFloat(c.balanceVulcano) || 0);
 
-                    const newBalM = Math.max(0, currentBalM - (sale.totalM || 0));
-                    const newBalV = Math.max(0, currentBalV - (sale.totalV || 0));
+                    const newBalM = Math.max(0, currentBalM - creditM);
+                    const newBalV = Math.max(0, currentBalV - creditV);
                     await Storage.updateItem(STORAGE_KEYS.CLIENTS, c.id, {
                         balanceMillenio: newBalM,
                         balanceVulcano: newBalV
