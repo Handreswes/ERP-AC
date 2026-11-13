@@ -142,24 +142,24 @@ window.Logistics = {
 
         list.innerHTML = sales.map(s => `
             <tr>
-                <td>${new Date(s.date).toLocaleDateString()}</td>
-                <td>
+                <td data-label="Fecha">${new Date(s.date).toLocaleDateString()}</td>
+                <td data-label="Cliente">
                     <strong>${s.clientName || 'Cliente Genérico'}</strong><br>
                     <small style="color: var(--accent); font-weight: 600;"><i class="fas fa-phone"></i> ${s.phone || s.clientPhone || 'Sin teléfono'}</small>
                 </td>
-                <td>${s.city || '--'}</td>
-                <td>
+                <td data-label="Ubicación">${s.city || '--'}</td>
+                <td data-label="Dirección">
                     <span class="badge ${s.shippingType === 'oficina' ? 'bg-orange' : 'bg-blue'}" style="font-size: 0.65rem; margin-bottom: 4px;">
                         ${(s.shippingType || 'domicilio').toUpperCase()}
                     </span><br>
                     <small>${s.address || '--'}</small>
                 </td>
-                <td>${s.items.map(i => `${i.qty || i.quantity}x ${i.name}`).join('<br>')}</td>
-                <td>$${(s.total || 0).toLocaleString()}</td>
-                <td><span class="badge ${s.source === 'web' ? 'bg-blue' : 'bg-success'}">${s.source === 'web' ? 'WEB' : 'POS'}</span></td>
-                <td>${s.carrier || '<span class="text-secondary">--</span>'}</td>
-                <td>${s.tracking_number || '<span class="text-secondary">--</span>'}</td>
-                <td class="table-actions" style="display: flex; gap: 5px;">
+                <td data-label="Productos">${s.items.map(i => `${i.qty || i.quantity}x ${i.name}`).join('<br>')}</td>
+                <td data-label="Total">$${(s.total || 0).toLocaleString()}</td>
+                <td data-label="Origen"><span class="badge ${s.source === 'web' ? 'bg-blue' : 'bg-success'}">${s.source === 'web' ? 'WEB' : 'POS'}</span></td>
+                <td data-label="Transportadora">${s.carrier || '<span class="text-secondary">--</span>'}</td>
+                <td data-label="Nro. Guía">${s.tracking_number || '<span class="text-secondary">--</span>'}</td>
+                <td data-label="Acciones" class="table-actions" style="display: flex; gap: 5px;">
                     <button class="btn btn-sm btn-primary edit-logistic-btn" data-id="${s.id}">
                         <i class="fas fa-truck"></i> Despachar
                     </button>
