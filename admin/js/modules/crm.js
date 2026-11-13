@@ -256,6 +256,9 @@ window.CRM = {
             safeLower(c.businessName).includes(term)
         );
 
+        // Guarantee persistent alphabetical order by client name across all abonos & cloud syncs
+        filtered.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true }));
+
         list.innerHTML = filtered.map(c => `
             <tr>
                 <td data-label="Cliente">
