@@ -208,7 +208,7 @@ window.Vendedores = {
         const sellerId = document.getElementById('comm-seller-filter')?.value || 'all';
         const month = document.getElementById('comm-month-filter')?.value || '';
         const sales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
-        const sellers = this.getSellers();
+        const sellers = [...this.getSellers()].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true }));
 
         // Eligibility: recibida, money_confirmed=true, is_commission_paid != true
         let filtered = sales.filter(s =>
@@ -317,7 +317,7 @@ window.Vendedores = {
     showCommissionVoucher(paidSaleIds, totalAmount) {
         const sales = Storage.get(STORAGE_KEYS.TUCOMPRAS_SALES) || [];
         const paidSales = sales.filter(s => paidSaleIds.includes(s.id));
-        const sellers = this.getSellers();
+        const sellers = [...this.getSellers()].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true }));
         const seller = sellers.find(s => s.id === paidSales[0]?.seller_id)?.name || 'Vendedor';
 
         const voucherWin = window.open('', '_blank', 'width=750,height=850');
@@ -375,7 +375,7 @@ window.Vendedores = {
     },
 
     updateSellersList() {
-        const sellers = this.getSellers();
+        const sellers = [...this.getSellers()].sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true }));
         const list = document.getElementById('sellers-list');
         if (!list) return;
 
