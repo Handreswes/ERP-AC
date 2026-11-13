@@ -633,14 +633,14 @@ window.TuCompras = {
                         <tbody>
                             ${sellerStatsList.map(v => `
                                 <tr>
-                                    <td><strong>${v.name}</strong></td>
-                                    <td>${v.totalSalesCount} pedidos</td>
-                                    <td><span class="badge bg-success">${v.deliveredCount} entregados</span></td>
-                                    <td>$${v.totalRevenue.toLocaleString('es-CO')}</td>
-                                    <td><strong style="color: #f59e0b; font-size: 1rem;">$${v.pendingCommission.toLocaleString('es-CO')} COP</strong></td>
-                                    <td><span style="color: #10b981;">$${v.paidCommission.toLocaleString('es-CO')} COP</span></td>
-                                    <td><strong>$${(v.pendingCommission + v.paidCommission).toLocaleString('es-CO')} COP</strong></td>
-                                    <td>
+                                    <td data-label="Vendedor"><strong>${v.name}</strong></td>
+                                    <td data-label="Despachos Totales">${v.totalSalesCount} pedidos</td>
+                                    <td data-label="Entregas Exitosas"><span class="badge bg-success">${v.deliveredCount} entregados</span></td>
+                                    <td data-label="Facturado Real">$${v.totalRevenue.toLocaleString('es-CO')}</td>
+                                    <td data-label="Comisión Pendiente"><strong style="color: #f59e0b; font-size: 1rem;">$${v.pendingCommission.toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Comisión Pagada"><span style="color: #10b981;">$${v.paidCommission.toLocaleString('es-CO')} COP</span></td>
+                                    <td data-label="Comisión Total"><strong>$${(v.pendingCommission + v.paidCommission).toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Acciones" class="tc-table-actions">
                                         ${v.pendingCommission > 0 ? `
                                             <button class="btn btn-primary btn-sm tc-pay-seller-comm-btn" data-seller-id="${v.id}" style="border-radius: 8px;">
                                                 <i class="fas fa-hand-holding-usd"></i> Pagar Comisión
@@ -771,19 +771,19 @@ window.TuCompras = {
                         <tbody>
                             ${productStatsList.map(p => `
                                 <tr>
-                                    <td><strong>${p.name}</strong></td>
-                                    <td>${p.shippedQty} unids.</td>
-                                    <td>
+                                    <td data-label="Producto"><strong>${p.name}</strong></td>
+                                    <td data-label="Despachos">${p.shippedQty} unids.</td>
+                                    <td data-label="Entregas / Tasa">
                                         <span class="badge ${p.deliveryRate >= 70 ? 'bg-success' : 'bg-warning'}">
                                             ${p.deliveredQty}✅ / ${p.returnedQty}❌ (${p.deliveryRate}%)
                                         </span>
                                     </td>
-                                    <td>$${p.revenue.toLocaleString('es-CO')}</td>
-                                    <td>$${p.cogs.toLocaleString('es-CO')}</td>
-                                    <td><span style="color:#ef4444;">$${p.shippingLoss.toLocaleString('es-CO')}</span></td>
-                                    <td><span style="color:#f59e0b;">$${p.commissions.toLocaleString('es-CO')}</span></td>
-                                    <td><strong style="color: ${p.netMargin >= 0 ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">$${p.netMargin.toLocaleString('es-CO')} COP</strong></td>
-                                    <td><span class="badge ${p.marginRate >= 20 ? 'bg-success' : (p.marginRate > 0 ? 'bg-warning' : 'bg-danger')}">${p.marginRate}%</span></td>
+                                    <td data-label="Facturación">$${p.revenue.toLocaleString('es-CO')}</td>
+                                    <td data-label="Costo Mercancía">$${p.cogs.toLocaleString('es-CO')}</td>
+                                    <td data-label="Flete Pérdida"><span style="color:#ef4444;">$${p.shippingLoss.toLocaleString('es-CO')}</span></td>
+                                    <td data-label="Comisiones"><span style="color:#f59e0b;">$${p.commissions.toLocaleString('es-CO')}</span></td>
+                                    <td data-label="Margen Neto"><strong style="color: ${p.netMargin >= 0 ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">$${p.netMargin.toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Margen %"><span class="badge ${p.marginRate >= 20 ? 'bg-success' : (p.marginRate > 0 ? 'bg-warning' : 'bg-danger')}">${p.marginRate}%</span></td>
                                 </tr>
                             `).join('')}
                             ${productStatsList.length === 0 ? '<tr><td colspan="9" class="text-center text-secondary">No hay productos con movimientos en el período seleccionado.</td></tr>' : ''}
@@ -928,23 +928,23 @@ window.TuCompras = {
 
                                     return `
                                         <tr>
-                                            <td>${new Date(s.date).toLocaleDateString()}</td>
-                                            <td>
+                                            <td data-label="Fecha">${new Date(s.date).toLocaleDateString()}</td>
+                                            <td data-label="Plataforma">
                                                 <span class="badge" style="background: ${isSiste ? 'rgba(168,85,247,0.15)' : 'rgba(236,72,153,0.15)'}; color: ${isSiste ? '#c084fc' : '#f472b6'}; font-weight: 700;">
                                                     ${isSiste ? '💳 Sistecrédito' : '⚡ ADDI'}
                                                 </span>
                                             </td>
-                                            <td><strong>${s.credit_approval_number || 'N/A'}</strong> (${s.credit_installments || 3} cuotas)</td>
-                                            <td><strong>${s.customer_name || 'Cliente'}</strong><br><small class="text-secondary">${s.customer_phone || ''}</small></td>
-                                            <td>$${totalSale.toLocaleString('es-CO')}</td>
-                                            <td><span style="color: #ef4444;">-$${comm.toLocaleString('es-CO')}</span></td>
-                                            <td><strong style="color: #38bdf8;">$${netAmount.toLocaleString('es-CO')}</strong></td>
-                                            <td>
+                                            <td data-label="# Aprobación"><strong>${s.credit_approval_number || 'N/A'}</strong> (${s.credit_installments || 3} cuotas)</td>
+                                            <td data-label="Cliente"><strong>${s.customer_name || 'Cliente'}</strong><br><small class="text-secondary">${s.customer_phone || ''}</small></td>
+                                            <td data-label="Venta Bruta">$${totalSale.toLocaleString('es-CO')}</td>
+                                            <td data-label="Comisión Platform"><span style="color: #ef4444;">-$${comm.toLocaleString('es-CO')}</span></td>
+                                            <td data-label="Neto a Recibir"><strong style="color: #38bdf8;">$${netAmount.toLocaleString('es-CO')}</strong></td>
+                                            <td data-label="Estado Desembolso">
                                                 <span class="badge ${s.money_confirmed ? 'bg-success' : 'bg-warning'}">
                                                     ${s.money_confirmed ? '✅ DESEMBOLSADO' : '🟡 PENDIENTE BANCO'}
                                                 </span>
                                             </td>
-                                            <td>
+                                            <td data-label="Acciones" class="tc-table-actions">
                                                 <div style="display: flex; gap: 6px; flex-wrap: wrap;">
                                                     ${!s.money_confirmed ? `
                                                         <button class="btn btn-sm btn-success tc-confirm-disbursement-btn" data-id="${s.id}" style="border-radius: 8px;">
@@ -1143,16 +1143,16 @@ window.TuCompras = {
 
                                 return `
                                     <tr>
-                                        <td>${new Date(s.date).toLocaleDateString()}</td>
-                                        <td><strong>${s.carrier || '-'}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.tracking_number || '-'}</span></td>
-                                        <td><strong>${s.customer_name || 'N/A'}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.customer_phone || ''}</span></td>
-                                        <td>$${totalSale.toLocaleString('es-CO')}</td>
-                                        <td>$${shippingCost.toLocaleString('es-CO')}</td>
-                                        <td><strong style="color: var(--accent-vibrant);">$${netExp.toLocaleString('es-CO')}</strong></td>
-                                        <td><strong style="color: #10b981;">${s.money_confirmed ? '$' + netRec.toLocaleString('es-CO') : '-'}</strong></td>
-                                        <td><strong style="color: ${diff < 0 ? '#ef4444' : '#10b981'};">${s.money_confirmed ? (diff >= 0 ? '+' : '') + '$' + diff.toLocaleString('es-CO') : '-'}</strong></td>
-                                        <td>${statusBadge}</td>
-                                        <td>
+                                        <td data-label="Fecha">${new Date(s.date).toLocaleDateString()}</td>
+                                        <td data-label="Guía / Transp."><strong>${s.carrier || '-'}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.tracking_number || '-'}</span></td>
+                                        <td data-label="Cliente"><strong>${s.customer_name || 'N/A'}</strong><br><span style="font-size:0.75rem; color:var(--text-secondary);">${s.customer_phone || ''}</span></td>
+                                        <td data-label="Valor Venta">$${totalSale.toLocaleString('es-CO')}</td>
+                                        <td data-label="Flete Est.">$${shippingCost.toLocaleString('es-CO')}</td>
+                                        <td data-label="Neto Esperado"><strong style="color: var(--accent-vibrant);">$${netExp.toLocaleString('es-CO')}</strong></td>
+                                        <td data-label="Neto Recibido"><strong style="color: #10b981;">${s.money_confirmed ? '$' + netRec.toLocaleString('es-CO') : '-'}</strong></td>
+                                        <td data-label="Diferencia"><strong style="color: ${diff < 0 ? '#ef4444' : '#10b981'};">${s.money_confirmed ? (diff >= 0 ? '+' : '') + '$' + diff.toLocaleString('es-CO') : '-'}</strong></td>
+                                        <td data-label="Estado Conciliación">${statusBadge}</td>
+                                        <td data-label="Acción" class="tc-table-actions">
                                             <button class="btn btn-sm btn-outline" onclick="TuCompras.openStatusModal('${s.id}')">
                                                 <i class="fas ${s.money_confirmed ? 'fa-edit' : 'fa-check'}"></i> ${s.money_confirmed ? 'Editar' : 'Conciliar'}
                                             </button>
@@ -1363,19 +1363,19 @@ window.TuCompras = {
                         <tbody>
                             ${productStatsList.map(p => `
                                 <tr>
-                                    <td><strong>${p.name}</strong></td>
-                                    <td>${p.shippedQty} unids.</td>
-                                    <td>
+                                    <td data-label="Producto"><strong>${p.name}</strong></td>
+                                    <td data-label="Despachos">${p.shippedQty} unids.</td>
+                                    <td data-label="Entregas / Tasa">
                                         <span class="badge ${p.deliveryRate >= 70 ? 'bg-success' : 'bg-warning'}">
                                             ${p.deliveredQty}✅ / ${p.returnedQty}❌ (${p.deliveryRate}%)
                                         </span>
                                     </td>
-                                    <td>$${p.revenue.toLocaleString('es-CO')}</td>
-                                    <td>$${p.cogs.toLocaleString('es-CO')}</td>
-                                    <td><span style="color:#ef4444;">$${p.shippingLoss.toLocaleString('es-CO')}</span></td>
-                                    <td><span style="color:#f59e0b;">$${p.commissions.toLocaleString('es-CO')}</span></td>
-                                    <td><strong style="color: ${p.netMargin >= 0 ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">$${p.netMargin.toLocaleString('es-CO')} COP</strong></td>
-                                    <td><span class="badge ${p.marginRate >= 20 ? 'bg-success' : (p.marginRate > 0 ? 'bg-warning' : 'bg-danger')}">${p.marginRate}%</span></td>
+                                    <td data-label="Facturación">$${p.revenue.toLocaleString('es-CO')}</td>
+                                    <td data-label="Costo Mercancía">$${p.cogs.toLocaleString('es-CO')}</td>
+                                    <td data-label="Flete Pérdida"><span style="color:#ef4444;">$${p.shippingLoss.toLocaleString('es-CO')}</span></td>
+                                    <td data-label="Comisiones"><span style="color:#f59e0b;">$${p.commissions.toLocaleString('es-CO')}</span></td>
+                                    <td data-label="Margen Neto"><strong style="color: ${p.netMargin >= 0 ? '#10b981' : '#ef4444'}; font-size: 0.9rem;">$${p.netMargin.toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Margen %"><span class="badge ${p.marginRate >= 20 ? 'bg-success' : (p.marginRate > 0 ? 'bg-warning' : 'bg-danger')}">${p.marginRate}%</span></td>
                                 </tr>
                             `).join('')}
                             ${productStatsList.length === 0 ? '<tr><td colspan="9" class="text-center text-secondary">No hay datos suficientes de ventas para productos</td></tr>' : ''}
@@ -1404,13 +1404,13 @@ window.TuCompras = {
                         <tbody>
                             ${sellerStatsList.map(sel => `
                                 <tr>
-                                    <td><strong>${sel.name}</strong></td>
-                                    <td>${sel.totalSalesCount} pedidos</td>
-                                    <td><span class="badge bg-success">${sel.deliveredCount} entregas</span></td>
-                                    <td><strong style="color: var(--accent-vibrant);">$${sel.totalRevenue.toLocaleString('es-CO')} COP</strong></td>
-                                    <td><strong style="color: #f59e0b;">$${sel.pendingCommission.toLocaleString('es-CO')} COP</strong></td>
-                                    <td><strong style="color: #10b981;">$${sel.paidCommission.toLocaleString('es-CO')} COP</strong></td>
-                                    <td>$${(sel.pendingCommission + sel.paidCommission).toLocaleString('es-CO')} COP</td>
+                                    <td data-label="Vendedor"><strong>${sel.name}</strong></td>
+                                    <td data-label="Despachos">${sel.totalSalesCount} pedidos</td>
+                                    <td data-label="Entregas"><span class="badge bg-success">${sel.deliveredCount} entregas</span></td>
+                                    <td data-label="Facturación"><strong style="color: var(--accent-vibrant);">$${sel.totalRevenue.toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Comisión Pendiente"><strong style="color: #f59e0b;">$${sel.pendingCommission.toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Comisión Pagada"><strong style="color: #10b981;">$${sel.paidCommission.toLocaleString('es-CO')} COP</strong></td>
+                                    <td data-label="Comisión Total">$${(sel.pendingCommission + sel.paidCommission).toLocaleString('es-CO')} COP</td>
                                 </tr>
                             `).join('')}
                             ${sellerStatsList.length === 0 ? '<tr><td colspan="7" class="text-center text-secondary">No hay vendedores registrados</td></tr>' : ''}
@@ -3301,12 +3301,12 @@ window.TuCompras = {
                                 const acc = accounts.find(a => a.id === w.originAccount)?.name || w.originAccount || 'Billetera TuCompras';
                                 return `
                                     <tr>
-                                        <td>${new Date(w.date || w.createdAt).toLocaleDateString()}</td>
-                                        <td><span class="badge" style="background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3);">${w.notes ? w.notes.split('|')[0] : 'Socio'}</span></td>
-                                        <td><strong style="color: #a855f7;">$${parseFloat(w.amount).toLocaleString('es-CO')} COP</strong></td>
-                                        <td>${acc}</td>
-                                        <td>${w.concept || '-'}</td>
-                                        <td>
+                                        <td data-label="Fecha">${new Date(w.date || w.createdAt).toLocaleDateString()}</td>
+                                        <td data-label="Beneficiario / Socio"><span class="badge" style="background: rgba(168,85,247,0.15); color: #a855f7; border: 1px solid rgba(168,85,247,0.3);">${w.notes ? w.notes.split('|')[0] : 'Socio'}</span></td>
+                                        <td data-label="Monto Retirado"><strong style="color: #a855f7;">$${parseFloat(w.amount).toLocaleString('es-CO')} COP</strong></td>
+                                        <td data-label="Cuenta de Salida">${acc}</td>
+                                        <td data-label="Motivo / Detalle">${w.concept || '-'}</td>
+                                        <td data-label="Acciones" class="tc-table-actions">
                                             <button class="icon-btn" onclick="TuCompras.deleteWithdrawal('${w.id}')" style="color: #ef4444;" title="Eliminar Retiro"><i class="fas fa-trash"></i></button>
                                         </td>
                                     </tr>
