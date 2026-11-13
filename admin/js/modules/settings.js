@@ -163,10 +163,10 @@ window.Settings = {
         const users = await Auth.getUsers();
         tbody.innerHTML = users.map(u => `
             <tr>
-                <td><strong>${u.username}</strong></td>
-                <td>${u.full_name}</td>
-                <td><span class="badge ${u.role === 'principal' ? 'bg-success' : 'bg-blue'}">${u.role.toUpperCase()}</span></td>
-                <td>
+                <td data-label="Usuario"><strong>${u.username}</strong></td>
+                <td data-label="Nombre">${u.full_name}</td>
+                <td data-label="Rol"><span class="badge ${u.role === 'principal' ? 'bg-success' : 'bg-blue'}">${u.role.toUpperCase()}</span></td>
+                <td data-label="Acciones" class="table-actions">
                     ${u.username !== Auth.currentUser.username ? `
                         <button class="btn btn-sm btn-outline delete-user-btn" data-id="${u.id}" style="color:var(--danger); border-color:var(--danger);">
                             <i class="fas fa-trash"></i>
