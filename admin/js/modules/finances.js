@@ -524,7 +524,7 @@ window.Finances = {
 
         if (selectedClientId === 'all') {
             // Existing logic: show only those with debt
-            clientsToDisplay = allClients.filter(c => ((c.balanceMillenio || 0) > 0 || (c.balanceVulcano || 0) > 0));
+            clientsToDisplay = allClients.filter(c => ((c.balanceMillenio || 0) > 0 || (c.balanceVulcano || 0) > 0)).sort((a, b) => (a.name || '').localeCompare(b.name || '', 'es', { sensitivity: 'base', numeric: true }));
         } else {
             const client = allClients.find(c => c.id === selectedClientId);
             if (client) {
