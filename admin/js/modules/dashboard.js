@@ -613,10 +613,10 @@ window.Dashboard = {
                 <tbody>
                     ${sales.map(s => `
                         <tr>
-                            <td style="font-size:0.8rem;">${new Date(s.date).toLocaleDateString()}</td>
-                            <td>${s.clientName}</td>
-                            <td><span class="badge ${s.method === 'cash' ? 'bg-green' : (s.method === 'credit' ? 'bg-red' : 'bg-blue')}">${s.method}</span></td>
-                            <td class="text-right"><strong>$${(s.total || 0).toLocaleString()}</strong></td>
+                            <td data-label="Fecha" style="font-size:0.8rem;">${new Date(s.date).toLocaleDateString()}</td>
+                            <td data-label="Cliente">${s.clientName}</td>
+                            <td data-label="Método"><span class="badge ${s.method === 'cash' ? 'bg-green' : (s.method === 'credit' ? 'bg-red' : 'bg-blue')}">${s.method}</span></td>
+                            <td data-label="Total" class="text-right"><strong>$${(s.total || 0).toLocaleString()}</strong></td>
                         </tr>
                     `).join('')}
                     ${sales.length === 0 ? '<tr><td colspan="4" class="text-center">No hay ventas registradas</td></tr>' : ''}
@@ -662,10 +662,10 @@ window.Dashboard = {
             const vStock = p.stockVulcano || 0;
             return `
                             <tr>
-                                <td>${p.name}</td>
-                                <td class="text-center ${mStock < 5 ? 'text-danger fw-bold' : ''}">${mStock}</td>
-                                <td class="text-center ${vStock < 5 ? 'text-danger fw-bold' : ''}">${vStock}</td>
-                                <td class="text-center">${mStock + vStock}</td>
+                                <td data-label="Producto">${p.name}</td>
+                                <td data-label="Millenio" class="text-center ${mStock < 5 ? 'text-danger fw-bold' : ''}">${mStock}</td>
+                                <td data-label="Vulcano" class="text-center ${vStock < 5 ? 'text-danger fw-bold' : ''}">${vStock}</td>
+                                <td data-label="Total" class="text-center">${mStock + vStock}</td>
                             </tr>
                         `;
         }).join('')}
@@ -713,10 +713,10 @@ window.Dashboard = {
                 <tbody>
                     ${clients.map(c => `
                         <tr>
-                            <td>${c.name}</td>
-                            <td class="text-right">$${(c.balanceMillenio || 0).toLocaleString()}</td>
-                            <td class="text-right">$${(c.balanceVulcano || 0).toLocaleString()}</td>
-                            <td class="text-right"><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
+                            <td data-label="Cliente">${c.name}</td>
+                            <td data-label="Millenio" class="text-right">$${(c.balanceMillenio || 0).toLocaleString()}</td>
+                            <td data-label="Vulcano" class="text-right">$${(c.balanceVulcano || 0).toLocaleString()}</td>
+                            <td data-label="Total" class="text-right"><strong>$${((c.balanceMillenio || 0) + (c.balanceVulcano || 0)).toLocaleString()}</strong></td>
                         </tr>
                     `).join('')}
                     ${clients.length === 0 ? '<tr><td colspan="4" class="text-center">No hay créditos pendientes</td></tr>' : ''}
