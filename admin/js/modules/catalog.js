@@ -269,13 +269,13 @@ window.Catalog = {
                 const displayDesc = this.getDisplayDescription(p);
                 return `
                     <tr>
-                        <td><img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/50'}" style="width: 50px; height:50px; object-fit: cover; border-radius: 8px;"></td>
-                        <td>
+                        <td data-label="Foto"><img src="${(Array.isArray(p.image) ? p.image[0] : p.image) || 'https://via.placeholder.com/50'}" style="width: 50px; height:50px; object-fit: cover; border-radius: 8px;"></td>
+                        <td data-label="Producto">
                             <strong>${p.name}</strong>
                             ${displayDesc ? `<div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; text-align: left;">${this.formatCatalogDescription(displayDesc)}</div>` : ''}
                         </td>
-                        <td>${p.category}</td>
-                        <td class="text-success" style="font-weight: 700;">$${parseFloat(price || 0).toLocaleString()}</td>
+                        <td data-label="Categoría">${p.category}</td>
+                        <td data-label="Precio" class="text-success" style="font-weight: 700;">$${parseFloat(price || 0).toLocaleString()}</td>
                     </tr>
                 `;
             }).join('');
